@@ -41,7 +41,7 @@ If not, you should be able to install these dependencies with your package manag
 Start by cloning this repository with its submodules.
 
 ```sh
-$ git --recurse-submodules clone https://gitlab.com/rmonthil/c0pep0d.git
+$ git --recurse-submodules clone https://github.com/C0PEP0D/sheld0n.git
 ```
 
 And that's it!
