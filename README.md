@@ -31,7 +31,7 @@ This software has been produced during my PhD thesis and as part as the European
 The dependencies are standard softwares that may already be installed on your system.
 If not, you should be able to install these dependencies with your package manager.
 
-* [**Python**`](https://www.python.org/) must be installed
+* [**Python**](https://www.python.org/) must be installed
 * [**CMake** `v?`](https://cmake.org/download/) or higher must be installed
 * a c++17 compliant compiler, such as [**gcc** `v9`](https://cmake.org/download/) or higher must be installed
 * the [**Threading Building Block Library** `v2018`](https://github.com/ibaned/tbb) or higher must be installed ([this version](https://github.com/wjakob/tbb) that enables is installing it using CMake is advised)
