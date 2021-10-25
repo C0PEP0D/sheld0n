@@ -1,0 +1,12 @@
+#ifndef C0P_PARAM_OBJECTS_OBJECT_PAIR_A_AGENT_BEHAVIOUR_SWIM_IN_DIRECTION_SWIMMING_DIRECTION_BEHAVIOUR_DIRECTION_CHOICE_H
+#define C0P_PARAM_OBJECTS_OBJECT_PAIR_A_AGENT_BEHAVIOUR_SWIM_IN_DIRECTION_SWIMMING_DIRECTION_BEHAVIOUR_DIRECTION_CHOICE_H
+#pragma once
+
+// choose your behaviour
+#include "param/env/objects/object/pair/_a/agent/_behaviour/swim_in_direction/swimming_direction/_behaviour_direction/surf/choice.h"
+namespace c0p {
+    template<typename ObjectPairAAgentActiveStep>
+    using ObjectPairAAgentBehaviourSwimInDirectionSwimmingDirectionBehaviourDirection = ObjectPairAAgentBehaviourSwimInDirectionSwimmingDirectionBehaviourDirectionSurf<ObjectPairAAgentActiveStep>;
+}
+
+#endif

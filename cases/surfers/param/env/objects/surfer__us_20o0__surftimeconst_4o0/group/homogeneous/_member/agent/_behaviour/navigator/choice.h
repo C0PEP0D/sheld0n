@@ -1,0 +1,20 @@
+#ifndef C0P_PARAM_OBJECTS_SURFER__US_20O0__SURFTIMECONST_4O0_GROUP_HOMOGENEOUS_MEMBER_AGENT_BEHAVIOUR_NAVIGATOR_CHOICE_H
+#define C0P_PARAM_OBJECTS_SURFER__US_20O0__SURFTIMECONST_4O0_GROUP_HOMOGENEOUS_MEMBER_AGENT_BEHAVIOUR_NAVIGATOR_CHOICE_H
+#pragma once
+
+// THIS FILE SHOULD NOT BE EDITED DIRECTLY BY THE USERS.
+// THIS FILE WILL BE AUTOMATICALLY EDITED WHEN THE
+// CHOOSE COMMAND IS USED
+
+// behaviour direction choice
+#include "param/env/objects/surfer__us_20o0__surftimeconst_4o0/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/choice.h"
+#include "param/env/objects/surfer__us_20o0__surftimeconst_4o0/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_velocity/choice.h"
+// choose your behaviour
+#include "core/env/objects/object/agent/behaviour/navigator/swimmer/core.h"
+#include "param/env/objects/surfer__us_20o0__surftimeconst_4o0/group/homogeneous/_member/agent/_behaviour/navigator/swimmer/parameters.h"
+namespace c0p {
+    template<typename SurferUs20O0Surftimeconst4O0GroupHomogeneousMemberAgentActiveStep>
+    using SurferUs20O0Surftimeconst4O0GroupHomogeneousMemberAgentBehaviourNavigator = AgentBehaviourNavigatorSwimmer<SurferUs20O0Surftimeconst4O0GroupHomogeneousMemberAgentBehaviourNavigatorSwimmerParameters, SurferUs20O0Surftimeconst4O0GroupHomogeneousMemberAgentActiveStep, SurferUs20O0Surftimeconst4O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourDirection<SurferUs20O0Surftimeconst4O0GroupHomogeneousMemberAgentActiveStep>, SurferUs20O0Surftimeconst4O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourVelocity<SurferUs20O0Surftimeconst4O0GroupHomogeneousMemberAgentActiveStep>>;
+}
+
+#endif

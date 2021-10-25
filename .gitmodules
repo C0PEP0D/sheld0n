@@ -1,0 +1,33 @@
+[submodule "thirdparty/eigen"]
+	path = thirdparty/eigen
+	url = https://gitlab.com/libeigen/eigen.git
+[submodule "modules/v0l"]
+	path = modules/v0l
+	url = https://github.com/C0PEP0D/v0l.git
+[submodule "modules/sl0"]
+	path = modules/sl0
+	url = https://github.com/C0PEP0D/sl0.git
+[submodule "modules/sa0"]
+	path = modules/sa0
+	url = https://github.com/C0PEP0D/sa0.git
+[submodule "modules/s0ve"]
+	path = modules/s0ve
+	url = https://github.com/C0PEP0D/s0ve.git
+[submodule "modules/s0s"]
+	path = modules/s0s
+	url = https://github.com/C0PEP0D/s0s.git
+[submodule "modules/p0l"]
+	path = modules/p0l
+	url = https://github.com/C0PEP0D/p0l.git
+[submodule "modules/m0sh"]
+	path = modules/m0sh
+	url = https://github.com/C0PEP0D/m0sh.git
+[submodule "modules/l0ad"]
+	path = modules/l0ad
+	url = https://github.com/C0PEP0D/l0ad.git
+[submodule "modules/fl0w"]
+	path = modules/fl0w
+	url = https://github.com/C0PEP0D/fl0w.git
+[submodule "modules/fl0p"]
+	path = modules/fl0p
+	url = https://github.com/C0PEP0D/fl0p.git

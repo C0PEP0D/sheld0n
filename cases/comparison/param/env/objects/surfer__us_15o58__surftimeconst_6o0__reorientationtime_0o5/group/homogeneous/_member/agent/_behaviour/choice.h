@@ -1,0 +1,16 @@
+#ifndef C0P_PARAM_OBJECTS_SURFER__US_15O58__SURFTIMECONST_6O0__REORIENTATIONTIME_0O5_GROUP_HOMOGENEOUS_MEMBER_AGENT_BEHAVIOUR_CHOICE_H
+#define C0P_PARAM_OBJECTS_SURFER__US_15O58__SURFTIMECONST_6O0__REORIENTATIONTIME_0O5_GROUP_HOMOGENEOUS_MEMBER_AGENT_BEHAVIOUR_CHOICE_H
+#pragma once
+
+// THIS FILE SHOULD NOT BE EDITED DIRECTLY BY THE USERS.
+// THIS FILE WILL BE AUTOMATICALLY EDITED WHEN THE
+// CHOOSE COMMAND IS USED
+
+#include "param/env/objects/surfer__us_15o58__surftimeconst_6o0__reorientationtime_0o5/group/homogeneous/_member/agent/_active/choice.h"
+// choose your behaviour
+#include "param/env/objects/surfer__us_15o58__surftimeconst_6o0__reorientationtime_0o5/group/homogeneous/_member/agent/_behaviour/navigator/choice.h"
+namespace c0p {
+    using SurferUs15O58Surftimeconst6O0Reorientationtime0O5GroupHomogeneousMemberAgentBehaviour = SurferUs15O58Surftimeconst6O0Reorientationtime0O5GroupHomogeneousMemberAgentBehaviourNavigator<SurferUs15O58Surftimeconst6O0Reorientationtime0O5GroupHomogeneousMemberAgentActiveStep>;
+}
+
+#endif

@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+
+# Core
+import os
+# Command line program
+import argparse
+# Directory operations
+import shutil
+import glob
+# File edit
+import fileinput
+
+
+def parse():
+    parser = argparse.ArgumentParser(description='create a new simulation case based on the default one')
+    parser.add_argument('name', nargs='?', default='case', help='specify the name of the new simulation case')
+    return parser.parse_args()
+
+def main():
+    args = parse()
+    # init utils
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    code_dir = script_dir + "/.."
+    # copy directory
+    shutil.copytree(code_dir + "/app/default", args.name, ignore=shutil.ignore_patterns('__*'))
+    # change C0P_DIR
+    #for line in fileinput.FileInput(args.name + "/CMakeLists.txt", inplace=True):
+    #    if line == '    set(C0P_PROJECT_DIR ../..)\n':
+    #        print('    set(C0P_PROJECT_DIR ' + code_dir + ')\n', end='')
+    #    else:
+    #        print(line, end='')
+    # copy symlinks
+    ## post process
+    if not os.path.exists(args.name + '/post_process'):
+        os.makedirs(args.name + '/post_process')
+    ### csv scripts
+    #for script in glob.glob(code_dir + "/modules/py0csv/csv_*.py"):
+    #    os.symlink(script, args.name + "/post_process/" + os.path.basename(script).split(".")[0])
+    ### post scripts
+    for script in glob.glob(code_dir + "/modules/pyp0st/post_*.py"):
+        dest = args.name + "/post_process/"
+        os.symlink(os.path.relpath(script, dest), dest + os.path.basename(script).split(".")[0])
+    ### post scripts defaults
+    #shutil.copy(code_dir + "/modules/pyp0st/post_default.py", args.name + "/post_process/post_default.py")
+    ## interface
+    os.symlink(os.path.relpath(code_dir + "/app/interface/run.py", args.name), args.name + "/run")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post.py", args.name), args.name + "/post")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/clean.py", args.name), args.name + "/clean")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/print_param.py", args.name), args.name + "/print_param")
+    ### env
+    #### flow
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/flow/choose.py", args.name + "/param/env/flow"), args.name + "/param/env/flow/choose")
+    #### objects
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/copy_object.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/copy_object")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/remove_object.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/remove_object")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/create_batch.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/create_batch")
+    #### object
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/choose.py", args.name + "/param/env/objects/object"), args.name + "/param/env/objects/object/choose")
+    ##### group of agents
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/group/homogeneous/_member/choose.py", args.name + "/param/env/objects/object/group/homogeneous/_member"), args.name + "/param/env/objects/object/group/homogeneous/_member/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/group/homogeneous/_member/agent/_active/choose.py", args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_active"), args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_active/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/group/homogeneous/_member/agent/_active/_passive/choose.py", args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_active/_passive"), args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_active/_passive/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/group/homogeneous/_member/agent/_behaviour/choose.py", args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour"), args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/choose.py", args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator"), args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/choose.py", args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction"), args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/surf/choose.py", args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/surf"), args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/surf/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/surf/_behaviour_time_horizon/choose.py", args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/surf/_behaviour_time_horizon"), args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/surf/_behaviour_time_horizon/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_velocity/choose.py", args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_velocity"), args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_velocity/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients/choose.py", args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients"), args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients/choose")
+    ### init
+    #### objects
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/copy_init.py", args.name + "/param/init/objects/object"), args.name + "/param/init/objects/object/copy_init")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/remove_init.py", args.name + "/param/init/objects/object"), args.name + "/param/init/objects/object/remove_init")
+    ##### object
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/choose.py", args.name + "/param/init/objects/object/pos"), args.name + "/param/init/objects/object/pos/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/choose.py", args.name + "/param/init/objects/object/pos/group"), args.name + "/param/init/objects/object/pos/group/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/choose.py", args.name + "/param/init/objects/object/pos/group/_member"), args.name + "/param/init/objects/object/pos/group/_member/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/passive/choose.py", args.name + "/param/init/objects/object/pos/group/_member/passive"), args.name + "/param/init/objects/object/pos/group/_member/passive/choose")
+    ### post
+    #### objects
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/copy_post.py", args.name + "/param/post/objects/object"), args.name + "/param/post/objects/object/copy_post")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/remove_post.py", args.name + "/param/post/objects/object"), args.name + "/param/post/objects/object/remove_post")
+    ##### object
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/px/choose.py", args.name + "/param/post/objects/object/px"), args.name + "/param/post/objects/object/px/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/px/group/choose.py", args.name + "/param/post/objects/object/px/group"), args.name + "/param/post/objects/object/px/group/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/px/group/_member/choose.py", args.name + "/param/post/objects/object/px/group/_member"), args.name + "/param/post/objects/object/px/group/_member/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/px/group/_member/passive/choose.py", args.name + "/param/post/objects/object/px/group/_member/passive"), args.name + "/param/post/objects/object/px/group/_member/passive/choose")
+    #### mesh
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/mesh/copy_post.py", args.name + "/param/post/mesh"),  args.name + "/param/post/mesh/copy_post")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/mesh/remove_post.py", args.name + "/param/post/mesh"), args.name + "/param/post/mesh/remove_post")
+    #### flow
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/flow/copy_post.py", args.name + "/param/post/flow"),  args.name + "/param/post/flow/copy_post")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/flow/remove_post.py", args.name + "/param/post/flow"), args.name + "/param/post/flow/remove_post")
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,17 @@
+#ifndef C0P_PARAM_OBJECTS_OBJECT_PAIR_A_AGENT_BEHAVIOUR_SWIM_IN_DIRECTION_SWIMMING_DIRECTION_BEHAVIOUR_DIRECTION_SURF_CHOICE_H
+#define C0P_PARAM_OBJECTS_OBJECT_PAIR_A_AGENT_BEHAVIOUR_SWIM_IN_DIRECTION_SWIMMING_DIRECTION_BEHAVIOUR_DIRECTION_SURF_CHOICE_H
+#pragma once
+
+// sensor choice
+#include "param/env/objects/object/pair/_a/agent/_behaviour/_sensor/matrix/choice.h"
+// behaviour time horizon choice
+#include "param/env/objects/object/pair/_a/agent/_behaviour/swim_in_direction/swimming_direction/_behaviour_direction/surf/_behaviour_time_horizon/choice.h"
+// choose your behaviour
+#include "core/env/objects/object/agent/behaviour/swim_in_direction/swimming_direction/behaviour_direction/surf/exp/core.h"
+#include "param/env/objects/object/pair/_a/agent/_behaviour/swim_in_direction/swimming_direction/_behaviour_direction/surf/exp/parameters.h"
+namespace c0p {
+    template<typename ObjectPairAAgentActiveStep>
+    using ObjectPairAAgentBehaviourSwimInDirectionSwimmingDirectionBehaviourDirectionSurf = AgentBehaviourSwimInDirectionSwimmingDirectionBehaviourDirectionSurfExp<ObjectPairAAgentBehaviourSwimInDirectionSwimmingDirectionBehaviourDirectionSurfExpParameters, ObjectPairAAgentActiveStep, ObjectPairAAgentBehaviourSensorMatrix<ObjectPairAAgentActiveStep>, ObjectPairAAgentBehaviourSwimInDirectionSwimmingDirectionBehaviourDirectionSurfBehaviourTimeHorizon<ObjectPairAAgentActiveStep>>;
+}
+
+#endif
