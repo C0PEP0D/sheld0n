@@ -14,7 +14,6 @@
 #include "param/env/flow/choice.h"
 // FLAG: INCLUDE OBJECT BEGIN
 #include "param/env/objects/surfer__us_1o0__surftimeprefactor_1o0/choice.h"
-#include "param/env/objects/surfer__us_1o0__surftimeprefactor_0o0/choice.h"
 #include "param/env/objects/surfer__us_1o0__surftimeprefactor_0o25/choice.h"
 #include "param/env/objects/surfer__us_1o0__surftimeprefactor_0o5/choice.h"
 #include "param/env/objects/surfer__us_1o0__surftimeprefactor_0o75/choice.h"
@@ -30,8 +29,6 @@
 #include "param/env/objects/surfer__us_1o0__surftimeprefactor_3o5/choice.h"
 #include "param/env/objects/surfer__us_1o0__surftimeprefactor_3o75/choice.h"
 #include "param/env/objects/surfer__us_1o0__surftimeprefactor_4o0/choice.h"
-#include "param/env/objects/surfer__us_4o0__surftimeprefactor_0o0/choice.h"
-#include "param/env/objects/surfer__us_8o0__surftimeprefactor_0o0/choice.h"
 #include "param/env/objects/surfer__us_4o0__surftimeprefactor_0o25/choice.h"
 #include "param/env/objects/surfer__us_8o0__surftimeprefactor_0o25/choice.h"
 #include "param/env/objects/surfer__us_4o0__surftimeprefactor_0o5/choice.h"
@@ -72,8 +69,6 @@ struct ObjectsParameters {
     // FLAG: DECLARE OBJECT BEGIN
     std::shared_ptr<SurferUs1O0Surftimeprefactor1O0Step> sSurferUs1O0Surftimeprefactor1O0Step;
     unsigned int surfer__us_1o0__surftimeprefactor_1o0Index;
-    std::shared_ptr<SurferUs1O0Surftimeprefactor0O0Step> sSurferUs1O0Surftimeprefactor0O0Step;
-    unsigned int surfer__us_1o0__surftimeprefactor_0o0Index;
     std::shared_ptr<SurferUs1O0Surftimeprefactor0O25Step> sSurferUs1O0Surftimeprefactor0O25Step;
     unsigned int surfer__us_1o0__surftimeprefactor_0o25Index;
     std::shared_ptr<SurferUs1O0Surftimeprefactor0O5Step> sSurferUs1O0Surftimeprefactor0O5Step;
@@ -104,10 +99,6 @@ struct ObjectsParameters {
     unsigned int surfer__us_1o0__surftimeprefactor_3o75Index;
     std::shared_ptr<SurferUs1O0Surftimeprefactor4O0Step> sSurferUs1O0Surftimeprefactor4O0Step;
     unsigned int surfer__us_1o0__surftimeprefactor_4o0Index;
-    std::shared_ptr<SurferUs4O0Surftimeprefactor0O0Step> sSurferUs4O0Surftimeprefactor0O0Step;
-    unsigned int surfer__us_4o0__surftimeprefactor_0o0Index;
-    std::shared_ptr<SurferUs8O0Surftimeprefactor0O0Step> sSurferUs8O0Surftimeprefactor0O0Step;
-    unsigned int surfer__us_8o0__surftimeprefactor_0o0Index;
     std::shared_ptr<SurferUs4O0Surftimeprefactor0O25Step> sSurferUs4O0Surftimeprefactor0O25Step;
     unsigned int surfer__us_4o0__surftimeprefactor_0o25Index;
     std::shared_ptr<SurferUs8O0Surftimeprefactor0O25Step> sSurferUs8O0Surftimeprefactor0O25Step;
@@ -182,10 +173,6 @@ struct ObjectsParameters {
         sSurferUs1O0Surftimeprefactor1O0Step = std::make_shared<SurferUs1O0Surftimeprefactor1O0Step>(sFlow, pObjects);
         data.push_back(sSurferUs1O0Surftimeprefactor1O0Step);
         surfer__us_1o0__surftimeprefactor_1o0Index = data.size() - 1;
-        // // surfer__us_1o0__surftimeprefactor_0o0
-        sSurferUs1O0Surftimeprefactor0O0Step = std::make_shared<SurferUs1O0Surftimeprefactor0O0Step>(sFlow, pObjects);
-        data.push_back(sSurferUs1O0Surftimeprefactor0O0Step);
-        surfer__us_1o0__surftimeprefactor_0o0Index = data.size() - 1;
         // // surfer__us_1o0__surftimeprefactor_0o25
         sSurferUs1O0Surftimeprefactor0O25Step = std::make_shared<SurferUs1O0Surftimeprefactor0O25Step>(sFlow, pObjects);
         data.push_back(sSurferUs1O0Surftimeprefactor0O25Step);
@@ -246,14 +233,6 @@ struct ObjectsParameters {
         sSurferUs1O0Surftimeprefactor4O0Step = std::make_shared<SurferUs1O0Surftimeprefactor4O0Step>(sFlow, pObjects);
         data.push_back(sSurferUs1O0Surftimeprefactor4O0Step);
         surfer__us_1o0__surftimeprefactor_4o0Index = data.size() - 1;
-        // // surfer__us_4o0__surftimeprefactor_0o0
-        sSurferUs4O0Surftimeprefactor0O0Step = std::make_shared<SurferUs4O0Surftimeprefactor0O0Step>(sFlow, pObjects);
-        data.push_back(sSurferUs4O0Surftimeprefactor0O0Step);
-        surfer__us_4o0__surftimeprefactor_0o0Index = data.size() - 1;
-        // // surfer__us_8o0__surftimeprefactor_0o0
-        sSurferUs8O0Surftimeprefactor0O0Step = std::make_shared<SurferUs8O0Surftimeprefactor0O0Step>(sFlow, pObjects);
-        data.push_back(sSurferUs8O0Surftimeprefactor0O0Step);
-        surfer__us_8o0__surftimeprefactor_0o0Index = data.size() - 1;
         // // surfer__us_4o0__surftimeprefactor_0o25
         sSurferUs4O0Surftimeprefactor0O25Step = std::make_shared<SurferUs4O0Surftimeprefactor0O25Step>(sFlow, pObjects);
         data.push_back(sSurferUs4O0Surftimeprefactor0O25Step);

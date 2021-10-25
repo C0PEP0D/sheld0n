@@ -15,6 +15,22 @@
 // FLAG: INCLUDE OBJECT BEGIN
 #include "param/env/objects/surfer__us_1o0__surftimeconst_1o0/choice.h"
 #include "param/env/objects/riser__us_1o0/choice.h"
+#include "param/env/objects/riser__us_0o5/choice.h"
+#include "param/env/objects/riser__us_1o5/choice.h"
+#include "param/env/objects/riser__us_2o0/choice.h"
+#include "param/env/objects/riser__us_2o5/choice.h"
+#include "param/env/objects/riser__us_3o0/choice.h"
+#include "param/env/objects/riser__us_3o5/choice.h"
+#include "param/env/objects/riser__us_4o0/choice.h"
+#include "param/env/objects/riser__us_4o5/choice.h"
+#include "param/env/objects/riser__us_5o0/choice.h"
+#include "param/env/objects/riser__us_6o0/choice.h"
+#include "param/env/objects/riser__us_7o0/choice.h"
+#include "param/env/objects/riser__us_8o0/choice.h"
+#include "param/env/objects/riser__us_9o0/choice.h"
+#include "param/env/objects/riser__us_10o0/choice.h"
+#include "param/env/objects/riser__us_15o0/choice.h"
+#include "param/env/objects/riser__us_20o0/choice.h"
 #include "param/env/objects/surfer__us_0o5__surftimeconst_1o0/choice.h"
 #include "param/env/objects/surfer__us_1o5__surftimeconst_1o0/choice.h"
 #include "param/env/objects/surfer__us_2o0__surftimeconst_1o0/choice.h"
@@ -201,22 +217,6 @@
 #include "param/env/objects/surfer__us_9o0__surftimeconst_8o0/choice.h"
 #include "param/env/objects/surfer__us_9o0__surftimeconst_9o0/choice.h"
 #include "param/env/objects/surfer__us_9o0__surftimeconst_10o0/choice.h"
-#include "param/env/objects/riser__us_0o5/choice.h"
-#include "param/env/objects/riser__us_1o5/choice.h"
-#include "param/env/objects/riser__us_2o0/choice.h"
-#include "param/env/objects/riser__us_2o5/choice.h"
-#include "param/env/objects/riser__us_3o0/choice.h"
-#include "param/env/objects/riser__us_3o5/choice.h"
-#include "param/env/objects/riser__us_4o0/choice.h"
-#include "param/env/objects/riser__us_4o5/choice.h"
-#include "param/env/objects/riser__us_5o0/choice.h"
-#include "param/env/objects/riser__us_6o0/choice.h"
-#include "param/env/objects/riser__us_7o0/choice.h"
-#include "param/env/objects/riser__us_8o0/choice.h"
-#include "param/env/objects/riser__us_9o0/choice.h"
-#include "param/env/objects/riser__us_10o0/choice.h"
-#include "param/env/objects/riser__us_15o0/choice.h"
-#include "param/env/objects/riser__us_20o0/choice.h"
 // FLAG: INCLUDE OBJECT END
 
 namespace c0p {
@@ -227,6 +227,38 @@ struct ObjectsParameters {
     unsigned int surfer__us_1o0__surftimeconst_1o0Index;
     std::shared_ptr<RiserUs1O0Step> sRiserUs1O0Step;
     unsigned int riser__us_1o0Index;
+    std::shared_ptr<RiserUs0O5Step> sRiserUs0O5Step;
+    unsigned int riser__us_0o5Index;
+    std::shared_ptr<RiserUs1O5Step> sRiserUs1O5Step;
+    unsigned int riser__us_1o5Index;
+    std::shared_ptr<RiserUs2O0Step> sRiserUs2O0Step;
+    unsigned int riser__us_2o0Index;
+    std::shared_ptr<RiserUs2O5Step> sRiserUs2O5Step;
+    unsigned int riser__us_2o5Index;
+    std::shared_ptr<RiserUs3O0Step> sRiserUs3O0Step;
+    unsigned int riser__us_3o0Index;
+    std::shared_ptr<RiserUs3O5Step> sRiserUs3O5Step;
+    unsigned int riser__us_3o5Index;
+    std::shared_ptr<RiserUs4O0Step> sRiserUs4O0Step;
+    unsigned int riser__us_4o0Index;
+    std::shared_ptr<RiserUs4O5Step> sRiserUs4O5Step;
+    unsigned int riser__us_4o5Index;
+    std::shared_ptr<RiserUs5O0Step> sRiserUs5O0Step;
+    unsigned int riser__us_5o0Index;
+    std::shared_ptr<RiserUs6O0Step> sRiserUs6O0Step;
+    unsigned int riser__us_6o0Index;
+    std::shared_ptr<RiserUs7O0Step> sRiserUs7O0Step;
+    unsigned int riser__us_7o0Index;
+    std::shared_ptr<RiserUs8O0Step> sRiserUs8O0Step;
+    unsigned int riser__us_8o0Index;
+    std::shared_ptr<RiserUs9O0Step> sRiserUs9O0Step;
+    unsigned int riser__us_9o0Index;
+    std::shared_ptr<RiserUs10O0Step> sRiserUs10O0Step;
+    unsigned int riser__us_10o0Index;
+    std::shared_ptr<RiserUs15O0Step> sRiserUs15O0Step;
+    unsigned int riser__us_15o0Index;
+    std::shared_ptr<RiserUs20O0Step> sRiserUs20O0Step;
+    unsigned int riser__us_20o0Index;
     std::shared_ptr<SurferUs0O5Surftimeconst1O0Step> sSurferUs0O5Surftimeconst1O0Step;
     unsigned int surfer__us_0o5__surftimeconst_1o0Index;
     std::shared_ptr<SurferUs1O5Surftimeconst1O0Step> sSurferUs1O5Surftimeconst1O0Step;
@@ -599,38 +631,6 @@ struct ObjectsParameters {
     unsigned int surfer__us_9o0__surftimeconst_9o0Index;
     std::shared_ptr<SurferUs9O0Surftimeconst10O0Step> sSurferUs9O0Surftimeconst10O0Step;
     unsigned int surfer__us_9o0__surftimeconst_10o0Index;
-    std::shared_ptr<RiserUs0O5Step> sRiserUs0O5Step;
-    unsigned int riser__us_0o5Index;
-    std::shared_ptr<RiserUs1O5Step> sRiserUs1O5Step;
-    unsigned int riser__us_1o5Index;
-    std::shared_ptr<RiserUs2O0Step> sRiserUs2O0Step;
-    unsigned int riser__us_2o0Index;
-    std::shared_ptr<RiserUs2O5Step> sRiserUs2O5Step;
-    unsigned int riser__us_2o5Index;
-    std::shared_ptr<RiserUs3O0Step> sRiserUs3O0Step;
-    unsigned int riser__us_3o0Index;
-    std::shared_ptr<RiserUs3O5Step> sRiserUs3O5Step;
-    unsigned int riser__us_3o5Index;
-    std::shared_ptr<RiserUs4O0Step> sRiserUs4O0Step;
-    unsigned int riser__us_4o0Index;
-    std::shared_ptr<RiserUs4O5Step> sRiserUs4O5Step;
-    unsigned int riser__us_4o5Index;
-    std::shared_ptr<RiserUs5O0Step> sRiserUs5O0Step;
-    unsigned int riser__us_5o0Index;
-    std::shared_ptr<RiserUs6O0Step> sRiserUs6O0Step;
-    unsigned int riser__us_6o0Index;
-    std::shared_ptr<RiserUs7O0Step> sRiserUs7O0Step;
-    unsigned int riser__us_7o0Index;
-    std::shared_ptr<RiserUs8O0Step> sRiserUs8O0Step;
-    unsigned int riser__us_8o0Index;
-    std::shared_ptr<RiserUs9O0Step> sRiserUs9O0Step;
-    unsigned int riser__us_9o0Index;
-    std::shared_ptr<RiserUs10O0Step> sRiserUs10O0Step;
-    unsigned int riser__us_10o0Index;
-    std::shared_ptr<RiserUs15O0Step> sRiserUs15O0Step;
-    unsigned int riser__us_15o0Index;
-    std::shared_ptr<RiserUs20O0Step> sRiserUs20O0Step;
-    unsigned int riser__us_20o0Index;
     // FLAG: DECLARE OBJECT END
     
     // construct data
@@ -645,6 +645,70 @@ struct ObjectsParameters {
         sRiserUs1O0Step = std::make_shared<RiserUs1O0Step>(sFlow, pObjects);
         data.push_back(sRiserUs1O0Step);
         riser__us_1o0Index = data.size() - 1;
+        // // riser__us_0o5
+        sRiserUs0O5Step = std::make_shared<RiserUs0O5Step>(sFlow, pObjects);
+        data.push_back(sRiserUs0O5Step);
+        riser__us_0o5Index = data.size() - 1;
+        // // riser__us_1o5
+        sRiserUs1O5Step = std::make_shared<RiserUs1O5Step>(sFlow, pObjects);
+        data.push_back(sRiserUs1O5Step);
+        riser__us_1o5Index = data.size() - 1;
+        // // riser__us_2o0
+        sRiserUs2O0Step = std::make_shared<RiserUs2O0Step>(sFlow, pObjects);
+        data.push_back(sRiserUs2O0Step);
+        riser__us_2o0Index = data.size() - 1;
+        // // riser__us_2o5
+        sRiserUs2O5Step = std::make_shared<RiserUs2O5Step>(sFlow, pObjects);
+        data.push_back(sRiserUs2O5Step);
+        riser__us_2o5Index = data.size() - 1;
+        // // riser__us_3o0
+        sRiserUs3O0Step = std::make_shared<RiserUs3O0Step>(sFlow, pObjects);
+        data.push_back(sRiserUs3O0Step);
+        riser__us_3o0Index = data.size() - 1;
+        // // riser__us_3o5
+        sRiserUs3O5Step = std::make_shared<RiserUs3O5Step>(sFlow, pObjects);
+        data.push_back(sRiserUs3O5Step);
+        riser__us_3o5Index = data.size() - 1;
+        // // riser__us_4o0
+        sRiserUs4O0Step = std::make_shared<RiserUs4O0Step>(sFlow, pObjects);
+        data.push_back(sRiserUs4O0Step);
+        riser__us_4o0Index = data.size() - 1;
+        // // riser__us_4o5
+        sRiserUs4O5Step = std::make_shared<RiserUs4O5Step>(sFlow, pObjects);
+        data.push_back(sRiserUs4O5Step);
+        riser__us_4o5Index = data.size() - 1;
+        // // riser__us_5o0
+        sRiserUs5O0Step = std::make_shared<RiserUs5O0Step>(sFlow, pObjects);
+        data.push_back(sRiserUs5O0Step);
+        riser__us_5o0Index = data.size() - 1;
+        // // riser__us_6o0
+        sRiserUs6O0Step = std::make_shared<RiserUs6O0Step>(sFlow, pObjects);
+        data.push_back(sRiserUs6O0Step);
+        riser__us_6o0Index = data.size() - 1;
+        // // riser__us_7o0
+        sRiserUs7O0Step = std::make_shared<RiserUs7O0Step>(sFlow, pObjects);
+        data.push_back(sRiserUs7O0Step);
+        riser__us_7o0Index = data.size() - 1;
+        // // riser__us_8o0
+        sRiserUs8O0Step = std::make_shared<RiserUs8O0Step>(sFlow, pObjects);
+        data.push_back(sRiserUs8O0Step);
+        riser__us_8o0Index = data.size() - 1;
+        // // riser__us_9o0
+        sRiserUs9O0Step = std::make_shared<RiserUs9O0Step>(sFlow, pObjects);
+        data.push_back(sRiserUs9O0Step);
+        riser__us_9o0Index = data.size() - 1;
+        // // riser__us_10o0
+        sRiserUs10O0Step = std::make_shared<RiserUs10O0Step>(sFlow, pObjects);
+        data.push_back(sRiserUs10O0Step);
+        riser__us_10o0Index = data.size() - 1;
+        // // riser__us_15o0
+        sRiserUs15O0Step = std::make_shared<RiserUs15O0Step>(sFlow, pObjects);
+        data.push_back(sRiserUs15O0Step);
+        riser__us_15o0Index = data.size() - 1;
+        // // riser__us_20o0
+        sRiserUs20O0Step = std::make_shared<RiserUs20O0Step>(sFlow, pObjects);
+        data.push_back(sRiserUs20O0Step);
+        riser__us_20o0Index = data.size() - 1;
         // // surfer__us_0o5__surftimeconst_1o0
         sSurferUs0O5Surftimeconst1O0Step = std::make_shared<SurferUs0O5Surftimeconst1O0Step>(sFlow, pObjects);
         data.push_back(sSurferUs0O5Surftimeconst1O0Step);
@@ -1389,70 +1453,6 @@ struct ObjectsParameters {
         sSurferUs9O0Surftimeconst10O0Step = std::make_shared<SurferUs9O0Surftimeconst10O0Step>(sFlow, pObjects);
         data.push_back(sSurferUs9O0Surftimeconst10O0Step);
         surfer__us_9o0__surftimeconst_10o0Index = data.size() - 1;
-        // // riser__us_0o5
-        sRiserUs0O5Step = std::make_shared<RiserUs0O5Step>(sFlow, pObjects);
-        data.push_back(sRiserUs0O5Step);
-        riser__us_0o5Index = data.size() - 1;
-        // // riser__us_1o5
-        sRiserUs1O5Step = std::make_shared<RiserUs1O5Step>(sFlow, pObjects);
-        data.push_back(sRiserUs1O5Step);
-        riser__us_1o5Index = data.size() - 1;
-        // // riser__us_2o0
-        sRiserUs2O0Step = std::make_shared<RiserUs2O0Step>(sFlow, pObjects);
-        data.push_back(sRiserUs2O0Step);
-        riser__us_2o0Index = data.size() - 1;
-        // // riser__us_2o5
-        sRiserUs2O5Step = std::make_shared<RiserUs2O5Step>(sFlow, pObjects);
-        data.push_back(sRiserUs2O5Step);
-        riser__us_2o5Index = data.size() - 1;
-        // // riser__us_3o0
-        sRiserUs3O0Step = std::make_shared<RiserUs3O0Step>(sFlow, pObjects);
-        data.push_back(sRiserUs3O0Step);
-        riser__us_3o0Index = data.size() - 1;
-        // // riser__us_3o5
-        sRiserUs3O5Step = std::make_shared<RiserUs3O5Step>(sFlow, pObjects);
-        data.push_back(sRiserUs3O5Step);
-        riser__us_3o5Index = data.size() - 1;
-        // // riser__us_4o0
-        sRiserUs4O0Step = std::make_shared<RiserUs4O0Step>(sFlow, pObjects);
-        data.push_back(sRiserUs4O0Step);
-        riser__us_4o0Index = data.size() - 1;
-        // // riser__us_4o5
-        sRiserUs4O5Step = std::make_shared<RiserUs4O5Step>(sFlow, pObjects);
-        data.push_back(sRiserUs4O5Step);
-        riser__us_4o5Index = data.size() - 1;
-        // // riser__us_5o0
-        sRiserUs5O0Step = std::make_shared<RiserUs5O0Step>(sFlow, pObjects);
-        data.push_back(sRiserUs5O0Step);
-        riser__us_5o0Index = data.size() - 1;
-        // // riser__us_6o0
-        sRiserUs6O0Step = std::make_shared<RiserUs6O0Step>(sFlow, pObjects);
-        data.push_back(sRiserUs6O0Step);
-        riser__us_6o0Index = data.size() - 1;
-        // // riser__us_7o0
-        sRiserUs7O0Step = std::make_shared<RiserUs7O0Step>(sFlow, pObjects);
-        data.push_back(sRiserUs7O0Step);
-        riser__us_7o0Index = data.size() - 1;
-        // // riser__us_8o0
-        sRiserUs8O0Step = std::make_shared<RiserUs8O0Step>(sFlow, pObjects);
-        data.push_back(sRiserUs8O0Step);
-        riser__us_8o0Index = data.size() - 1;
-        // // riser__us_9o0
-        sRiserUs9O0Step = std::make_shared<RiserUs9O0Step>(sFlow, pObjects);
-        data.push_back(sRiserUs9O0Step);
-        riser__us_9o0Index = data.size() - 1;
-        // // riser__us_10o0
-        sRiserUs10O0Step = std::make_shared<RiserUs10O0Step>(sFlow, pObjects);
-        data.push_back(sRiserUs10O0Step);
-        riser__us_10o0Index = data.size() - 1;
-        // // riser__us_15o0
-        sRiserUs15O0Step = std::make_shared<RiserUs15O0Step>(sFlow, pObjects);
-        data.push_back(sRiserUs15O0Step);
-        riser__us_15o0Index = data.size() - 1;
-        // // riser__us_20o0
-        sRiserUs20O0Step = std::make_shared<RiserUs20O0Step>(sFlow, pObjects);
-        data.push_back(sRiserUs20O0Step);
-        riser__us_20o0Index = data.size() - 1;
         // FLAG: MAKE OBJECT END
     }
 };

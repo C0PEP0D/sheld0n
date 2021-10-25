@@ -14,6 +14,22 @@
 // FLAG: INCLUDE OBJECT BEGIN
 #include "param/init/objects/surfer__us_1o0__surftimeconst_1o0/parameters.h"
 #include "param/init/objects/riser__us_1o0/parameters.h"
+#include "param/init/objects/riser__us_0o5/parameters.h"
+#include "param/init/objects/riser__us_1o5/parameters.h"
+#include "param/init/objects/riser__us_2o0/parameters.h"
+#include "param/init/objects/riser__us_2o5/parameters.h"
+#include "param/init/objects/riser__us_3o0/parameters.h"
+#include "param/init/objects/riser__us_3o5/parameters.h"
+#include "param/init/objects/riser__us_4o0/parameters.h"
+#include "param/init/objects/riser__us_4o5/parameters.h"
+#include "param/init/objects/riser__us_5o0/parameters.h"
+#include "param/init/objects/riser__us_6o0/parameters.h"
+#include "param/init/objects/riser__us_7o0/parameters.h"
+#include "param/init/objects/riser__us_8o0/parameters.h"
+#include "param/init/objects/riser__us_9o0/parameters.h"
+#include "param/init/objects/riser__us_10o0/parameters.h"
+#include "param/init/objects/riser__us_15o0/parameters.h"
+#include "param/init/objects/riser__us_20o0/parameters.h"
 #include "param/init/objects/surfer__us_0o5__surftimeconst_1o0/parameters.h"
 #include "param/init/objects/surfer__us_1o5__surftimeconst_1o0/parameters.h"
 #include "param/init/objects/surfer__us_2o0__surftimeconst_1o0/parameters.h"
@@ -200,22 +216,6 @@
 #include "param/init/objects/surfer__us_9o0__surftimeconst_8o0/parameters.h"
 #include "param/init/objects/surfer__us_9o0__surftimeconst_9o0/parameters.h"
 #include "param/init/objects/surfer__us_9o0__surftimeconst_10o0/parameters.h"
-#include "param/init/objects/riser__us_0o5/parameters.h"
-#include "param/init/objects/riser__us_1o5/parameters.h"
-#include "param/init/objects/riser__us_2o0/parameters.h"
-#include "param/init/objects/riser__us_2o5/parameters.h"
-#include "param/init/objects/riser__us_3o0/parameters.h"
-#include "param/init/objects/riser__us_3o5/parameters.h"
-#include "param/init/objects/riser__us_4o0/parameters.h"
-#include "param/init/objects/riser__us_4o5/parameters.h"
-#include "param/init/objects/riser__us_5o0/parameters.h"
-#include "param/init/objects/riser__us_6o0/parameters.h"
-#include "param/init/objects/riser__us_7o0/parameters.h"
-#include "param/init/objects/riser__us_8o0/parameters.h"
-#include "param/init/objects/riser__us_9o0/parameters.h"
-#include "param/init/objects/riser__us_10o0/parameters.h"
-#include "param/init/objects/riser__us_15o0/parameters.h"
-#include "param/init/objects/riser__us_20o0/parameters.h"
 // FLAG: INCLUDE OBJECT END
 
 namespace c0p {
@@ -227,6 +227,22 @@ struct InitObjectsParameters {
         // FLAG: MAKE OBJECT BEGIN
         data.push_back(std::make_shared<InitInit<InitSurferUs1O0Surftimeconst1O0Parameters, SurferUs1O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs1O0Surftimeconst1O0Step));
         data.push_back(std::make_shared<InitInit<InitRiserUs1O0Parameters, RiserUs1O0Step>>(objects.parameters.sRiserUs1O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs0O5Parameters, RiserUs0O5Step>>(objects.parameters.sRiserUs0O5Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs1O5Parameters, RiserUs1O5Step>>(objects.parameters.sRiserUs1O5Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs2O0Parameters, RiserUs2O0Step>>(objects.parameters.sRiserUs2O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs2O5Parameters, RiserUs2O5Step>>(objects.parameters.sRiserUs2O5Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs3O0Parameters, RiserUs3O0Step>>(objects.parameters.sRiserUs3O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs3O5Parameters, RiserUs3O5Step>>(objects.parameters.sRiserUs3O5Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs4O0Parameters, RiserUs4O0Step>>(objects.parameters.sRiserUs4O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs4O5Parameters, RiserUs4O5Step>>(objects.parameters.sRiserUs4O5Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs5O0Parameters, RiserUs5O0Step>>(objects.parameters.sRiserUs5O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs6O0Parameters, RiserUs6O0Step>>(objects.parameters.sRiserUs6O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs7O0Parameters, RiserUs7O0Step>>(objects.parameters.sRiserUs7O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs8O0Parameters, RiserUs8O0Step>>(objects.parameters.sRiserUs8O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs9O0Parameters, RiserUs9O0Step>>(objects.parameters.sRiserUs9O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs10O0Parameters, RiserUs10O0Step>>(objects.parameters.sRiserUs10O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs15O0Parameters, RiserUs15O0Step>>(objects.parameters.sRiserUs15O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs20O0Parameters, RiserUs20O0Step>>(objects.parameters.sRiserUs20O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs0O5Surftimeconst1O0Parameters, SurferUs0O5Surftimeconst1O0Step>>(objects.parameters.sSurferUs0O5Surftimeconst1O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs1O5Surftimeconst1O0Parameters, SurferUs1O5Surftimeconst1O0Step>>(objects.parameters.sSurferUs1O5Surftimeconst1O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs2O0Surftimeconst1O0Parameters, SurferUs2O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs2O0Surftimeconst1O0Step));
@@ -413,22 +429,6 @@ struct InitObjectsParameters {
         data.push_back(std::make_shared<InitInit<InitSurferUs9O0Surftimeconst8O0Parameters, SurferUs9O0Surftimeconst8O0Step>>(objects.parameters.sSurferUs9O0Surftimeconst8O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs9O0Surftimeconst9O0Parameters, SurferUs9O0Surftimeconst9O0Step>>(objects.parameters.sSurferUs9O0Surftimeconst9O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs9O0Surftimeconst10O0Parameters, SurferUs9O0Surftimeconst10O0Step>>(objects.parameters.sSurferUs9O0Surftimeconst10O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs0O5Parameters, RiserUs0O5Step>>(objects.parameters.sRiserUs0O5Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs1O5Parameters, RiserUs1O5Step>>(objects.parameters.sRiserUs1O5Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs2O0Parameters, RiserUs2O0Step>>(objects.parameters.sRiserUs2O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs2O5Parameters, RiserUs2O5Step>>(objects.parameters.sRiserUs2O5Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs3O0Parameters, RiserUs3O0Step>>(objects.parameters.sRiserUs3O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs3O5Parameters, RiserUs3O5Step>>(objects.parameters.sRiserUs3O5Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs4O0Parameters, RiserUs4O0Step>>(objects.parameters.sRiserUs4O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs4O5Parameters, RiserUs4O5Step>>(objects.parameters.sRiserUs4O5Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs5O0Parameters, RiserUs5O0Step>>(objects.parameters.sRiserUs5O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs6O0Parameters, RiserUs6O0Step>>(objects.parameters.sRiserUs6O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs7O0Parameters, RiserUs7O0Step>>(objects.parameters.sRiserUs7O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs8O0Parameters, RiserUs8O0Step>>(objects.parameters.sRiserUs8O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs9O0Parameters, RiserUs9O0Step>>(objects.parameters.sRiserUs9O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs10O0Parameters, RiserUs10O0Step>>(objects.parameters.sRiserUs10O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs15O0Parameters, RiserUs15O0Step>>(objects.parameters.sRiserUs15O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs20O0Parameters, RiserUs20O0Step>>(objects.parameters.sRiserUs20O0Step));
         // FLAG: MAKE OBJECT END
     }
 };
