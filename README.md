@@ -1,4 +1,4 @@
-# Sheld0n: Lagrangian active particles advection software
+# Sheld0n: Lagrangian active particles advection
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
