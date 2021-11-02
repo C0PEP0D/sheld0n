@@ -2,7 +2,7 @@
 
 import os
 
-choices_dir = "env/objects/object/__agent/_behaviour/navigator/_behaviour_velocity/surf/_behaviour_time_horizon"
+choices_dir = "env/objects/object/__agent/_behaviour/navigator/_behaviour_velocity/__surf/_behaviour_time_horizon"
 choices_exceptions = []
 
 if __name__ == '__main__':

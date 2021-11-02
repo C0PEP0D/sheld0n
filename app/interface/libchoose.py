@@ -282,6 +282,7 @@ def choose_post(choices_dir, choices_exceptions):
     shutil.rmtree(selected)
     # edit
     edit_header(selected, args.choice)
+    print(args.choice, get_default_post(get_abs_choices_dir(choices_dir)), get_post(), 2)
     edit_choice(args.choice, get_default_post(get_abs_choices_dir(choices_dir)), get_post(), 2)
     # create sym links
     create_sym_links(args.choice, choices[args.choice])

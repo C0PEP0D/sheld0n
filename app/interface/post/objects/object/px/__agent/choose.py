@@ -2,7 +2,7 @@
 
 import os
 
-choices_dir = "env/objects/object/__agent/_behaviour/navigator/_behaviour_velocity/surf"
+choices_dir = "post/objects/object/px/__agent"
 choices_exceptions = []
 
 if __name__ == '__main__':
@@ -13,4 +13,4 @@ if __name__ == '__main__':
         lib_code = compile(lib_source_file.read(), lib_filename, "exec")
     exec(lib_code)
     # run tests
-    choose(choices_dir, choices_exceptions)
+    choose_post(choices_dir, choices_exceptions)
