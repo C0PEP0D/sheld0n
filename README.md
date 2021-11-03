@@ -1,4 +1,4 @@
-# Sheld0n: Lagrangian active particles advection software
+# Sheld0n: Lagrangian active particles advection
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
@@ -41,7 +41,7 @@ If not, you should be able to install these dependencies with your package manag
 Start by cloning this repository with its submodules.
 
 ```sh
-$ git --recurse-submodules clone https://github.com/C0PEP0D/sheld0n.git
+$ git clone --recurse-submodules https://github.com/C0PEP0D/sheld0n.git
 ```
 
 And that's it!
