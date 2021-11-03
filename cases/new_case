@@ -13,7 +13,7 @@ import fileinput
 
 def parse():
     parser = argparse.ArgumentParser(description='create a new simulation case based on the default one')
-    parser.add_argument('name', nargs='?', default='case', help='specify the name of the new simulation case')
+    parser.add_argument('name', nargs='?', default='new_case', help='specify the name of the new simulation case')
     return parser.parse_args()
 
 def main():
@@ -69,6 +69,7 @@ def main():
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients/choose.py", args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients"), args.name + "/param/env/objects/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients/choose")
     ### init
     #### objects
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/copy_inits.py", args.name + "/param/init/objects"), args.name + "/param/init/objects/copy_inits")
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/copy_init.py", args.name + "/param/init/objects/object"), args.name + "/param/init/objects/object/copy_init")
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/remove_init.py", args.name + "/param/init/objects/object"), args.name + "/param/init/objects/object/remove_init")
     ##### object
@@ -78,6 +79,7 @@ def main():
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/passive/choose.py", args.name + "/param/init/objects/object/pos/group/_member/passive"), args.name + "/param/init/objects/object/pos/group/_member/passive/choose")
     ### post
     #### objects
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/copy_posts.py", args.name + "/param/post/objects"), args.name + "/param/post/objects/copy_posts")
     os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/copy_post.py", args.name + "/param/post/objects/object"), args.name + "/param/post/objects/object/copy_post")
     os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/remove_post.py", args.name + "/param/post/objects/object"), args.name + "/param/post/objects/object/remove_post")
     ##### object
