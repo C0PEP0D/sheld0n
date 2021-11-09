@@ -11,7 +11,7 @@ namespace c0p {
 struct InitTracersPosGroupMemberPassivePositionBoxParameters {
     // Center of the box
     TypeSpaceVector c0 = TypeSpaceVector::Constant(M_PI);
-    // Length of the box for each dimension
+    // Size of the box
     TypeSpaceVector l = TypeSpaceVector::Constant(2.0 * M_PI);
 };
 

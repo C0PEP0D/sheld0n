@@ -1,5 +1,5 @@
-#ifndef C0P_PARAM_OBJECTS_OBJECT_PAIR_A_AGENT_BEHAVIOUR_SENSOR_DIRECTION_ACCURATE_PARAMETERS_H
-#define C0P_PARAM_OBJECTS_OBJECT_PAIR_A_AGENT_BEHAVIOUR_SENSOR_DIRECTION_ACCURATE_PARAMETERS_H
+#ifndef C0P_PARAM_OBJECTS_OBJECT_GROUP_HOMOGENEOUS_MEMBER_PAIR_A_AGENT_BEHAVIOUR_SENSOR_DIRECTION_ACCURATE_PARAMETERS_H
+#define C0P_PARAM_OBJECTS_OBJECT_GROUP_HOMOGENEOUS_MEMBER_PAIR_A_AGENT_BEHAVIOUR_SENSOR_DIRECTION_ACCURATE_PARAMETERS_H
 #pragma once
 
 // app includes
@@ -8,7 +8,9 @@
 
 namespace c0p {
 
-struct ObjectPairAAgentBehaviourSensorDirectionAccurateParameters {
+// Accurate direction sensor parameters
+struct ObjectGroupHomogeneousMemberPairAAgentBehaviourSensorDirectionAccurateParameters {
+    // Direction sensed
     const TypeSpaceVector direction = {1.0, 0.0, 0.0};
 };
 

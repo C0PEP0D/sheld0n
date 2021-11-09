@@ -18,8 +18,8 @@ class AgentBehaviourNavigatorBehaviourVelocitySurfBehaviourTimeHorizonInvVelocit
         AgentBehaviourNavigatorBehaviourVelocitySurfBehaviourTimeHorizonInvVelocityGradientsSymmetric() {
         }
     public:
-        TypeScalar operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep& stepActive, const TypeSpaceMatrix& gradientsMeasure) const override{
-            const TypeScalar value = 0.5 * (gradientsMeasure + gradientsMeasure.transpose()).norm();
+        TypeScalar operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep& stepActive, const TypeSpaceMatrix& velocityGradients) const override{
+            const TypeScalar value = 0.5 * (velocityGradients + velocityGradients.transpose()).norm();
             if(value > 0) {
                 return parameters.prefactor / value;
             } else {

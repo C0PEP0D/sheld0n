@@ -17,7 +17,7 @@ struct RiserUs4O5GroupHomogeneousStepParameters {
     // should be done in the _member directory.
     using TypeMemberStep = RiserUs4O5GroupHomogeneousMemberStep;
     // Group size
-    static const unsigned int size = 1/(4.5*4.5) * Parameters::cGroupSize;
+    static const unsigned int size = 1/(1.0*1.0) * Parameters::cGroupSize;
 };
 
 }

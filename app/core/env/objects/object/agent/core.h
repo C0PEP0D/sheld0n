@@ -20,7 +20,6 @@ class AgentStep : public TypeAgentStep<AgentActiveStep, Behaviour> {
     public:
         TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeStateStatic>& state) const override {
             std::vector<TypeSpaceVector> result = Type::positions(state);
-            std::vector<TypeSpaceVector> sensorPositions = Type::positions(state);
             return result;
         }
 };

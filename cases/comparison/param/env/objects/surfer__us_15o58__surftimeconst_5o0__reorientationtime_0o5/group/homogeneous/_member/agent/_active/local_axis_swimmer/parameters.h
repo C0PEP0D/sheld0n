@@ -12,7 +12,7 @@ namespace c0p {
 // of its local axis that may rotate due to the surrounding flow
 struct SurferUs15O58Surftimeconst5O0Reorientationtime0O5GroupHomogeneousMemberAgentActiveLocalAxisSwimmerStepParameters {
     // Swimming velocity
-    TypeScalar velocity = 15.58 * Parameters::cVelocity; // swim velocity
+    TypeScalar velocity = 15.58 * Parameters::cVelocity;
     // Preferential orientation
     TypeSpaceVector direction = TypeSpaceVector::Random().normalized();
     // Characteristic time to reach the preferential direction in a uniform flow.

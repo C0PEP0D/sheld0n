@@ -6,15 +6,12 @@
 // THIS FILE WILL BE AUTOMATICALLY EDITED WHEN THE
 // CHOOSE COMMAND IS USED
 
-// sensor choice
-#include "param/env/objects/surfer__us_5o0__surftimeconst_9o0/group/homogeneous/_member/agent/_behaviour/_sensor/direction/choice.h"
-#include "param/env/objects/surfer__us_5o0__surftimeconst_9o0/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients/choice.h"
 // choose your behaviour
 #include "core/env/objects/object/agent/behaviour/navigator/behaviour_velocity/const/core.h"
 #include "param/env/objects/surfer__us_5o0__surftimeconst_9o0/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_velocity/const/parameters.h"
 namespace c0p {
     template<typename SurferUs5O0Surftimeconst9O0GroupHomogeneousMemberAgentActiveStep>
-    using SurferUs5O0Surftimeconst9O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourVelocityConst = AgentBehaviourNavigatorBehaviourVelocityConst<SurferUs5O0Surftimeconst9O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourVelocityConstParameters, SurferUs5O0Surftimeconst9O0GroupHomogeneousMemberAgentActiveStep, SurferUs5O0Surftimeconst9O0GroupHomogeneousMemberAgentBehaviourSensorDirection<SurferUs5O0Surftimeconst9O0GroupHomogeneousMemberAgentActiveStep>, SurferUs5O0Surftimeconst9O0GroupHomogeneousMemberAgentBehaviourSensorVelocityGradients<SurferUs5O0Surftimeconst9O0GroupHomogeneousMemberAgentActiveStep>>;
+    using SurferUs5O0Surftimeconst9O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourVelocityConst = AgentBehaviourNavigatorBehaviourVelocityConst<SurferUs5O0Surftimeconst9O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourVelocityConstParameters, SurferUs5O0Surftimeconst9O0GroupHomogeneousMemberAgentActiveStep>;
 }
 
 #endif

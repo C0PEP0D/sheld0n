@@ -12,7 +12,7 @@ namespace c0p {
 // The swimming direction is not affected by the flow.
 struct SurferUs1O0Surftimeconst0O0GroupHomogeneousMemberAgentActiveSwimmerStepParameters {
     // Swimming velocity
-    TypeSpaceVector velocity =  1.0 * Parameters::cVelocity * TypeSpaceVector::Random().normalized();
+    TypeSpaceVector velocity = 1.0 * Parameters::cVelocity * TypeSpaceVector::Random().normalized();
 };
 
 }

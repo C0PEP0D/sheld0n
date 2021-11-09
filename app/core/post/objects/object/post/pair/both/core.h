@@ -18,7 +18,7 @@ class PostPostPairBoth : public PostPostPost<TypeObjectStep> {
     public:
         TypeParameters parameters;
         typename TypeParameters::TypePostPostA<typename TypeObjectStep::TypeAStep> postA;
-        typename TypeParameters::TypePostPostB<typename TypeObjectStep::TypeAStep> postB;
+        typename TypeParameters::TypePostPostB<typename TypeObjectStep::TypeBStep> postB;
     public:
         using PostPostPost<TypeObjectStep>::sObjectStep;
     public:

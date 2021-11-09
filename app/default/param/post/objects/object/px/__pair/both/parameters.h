@@ -6,8 +6,8 @@
 #include "core/post/objects/object/post/pair/both/prop.h"
 
 // post member choice
-#include "core/post/objects/object/post/passive/pos/core.h"
-#include "param/post/objects/object/px/passive/pos/parameters.h"
+#include "param/post/objects/object/px/group/_member/pair/both/_a/choice.h"
+#include "param/post/objects/object/px/group/_member/pair/both/_b/choice.h"
 
 namespace c0p {
 

@@ -18,7 +18,7 @@ class AgentBehaviourNavigatorBehaviourDirectionSurfBehaviourTimeHorizonConst : p
         AgentBehaviourNavigatorBehaviourDirectionSurfBehaviourTimeHorizonConst() {
         }
     public:
-        TypeScalar operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep& stepActive, const TypeSpaceMatrix& gradientsMeasure) const override{
+        TypeScalar operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep& stepActive, const TypeSpaceMatrix& velocityGradients) const override{
             return parameters.value;
         }
 };

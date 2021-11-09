@@ -16,15 +16,6 @@
 #include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/px/choice.h"
 #include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/py/choice.h"
 #include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/pz/choice.h"
-#include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/j00/choice.h"
-#include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/j01/choice.h"
-#include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/j02/choice.h"
-#include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/j10/choice.h"
-#include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/j11/choice.h"
-#include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/j12/choice.h"
-#include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/j20/choice.h"
-#include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/j21/choice.h"
-#include "param/post/objects/surfer__us_8o0__surftimeconst_8o0/j22/choice.h"
 // FLAG: INCLUDE POST END
 
 namespace c0p {
@@ -40,15 +31,6 @@ struct PostSurferUs8O0Surftimeconst8O0Parameters {
         data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0Px<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
         data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0Py<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
         data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0Pz<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
-        data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0J00<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
-        data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0J01<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
-        data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0J02<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
-        data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0J10<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
-        data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0J11<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
-        data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0J12<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
-        data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0J20<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
-        data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0J21<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
-        data.push_back(std::make_shared<PostSurferUs8O0Surftimeconst8O0J22<TypeSurferUs8O0Surftimeconst8O0Step>>(sSurferUs8O0Surftimeconst8O0Step));
         // FLAG: MAKE POST END
     }
 };

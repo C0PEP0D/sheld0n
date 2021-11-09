@@ -7,11 +7,11 @@
 // CHOOSE COMMAND IS USED
 
 // choose your post processing
-#include "core/post/objects/object/post/group/all/core.h"
-#include "param/post/objects/riser__us_10o0/j10/group/all/parameters.h"
+#include "param/post/objects/riser__us_10o0/j10/group/choice.h"
+
 namespace c0p {
     template<typename TypeRiserUs10O0Step>
-    using PostRiserUs10O0J10 = PostPostGroupAll<PostRiserUs10O0J10GroupAllParameters, TypeRiserUs10O0Step>;
+    using PostRiserUs10O0J10 = PostRiserUs10O0J10Group<TypeRiserUs10O0Step>;
 }
 
 #endif

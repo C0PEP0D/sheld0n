@@ -16,10 +16,10 @@
 #include "param/post/objects/tracers/px/choice.h"
 #include "param/post/objects/tracers/py/choice.h"
 #include "param/post/objects/tracers/pz/choice.h"
+#include "param/post/objects/tracers/j00/choice.h"
 #include "param/post/objects/tracers/ux/choice.h"
 #include "param/post/objects/tracers/uy/choice.h"
 #include "param/post/objects/tracers/uz/choice.h"
-#include "param/post/objects/tracers/j00/choice.h"
 #include "param/post/objects/tracers/j01/choice.h"
 #include "param/post/objects/tracers/j02/choice.h"
 #include "param/post/objects/tracers/j10/choice.h"
@@ -43,10 +43,10 @@ struct PostTracersParameters {
         data.push_back(std::make_shared<PostTracersPx<TypeTracersStep>>(sTracersStep));
         data.push_back(std::make_shared<PostTracersPy<TypeTracersStep>>(sTracersStep));
         data.push_back(std::make_shared<PostTracersPz<TypeTracersStep>>(sTracersStep));
+        data.push_back(std::make_shared<PostTracersJ00<TypeTracersStep>>(sTracersStep));
         data.push_back(std::make_shared<PostTracersUx<TypeTracersStep>>(sTracersStep));
         data.push_back(std::make_shared<PostTracersUy<TypeTracersStep>>(sTracersStep));
         data.push_back(std::make_shared<PostTracersUz<TypeTracersStep>>(sTracersStep));
-        data.push_back(std::make_shared<PostTracersJ00<TypeTracersStep>>(sTracersStep));
         data.push_back(std::make_shared<PostTracersJ01<TypeTracersStep>>(sTracersStep));
         data.push_back(std::make_shared<PostTracersJ02<TypeTracersStep>>(sTracersStep));
         data.push_back(std::make_shared<PostTracersJ10<TypeTracersStep>>(sTracersStep));

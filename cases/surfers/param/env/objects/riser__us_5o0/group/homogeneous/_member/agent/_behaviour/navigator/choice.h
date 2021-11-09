@@ -6,7 +6,10 @@
 // THIS FILE WILL BE AUTOMATICALLY EDITED WHEN THE
 // CHOOSE COMMAND IS USED
 
-// behaviour direction choice
+// sensor choice
+#include "param/env/objects/riser__us_5o0/group/homogeneous/_member/agent/_behaviour/_sensor/direction/choice.h"
+#include "param/env/objects/riser__us_5o0/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients/choice.h"
+// sub behaviour choice
 #include "param/env/objects/riser__us_5o0/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/choice.h"
 #include "param/env/objects/riser__us_5o0/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_velocity/choice.h"
 // choose your behaviour
@@ -14,7 +17,7 @@
 #include "param/env/objects/riser__us_5o0/group/homogeneous/_member/agent/_behaviour/navigator/swimmer/parameters.h"
 namespace c0p {
     template<typename RiserUs5O0GroupHomogeneousMemberAgentActiveStep>
-    using RiserUs5O0GroupHomogeneousMemberAgentBehaviourNavigator = AgentBehaviourNavigatorSwimmer<RiserUs5O0GroupHomogeneousMemberAgentBehaviourNavigatorSwimmerParameters, RiserUs5O0GroupHomogeneousMemberAgentActiveStep, RiserUs5O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourDirection<RiserUs5O0GroupHomogeneousMemberAgentActiveStep>, RiserUs5O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourVelocity<RiserUs5O0GroupHomogeneousMemberAgentActiveStep>>;
+    using RiserUs5O0GroupHomogeneousMemberAgentBehaviourNavigator = AgentBehaviourNavigatorSwimmer<RiserUs5O0GroupHomogeneousMemberAgentBehaviourNavigatorSwimmerParameters, RiserUs5O0GroupHomogeneousMemberAgentActiveStep, RiserUs5O0GroupHomogeneousMemberAgentBehaviourSensorDirection<RiserUs5O0GroupHomogeneousMemberAgentActiveStep>, RiserUs5O0GroupHomogeneousMemberAgentBehaviourSensorVelocityGradients<RiserUs5O0GroupHomogeneousMemberAgentActiveStep>, RiserUs5O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourDirection<RiserUs5O0GroupHomogeneousMemberAgentActiveStep>, RiserUs5O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourVelocity<RiserUs5O0GroupHomogeneousMemberAgentActiveStep>>;
 }
 
 #endif

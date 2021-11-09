@@ -11,8 +11,8 @@
 #include "param/init/objects/tracers/pos/group/_member/passive/position/box/parameters.h"
 
 namespace c0p {
-    template<typename TypeObjectStep>
-    using InitTracersPosGroupMemberPassivePosition = InitInitPassivePositionBox<InitTracersPosGroupMemberPassivePositionBoxParameters, TypeObjectStep>;
+    template<typename TypeTracersStep>
+    using InitTracersPosGroupMemberPassivePosition = InitInitPassivePositionBox<InitTracersPosGroupMemberPassivePositionBoxParameters, TypeTracersStep>;
 }
 
 #endif

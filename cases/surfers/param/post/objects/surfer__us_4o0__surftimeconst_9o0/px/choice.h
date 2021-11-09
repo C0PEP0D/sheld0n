@@ -7,11 +7,11 @@
 // CHOOSE COMMAND IS USED
 
 // choose your post processing
-#include "core/post/objects/object/post/group/all/core.h"
-#include "param/post/objects/surfer__us_4o0__surftimeconst_9o0/px/group/all/parameters.h"
+#include "param/post/objects/surfer__us_4o0__surftimeconst_9o0/px/group/choice.h"
+
 namespace c0p {
     template<typename TypeSurferUs4O0Surftimeconst9O0Step>
-    using PostSurferUs4O0Surftimeconst9O0Px = PostPostGroupAll<PostSurferUs4O0Surftimeconst9O0PxGroupAllParameters, TypeSurferUs4O0Surftimeconst9O0Step>;
+    using PostSurferUs4O0Surftimeconst9O0Px = PostSurferUs4O0Surftimeconst9O0PxGroup<TypeSurferUs4O0Surftimeconst9O0Step>;
 }
 
 #endif

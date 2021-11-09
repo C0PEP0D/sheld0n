@@ -15,7 +15,10 @@
 #include "param/init/objects/surfer__us_1o0__surftimeconst_1o0/parameters.h"
 #include "param/init/objects/riser__us_1o0/parameters.h"
 #include "param/init/objects/riser__us_0o5/parameters.h"
+#include "param/init/objects/riser__us_10o0/parameters.h"
+#include "param/init/objects/riser__us_15o0/parameters.h"
 #include "param/init/objects/riser__us_1o5/parameters.h"
+#include "param/init/objects/riser__us_20o0/parameters.h"
 #include "param/init/objects/riser__us_2o0/parameters.h"
 #include "param/init/objects/riser__us_2o5/parameters.h"
 #include "param/init/objects/riser__us_3o0/parameters.h"
@@ -27,11 +30,11 @@
 #include "param/init/objects/riser__us_7o0/parameters.h"
 #include "param/init/objects/riser__us_8o0/parameters.h"
 #include "param/init/objects/riser__us_9o0/parameters.h"
-#include "param/init/objects/riser__us_10o0/parameters.h"
-#include "param/init/objects/riser__us_15o0/parameters.h"
-#include "param/init/objects/riser__us_20o0/parameters.h"
 #include "param/init/objects/surfer__us_0o5__surftimeconst_1o0/parameters.h"
+#include "param/init/objects/surfer__us_10o0__surftimeconst_1o0/parameters.h"
+#include "param/init/objects/surfer__us_15o0__surftimeconst_1o0/parameters.h"
 #include "param/init/objects/surfer__us_1o5__surftimeconst_1o0/parameters.h"
+#include "param/init/objects/surfer__us_20o0__surftimeconst_1o0/parameters.h"
 #include "param/init/objects/surfer__us_2o0__surftimeconst_1o0/parameters.h"
 #include "param/init/objects/surfer__us_2o5__surftimeconst_1o0/parameters.h"
 #include "param/init/objects/surfer__us_3o0__surftimeconst_1o0/parameters.h"
@@ -43,9 +46,6 @@
 #include "param/init/objects/surfer__us_7o0__surftimeconst_1o0/parameters.h"
 #include "param/init/objects/surfer__us_8o0__surftimeconst_1o0/parameters.h"
 #include "param/init/objects/surfer__us_9o0__surftimeconst_1o0/parameters.h"
-#include "param/init/objects/surfer__us_10o0__surftimeconst_1o0/parameters.h"
-#include "param/init/objects/surfer__us_15o0__surftimeconst_1o0/parameters.h"
-#include "param/init/objects/surfer__us_20o0__surftimeconst_1o0/parameters.h"
 #include "param/init/objects/surfer__us_0o5__surftimeconst_0o0/parameters.h"
 #include "param/init/objects/surfer__us_0o5__surftimeconst_2o0/parameters.h"
 #include "param/init/objects/surfer__us_0o5__surftimeconst_3o0/parameters.h"
@@ -228,7 +228,10 @@ struct InitObjectsParameters {
         data.push_back(std::make_shared<InitInit<InitSurferUs1O0Surftimeconst1O0Parameters, SurferUs1O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs1O0Surftimeconst1O0Step));
         data.push_back(std::make_shared<InitInit<InitRiserUs1O0Parameters, RiserUs1O0Step>>(objects.parameters.sRiserUs1O0Step));
         data.push_back(std::make_shared<InitInit<InitRiserUs0O5Parameters, RiserUs0O5Step>>(objects.parameters.sRiserUs0O5Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs10O0Parameters, RiserUs10O0Step>>(objects.parameters.sRiserUs10O0Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs15O0Parameters, RiserUs15O0Step>>(objects.parameters.sRiserUs15O0Step));
         data.push_back(std::make_shared<InitInit<InitRiserUs1O5Parameters, RiserUs1O5Step>>(objects.parameters.sRiserUs1O5Step));
+        data.push_back(std::make_shared<InitInit<InitRiserUs20O0Parameters, RiserUs20O0Step>>(objects.parameters.sRiserUs20O0Step));
         data.push_back(std::make_shared<InitInit<InitRiserUs2O0Parameters, RiserUs2O0Step>>(objects.parameters.sRiserUs2O0Step));
         data.push_back(std::make_shared<InitInit<InitRiserUs2O5Parameters, RiserUs2O5Step>>(objects.parameters.sRiserUs2O5Step));
         data.push_back(std::make_shared<InitInit<InitRiserUs3O0Parameters, RiserUs3O0Step>>(objects.parameters.sRiserUs3O0Step));
@@ -240,11 +243,11 @@ struct InitObjectsParameters {
         data.push_back(std::make_shared<InitInit<InitRiserUs7O0Parameters, RiserUs7O0Step>>(objects.parameters.sRiserUs7O0Step));
         data.push_back(std::make_shared<InitInit<InitRiserUs8O0Parameters, RiserUs8O0Step>>(objects.parameters.sRiserUs8O0Step));
         data.push_back(std::make_shared<InitInit<InitRiserUs9O0Parameters, RiserUs9O0Step>>(objects.parameters.sRiserUs9O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs10O0Parameters, RiserUs10O0Step>>(objects.parameters.sRiserUs10O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs15O0Parameters, RiserUs15O0Step>>(objects.parameters.sRiserUs15O0Step));
-        data.push_back(std::make_shared<InitInit<InitRiserUs20O0Parameters, RiserUs20O0Step>>(objects.parameters.sRiserUs20O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs0O5Surftimeconst1O0Parameters, SurferUs0O5Surftimeconst1O0Step>>(objects.parameters.sSurferUs0O5Surftimeconst1O0Step));
+        data.push_back(std::make_shared<InitInit<InitSurferUs10O0Surftimeconst1O0Parameters, SurferUs10O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs10O0Surftimeconst1O0Step));
+        data.push_back(std::make_shared<InitInit<InitSurferUs15O0Surftimeconst1O0Parameters, SurferUs15O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs15O0Surftimeconst1O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs1O5Surftimeconst1O0Parameters, SurferUs1O5Surftimeconst1O0Step>>(objects.parameters.sSurferUs1O5Surftimeconst1O0Step));
+        data.push_back(std::make_shared<InitInit<InitSurferUs20O0Surftimeconst1O0Parameters, SurferUs20O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs20O0Surftimeconst1O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs2O0Surftimeconst1O0Parameters, SurferUs2O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs2O0Surftimeconst1O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs2O5Surftimeconst1O0Parameters, SurferUs2O5Surftimeconst1O0Step>>(objects.parameters.sSurferUs2O5Surftimeconst1O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs3O0Surftimeconst1O0Parameters, SurferUs3O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs3O0Surftimeconst1O0Step));
@@ -256,9 +259,6 @@ struct InitObjectsParameters {
         data.push_back(std::make_shared<InitInit<InitSurferUs7O0Surftimeconst1O0Parameters, SurferUs7O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs7O0Surftimeconst1O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs8O0Surftimeconst1O0Parameters, SurferUs8O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs8O0Surftimeconst1O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs9O0Surftimeconst1O0Parameters, SurferUs9O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs9O0Surftimeconst1O0Step));
-        data.push_back(std::make_shared<InitInit<InitSurferUs10O0Surftimeconst1O0Parameters, SurferUs10O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs10O0Surftimeconst1O0Step));
-        data.push_back(std::make_shared<InitInit<InitSurferUs15O0Surftimeconst1O0Parameters, SurferUs15O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs15O0Surftimeconst1O0Step));
-        data.push_back(std::make_shared<InitInit<InitSurferUs20O0Surftimeconst1O0Parameters, SurferUs20O0Surftimeconst1O0Step>>(objects.parameters.sSurferUs20O0Surftimeconst1O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs0O5Surftimeconst0O0Parameters, SurferUs0O5Surftimeconst0O0Step>>(objects.parameters.sSurferUs0O5Surftimeconst0O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs0O5Surftimeconst2O0Parameters, SurferUs0O5Surftimeconst2O0Step>>(objects.parameters.sSurferUs0O5Surftimeconst2O0Step));
         data.push_back(std::make_shared<InitInit<InitSurferUs0O5Surftimeconst3O0Parameters, SurferUs0O5Surftimeconst3O0Step>>(objects.parameters.sSurferUs0O5Surftimeconst3O0Step));

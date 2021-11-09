@@ -8,19 +8,18 @@
 
 namespace c0p {
 
-template<typename TypeParameters, typename AgentActiveStep, typename TypeSensorDirection>
+template<typename TypeParameters, typename AgentActiveStep>
 class AgentBehaviourNavigatorBehaviourVelocityStraightSprinter : public AgentBehaviourNavigatorBehaviourVelocity<AgentActiveStep> {
     public:
         using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
     public:
         TypeParameters parameters;
-        TypeSensorDirection sensorDirection;
     public:
         AgentBehaviourNavigatorBehaviourVelocityStraightSprinter() {
         }
     public:
-        double operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& swimmingDirection) const override {
-            if(swimmingDirection.dot(sensorDirection(state, t, stepActive)) > 0.0){
+        double operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& direction, const TypeSpaceMatrix& velocityGradients, const TypeSpaceVector& swimmingDirection) const override {
+            if(swimmingDirection.dot(direction) > 0.0){
                 return 1.0;
             } else {
                 return 0.0;

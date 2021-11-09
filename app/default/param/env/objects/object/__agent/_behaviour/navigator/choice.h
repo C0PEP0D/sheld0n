@@ -6,7 +6,10 @@
 // THIS FILE WILL BE AUTOMATICALLY EDITED WHEN THE
 // CHOOSE COMMAND IS USED
 
-// behaviour direction choice
+// sensor choice
+#include "param/env/objects/object/agent/_behaviour/_sensor/direction/choice.h"
+#include "param/env/objects/object/agent/_behaviour/_sensor/velocity_gradients/choice.h"
+// sub behaviour choice
 #include "param/env/objects/object/agent/_behaviour/navigator/_behaviour_direction/choice.h"
 #include "param/env/objects/object/agent/_behaviour/navigator/_behaviour_velocity/choice.h"
 // choose your behaviour
@@ -14,7 +17,7 @@
 #include "param/env/objects/object/agent/_behaviour/navigator/local_axis_swimmer/parameters.h"
 namespace c0p {
     template<typename ObjectAgentActiveStep>
-    using ObjectAgentBehaviourNavigator = AgentBehaviourNavigatorLocalAxisSwimmer<ObjectAgentBehaviourNavigatorLocalAxisSwimmerParameters, ObjectAgentActiveStep, ObjectAgentBehaviourNavigatorBehaviourDirection<ObjectAgentActiveStep>, ObjectAgentBehaviourNavigatorBehaviourVelocity<ObjectAgentActiveStep>>;
+    using ObjectAgentBehaviourNavigator = AgentBehaviourNavigatorLocalAxisSwimmer<ObjectAgentBehaviourNavigatorLocalAxisSwimmerParameters, ObjectAgentActiveStep, ObjectAgentBehaviourSensorDirection<ObjectAgentActiveStep>, ObjectAgentBehaviourSensorVelocityGradients<ObjectAgentActiveStep>, ObjectAgentBehaviourNavigatorBehaviourDirection<ObjectAgentActiveStep>, ObjectAgentBehaviourNavigatorBehaviourVelocity<ObjectAgentActiveStep>>;
 }
 
 #endif

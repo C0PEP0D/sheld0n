@@ -16,6 +16,10 @@ class AgentBehaviourSensorDirection {
         }
     public:
         virtual TypeSpaceVector operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep& stepActive) const = 0;
+    public:
+        virtual TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeAgentStateStatic>& state, const AgentActiveStep& stepActive) const {
+            return {};
+        }
 };
 
 

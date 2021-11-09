@@ -17,7 +17,7 @@ struct SurferUs10O0Surftimeconst5O0GroupHomogeneousStepParameters {
     // should be done in the _member directory.
     using TypeMemberStep = SurferUs10O0Surftimeconst5O0GroupHomogeneousMemberStep;
     // Group size
-    static const unsigned int size = 1/(10.0*10.0) * Parameters::cGroupSize;
+    static const unsigned int size = 1/(1.0*1.0) * Parameters::cGroupSize;
 };
 
 }

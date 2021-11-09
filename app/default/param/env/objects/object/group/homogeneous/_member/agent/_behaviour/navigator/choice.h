@@ -6,7 +6,10 @@
 // THIS FILE WILL BE AUTOMATICALLY EDITED WHEN THE
 // CHOOSE COMMAND IS USED
 
-// behaviour direction choice
+// sensor choice
+#include "param/env/objects/object/group/homogeneous/_member/agent/_behaviour/_sensor/direction/choice.h"
+#include "param/env/objects/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients/choice.h"
+// sub behaviour choice
 #include "param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/choice.h"
 #include "param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_velocity/choice.h"
 // choose your behaviour
@@ -14,7 +17,7 @@
 #include "param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/local_axis_swimmer/parameters.h"
 namespace c0p {
     template<typename ObjectGroupHomogeneousMemberAgentActiveStep>
-    using ObjectGroupHomogeneousMemberAgentBehaviourNavigator = AgentBehaviourNavigatorLocalAxisSwimmer<ObjectGroupHomogeneousMemberAgentBehaviourNavigatorLocalAxisSwimmerParameters, ObjectGroupHomogeneousMemberAgentActiveStep, ObjectGroupHomogeneousMemberAgentBehaviourNavigatorBehaviourDirection<ObjectGroupHomogeneousMemberAgentActiveStep>, ObjectGroupHomogeneousMemberAgentBehaviourNavigatorBehaviourVelocity<ObjectGroupHomogeneousMemberAgentActiveStep>>;
+    using ObjectGroupHomogeneousMemberAgentBehaviourNavigator = AgentBehaviourNavigatorLocalAxisSwimmer<ObjectGroupHomogeneousMemberAgentBehaviourNavigatorLocalAxisSwimmerParameters, ObjectGroupHomogeneousMemberAgentActiveStep, ObjectGroupHomogeneousMemberAgentBehaviourSensorDirection<ObjectGroupHomogeneousMemberAgentActiveStep>, ObjectGroupHomogeneousMemberAgentBehaviourSensorVelocityGradients<ObjectGroupHomogeneousMemberAgentActiveStep>, ObjectGroupHomogeneousMemberAgentBehaviourNavigatorBehaviourDirection<ObjectGroupHomogeneousMemberAgentActiveStep>, ObjectGroupHomogeneousMemberAgentBehaviourNavigatorBehaviourVelocity<ObjectGroupHomogeneousMemberAgentActiveStep>>;
 }
 
 #endif

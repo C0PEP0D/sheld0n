@@ -7,11 +7,11 @@
 // CHOOSE COMMAND IS USED
 
 // choose your post processing
-#include "core/post/objects/object/post/group/all/core.h"
-#include "param/post/objects/tracers/ux/group/all/parameters.h"
+#include "param/post/objects/tracers/ux/group/choice.h"
+
 namespace c0p {
     template<typename TypeTracersStep>
-    using PostTracersUx = PostPostGroupAll<PostTracersUxGroupAllParameters, TypeTracersStep>;
+    using PostTracersUx = PostTracersUxGroup<TypeTracersStep>;
 }
 
 #endif

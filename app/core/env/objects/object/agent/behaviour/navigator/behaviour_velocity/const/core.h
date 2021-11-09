@@ -10,24 +10,18 @@
 
 namespace c0p {
 
-template<typename TypeParameters, typename AgentActiveStep, typename TypeSensorDirection, typename TypeSensorVelocityGradients>
+template<typename TypeParameters, typename AgentActiveStep>
 class AgentBehaviourNavigatorBehaviourVelocityConst : public AgentBehaviourNavigatorBehaviourVelocity<AgentActiveStep> {
     public:
         using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
     public:
         TypeParameters parameters;
-        TypeSensorDirection sensorDirection;
-        TypeSensorVelocityGradients sensorVelocityGradients;
     public:
         AgentBehaviourNavigatorBehaviourVelocityConst() {
         }
     public:
-        double operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& swimmingDirection) const override {
+        double operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& direction, const TypeSpaceMatrix& velocityGradients, const TypeSpaceVector& swimmingDirection) const override {
             return 1.0;
-        }
-    public:
-        TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeAgentStateStatic>& state, const AgentActiveStep& stepActive) const override {
-            return sensorVelocityGradients.positions(state, stepActive);
         }
 };
 

@@ -9,12 +9,12 @@
 // member
 #include "param/init/objects/tracers/pos/group/_member/choice.h"
 // choose your init
-#include "core/init/objects/object/init/group/box/core.h"
-#include "param/init/objects/tracers/pos/group/box/parameters.h"
+#include "core/init/objects/object/init/group/all/core.h"
+#include "param/init/objects/tracers/pos/group/all/parameters.h"
 
 namespace c0p {
     template<typename TypeTracersStep>
-    using InitTracersPosGroup = InitInitGroupBox<InitTracersPosGroupBoxParameters, TypeTracersStep, InitTracersPosGroupMember>;
+    using InitTracersPosGroup = InitInitGroupAll<InitTracersPosGroupAllParameters, TypeTracersStep, InitTracersPosGroupMember>;
 }
 
 #endif

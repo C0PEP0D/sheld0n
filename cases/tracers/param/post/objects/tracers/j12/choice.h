@@ -7,11 +7,11 @@
 // CHOOSE COMMAND IS USED
 
 // choose your post processing
-#include "core/post/objects/object/post/group/all/core.h"
-#include "param/post/objects/tracers/j12/group/all/parameters.h"
+#include "param/post/objects/tracers/j12/group/choice.h"
+
 namespace c0p {
     template<typename TypeTracersStep>
-    using PostTracersJ12 = PostPostGroupAll<PostTracersJ12GroupAllParameters, TypeTracersStep>;
+    using PostTracersJ12 = PostTracersJ12Group<TypeTracersStep>;
 }
 
 #endif

@@ -13,7 +13,7 @@ import fileinput
 
 def parse():
     parser = argparse.ArgumentParser(description='create a new simulation case based on the default one')
-    parser.add_argument('name', nargs='?', default='new_case', help='specify the name of the new simulation case')
+    parser.add_argument('name', nargs='?', default='new', help='specify the name of the new simulation case')
     return parser.parse_args()
 
 def main():

@@ -6,14 +6,12 @@
 // THIS FILE WILL BE AUTOMATICALLY EDITED WHEN THE
 // CHOOSE COMMAND IS USED
 
-// sensor choice
-#include "param/env/objects/riser__us_15o0/group/homogeneous/_member/agent/_behaviour/_sensor/direction/choice.h"
 // choose your behaviour
 #include "core/env/objects/object/agent/behaviour/navigator/behaviour_direction/straight/core.h"
 #include "param/env/objects/riser__us_15o0/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_direction/straight/parameters.h"
 namespace c0p {
     template<typename RiserUs15O0GroupHomogeneousMemberAgentActiveStep>
-    using RiserUs15O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourDirectionStraight = AgentBehaviourNavigatorBehaviourDirectionStraight<RiserUs15O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourDirectionStraightParameters, RiserUs15O0GroupHomogeneousMemberAgentActiveStep, RiserUs15O0GroupHomogeneousMemberAgentBehaviourSensorDirection<RiserUs15O0GroupHomogeneousMemberAgentActiveStep>>;
+    using RiserUs15O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourDirectionStraight = AgentBehaviourNavigatorBehaviourDirectionStraight<RiserUs15O0GroupHomogeneousMemberAgentBehaviourNavigatorBehaviourDirectionStraightParameters, RiserUs15O0GroupHomogeneousMemberAgentActiveStep>;
 }
 
 #endif

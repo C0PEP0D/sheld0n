@@ -6,9 +6,6 @@
 // THIS FILE WILL BE AUTOMATICALLY EDITED WHEN THE
 // CHOOSE COMMAND IS USED
 
-// sensor choice
-#include "param/env/objects/object/agent/_behaviour/_sensor/direction/choice.h"
-#include "param/env/objects/object/agent/_behaviour/_sensor/velocity_gradients/choice.h"
 // behaviour time horizon choice
 #include "param/env/objects/object/agent/_behaviour/navigator/_behaviour_velocity/surf/_behaviour_time_horizon/choice.h"
 // choose your behaviour
@@ -16,7 +13,7 @@
 #include "param/env/objects/object/agent/_behaviour/navigator/_behaviour_velocity/surf/sprinter/parameters.h"
 namespace c0p {
     template<typename ObjectAgentActiveStep>
-    using ObjectAgentBehaviourNavigatorBehaviourVelocitySurf = AgentBehaviourNavigatorBehaviourVelocitySurfSprinter<ObjectAgentBehaviourNavigatorBehaviourVelocitySurfSprinterParameters, ObjectAgentActiveStep, ObjectAgentBehaviourSensorDirection<ObjectAgentActiveStep>, ObjectAgentBehaviourSensorVelocityGradients<ObjectAgentActiveStep>, ObjectAgentBehaviourNavigatorBehaviourVelocitySurfBehaviourTimeHorizon<ObjectAgentActiveStep>>;
+    using ObjectAgentBehaviourNavigatorBehaviourVelocitySurf = AgentBehaviourNavigatorBehaviourVelocitySurfSprinter<ObjectAgentBehaviourNavigatorBehaviourVelocitySurfSprinterParameters, ObjectAgentActiveStep, ObjectAgentBehaviourNavigatorBehaviourVelocitySurfBehaviourTimeHorizon<ObjectAgentActiveStep>>;
 }
 
 #endif

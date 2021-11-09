@@ -7,10 +7,10 @@
 // CHOOSE COMMAND IS USED
 
 // choose your behaviour
-#include "param/env/objects/object/agent/_behaviour/navigator/_behaviour_velocity/surf/choice.h"
+#include "param/env/objects/object/agent/_behaviour/navigator/_behaviour_velocity/const/choice.h"
 namespace c0p {
     template<typename ObjectAgentActiveStep>
-    using ObjectAgentBehaviourNavigatorBehaviourVelocity = ObjectAgentBehaviourNavigatorBehaviourVelocitySurf<ObjectAgentActiveStep>;
+    using ObjectAgentBehaviourNavigatorBehaviourVelocity = ObjectAgentBehaviourNavigatorBehaviourVelocityConst<ObjectAgentActiveStep>;
 }
 
 #endif

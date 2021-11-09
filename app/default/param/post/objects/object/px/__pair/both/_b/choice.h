@@ -3,7 +3,7 @@
 #pragma once
 
 // choose your post
-#include "param/post/objects/object/px/pair/_b/passive/choice.h"
+#include "param/post/objects/object/px/pair/both/_b/passive/choice.h"
 
 namespace c0p {
     template<typename TypeMemberStep>
