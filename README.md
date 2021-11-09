@@ -5,7 +5,8 @@
 A code that enables complex active particle advection in flows. 
 The code is still in active developpement, feel free to ask for features.
 
-This code enables to compute active particle trajectories inside flows. It enables the user to specify a complex behaviour of particles. It can be used with external flow data, thus enabling to use data from flow simulations or experiments. Please keep in mind that this is a work in progress, all may not work out of the box yet.
+This code enables to compute active particle trajectories inside flows. It enables the user to specify a complex behaviour of particles. It can be used with external flow data, thus enabling to use data from flow simulations or experiments. Moreover, provided an internet connection, the software enables to use flows of the [Johns Hopkins Turbulence Database](http://turbulence.pha.jhu.edu/).
+Please keep in mind that this is a work in progress, all may not work out of the box yet.
 This software should be usable on any operating system but only have been tested on recent Linux distributions (Ubuntu 20, Archlinux).
 
 This repository contains:
@@ -57,6 +58,8 @@ $ git pull
 ```
 
 ## Usage
+
+The following covers basic usage of the code, while the documentation is improving, feel free to contact me if you have any questions regarding using this software.
 
 Most scripts provided by this software contain their description, explaining how to use them. 
 One can access this description using the following:
