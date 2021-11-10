@@ -6,9 +6,10 @@
 // THIS FILE WILL BE AUTOMATICALLY EDITED WHEN THE
 // CHOOSE COMMAND IS USED
 
-#include "param/env/objects/object/group/homogeneous/_member/agent/_active/choice.h"
 // choose your behaviour
 #include "param/env/objects/object/group/homogeneous/_member/agent/_behaviour/navigator/choice.h"
+// choose your active part
+#include "param/env/objects/object/group/homogeneous/_member/agent/_active/choice.h"
 namespace c0p {
     using ObjectGroupHomogeneousMemberAgentBehaviour = ObjectGroupHomogeneousMemberAgentBehaviourNavigator<ObjectGroupHomogeneousMemberAgentActiveStep>;
 }
