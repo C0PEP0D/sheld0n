@@ -24,8 +24,8 @@ class PostMeshPos : public PostMeshPost {
             // Init
             std::map<std::string, TypeScalar> processed;
             // Members process
-            for(const auto& index : sMesh->indexs()) {
-                processed["mesh_index_" + std::to_string(index) + "__" + parameters.name + "_" + std::to_string(parameters.i)] = sMesh->x(index)[parameters.i];
+            for(const auto& index : sMesh->indexCells()) {
+                processed["mesh_index_" + std::to_string(index) + "__" + parameters.name + "_" + std::to_string(parameters.i)] = sMesh->positionCell(index)[parameters.i];
             }
             return processed;
         };

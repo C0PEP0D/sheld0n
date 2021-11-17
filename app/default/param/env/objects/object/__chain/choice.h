@@ -6,10 +6,10 @@
 // THIS FILE WILL BE AUTOMATICALLY EDITED WHEN THE
 // CHOOSE COMMAND IS USED
 
-#include "core/env/objects/object/chain/simple/core.h"
-#include "param/env/objects/object/chain/simple/parameters.h"
+#include "core/env/objects/object/chain/non_strechable/core.h"
+#include "param/env/objects/object/chain/non_strechable/parameters.h"
 namespace c0p {
-    using ObjectChainStep = ChainSimpleStep<ObjectChainSimpleStepParameters>;
+    using ObjectChainStep = ChainNonStrechableStep<ObjectChainNonStrechableStepParameters>;
 }
 
 #endif

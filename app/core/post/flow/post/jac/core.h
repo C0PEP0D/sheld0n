@@ -25,8 +25,8 @@ class PostFlowJac : public PostFlowPost {
             // Init
             std::map<std::string, TypeScalar> processed;
             // Members process
-            for(const auto& index : sMesh->indexs()) {
-                processed["mesh_index_" + std::to_string(index) + "__" + parameters.name + "_" + std::to_string(parameters.i) + "_" + std::to_string(parameters.j)] = sFlow->getJacobian(sMesh->x(index), t)(parameters.i, parameters.j);
+            for(const auto& index : sMesh->indexCells()) {
+                processed["mesh_index_" + std::to_string(index) + "__" + parameters.name + "_" + std::to_string(parameters.i) + "_" + std::to_string(parameters.j)] = sFlow->getJacobian(sMesh->positionCell(index), t)(parameters.i, parameters.j);
             }
             return processed;
         };

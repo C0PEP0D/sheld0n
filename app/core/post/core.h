@@ -140,7 +140,7 @@ class Post {
                     env.sFlow->prepare(env.objects.sStep->positions(env.objects.state), t);
                 }
                 if(parameters.isPostProcessingFlow) {
-                    env.sFlow->prepare(mesh.sData->xs(), t);
+                    env.sFlow->prepare(mesh.sData->positionCells(), t);
                 }
             }
         }

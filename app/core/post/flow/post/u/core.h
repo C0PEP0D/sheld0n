@@ -25,8 +25,8 @@ class PostFlowU : public PostFlowPost {
             // Init
             std::map<std::string, TypeScalar> processed;
             // Members process
-            for(const auto& index : sMesh->indexs()) {
-                processed["mesh_index_" + std::to_string(index) + "__" + parameters.name + "_" + std::to_string(parameters.i)] = sFlow->getVelocity(sMesh->x(index), t)[parameters.i];
+            for(const auto& index : sMesh->indexCells()) {
+                processed["mesh_index_" + std::to_string(index) + "__" + parameters.name + "_" + std::to_string(parameters.i)] = sFlow->getVelocity(sMesh->positionCell(index), t)[parameters.i];
             }
             return processed;
         };

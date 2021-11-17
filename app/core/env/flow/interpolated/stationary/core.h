@@ -9,7 +9,7 @@
 #include <memory> // shared_ptr
 // Lib includes
 #include "v0l/bin/file_data.h"
-#include "m0sh/regular.h"
+#include "m0sh/uniform.h"
 #include "m0sh/structured_sub.h"
 #include "fl0p/stationary.h"
 // App includes
@@ -18,7 +18,7 @@
 
 namespace c0p {
 
-using TypeFlowInterpolatedMesh = m0sh::Regular<TypeVector, TypeRef, TypeContainer>;
+using TypeFlowInterpolatedMesh = m0sh::Uniform<TypeVector, TypeRef, TypeContainer>;
 using TypeFlowInterpolatedMeshSub = m0sh::StructuredSub<TypeVector, TypeRef, TypeContainer>;
 using TypeFlowInterpolated = fl0w::fl0p::Stationary<TypeVector, TypeMatrix, TypeRef, TypeFlowInterpolatedMesh, TypeContainer, TypeFlowInterpolatedMeshSub, v0l::FileData>;
 
@@ -52,7 +52,7 @@ class FlowInterpolatedStationary {
                 origin[i] = vx.meta.origin[i];
             }
             // Allocate data
-            sData = std::make_shared<Type>(std::make_shared<TypeFlowInterpolatedMesh>(vx.meta.dimensions, lengths, origin), std::vector<v0l::FileData>({vx, vy, vz}), std::vector<v0l::FileData>({duxdx, duydx, duzdx, duxdy, duydy, duzdy, duxdz, duydz, duzdz}), parameters.order);
+            sData = std::make_shared<Type>(std::make_shared<TypeFlowInterpolatedMesh>(vx.meta.dimensions, lengths, origin, std::vector<bool>(3, true)), std::vector<v0l::FileData>({vx, vy, vz}), std::vector<v0l::FileData>({duxdx, duydx, duzdx, duxdy, duydy, duzdy, duxdz, duydz, duzdz}), parameters.order);
         }
         
         void init(const TypeScalar& t) {

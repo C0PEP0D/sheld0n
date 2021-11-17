@@ -10,7 +10,7 @@
 #include <filesystem>
 // Lib includes
 #include "v0l/bin/file_data.h"
-#include "m0sh/regular.h"
+#include "m0sh/uniform.h"
 #include "m0sh/structured_sub.h"
 #include "fl0p/unstationary.h"
 // App includes
@@ -19,9 +19,9 @@
 
 namespace c0p {
 
-using TypeFlowInterpolatedMesh = m0sh::Regular<TypeSpaceVector, TypeRef, TypeContainer>;
+using TypeFlowInterpolatedMesh = m0sh::Uniform<TypeSpaceVector, TypeRef, TypeContainer>;
 using TypeFlowInterpolatedMeshSub = m0sh::StructuredSub<TypeSpaceVector, TypeRef, TypeContainer>;
-using TypeFlowInterpolatedMeshTime = m0sh::Regular<TypeVector<1>, TypeRef, TypeContainer>;
+using TypeFlowInterpolatedMeshTime = m0sh::Uniform<TypeVector<1>, TypeRef, TypeContainer>;
 using TypeFlowInterpolatedMeshTimeSub = m0sh::StructuredSub<TypeVector<1>, TypeRef, TypeContainer>;
 using TypeFlowInterpolated = fl0w::fl0p::Unstationary<TypeSpaceVector, TypeSpaceMatrix, TypeRef, TypeFlowInterpolatedMesh, TypeContainer, TypeFlowInterpolatedMeshSub, TypeFlowInterpolatedMeshTime, TypeFlowInterpolatedMeshTimeSub, TypeVector<1>, v0l::FileData>;
 
@@ -142,7 +142,7 @@ class FlowInterpolatedUnstationary : public TypeFlowInterpolated {
                 origin[i] = velocity[0][0].meta.origin[i];
             }
             // build data
-            Type::build(std::make_shared<TypeFlowInterpolatedMesh>(velocity[0][0].meta.dimensions, lengths, origin), velocity, jacobian, parameters.spaceOrder, std::make_shared<TypeFlowInterpolatedMeshTime>(TypeContainer<std::size_t>(1, parameters.timeOrder + 1), TypeContainer<TypeScalar>(1, parameters.dt * (parameters.timeOrder + 1)), TypeVector<1>(t)), parameters.timeOrder);
+            Type::build(std::make_shared<TypeFlowInterpolatedMesh>(velocity[0][0].meta.dimensions, lengths, origin), velocity, jacobian, parameters.spaceOrder, std::make_shared<TypeFlowInterpolatedMeshTime>(TypeContainer<std::size_t>(1, parameters.timeOrder + 1), TypeContainer<TypeScalar>(1, parameters.dt * (parameters.timeOrder + 1)), TypeVector<1>(t), TypeContainer<bool>(1, false)), parameters.timeOrder);
         }
 };
 
