@@ -4,30 +4,40 @@
 [submodule "modules/v0l"]
 	path = modules/v0l
 	url = https://github.com/C0PEP0D/v0l.git
+	branch = master
 [submodule "modules/sl0"]
 	path = modules/sl0
 	url = https://github.com/C0PEP0D/sl0.git
+	branch = master
 [submodule "modules/sa0"]
 	path = modules/sa0
 	url = https://github.com/C0PEP0D/sa0.git
+	branch = master
 [submodule "modules/s0ve"]
 	path = modules/s0ve
 	url = https://github.com/C0PEP0D/s0ve.git
+	branch = master
 [submodule "modules/s0s"]
 	path = modules/s0s
 	url = https://github.com/C0PEP0D/s0s.git
+	branch = master
 [submodule "modules/p0l"]
 	path = modules/p0l
 	url = https://github.com/C0PEP0D/p0l.git
+	branch = master
 [submodule "modules/m0sh"]
 	path = modules/m0sh
 	url = https://github.com/C0PEP0D/m0sh.git
+	branch = master
 [submodule "modules/l0ad"]
 	path = modules/l0ad
 	url = https://github.com/C0PEP0D/l0ad.git
+	branch = master
 [submodule "modules/fl0w"]
 	path = modules/fl0w
 	url = https://github.com/C0PEP0D/fl0w.git
+	branch = master
 [submodule "modules/fl0p"]
 	path = modules/fl0p
 	url = https://github.com/C0PEP0D/fl0p.git
+	branch = master
