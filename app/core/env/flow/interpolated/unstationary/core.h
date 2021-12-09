@@ -60,7 +60,7 @@ class FlowInterpolatedUnstationary : public TypeFlowInterpolated {
             std::vector<std::size_t> indexs;
             for(const TypeSpaceVector& x : positions) {
                 // Compute offset
-                std::vector<int> offset = Type::data[0].sMesh->ijk(x);
+                std::vector<int> offset = Type::data[0].sMesh->ijkCell(x);
                 for(auto& o : offset) {
                     o -= (Type::data[0].order + 1)/2;
                 }
@@ -76,7 +76,7 @@ class FlowInterpolatedUnstationary : public TypeFlowInterpolated {
                 //    }
                 //}
                 // Build subMesh and compute
-                std::vector<std::size_t> xIndexs = TypeFlowInterpolatedMeshSub(std::vector<std::size_t>(x.size(), Type::data[0].order + 1), offset, Type::data[0].sMesh).indexs();
+                std::vector<std::size_t> xIndexs = TypeFlowInterpolatedMeshSub(std::vector<std::size_t>(x.size(), Type::data[0].order + 1), offset, Type::data[0].sMesh).indexCells();
                 indexs.insert(indexs.end(), xIndexs.begin(), xIndexs.end());
             }
             for(auto& frame : Type::data) {
@@ -142,7 +142,7 @@ class FlowInterpolatedUnstationary : public TypeFlowInterpolated {
                 origin[i] = velocity[0][0].meta.origin[i];
             }
             // build data
-            Type::build(std::make_shared<TypeFlowInterpolatedMesh>(velocity[0][0].meta.dimensions, lengths, origin), velocity, jacobian, parameters.spaceOrder, std::make_shared<TypeFlowInterpolatedMeshTime>(TypeContainer<std::size_t>(1, parameters.timeOrder + 1), TypeContainer<TypeScalar>(1, parameters.dt * (parameters.timeOrder + 1)), TypeVector<1>(t), TypeContainer<bool>(1, false)), parameters.timeOrder);
+            Type::build(std::make_shared<TypeFlowInterpolatedMesh>(velocity[0][0].meta.dimensions, lengths, origin, TypeContainer<bool>(3, true)), velocity, jacobian, parameters.spaceOrder, std::make_shared<TypeFlowInterpolatedMeshTime>(TypeContainer<std::size_t>(1, parameters.timeOrder), TypeContainer<TypeScalar>(1, parameters.dt * (parameters.timeOrder + 1)), TypeVector<1>(t), TypeContainer<bool>(1, false)), parameters.timeOrder);
         }
 };
 
