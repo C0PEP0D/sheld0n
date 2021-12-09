@@ -1,6 +1,8 @@
 # TODO
 
 * Current:
+    - interface: all dynamic objects for starters
+    - agent follow line case
     - space partition and geometry
     - template argument number reduction (C-like interface)
 * App:
