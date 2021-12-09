@@ -9,7 +9,7 @@
 
 namespace c0p {
 
-using TypePassivePointStep = sl0::StepPoint<TypeVector, DIM, TypeRef, TypeView, Flow>;
+using TypePassivePointStep = sl0::StepPoint<TypeVector, DIM, TypeView, Flow>;
 
 }
 

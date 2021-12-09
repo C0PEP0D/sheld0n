@@ -1,5 +1,8 @@
 # TODO
 
+* Current:
+    - space partition and geometry
+    - template argument number reduction (C-like interface)
 * App:
     - Python custom behaviour
     - factorise parameters (ex: behaviourTimeHorizon)
@@ -12,6 +15,5 @@
     - s0ve
     - StepPoint -> PointStep, same for all others
     - use only Generic TypeAlgebra, along with DIM and other global parameters
-    - template argument number reduction
 * Misc:
     - setup testing pipeline

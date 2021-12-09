@@ -10,7 +10,7 @@
 #include "core/post/prop.h"
 
 namespace c0p {
-    using TypeObjects = c0p::Objects<c0p::ObjectsParameters>;
+    using TypeObjects = c0p::Objects;
 }
 
 #endif

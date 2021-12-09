@@ -15,17 +15,22 @@ namespace c0p {
 template<typename TypeParameters>
 class PostObjects {
     public:
-        std::shared_ptr<TypeObjects::Type::TypeStep> sObjectsStep;
+        std::shared_ptr<TypeObjects> sObjects;
         TypeParameters parameters;
     public:
-        PostObjects(const TypeObjects& objects) : parameters(objects), sObjectsStep(objects.sStep) {
+        PostObjects(std::shared_ptr<TypeObjects> p_sObjects, std::shared_ptr<ObjectsParameters> sObjectsParameters) : parameters(sObjectsParameters), sObjects(p_sObjects) {
         }
     public:
-        std::map<std::string, TypeScalar> operator()(const TypeVector<Eigen::Dynamic>& state, const double& t) {
+        std::map<std::string, TypeScalar> operator()(const double* pStateStatic, const std::vector<std::vector<double>>& statesDynamic, const double& t) {
             // compute
             std::vector<std::map<std::string, TypeScalar>> processedMembers(parameters.data.size());
-            std::for_each(/*std::execution::par_unseq, */sObjectsStep->memberIndexs.cbegin(), sObjectsStep->memberIndexs.cend(), [this, state, t, &processedMembers](const unsigned int& memberIndex){ 
-                processedMembers[memberIndex] = (*parameters.data[memberIndex])(sObjectsStep->cMemberState(state, memberIndex), t);
+            // static
+            std::for_each(/*std::execution::par_unseq, */sObjects->sStepStatic->memberIndexs.cbegin(), sObjects->sStepStatic->memberIndexs.cend(), [this, pStateStatic, t, &processedMembers](const unsigned int& memberIndex){ 
+                processedMembers[memberIndex] = (*parameters.data[memberIndex])(sObjects->sStepStatic->cMemberState(pStateStatic, memberIndex), t);
+            });
+            // dynamic
+            std::for_each(/*std::execution::par_unseq, */sObjects->dynamicIndexs.cbegin(), sObjects->dynamicIndexs.cend(), [this, statesDynamic, t, &processedMembers](const unsigned int& dynamicIndex){ 
+                processedMembers[sObjects->sStepStatic->size() + dynamicIndex] = (*parameters.data[sObjects->sStepStatic->size() + dynamicIndex])(statesDynamic[dynamicIndex].data(), t);
             });
             // return
             std::map<std::string, TypeScalar> processed;

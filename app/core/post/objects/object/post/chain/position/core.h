@@ -21,15 +21,14 @@ class PostPostChainPosition : public PostPostPost<TypeObjectStep> {
     public:
         using PostPostPost<TypeObjectStep>::PostPostPost;
     public:
-        std::map<std::string, TypeScalar> operator()(const TypeVector<Eigen::Dynamic>& state, const double& t) override {
+        std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
             std::map<std::string, TypeScalar> processed;
-            const unsigned int n = std::ceil(sObjectStep->length / parameters.dl);
-            const double ds = 1.0 / (n - 1);
+            const unsigned int n = std::ceil(1.0 / parameters.ds);
             for(unsigned int i = 0; i < n; i++) {
-                const double s = i *ds;
+                const double s = i * parameters.ds;
                 std::string sStr = std::to_string(s);
                 std::replace(sStr.begin(), sStr.end(), '.', 'o');
-                processed["s_" + sStr + "__" + parameters.name + "_" + std::to_string(parameters.i)] = sObjectStep->cX(state, s)[parameters.i];
+                processed["s_" + sStr + "__" + parameters.name + "_" + std::to_string(parameters.i)] = sObjectStep->cX(pState, s)[parameters.i];
             }
             return processed;
         };

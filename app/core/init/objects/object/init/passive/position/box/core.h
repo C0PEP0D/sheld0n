@@ -9,13 +9,13 @@
 namespace c0p {
 
 template<typename Parameters, typename TypeObjectStep>
-class InitInitPassivePositionBox : public InitInitInit<TypeObjectStep> {
+class InitInitPassivePositionBox : public InitInitInitStatic<TypeObjectStep> {
     public:
         Parameters parameters;
     public:
-        using InitInitInit<TypeObjectStep>::sObjectStep;
+        using InitInitInitStatic<TypeObjectStep>::sObjectStep;
     public:
-        using InitInitInit<TypeObjectStep>::InitInitInit;
+        using InitInitInitStatic<TypeObjectStep>::InitInitInitStatic;
     public:
         void operator()(TypeRef<TypeVector<Eigen::Dynamic>> state) override {
             TypeSpaceVector xInit = parameters.c0;

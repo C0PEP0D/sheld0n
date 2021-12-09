@@ -25,13 +25,14 @@ struct ObjectsParameters {
     // FLAG: DECLARE OBJECT END
     
     // construct data
-    std::vector<std::shared_ptr<StepObject>> data;
-    ObjectsParameters(std::shared_ptr<Flow> sFlow, Objects<ObjectsParameters>* pObjects) {
+    std::vector<std::shared_ptr<StepObjectStatic>> sObjectsStaticSteps;
+    std::vector<std::shared_ptr<StepObjectDynamic>> sObjectsDynamicSteps;
+    ObjectsParameters(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) {
         // FLAG: MAKE OBJECT BEGIN
         // // object
-        sObjectStep = std::make_shared<ObjectStep>(sFlow, pObjects);
-        data.push_back(sObjectStep);
-        objectIndex = data.size() - 1;
+        sObjectStep = std::make_shared<ObjectStep>(sFlow, sObjects);
+        sObjectsStaticSteps.push_back(sObjectStep);
+        objectIndex = sObjectsStaticSteps.size() - 1;
         // FLAG: MAKE OBJECT END
     }
 };

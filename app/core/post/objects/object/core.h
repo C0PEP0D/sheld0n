@@ -20,7 +20,7 @@ class PostPostBase {
         PostPostBase() {
         }
     public:
-        virtual std::map<std::string, TypeScalar> operator()(const TypeVector<Eigen::Dynamic>& state, const double& t) = 0;
+        virtual std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) = 0;
 };
 
 template<template<typename> typename TypeParameters, typename TypeObjectStep>
@@ -32,13 +32,13 @@ class PostPost : public PostPostBase {
         PostPost(std::shared_ptr<TypeObjectStep> p_sObjectStep) : sObjectStep(p_sObjectStep), parameters(sObjectStep) {
         }
     public:
-        std::map<std::string, TypeScalar> operator()(const TypeVector<Eigen::Dynamic>& state, const double& t) override {
+        std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
             std::vector<unsigned int> dataIndexs(parameters.data.size());
             std::iota(dataIndexs.begin(), dataIndexs.end(), 0);
             // compute
             std::vector<std::map<std::string, TypeScalar>> processedData(parameters.data.size());
-            std::for_each(/*std::execution::par_unseq, */dataIndexs.begin(), dataIndexs.end(), [this, state, t, &processedData](const unsigned int& dataIndex){ 
-                for(const auto& p : (*parameters.data[dataIndex])(state, t)) {
+            std::for_each(/*std::execution::par_unseq, */dataIndexs.begin(), dataIndexs.end(), [this, pState, t, &processedData](const unsigned int& dataIndex){ 
+                for(const auto& p : (*parameters.data[dataIndex])(pState, t)) {
                     processedData[dataIndex][parameters.name + "__" + p.first] = p.second;
                 }
             });

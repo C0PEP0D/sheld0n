@@ -19,10 +19,11 @@ namespace c0p {
 
 struct InitObjectsParameters {
     // make data
-    std::vector<std::shared_ptr<InitInitBase>> data;
-    InitObjectsParameters(const TypeObjects& objects) {
+    std::vector<std::shared_ptr<InitInitStaticBase>> sInitsStatic;
+    std::vector<std::shared_ptr<InitInitDynamicBase>> sInitsDynamic;
+    InitObjectsParameters(std::shared_ptr<TypeObjectsParameters> sObjectsParameters) {
         // FLAG: MAKE OBJECT BEGIN
-        data.push_back(std::make_shared<InitInit<InitObjectParameters, ObjectStep>>(objects.parameters.sObjectStep));
+        sInitsStatic.push_back(std::make_shared<InitInitStatic<InitObjectParameters, ObjectStep>>(sObjectsParameters->sObjectStep));
         // FLAG: MAKE OBJECT END
     }
 };

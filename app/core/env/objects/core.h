@@ -5,6 +5,7 @@
 // std includes
 #include <string>
 #include <memory>
+#include <execution>
 // lib includes
 #include "sl0/group/dynamic.h"
 // app includes
@@ -12,81 +13,64 @@
 
 namespace c0p {
 
-template<typename TypeParameters>
 class Objects;
 
-template<typename TypeObjectsParameters>
-class StepObjects : public sl0::StepGroupDynamic<TypeVector, DIM, TypeRef, TypeView, StepObject> {
+class StepObjectsStatic : public sl0::StepGroupDynamic<TypeVector, DIM, TypeView> {
     public:
-        using Type = sl0::StepGroupDynamic<TypeVector, DIM, TypeRef, TypeView, StepObject>;
+        using Type = sl0::StepGroupDynamic<TypeVector, DIM, TypeView>;
+        using typename Type::TypeStateVectorDynamic;
     public:
         // env
         std::shared_ptr<Flow> sFlow;
-        Objects<TypeObjectsParameters>* pObjects;
     public:
-        StepObjects(const std::shared_ptr<Flow>& p_sFlow, Objects<TypeObjectsParameters>* p_pObjects) : Type(), sFlow(p_sFlow), pObjects(p_pObjects) {
+        StepObjectsStatic(const std::shared_ptr<Flow>& p_sFlow) : Type(), sFlow(p_sFlow) {
         }
     public:
-        TypeVector<Eigen::Dynamic> operator()(const TypeRef<const TypeVector<Eigen::Dynamic>>& state, const double& t) const override {
+        TypeStateVectorDynamic operator()(const double* pState, const double& t) const override {
             // TODO
-            sFlow->prepare(positions(state), t);
-            return Type::operator()(state, t);
+            sFlow->prepare(positions(pState), t);
+            return Type::operator()(pState, t);
         }
-    //public:
-        //TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeVector<Eigen::Dynamic>>& state) const override {
-        //    TypeContainer<TypeSpaceVector> result;
-        //    result.reserve(state.size() / DIM);
-        //    for(unsigned int i = 0; i < state.size(); i += DIM) {
-        //        result.emplace_back();
-        //        for(unsigned int j = 0; j < DIM; j++) {
-        //            result.back()[j] = state[i + j];
-        //        }
-        //    }
-        //    return result;
-        //}
 };
 
-template<typename TypeParameters>
-class Objects : public sl0::ObjectDynamic<TypeSolver, StepObjects<TypeParameters>> {
+class Objects {
     public:
-        using Type = sl0::ObjectDynamic<TypeSolver, StepObjects<TypeParameters>>;
+        using TypeStepDynamic = sl0::StepGroupDynamicHomogeneousBase<TypeVector, DIM, TypeView>;
     public:
-        TypeParameters parameters;
-        std::shared_ptr<Flow> sFlow;
-    public:
-        Objects(const std::shared_ptr<Flow>& p_sFlow) : Type(std::make_shared<StepObjects<TypeParameters>>(p_sFlow, this)), parameters(p_sFlow, this), sFlow(p_sFlow) {
-            for(const std::shared_ptr<StepObject> sMemberStep : parameters.data) {
-                addMember(sMemberStep, sMemberStep->stateSize());
-            }
+        Objects(const std::shared_ptr<Flow>& sFlow) : sSolver(std::make_shared<TypeSolver>()), t(0.0), sStepStatic(std::make_shared<StepObjectsStatic>(sFlow)), stateStatic(sStepStatic->stateSize(), 0.0) {
+        }
+        void update(const double& dt) {
+            // static
+            (*sSolver)(*sStepStatic, stateStatic.data(), stateStatic.size(), t, dt);
+            (*sStepStatic).update(stateStatic, t);
+            // dynamic
+            std::for_each(std::execution::par_unseq, dynamicIndexs.cbegin(), dynamicIndexs.cend(), [this, dt](const unsigned int& dynamicIndex){ 
+                (*sSolver)(*sStepsDynamic[dynamicIndex], statesDynamic[dynamicIndex].data(), statesDynamic[dynamicIndex].size(), t, dt);
+                (*sStepsDynamic[dynamicIndex]).update(statesDynamic[dynamicIndex], t);
+            });
+            // t
+            t += dt;
         }
     public:
-        // member management
-        void addMember(std::shared_ptr<StepObject> sMemberStep, const unsigned int& stateSize) {
-            state.conservativeResize(state.size() + stateSize);
-            sStep->registerMember(sMemberStep, stateSize);
-        }
-        void removeMember(const unsigned int& memberIndex) {
-            std::copy(state.begin() + memberIndex + sStep->memberStateSizes[memberIndex], state.end(), state.begin() + memberIndex);
-            state.conservativeResize(state.size() - sStep->memberStateSizes[memberIndex]);
-            sStep->unregisterMember(memberIndex);
-        }
-        void updateMemberSize(const unsigned int& memberIndex, const unsigned int& stateSize) {
-            const int difference = stateSize - sStep->memberStateSizes[memberIndex];
-            if(difference > 0) {
-                state.conservativeResize(state.size() + difference);
-                std::copy(state.begin() + memberIndex + sStep->memberStateSizes[memberIndex], state.end() - difference, state.begin() + stateSize);
+        void addDynamicObject(std::shared_ptr<TypeStepDynamic> p_sStepDynamic) {
+            sStepsDynamic.push_back(p_sStepDynamic);
+            statesDynamic.emplace_back();
+            if(dynamicIndexs.empty()) {
+                dynamicIndexs.push_back(0);
             } else {
-                std::copy(state.begin() + memberIndex + sStep->memberStateSizes[memberIndex], state.end(), state.begin() + stateSize);
-                state.conservativeResize(state.size() + difference);
+                dynamicIndexs.push_back(dynamicIndexs.back() + 1);
             }
-            sStep->updateMemberSize(memberIndex, difference);
         }
     public:
-        // Inherited properties
-        using Type::sSolver;
-        using Type::sStep;
-        using Type::state;
-        using Type::t;
+        std::shared_ptr<TypeSolver> sSolver;
+        double t;
+    public:
+        std::shared_ptr<StepObjectsStatic> sStepStatic;
+        std::vector<double> stateStatic;
+    public:
+        std::vector<std::shared_ptr<TypeStepDynamic>> sStepsDynamic;
+        std::vector<std::vector<double>> statesDynamic;
+        std::vector<std::size_t> dynamicIndexs;
 };
 
 }

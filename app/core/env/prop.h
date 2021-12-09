@@ -29,7 +29,7 @@ constexpr unsigned int DIM = 3; // 2D or 3D
 using TypeSpaceVector = TypeVector<DIM>;
 using TypeSpaceMatrix = TypeMatrix<DIM, DIM>;
 // Solver
-using TypeSolver = s0s::SolverRungeKuttaFehlberg;
+using TypeSolver = s0s::SolverRungeKuttaFehlberg<TypeVector<-1>, TypeView>;
 
 }
 

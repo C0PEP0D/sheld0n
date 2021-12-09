@@ -16,5 +16,5 @@
 #include "param/post/flow/parameters.h"
 
 int main () { 
-    c0p::Post<c0p::PostParameters, c0p::PostObjectsParameters, c0p::PostMeshParameters, c0p::PostFlowParameters, c0p::Env<c0p::EnvParameters, c0p::Objects<c0p::ObjectsParameters>>> post;
+    c0p::Post<c0p::PostParameters, c0p::PostObjectsParameters, c0p::PostMeshParameters, c0p::PostFlowParameters, c0p::Env<c0p::EnvParameters>> post;
 }
