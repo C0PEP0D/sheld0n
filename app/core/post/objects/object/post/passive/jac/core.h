@@ -20,9 +20,9 @@ class PostPostPassiveJac : public PostPostPost<TypeObjectStep> {
     public:
         using PostPostPost<TypeObjectStep>::PostPostPost;
     public:
-        std::map<std::string, TypeScalar> operator()(const TypeVector<Eigen::Dynamic>& state, const double& t) override {
+        std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
             return {
-                { parameters.name + "_" + std::to_string(parameters.i) + "_" + std::to_string(parameters.j), sObjectStep->sFlow->getJacobian(sObjectStep->cX(state), t)(parameters.i, parameters.j) }
+                { parameters.name + "_" + std::to_string(parameters.i) + "_" + std::to_string(parameters.j), sObjectStep->sFlow->getJacobian(sObjectStep->cX(pState), t)(parameters.i, parameters.j) }
             };
         };
 };
