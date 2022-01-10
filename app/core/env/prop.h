@@ -4,6 +4,8 @@
 
 // thirdparties includes
 #include <Eigen/Dense>
+// std
+#include <random>
 // lib includes
 #include "s0s/runge_kutta_fehlberg.h"
 
@@ -30,6 +32,19 @@ using TypeSpaceVector = TypeVector<DIM>;
 using TypeSpaceMatrix = TypeMatrix<DIM, DIM>;
 // Solver
 using TypeSolver = s0s::SolverRungeKuttaFehlberg;
+
+namespace rand0m {
+    std::random_device device;
+    std::default_random_engine engine(device());
+    // distribution
+    std::normal_distribution<> standardNormalDistribution(0.0, 1.0);
+    std::uniform_real_distribution<> uniformRealDistribution(-1.0, 1.0);
+
+    void seed(unsigned int p_seed) {
+        engine.seed(p_seed);
+        std::srand(p_seed);
+    }
+}
 
 }
 

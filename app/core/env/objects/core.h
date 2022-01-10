@@ -28,7 +28,6 @@ class StepObjects : public sl0::StepGroupDynamic<TypeVector, DIM, TypeRef, TypeV
         }
     public:
         TypeVector<Eigen::Dynamic> operator()(const TypeRef<const TypeVector<Eigen::Dynamic>>& state, const double& t) const override {
-            // TODO
             sFlow->prepare(positions(state), t);
             return Type::operator()(state, t);
         }
