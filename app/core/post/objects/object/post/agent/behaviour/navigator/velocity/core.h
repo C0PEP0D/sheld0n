@@ -21,8 +21,11 @@ class PostPostAgentBehaviourNavigatorVelocity : public PostPostPost<TypeObjectSt
         using PostPostPost<TypeObjectStep>::PostPostPost;
     public:
         std::map<std::string, TypeScalar> operator()(const TypeVector<Eigen::Dynamic>& state, const double& t) override {
+            const TypeSpaceVector direction = sObjectStep->sBehaviour->sensorDirection(state, t, *sObjectStep);
+            const TypeSpaceMatrix velocityGradients = sObjectStep->sBehaviour->sensorVelocityGradients(state, t, *sObjectStep);
+            const TypeSpaceVector swimmingDirection = sObjectStep->cAxis(state);
             return {
-                { parameters.name, sObjectStep->sBehaviour->behaviourVelocity(state, t, *sObjectStep, sObjectStep->sBehaviour->behaviourDirection(state, t, *sObjectStep).normalized()) * (*sObjectStep).parameters.velocity }
+                { parameters.name, sObjectStep->sBehaviour->behaviourVelocity(state, t, *sObjectStep, direction, velocityGradients, swimmingDirection) * (*sObjectStep).parameters.velocity }
             };
         };
 };

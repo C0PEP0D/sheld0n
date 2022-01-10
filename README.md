@@ -113,6 +113,13 @@ One can edit any `parameters.h` file in this subtree.
 Furthermore can choose between different simulation parameters using the `choose` scripts.
 The `print_param` is a helper script to print all parameters that can be used to check all simulation parameters before running a simulation.
 
+### Known issue
+
+There is a memory leak somewhere. 
+I am pretty sure it comes from the turblib library but I have not got the time to investigate it more.
+You should be fine if you do not use the jhtdb flow.
+If you do, just kill the process when too much memory is used and rerun it.
+
 ## Maintainers
 
 Rémi Monthiller - [@rmonthil](https://gitlab.com/rmonthil) - remi.monthiller@gmail.com

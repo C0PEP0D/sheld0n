@@ -49,12 +49,13 @@ def main():
                 J[2, 0] = objects_j_2_0[object_name]["value"][i, j]
                 J[2, 1] = objects_j_2_1[object_name]["value"][i, j]
                 J[2, 2] = objects_j_2_2[object_name]["value"][i, j]
+                O = 0.5 * (J - J.transpose())
                 # compute
                 objects_tr_2[object_name]["value"][i, j] = np.trace(np.matmul(J, J))
                 tr_2_name = "tr(J^2)"
                 invariant = np.dot(J, DIRECTION)
-                objects_invariant[object_name]["value"][i, j] = np.linalg.norm(invariant)
-                invariant_name = "||J.z||"
+                objects_invariant[object_name]["value"][i, j] = O[0,2] * O[0,2]#np.linalg.norm(invariant)
+                invariant_name = "vort.y"#"||J.z||"
                 objects_invariant_mmean[object_name]["value"][i, j] = np.linalg.norm(invariant)
                 objects_invariant_x[object_name]["value"][i, j] = invariant[0]
                 objects_invariant_y[object_name]["value"][i, j] = invariant[1]
@@ -132,33 +133,33 @@ def main():
         if not reduced_object_name in objects_time_estimate:
             objects_time_estimate_tr_2[reduced_object_name] = {}
             objects_time_estimate_tr_2[reduced_object_name]["value"] = []
-            objects_time_estimate_tr_2[reduced_object_name]["info"] = ["us/u_eta", "time_estimate"]
+            objects_time_estimate_tr_2[reduced_object_name]["info"] = ["us/u_eta", "reorientationtime/tau_eta", "time_estimate"]
             objects_time_estimate_sq_tr_2[reduced_object_name] = {}
             objects_time_estimate_sq_tr_2[reduced_object_name]["value"] = []
-            objects_time_estimate_sq_tr_2[reduced_object_name]["info"] = ["us/u_eta", "time_estimate"]
+            objects_time_estimate_sq_tr_2[reduced_object_name]["info"] = ["us/u_eta", "reorientationtime/tau_eta", "time_estimate"]
             objects_time_estimate[reduced_object_name] = {}
             objects_time_estimate[reduced_object_name]["value"] = []
-            objects_time_estimate[reduced_object_name]["info"] = ["us/u_eta", "time_estimate"]
+            objects_time_estimate[reduced_object_name]["info"] = ["us/u_eta", "reorientationtime/tau_eta", "time_estimate"]
             objects_time_estimate_mmean[reduced_object_name] = {}
             objects_time_estimate_mmean[reduced_object_name]["value"] = []
-            objects_time_estimate_mmean[reduced_object_name]["info"] = ["us/u_eta", "time_estimate"]
+            objects_time_estimate_mmean[reduced_object_name]["info"] = ["us/u_eta", "reorientationtime/tau_eta", "time_estimate"]
             objects_time_estimate_x[reduced_object_name] = {}
             objects_time_estimate_x[reduced_object_name]["value"] = []
-            objects_time_estimate_x[reduced_object_name]["info"] = ["us/u_eta", "time_estimate"]
+            objects_time_estimate_x[reduced_object_name]["info"] = ["us/u_eta", "reorientationtime/tau_eta", "time_estimate"]
             objects_time_estimate_y[reduced_object_name] = {}
             objects_time_estimate_y[reduced_object_name]["value"] = []
-            objects_time_estimate_y[reduced_object_name]["info"] = ["us/u_eta", "time_estimate"]
+            objects_time_estimate_y[reduced_object_name]["info"] = ["us/u_eta", "reorientationtime/tau_eta", "time_estimate"]
             objects_time_estimate_z[reduced_object_name] = {}
             objects_time_estimate_z[reduced_object_name]["value"] = []
-            objects_time_estimate_z[reduced_object_name]["info"] = ["us/u_eta", "time_estimate"]
+            objects_time_estimate_z[reduced_object_name]["info"] = ["us/u_eta", "reorientationtime/tau_eta", "time_estimate"]
         # value
-        objects_time_estimate_tr_2[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), np.trapz(objects_average_fft_tr_2[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_tr_2[object_name]["value"][:, 0], x=angular_frequency)]))
-        objects_time_estimate_sq_tr_2[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), np.trapz(np.sqrt(objects_average_fft_tr_2[object_name]["value"][:, 0]) * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(np.sqrt(objects_average_fft_tr_2[object_name]["value"][:, 0]), x=angular_frequency)]))
-        objects_time_estimate[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), np.trapz(objects_average_fft_invariant[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_invariant[object_name]["value"][:, 0], x=angular_frequency)]))
-        objects_time_estimate_mmean[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), np.trapz(objects_average_fft_invariant_mmean[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_invariant_mmean[object_name]["value"][:, 0], x=angular_frequency)]))
-        objects_time_estimate_x[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), np.trapz(objects_average_fft_invariant_x[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_invariant_x[object_name]["value"][:, 0], x=angular_frequency)]))
-        objects_time_estimate_y[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), np.trapz(objects_average_fft_invariant_y[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_invariant_y[object_name]["value"][:, 0], x=angular_frequency)]))
-        objects_time_estimate_z[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), np.trapz(objects_average_fft_invariant_z[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_invariant_z[object_name]["value"][:, 0], x=angular_frequency)]))
+        objects_time_estimate_tr_2[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), libpost.get_property_from_object_name(object_name, "reorientationtime"), np.trapz(objects_average_fft_tr_2[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_tr_2[object_name]["value"][:, 0], x=angular_frequency)]))
+        objects_time_estimate_sq_tr_2[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), libpost.get_property_from_object_name(object_name, "reorientationtime"), np.trapz(np.sqrt(objects_average_fft_tr_2[object_name]["value"][:, 0]) * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(np.sqrt(objects_average_fft_tr_2[object_name]["value"][:, 0]), x=angular_frequency)]))
+        objects_time_estimate[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), libpost.get_property_from_object_name(object_name, "reorientationtime"), np.trapz(objects_average_fft_invariant[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency)]))#/ np.trapz(objects_average_fft_invariant[object_name]["value"][:, 0], x=angular_frequency)]))
+        objects_time_estimate_mmean[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), libpost.get_property_from_object_name(object_name, "reorientationtime"), np.trapz(objects_average_fft_invariant_mmean[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_invariant_mmean[object_name]["value"][:, 0], x=angular_frequency)]))
+        objects_time_estimate_x[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), libpost.get_property_from_object_name(object_name, "reorientationtime"), np.trapz(objects_average_fft_invariant_x[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_invariant_x[object_name]["value"][:, 0], x=angular_frequency)]))
+        objects_time_estimate_y[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), libpost.get_property_from_object_name(object_name, "reorientationtime"), np.trapz(objects_average_fft_invariant_y[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_invariant_y[object_name]["value"][:, 0], x=angular_frequency)]))
+        objects_time_estimate_z[reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), libpost.get_property_from_object_name(object_name, "reorientationtime"), np.trapz(objects_average_fft_invariant_z[object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_invariant_z[object_name]["value"][:, 0], x=angular_frequency)]))
     for reduced_object_name in objects_time_estimate:
         objects_time_estimate_tr_2[reduced_object_name]["value"] = np.stack(objects_time_estimate[reduced_object_name]["value"])
         objects_time_estimate_sq_tr_2[reduced_object_name]["value"] = np.stack(objects_time_estimate_sq_tr_2[reduced_object_name]["value"])

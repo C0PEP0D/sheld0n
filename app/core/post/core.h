@@ -83,12 +83,12 @@ class Post {
                 if(time.size() > 0) {
                     std::sort(time.begin(), time.end());
                     // deal with parameters
-                    if(parameters.nb > 0 && parameters.nb < time.size()) {
+                    if(parameters.nb > 0 && parameters.nb < time.size() - parameters.begin) {
                         if(parameters.step == 0) {
                             parameters.step = (time.size() - parameters.begin)/parameters.nb;
                         }
                         for(int i = time.size() - 1; i > -1; i--) {
-                            if(not ((i - parameters.begin < parameters.nb * parameters.step) && ((i - parameters.begin) % parameters.step == 0))) {
+                            if(not ((i > parameters.begin) && (i - parameters.begin < parameters.nb * parameters.step) && ((i - parameters.begin) % parameters.step == 0))) {
                                 time.erase(time.begin() + i);
                             }
                         }

@@ -56,45 +56,45 @@ class FlowInterpolatedUnstationary : public TypeFlowInterpolated {
         }
 
         void prepare(const TypeContainer<TypeSpaceVector>& positions, const TypeScalar& t) {
-            // compute indexs
-            std::vector<std::size_t> indexs;
-            for(const TypeSpaceVector& x : positions) {
-                // Compute offset
-                std::vector<int> offset = Type::data[0].sMesh->ijkCell(x);
-                for(auto& o : offset) {
-                    o -= (Type::data[0].order + 1)/2;
-                }
-                //// If not periodic then be sure you are inside
-                //if(not periodic) {
-                //    for(std::size_t i = 0; i < offset.size(); i++) {
-                //        if(offset[i] < 0) {
-                //            offset[i] = 0;
-                //        }
-                //        else if(offset[i] > Type::data[0].sMesh->n[i] - n) {
-                //            offset[i] = Type::data[0].sMesh->n[i] - n;
-                //        }
-                //    }
-                //}
-                // Build subMesh and compute
-                std::vector<std::size_t> xIndexs = TypeFlowInterpolatedMeshSub(std::vector<std::size_t>(x.size(), Type::data[0].order + 1), offset, Type::data[0].sMesh).indexCells();
-                indexs.insert(indexs.end(), xIndexs.begin(), xIndexs.end());
-            }
-            for(auto& frame : Type::data) {
-                // velocity
-                frame.velocity[0].load(indexs);
-                frame.velocity[1].load(indexs);
-                frame.velocity[2].load(indexs);
-                // jacobian
-                frame.jacobian[0].load(indexs);
-                frame.jacobian[1].load(indexs);
-                frame.jacobian[2].load(indexs);
-                frame.jacobian[3].load(indexs);
-                frame.jacobian[4].load(indexs);
-                frame.jacobian[5].load(indexs);
-                frame.jacobian[6].load(indexs);
-                frame.jacobian[7].load(indexs);
-                frame.jacobian[8].load(indexs);
-            }
+            //// compute indexs
+            //std::vector<std::size_t> indexs;
+            //for(const TypeSpaceVector& x : positions) {
+            //    // Compute offset
+            //    std::vector<int> offset = Type::data[0].sMesh->ijkCell(x);
+            //    for(auto& o : offset) {
+            //        o -= (Type::data[0].order + 1)/2;
+            //    }
+            //    //// If not periodic then be sure you are inside
+            //    //if(not periodic) {
+            //    //    for(std::size_t i = 0; i < offset.size(); i++) {
+            //    //        if(offset[i] < 0) {
+            //    //            offset[i] = 0;
+            //    //        }
+            //    //        else if(offset[i] > Type::data[0].sMesh->n[i] - n) {
+            //    //            offset[i] = Type::data[0].sMesh->n[i] - n;
+            //    //        }
+            //    //    }
+            //    //}
+            //    // Build subMesh and compute
+            //    std::vector<std::size_t> xIndexs = TypeFlowInterpolatedMeshSub(std::vector<std::size_t>(x.size(), Type::data[0].order + 1), offset, Type::data[0].sMesh).indexCells();
+            //    indexs.insert(indexs.end(), xIndexs.begin(), xIndexs.end());
+            //}
+            //for(auto& frame : Type::data) {
+            //    // velocity
+            //    frame.velocity[0].load(indexs);
+            //    frame.velocity[1].load(indexs);
+            //    frame.velocity[2].load(indexs);
+            //    // jacobian
+            //    frame.jacobian[0].load(indexs);
+            //    frame.jacobian[1].load(indexs);
+            //    frame.jacobian[2].load(indexs);
+            //    frame.jacobian[3].load(indexs);
+            //    frame.jacobian[4].load(indexs);
+            //    frame.jacobian[5].load(indexs);
+            //    frame.jacobian[6].load(indexs);
+            //    frame.jacobian[7].load(indexs);
+            //    frame.jacobian[8].load(indexs);
+            //}
         }
 
         void info() const {

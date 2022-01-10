@@ -16,7 +16,7 @@ struct EnvParameters {
     static const unsigned int randomSeed = 0;
 
     EnvParameters() {
-        std::srand(randomSeed);
+        rand0m::seed(randomSeed);
     }
 };
 
