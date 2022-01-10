@@ -11,14 +11,12 @@ namespace c0p {
 template<typename TypeParameters, typename AgentActiveStep>
 class AgentBehaviourNavigatorBehaviourDirectionSurfBehaviourTimeHorizonConst : public AgentBehaviourNavigatorBehaviourDirectionSurfBehaviourTimeHorizon<AgentActiveStep> {
     public:
-        using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
-    public:
         TypeParameters parameters;
     public:
         AgentBehaviourNavigatorBehaviourDirectionSurfBehaviourTimeHorizonConst() {
         }
     public:
-        TypeScalar operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep& stepActive, const TypeSpaceMatrix& velocityGradients) const override{
+        TypeScalar operator()(const double* pState, const double& t, const AgentActiveStep& stepActive, const TypeSpaceMatrix& velocityGradients) const override{
             return parameters.value;
         }
 };

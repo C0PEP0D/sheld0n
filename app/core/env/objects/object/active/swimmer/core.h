@@ -14,12 +14,11 @@ template<typename TypeParameters, typename ActivePassiveStep>
 class ActiveSwimmerStep : public TypeActiveStep<ActivePassiveStep>  {
     public:
         using Type = TypeActiveStep<ActivePassiveStep>;
-        using TypeStateStatic = typename Type::TypeStateStatic;
     public:
         TypeParameters parameters;
         std::shared_ptr<TypeSwimStep<ActivePassiveStep>> sStepSwim;
 
-        ActiveSwimmerStep(const std::shared_ptr<Flow>& sFlow, Objects<ObjectsParameters>* pObjects) : Type(ActivePassiveStep(sFlow, pObjects)), sStepSwim(std::make_shared<TypeSwimStep<ActivePassiveStep>>(parameters.velocity)) {
+        ActiveSwimmerStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : Type(ActivePassiveStep(sFlow, sObjects)), sStepSwim(std::make_shared<TypeSwimStep<ActivePassiveStep>>(parameters.velocity)) {
             Type::register_actuator(sStepSwim);
         }
 };

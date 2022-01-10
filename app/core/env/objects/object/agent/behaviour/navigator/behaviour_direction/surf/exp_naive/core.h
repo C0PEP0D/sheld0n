@@ -11,16 +11,14 @@ namespace c0p {
 template<typename TypeParameters, typename AgentActiveStep, typename TypeBehaviourTimeHorizon>
 class AgentBehaviourNavigatorBehaviourDirectionSurfExpNaive : public AgentBehaviourNavigatorBehaviourDirection<AgentActiveStep> {
     public:
-        using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
-    public:
         TypeParameters parameters;
         TypeBehaviourTimeHorizon behaviourTimeHorizon;
     public:
         AgentBehaviourNavigatorBehaviourDirectionSurfExpNaive() {
         }
     public:
-        TypeSpaceVector operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& direction, const TypeSpaceMatrix& velocityGradients) const override {
-            return (naiveExp(velocityGradients * behaviourTimeHorizon(state, t, stepActive, velocityGradients), parameters.order)).transpose() * direction;
+        TypeSpaceVector operator()(const double* pState, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& direction, const TypeSpaceMatrix& velocityGradients) const override {
+            return (naiveExp(velocityGradients * behaviourTimeHorizon(pState, t, stepActive, velocityGradients), parameters.order)).transpose() * direction;
         }
         
         // computes sum(A^n / n!) over from n = 0 to order

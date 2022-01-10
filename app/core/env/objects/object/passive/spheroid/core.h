@@ -11,11 +11,10 @@ template<typename TypeParameters>
 class PassiveSpheroidStep : public TypePassiveSpheroidStep {
     public:
         using Type = TypePassiveSpheroidStep;
-        using TypeStateStatic = typename Type::TypeStateStatic;
     public:
         TypeParameters parameters;
     public:
-        PassiveSpheroidStep(const std::shared_ptr<Flow>& sFlow, Objects<ObjectsParameters>* pObjects) : Type(sFlow, 1.0) {
+        PassiveSpheroidStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : Type(sFlow, 1.0) {
             setProportion(parameters.proportion);
         }
 };

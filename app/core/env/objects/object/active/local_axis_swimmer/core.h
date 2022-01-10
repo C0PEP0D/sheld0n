@@ -14,14 +14,14 @@ template<typename TypeParameters, typename ActivePassiveStep>
 class ActiveLocalAxisSwimmerStep : public TypeActiveStep<ActivePassiveStep>  {
     public:
         using Type = TypeActiveStep<ActivePassiveStep>;
-        using TypeStateStatic = typename Type::TypeStateStatic;
+        using TypeStateVectorDynamic = typename Type::TypeStateVectorDynamic;
     public:
         TypeParameters parameters;
         std::shared_ptr<TypeLocalAxisSwimStep<ActivePassiveStep>> sStepLocalAxisSwim;
         std::shared_ptr<TypeAxisOrientStep<ActivePassiveStep>> sStepAxisOrient;
     public:
-        ActiveLocalAxisSwimmerStep(const std::shared_ptr<Flow>& sFlow, Objects<ObjectsParameters>* pObjects) : 
-            Type(ActivePassiveStep(sFlow, pObjects)), 
+        ActiveLocalAxisSwimmerStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : 
+            Type(ActivePassiveStep(sFlow, sObjects)), 
             sStepLocalAxisSwim(std::make_shared<TypeLocalAxisSwimStep<ActivePassiveStep>>(parameters.velocity)),
             sStepAxisOrient(std::make_shared<TypeAxisOrientStep<ActivePassiveStep>>(parameters.direction, parameters.time))
         {

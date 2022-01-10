@@ -10,9 +10,9 @@
 namespace c0p {
 
 template<typename ActivePassiveStep>
-using TypeLocalAxisSwimStep = sl0::sa0::StepAxisSwim<typename ActivePassiveStep::TypeStateStatic, TypeRef, ActivePassiveStep>;
+using TypeLocalAxisSwimStep = sl0::sa0::StepAxisSwim<ActivePassiveStep>;
 template<typename ActivePassiveStep>
-using TypeAxisOrientStep = sl0::sa0::StepAxisOrient<typename ActivePassiveStep::TypeStateStatic, TypeRef, ActivePassiveStep, TypeSpaceVector>;
+using TypeAxisOrientStep = sl0::sa0::StepAxisOrient<ActivePassiveStep>;
 
 }
 

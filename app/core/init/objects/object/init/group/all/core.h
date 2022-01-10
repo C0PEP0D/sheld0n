@@ -10,19 +10,19 @@
 namespace c0p {
 
 template<typename TypeParameters, typename TypeObjectStep, template<typename> typename TypeInitInitMember>
-class InitInitGroupAll : public InitInitInit<TypeObjectStep> {
+class InitInitGroupAll : public InitInitInitStatic<TypeObjectStep> {
     public:
         TypeParameters parameters;
         TypeInitInitMember<typename TypeObjectStep::TypeMemberStep> initMember;
     public:
-        using InitInitInit<TypeObjectStep>::sObjectStep;
+        using InitInitInitStatic<TypeObjectStep>::sObjectStep;
     public:
-        InitInitGroupAll(std::shared_ptr<TypeObjectStep> p_sObjectStep) : InitInitInit<TypeObjectStep>(p_sObjectStep), initMember(sObjectStep->sMemberStep) {
+        InitInitGroupAll(std::shared_ptr<TypeObjectStep> p_sObjectStep) : InitInitInitStatic<TypeObjectStep>(p_sObjectStep), initMember(sObjectStep->sMemberStep) {
         }
     public:
-        void operator()(TypeRef<TypeVector<Eigen::Dynamic>> state) override {
-            std::for_each(std::execution::par_unseq, sObjectStep->memberIndexs.cbegin(), sObjectStep->memberIndexs.cend(), [this, state](const unsigned int& memberIndex){ 
-                initMember(sObjectStep->memberState(state, memberIndex));
+        void operator()(double* pState) override {
+            std::for_each(std::execution::par_unseq, sObjectStep->memberIndexs.cbegin(), sObjectStep->memberIndexs.cend(), [this, pState](const unsigned int& memberIndex){ 
+                initMember(sObjectStep->memberState(pState, memberIndex));
             });
         };
 };

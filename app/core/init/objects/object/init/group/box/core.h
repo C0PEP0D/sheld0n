@@ -12,16 +12,16 @@
 namespace c0p {
 
 template<typename TypeParameters, typename TypeObjectStep, template<typename> typename TypeInitInitMember>
-class InitInitGroupBox : public InitInitInit<TypeObjectStep> {
+class InitInitGroupBox : public InitInitInitStatic<TypeObjectStep> {
     public:
         TypeParameters parameters;
     public:
-        using InitInitInit<TypeObjectStep>::sObjectStep;
+        using InitInitInitStatic<TypeObjectStep>::sObjectStep;
     public:
-        InitInitGroupBox(std::shared_ptr<TypeObjectStep> p_sObjectStep) : InitInitInit<TypeObjectStep>(p_sObjectStep) {
+        InitInitGroupBox(std::shared_ptr<TypeObjectStep> p_sObjectStep) : InitInitInitStatic<TypeObjectStep>(p_sObjectStep) {
         }
     public:
-        void operator()(TypeRef<TypeVector<Eigen::Dynamic>> state) override {
+        void operator()(double* pState) override {
             // compute n
             const unsigned int n = int(std::ceil(std::pow(sObjectStep->memberIndexs.size(), 1.0/parameters.l.size())));
             std::vector<double> d(parameters.l.size());
@@ -29,7 +29,7 @@ class InitInitGroupBox : public InitInitInit<TypeObjectStep> {
                 d[i] = parameters.l[i] / (n-1);
             }
             // set member positions
-            std::for_each(std::execution::seq, sObjectStep->memberIndexs.cbegin(), sObjectStep->memberIndexs.cend(), [this, state, n, d](const unsigned int& memberIndex){
+            std::for_each(std::execution::seq, sObjectStep->memberIndexs.cbegin(), sObjectStep->memberIndexs.cend(), [this, pState, n, d](const unsigned int& memberIndex){
                 // get ijk
                 unsigned int value = memberIndex;
                 std::vector<unsigned int> ijk(parameters.l.size());
@@ -39,9 +39,9 @@ class InitInitGroupBox : public InitInitInit<TypeObjectStep> {
                     value = value % divisor;
                 }
                 // compute and set position
-                sObjectStep->sMemberStep->x(sObjectStep->memberState(state, memberIndex)) = parameters.origin;
+                sObjectStep->sMemberStep->x(sObjectStep->memberState(pState, memberIndex)) = parameters.origin;
                 for(unsigned int i = 0; i < ijk.size(); i++) {
-                    sObjectStep->sMemberStep->x(sObjectStep->memberState(state, memberIndex))[i] += ijk[i] * d[i];
+                    sObjectStep->sMemberStep->x(sObjectStep->memberState(pState, memberIndex))[i] += ijk[i] * d[i];
                 }
             });
         };

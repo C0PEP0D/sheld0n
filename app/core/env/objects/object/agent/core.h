@@ -12,15 +12,10 @@ template<typename AgentActiveStep, typename Behaviour>
 class AgentStep : public TypeAgentStep<AgentActiveStep, Behaviour> {
     public:
         using Type = TypeAgentStep<AgentActiveStep, Behaviour>;
-        using TypeStateStatic = typename Type::TypeStateStatic;
+        using TypeStateVectorDynamic = typename Type::TypeStateVectorDynamic;
     public:
-        AgentStep(const std::shared_ptr<Flow>& sFlow, Objects<ObjectsParameters>* pObjects) : Type(AgentActiveStep(sFlow, pObjects), std::make_shared<Behaviour>(pObjects)) {
+        AgentStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : Type(AgentActiveStep(sFlow, sObjects), std::make_shared<Behaviour>(sObjects)) {
 
-        }
-    public:
-        TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeStateStatic>& state) const override {
-            std::vector<TypeSpaceVector> result = Type::positions(state);
-            return result;
         }
 };
 

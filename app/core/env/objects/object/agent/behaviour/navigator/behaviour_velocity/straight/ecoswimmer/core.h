@@ -11,14 +11,12 @@ namespace c0p {
 template<typename TypeParameters, typename AgentActiveStep>
 class AgentBehaviourNavigatorBehaviourVelocityStraightEcoswimmer : public AgentBehaviourNavigatorBehaviourVelocity<AgentActiveStep> {
     public:
-        using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
-    public:
         TypeParameters parameters;
     public:
         AgentBehaviourNavigatorBehaviourVelocityStraightEcoswimmer() {
         }
     public:
-        double operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& direction, const TypeSpaceMatrix& velocityGradients, const TypeSpaceVector& swimmingDirection) const override {
+        double operator()(const double* pState, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& direction, const TypeSpaceMatrix& velocityGradients, const TypeSpaceVector& swimmingDirection) const override {
             const double value = swimmingDirection.dot(direction);
             if(value > 0.0){
                 return value;

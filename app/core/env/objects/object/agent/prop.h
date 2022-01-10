@@ -12,7 +12,7 @@
 namespace c0p {
 
 template<typename AgentActiveStep, typename TypeBehaviour>
-using TypeAgentStep = sl0::sa0::StepAgent<TypeVector, TypeRef, TypeView, AgentActiveStep, TypeBehaviour>;
+using TypeAgentStep = sl0::sa0::StepAgent<TypeVector, TypeView, AgentActiveStep, TypeBehaviour>;
 
 }
 

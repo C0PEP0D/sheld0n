@@ -12,16 +12,16 @@
 namespace c0p {
 
 template<typename Parameters, typename TypeObjectStep>
-class InitInitPassiveAxisRandom : public InitInitInit<TypeObjectStep> {
+class InitInitPassiveAxisRandom : public InitInitInitStatic<TypeObjectStep> {
     public:
         Parameters parameters;
     public:
-        using InitInitInit<TypeObjectStep>::sObjectStep;
+        using InitInitInitStatic<TypeObjectStep>::sObjectStep;
     public:
-        using InitInitInit<TypeObjectStep>::InitInitInit;
+        using InitInitInitStatic<TypeObjectStep>::InitInitInitStatic;
     public:
-        void operator()(TypeRef<TypeVector<Eigen::Dynamic>> state) override {
-            sObjectStep->axis(state) = TypeSpaceVector::Random();
+        void operator()(double* pState) override {
+            sObjectStep->axis(pState) = TypeSpaceVector::Random();
         };
 };
 

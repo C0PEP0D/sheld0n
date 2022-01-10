@@ -11,18 +11,16 @@ namespace c0p {
 template<typename TypeParameters, typename AgentActiveStep>
 class AgentBehaviourSensorVelocityGradientsFiltered : public AgentBehaviourSensorVelocityGradients<AgentActiveStep> {
     public:
-        using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
-    public:
         TypeParameters parameters;
     public:
         AgentBehaviourSensorVelocityGradientsFiltered() {
         }
     public:
-        TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeAgentStateStatic>& state, const AgentActiveStep& stepActive) const override {
+        TypeContainer<TypeSpaceVector> positions(const double* pState, const AgentActiveStep& stepActive) const override {
             // init
             TypeContainer<TypeSpaceVector> result;
             // more
-            const TypeSpaceVector x = stepActive.cX(state);
+            const TypeSpaceVector x = stepActive.cX(pState);
             unsigned int nx = std::round(parameters.l/parameters.dx);
             result.reserve(std::pow(nx + 1, 3));
             // compute
@@ -42,8 +40,8 @@ class AgentBehaviourSensorVelocityGradientsFiltered : public AgentBehaviourSenso
             return result;
         }
     public:
-        TypeSpaceMatrix operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep&  stepActive) const override {
-            const TypeSpaceVector x = stepActive.cX(state);
+        TypeSpaceMatrix operator()(const double* pState, const double& t, const AgentActiveStep&  stepActive) const override {
+            const TypeSpaceVector x = stepActive.cX(pState);
             TypeSpaceMatrix gradients = TypeSpaceMatrix::Zero();
             unsigned int nx = std::round(parameters.l/parameters.dx);
             for(unsigned int i = 0; i < nx + 1; i++){

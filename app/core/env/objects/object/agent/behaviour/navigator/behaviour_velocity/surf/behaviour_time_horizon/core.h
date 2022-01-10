@@ -10,12 +10,10 @@ namespace c0p {
 template<typename AgentActiveStep>
 class AgentBehaviourNavigatorBehaviourVelocitySurfBehaviourTimeHorizon {
     public:
-        using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
-    public:
         AgentBehaviourNavigatorBehaviourVelocitySurfBehaviourTimeHorizon() {
         }
     public:
-        virtual TypeScalar operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep& stepActive, const TypeSpaceMatrix& velocityGradients) const = 0;
+        virtual TypeScalar operator()(const double* pState, const double& t, const AgentActiveStep& stepActive, const TypeSpaceMatrix& velocityGradients) const = 0;
 };
 
 

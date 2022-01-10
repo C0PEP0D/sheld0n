@@ -51,8 +51,10 @@ def main():
     #### flow
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/flow/choose.py", args.name + "/param/env/flow"), args.name + "/param/env/flow/choose")
     #### objects
-    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/copy_object.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/copy_object")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/remove_object.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/remove_object")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/copy_object_static.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/copy_object_static")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/copy_object_dynamic.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/copy_object_dynamic")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/remove_object_static.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/remove_object_static")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/remove_object_dynamic.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/remove_object_dynamic")
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/create_batch.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/create_batch")
     #### object
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/object/choose.py", args.name + "/param/env/objects/object"), args.name + "/param/env/objects/object/choose")

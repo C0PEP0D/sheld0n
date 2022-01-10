@@ -3,13 +3,14 @@
 #pragma once
 
 // lib includes
-#include "sl0/group/dynamic.h"
+#include "sl0/group/static.h"
 // app include
 #include "core/env/objects/object/group/prop.h"
 
 namespace c0p {
 
-using TypeGroupHomogeneousStep = sl0::StepGroupDynamic<TypeVector, DIM, TypeRef, TypeView, sl0::StepObject<TypeVector, DIM, TypeRef>>;
+template<typename TypeMemberStep, unsigned int Size>
+using TypeGroupHomogeneousStep = sl0::StepGroupStatic<TypeVector, DIM, TypeView, TypeMemberStep, Size>;
 
 }
 

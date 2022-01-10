@@ -9,7 +9,7 @@
 
 namespace c0p {
 
-using TypePassiveSpheroidStep = sl0::StepSpheroid<TypeVector, DIM, TypeRef, TypeView, Flow>;
+using TypePassiveSpheroidStep = sl0::StepSpheroid<TypeVector, DIM, TypeView, Flow>;
 
 }
 

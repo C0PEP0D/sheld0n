@@ -12,11 +12,10 @@ template<typename TypeParameters>
 class PassivePointStep : public TypePassivePointStep {
     public:
         using Type = TypePassivePointStep;
-        using TypeStateVectorDynamic = typename Type::TypeStateVectorDynamic;
     public:
         TypeParameters parameters;
     public:
-        PassivePointStep(const std::shared_ptr<Flow>& sFlow, std::shared_ptr<Objects> sObjects) : Type(sFlow) {
+        PassivePointStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : Type(sFlow) {
         }
 };
 

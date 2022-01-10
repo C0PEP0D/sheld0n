@@ -22,7 +22,7 @@ class AgentBehaviourTrackerSwimmer : public sl0::sa0::Behaviour<typename AgentAc
         TypeBehaviourDirection behaviourDirection;
         TypeBehaviourVelocity behaviourVelocity;
     public:
-        AgentBehaviourTrackerSwimmer(Objects<ObjectsParameters>* pObjects) {
+        AgentBehaviourTrackerSwimmer(std::shared_ptr<Objects> sObjects) : sensorPosition(sObjects) {
         }
     public:
         TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeAgentStateStatic>& state, const AgentActiveStep& stepActive) const override {

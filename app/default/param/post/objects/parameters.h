@@ -20,10 +20,11 @@ namespace c0p {
 // Post processing parameters
 struct PostObjectsParameters {
     // make data
-    std::vector<std::shared_ptr<PostPostBase>> data;
+    std::vector<std::shared_ptr<PostPostBase>> sPostsStatic;
+    std::vector<std::shared_ptr<PostPostBase>> sPostsDynamic;
     PostObjectsParameters(std::shared_ptr<ObjectsParameters> sObjectsParameters) {
         // FLAG: MAKE OBJECT BEGIN
-        data.push_back(std::make_shared<PostPost<PostObjectParameters, ObjectStep>>(sObjectsParameters->sObjectStep));
+        sPostsStatic.push_back(std::make_shared<PostPost<PostObjectParameters, ObjectStep>>(sObjectsParameters->sObjectStep));
         // FLAG: MAKE OBJECT END
     }
 };

@@ -16,7 +16,7 @@ class AgentBehaviourCustomLocalAxisSwimmer : public sl0::sa0::Behaviour<typename
     public:
         TypeParameters<TypeAgentStateStatic, AgentActiveStep> parameters;
     public:
-        AgentBehaviourCustomLocalAxisSwimmer(Objects<ObjectsParameters>* pObjects) {
+        AgentBehaviourCustomLocalAxisSwimmer(std::shared_ptr<Objects> sObjects) {
         }
     public:
         TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeAgentStateStatic>& state, const AgentActiveStep& stepActive) const override {

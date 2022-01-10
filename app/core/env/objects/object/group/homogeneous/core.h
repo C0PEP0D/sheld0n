@@ -11,18 +11,14 @@
 namespace c0p {
 
 template<typename TypeParameters>
-class GroupHomogeneousStep : public TypeGroupHomogeneousStep {
+class GroupHomogeneousStep : public TypeGroupHomogeneousStep<typename TypeParameters::TypeMemberStep, TypeParameters::size> {
     public:
-        using Type = TypeGroupHomogeneousStep;
-        using TypeMemberStep = typename TypeParameters::TypeMemberStep;
+        using Type = TypeGroupHomogeneousStep<typename TypeParameters::TypeMemberStep, TypeParameters::size>;
+        using Type::TypeMemberStep;
     public:
         TypeParameters parameters;
-        std::shared_ptr<TypeMemberStep> sMemberStep;
     public:
-        GroupHomogeneousStep(const std::shared_ptr<Flow>& sFlow, Objects<ObjectsParameters>* pObjects) : Type(), parameters(), sMemberStep(std::make_shared<TypeMemberStep>(sFlow, pObjects)) {
-            for(unsigned int memberIndex = 0; memberIndex < TypeParameters::size; memberIndex++) {
-                Type::registerMember(std::make_shared<TypeMemberStep>(sFlow, pObjects), sMemberStep->stateSize());
-            }
+        GroupHomogeneousStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : TypeGroupHomogeneousStep<typename TypeParameters::TypeMemberStep, TypeParameters::size>(std::make_shared<typename TypeParameters::TypeMemberStep>(sFlow, sObjects)), parameters() {
         }
 };
 

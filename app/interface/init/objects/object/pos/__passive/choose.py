@@ -2,7 +2,7 @@
 
 import os
 
-choices_dir = "init/objects/object/pos/passive"
+choices_dir = "init/objects/object/pos/__passive"
 choices_exceptions = []
 
 if __name__ == '__main__':

@@ -19,9 +19,9 @@ class InitInitGroupLine : public InitInitInit<TypeObjectStep> {
         InitInitGroupLine(std::shared_ptr<TypeObjectStep> p_sObjectStep) : InitInitInit<TypeObjectStep>(p_sObjectStep) {
         }
     public:
-        void operator()(TypeRef<TypeVector<Eigen::Dynamic>> state) override {
-            std::for_each(std::execution::seq, sObjectStep->memberIndexs.cbegin(), sObjectStep->memberIndexs.cend(), [this, state](const unsigned int& memberIndex){ 
-                sObjectStep->sMemberStep->x(sObjectStep->memberState(state, memberIndex)) = parameters.origin + parameters.l * double(memberIndex) / double(sObjectStep->size());
+        void operator()(double* pState) override {
+            std::for_each(std::execution::seq, sObjectStep->memberIndexs.cbegin(), sObjectStep->memberIndexs.cend(), [this, pState](const unsigned int& memberIndex){ 
+                sObjectStep->sMemberStep->x(sObjectStep->memberState(pState, memberIndex)) = parameters.origin + parameters.l * double(memberIndex) / double(sObjectStep->size());
             });
         };
 };

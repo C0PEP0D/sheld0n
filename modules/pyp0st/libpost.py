@@ -44,6 +44,8 @@ def get_object_names():
                         _object_name = _column_name[:_found_index]
                         if not _object_name in object_names:
                             object_names.append(_object_name)
+                    else: # simple object
+                        object_names.append(_column_name.split("__")[0])
     else:
         raise NameError('objects.csv not found')
     return object_names
@@ -68,7 +70,10 @@ def get_objects():
         obj = []
         for index in indexs:
             obj.append(loaded[:, index])
-        objects[object_name] = {"value":np.column_stack(obj), "info":[header[index] for index in indexs]}
+        if len(obj) > 1:
+            objects[object_name] = {"value":np.column_stack(obj), "info":[header[index] for index in indexs]}
+        else:
+            objects[object_name] = {"value":np.array(obj), "info":[header[index] for index in indexs]}
     return objects
 
 def get_mesh():

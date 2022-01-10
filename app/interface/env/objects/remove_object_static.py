@@ -33,11 +33,11 @@ def edit(name):
             pass
         elif (line == '        // // {}\n'.format(name)):
             pass
-        elif (line == '        s{Name}Step = std::make_shared<{Name}Step>(sFlow, pObjects);\n'.format(Name=upper_camel_name)):
+        elif (line == '        s{Name}Step = std::make_shared<{Name}Step>(sFlow, sObjects);\n'.format(Name=upper_camel_name)):
             pass
-        elif (line == '        data.push_back(s{Name}Step);\n'.format(Name=upper_camel_name)):
+        elif (line == '        sObjectsStaticSteps.push_back(s{Name}Step);\n'.format(Name=upper_camel_name)):
             pass
-        elif (line == '        {name}Index = data.size() - 1;\n'.format(name=name)):
+        elif (line == '        {name}Index = sObjectsStaticSteps.size() - 1;\n'.format(name=name)):
             pass
         else:
             print(line, end='')
@@ -45,15 +45,15 @@ def edit(name):
     for line in fileinput.FileInput("../../post/objects/parameters.h", inplace=True):
         if (line == '#include "param/post/objects/{}/parameters.h"\n'.format(name)):
             pass
-        elif (line == '        data.push_back(std::make_shared<PostPost<Post{Name}Parameters, {Name}Step>>(objects.parameters.s{Name}Step));\n'.format(Name=upper_camel_name)):
+        elif (line == '        sPostsStatic.push_back(std::make_shared<PostPost<Post{Name}Parameters, {Name}Step>>(objects.parameters.s{Name}Step));\n'.format(Name=upper_camel_name)):
             pass
         else:
             print(line, end='')
-    # remove object from param/env/objects/parameters.h
+    # remove object from param/init/objects/parameters.h
     for line in fileinput.FileInput("../../init/objects/parameters.h", inplace=True):
         if (line == '#include "param/init/objects/{}/parameters.h"\n'.format(name)):
             pass
-        elif (line == '        data.push_back(std::make_shared<InitInit<Init{Name}Parameters, {Name}Step>>(objects.parameters.s{Name}Step));\n'.format(Name=upper_camel_name)):
+        elif (line == '        sInitsStatic.push_back(std::make_shared<InitInitStatic<Init{Name}Parameters, {Name}Step>>(objects.parameters.s{Name}Step));\n'.format(Name=upper_camel_name)):
             pass
         else:
             print(line, end='')

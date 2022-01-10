@@ -10,7 +10,7 @@
 namespace c0p {
 
 template<typename ActivePassiveStep>
-using TypeSwimStep = sl0::sa0::StepPointSwim<typename ActivePassiveStep::TypeStateStatic, TypeRef, ActivePassiveStep, TypeSpaceVector>;
+using TypeSwimStep = sl0::sa0::StepPointSwim<ActivePassiveStep>;
 
 }
 

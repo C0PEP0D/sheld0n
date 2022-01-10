@@ -41,9 +41,9 @@ def edit(source, name):
             print('    unsigned int {name}Index;\n'.format(name=name), end='')
         if line == '        // FLAG: MAKE OBJECT END\n':
             print('        // // {}\n'.format(name), end='')
-            print('        s{Name}Step = std::make_shared<{Name}Step>(sFlow, pObjects);\n'.format(Name=upper_camel_name), end='')
-            print('        data.push_back(s{Name}Step);\n'.format(Name=upper_camel_name), end='')
-            print('        {name}Index = data.size() - 1;\n'.format(name=name), end='')
+            print('        s{Name}Step = std::make_shared<{Name}Step>(sFlow, sObjects);\n'.format(Name=upper_camel_name), end='')
+            print('        sObjectsDynamicSteps.push_back(s{Name}Step);\n'.format(Name=upper_camel_name), end='')
+            print('        {name}Index = sObjectsDynamicSteps.size() - 1;\n'.format(name=name), end='')
         print(line, end='')
     # post
     ## replace source by name
@@ -55,7 +55,7 @@ def edit(source, name):
         if line == '// FLAG: INCLUDE OBJECT END\n':
             print('#include "param/post/objects/{}/parameters.h"\n'.format(name), end='')
         if line == '        // FLAG: MAKE OBJECT END\n':
-            print('        data.push_back(std::make_shared<PostPost<Post{Name}Parameters, {Name}Step>>(objects.parameters.s{Name}Step));\n'.format(Name=upper_camel_name), end='')
+            print('        sPostsDynamic.push_back(std::make_shared<PostPost<Post{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name), end='')
         print(line, end='')
     # init
     ## replace source by name
@@ -65,7 +65,7 @@ def edit(source, name):
         if line == '// FLAG: INCLUDE OBJECT END\n':
             print('#include "param/init/objects/{}/parameters.h"\n'.format(name), end='')
         if line == '        // FLAG: MAKE OBJECT END\n':
-            print('        data.push_back(std::make_shared<InitInit<Init{Name}Parameters, {Name}Step>>(objects.parameters.s{Name}Step));\n'.format(Name=upper_camel_name), end='')
+            print('        sInitsDynamic.push_back(std::make_shared<InitInitDynamic<Init{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name), end='')
         print(line, end='')
 
 def main(source, name):

@@ -13,7 +13,7 @@ namespace c0p {
 struct PostObjectPxChainPositionParameters {
     std::string name = "pos";
     // Position along the chain. 0 <= s <= 1.
-    double dl = 0.1 * Parameters::cLength;
+    double ds = 0.01;
     // Component index of the position to extract. 0:x, 1:y, 2:z
     std::size_t i = 0;
 };

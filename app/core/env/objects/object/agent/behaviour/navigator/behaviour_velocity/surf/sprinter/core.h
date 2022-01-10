@@ -13,16 +13,14 @@ namespace c0p {
 template<typename TypeParameters, typename AgentActiveStep, typename TypeBehaviourTimeHorizon>
 class AgentBehaviourNavigatorBehaviourVelocitySurfSprinter : public AgentBehaviourNavigatorBehaviourVelocity<AgentActiveStep> {
     public:
-        using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
-    public:
         TypeParameters parameters;
         TypeBehaviourTimeHorizon behaviourTimeHorizon;
     public:
         AgentBehaviourNavigatorBehaviourVelocitySurfSprinter() {
         }
     public:
-        double operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& direction, const TypeSpaceMatrix& velocityGradients, const TypeSpaceVector& swimmingDirection) const override {
-            if((((velocityGradients * behaviourTimeHorizon(state, t, stepActive, velocityGradients)).exp()).transpose() * swimmingDirection).dot(direction) > 0.0){
+        double operator()(const double pState, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& direction, const TypeSpaceMatrix& velocityGradients, const TypeSpaceVector& swimmingDirection) const override {
+            if((((velocityGradients * behaviourTimeHorizon(pState, t, stepActive, velocityGradients)).exp()).transpose() * swimmingDirection).dot(direction) > 0.0){
                 return 1.0;
             } else {
                 return 0.0;

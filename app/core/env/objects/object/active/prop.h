@@ -10,7 +10,7 @@
 namespace c0p {
 
 template<typename ActivePassiveStep>
-using TypeActiveStep = sl0::sa0::StepActive<TypeVector, TypeRef, TypeView, ActivePassiveStep, sl0::sa0::StepActuator<typename ActivePassiveStep::TypeStateStatic, TypeRef, ActivePassiveStep>>;
+using TypeActiveStep = sl0::sa0::StepActive<TypeView, ActivePassiveStep, sl0::sa0::StepActuator<ActivePassiveStep>>;
 
 }
 

@@ -17,13 +17,13 @@ class InitInitPassivePositionBox : public InitInitInitStatic<TypeObjectStep> {
     public:
         using InitInitInitStatic<TypeObjectStep>::InitInitInitStatic;
     public:
-        void operator()(TypeRef<TypeVector<Eigen::Dynamic>> state) override {
+        void operator()(double* pState) override {
             TypeSpaceVector xInit = parameters.c0;
             TypeSpaceVector xRandom = TypeSpaceVector::Random();
             for(unsigned int i = 0; i < parameters.l.size(); i++) {
                 xInit[i] += 0.5 * parameters.l[i] * xRandom[i];
             }
-            sObjectStep->x(state) = xInit;
+            sObjectStep->x(pState) = xInit;
         };
 };
 

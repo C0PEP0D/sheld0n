@@ -24,7 +24,7 @@ class PostPostChainPosition : public PostPostPost<TypeObjectStep> {
         std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
             std::map<std::string, TypeScalar> processed;
             const unsigned int n = std::ceil(1.0 / parameters.ds);
-            for(unsigned int i = 0; i < n; i++) {
+            for(unsigned int i = 0; i < n + 1; i++) {
                 const double s = i * parameters.ds;
                 std::string sStr = std::to_string(s);
                 std::replace(sStr.begin(), sStr.end(), '.', 'o');
