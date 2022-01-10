@@ -12,25 +12,49 @@
 
 namespace c0p {
 
-class InitInitBase {
+class InitInitStaticBase {
     public:
-        InitInitBase() {
+        InitInitStaticBase() {
         }
     public:
-        virtual void operator()(TypeRef<TypeVector<Eigen::Dynamic>> state) = 0;
+        virtual void operator()(double* pState) = 0;
+};
+
+class InitInitDynamicBase {
+    public:
+        InitInitDynamicBase() {
+        }
+    public:
+        virtual void operator()(std::vector<double>& state) = 0;
 };
 
 template<template<typename> typename TypeParameters, typename TypeObjectStep>
-class InitInit : public InitInitBase {
+class InitInitStatic : public InitInitStaticBase {
     public:
         std::shared_ptr<TypeObjectStep> sObjectStep;
         TypeParameters<TypeObjectStep> parameters;
     public:
-        InitInit(std::shared_ptr<TypeObjectStep> p_sObjectStep) : sObjectStep(p_sObjectStep), parameters(sObjectStep) {
+        InitInitStatic(std::shared_ptr<TypeObjectStep> p_sObjectStep) : sObjectStep(p_sObjectStep), parameters(sObjectStep) {
         }
     public:
-        void operator()(TypeRef<TypeVector<Eigen::Dynamic>> state) override {
-            for(const std::shared_ptr<InitInitInit<TypeObjectStep>>& sInitObjectStep : parameters.data) {
+        void operator()(double* pState) override {
+            for(const std::shared_ptr<InitInitInitStatic<TypeObjectStep>>& sInitObjectStep : parameters.sInits) {
+                (*sInitObjectStep)(pState);
+            }
+        }
+};
+
+template<template<typename> typename TypeParameters, typename TypeObjectStep>
+class InitInitDynamic : public InitInitDynamicBase {
+    public:
+        std::shared_ptr<TypeObjectStep> sObjectStep;
+        TypeParameters<TypeObjectStep> parameters;
+    public:
+        InitInitDynamic(std::shared_ptr<TypeObjectStep> p_sObjectStep) : sObjectStep(p_sObjectStep), parameters(sObjectStep) {
+        }
+    public:
+        void operator()(std::vector<double>& state) override {
+            for(const std::shared_ptr<InitInitInitDynamic<TypeObjectStep>>& sInitObjectStep : parameters.sInits) {
                 (*sInitObjectStep)(state);
             }
         }

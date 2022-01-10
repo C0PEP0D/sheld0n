@@ -19,7 +19,7 @@ class PostPostPost {
         PostPostPost(std::shared_ptr<TypeObjectStep> p_sObjectStep) : sObjectStep(p_sObjectStep) {
         }
     public:
-        virtual std::map<std::string, TypeScalar> operator()(const TypeVector<Eigen::Dynamic>& state, const double& t) = 0;
+        virtual std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) = 0;
 };
 
 }

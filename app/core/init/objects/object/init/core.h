@@ -12,14 +12,25 @@
 namespace c0p {
 
 template<typename TypeObjectStep>
-class InitInitInit {
+class InitInitInitStatic {
     public:
         std::shared_ptr<TypeObjectStep> sObjectStep;
     public:
-        InitInitInit(std::shared_ptr<TypeObjectStep> p_sObjectStep) : sObjectStep(p_sObjectStep) {
+        InitInitInitStatic(std::shared_ptr<TypeObjectStep> p_sObjectStep) : sObjectStep(p_sObjectStep) {
         }
     public:
-        virtual void operator()(TypeRef<TypeVector<Eigen::Dynamic>> state) = 0;
+        virtual void operator()(double* pState) = 0;
+};
+
+template<typename TypeObjectStep>
+class InitInitInitDynamic {
+    public:
+        std::shared_ptr<TypeObjectStep> sObjectStep;
+    public:
+        InitInitInitDynamic(std::shared_ptr<TypeObjectStep> p_sObjectStep) : sObjectStep(p_sObjectStep) {
+        }
+    public:
+        virtual void operator()(std::vector<double>& state) = 0;
 };
 
 }

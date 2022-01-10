@@ -23,11 +23,11 @@ template<typename TypeObjectStep>
 struct InitObjectParameters {
     std::string name = "object";
     // make data
-    std::vector<std::shared_ptr<InitInitInit<TypeObjectStep>>> data;
+    std::vector<std::shared_ptr<InitInitInitStatic<TypeObjectStep>>> sInits;
     InitObjectParameters(std::shared_ptr<TypeObjectStep> sObjectStep) {
         // FLAG: MAKE INIT BEGIN
-        data.push_back(std::make_shared<InitObjectPos<TypeObjectStep>>(sObjectStep));
-        data.push_back(std::make_shared<InitObjectOrient<TypeObjectStep>>(sObjectStep));
+        sInits.push_back(std::make_shared<InitObjectPos<TypeObjectStep>>(sObjectStep));
+        sInits.push_back(std::make_shared<InitObjectOrient<TypeObjectStep>>(sObjectStep));
         // FLAG: MAKE INIT END
     }
 };

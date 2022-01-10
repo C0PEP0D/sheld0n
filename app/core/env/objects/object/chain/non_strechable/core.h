@@ -17,7 +17,7 @@ class ChainNonStrechableStep : public TypeChainNonStrechableStep<TypeParameters:
     public:
         TypeParameters parameters;
     public:
-        ChainNonStrechableStep(const std::shared_ptr<Flow>& sFlow, Objects<ObjectsParameters>* pObjects) : Type(std::make_shared<TypeMemberStep>(sFlow, pObjects), 1.0, 0), parameters() {
+        ChainNonStrechableStep(const std::shared_ptr<Flow>& sFlow, std::shared_ptr<Objects> sObjects) : Type(std::make_shared<TypeMemberStep>(sFlow, sObjects), 1.0, 0), parameters() {
             Type::interpolationOrder = parameters.interpolationOrder;
             Type::length = parameters.length;
         }

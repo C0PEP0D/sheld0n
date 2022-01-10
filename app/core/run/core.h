@@ -19,12 +19,14 @@ template<typename TypeParameters, typename TypeEnv, typename TypeInit>
 class Run {
     public:
         TypeParameters parameters;
-        TypeEnv env;
-        TypeInit inits;
+        std::shared_ptr<TypeEnv> sEnv;
+        std::shared_ptr<TypeInit> sInit;
     public:
         std::size_t startIndex;
     public:
-        Run() : parameters(), env(), inits(env) {
+        Run() : parameters() {
+            sEnv = std::make_shared<TypeEnv>();
+            sInit = std::make_shared<TypeInit>(sEnv);
             // Init saving system
             init();
             // Run case
@@ -60,21 +62,23 @@ class Run {
                     }
                 } else {
                     // Init
-                    startIndex = 0;
-                    inits(env);
+                    startIndex = 1;
+                    (*sInit)(sEnv);
+                    save(0.0);
                 }
             } else {
                 // Init
-                startIndex = 0;
-                inits(env);
+                startIndex = 1;
+                (*sInit)(sEnv);
                 // Create time directory
                 std::filesystem::create_directory("time");
+                save(0.0);
             }
         }
 
         void update(const TypeScalar& t) {
-            env.sFlow->update(t);
-            env.objects.update(parameters.dt);
+            sEnv->sFlow->update(t);
+            sEnv->sObjects->update(parameters.dt);
         }
         
         void save(const TypeScalar& t) {
@@ -82,16 +86,26 @@ class Run {
             std::string folder = "time/" + std::to_string(t);
             std::filesystem::create_directory(folder);
             // Save
-            s0ve::saveArrayDouble(folder + "/objects.txt", env.objects.state, "\n");
+            if(not sEnv->sObjects->stateStatic.empty()) {
+                s0ve::saveArrayDouble(folder + "/static.txt", sEnv->sObjects->stateStatic, "\n");
+            }
+            for(const unsigned int& dynamicIndex : sEnv->sObjects->dynamicIndexs) {
+                s0ve::saveArrayDouble(folder + "/dynamic_" + std::to_string(dynamicIndex) + ".txt", sEnv->sObjects->statesDynamic[dynamicIndex], "\n");
+            }
         }
         
         void load(const TypeScalar& t) {
             // Get directory
             std::string folder = "time/" + std::to_string(t);
             // Load
-            l0ad::ascii::loadArrayDouble(folder + "/objects.txt", env.objects.state, '\n');
-            env.objects.t = t;
-            env.sFlow->init(t);
+            if(not sEnv->sObjects->stateStatic.empty()) {
+                l0ad::ascii::loadArrayDouble(folder + "/static.txt", sEnv->sObjects->stateStatic, '\n');
+            }
+            for(const unsigned int& dynamicIndex : sEnv->sObjects->dynamicIndexs) {
+                l0ad::ascii::loadArrayDouble(folder + "/dynamic_" + std::to_string(dynamicIndex) + ".txt", sEnv->sObjects->statesDynamic[dynamicIndex], '\n');
+            }
+            sEnv->sObjects->t = t;
+            sEnv->sFlow->init(t);
         }
 };
 

@@ -3,14 +3,14 @@
 #pragma once
 
 // lib includes
-#include "sl0/chain/static.h"
+#include "sl0/chain/dynamic.h"
 // app include
 #include "core/env/objects/object/group/prop.h"
 
 namespace c0p {
 
 template<typename TypeMemberStep>
-using TypeChainStrechableStep = sl0::StepChainDynamic<TypeVector, DIM, TypeRef, TypeView, TypeMemberStep>;
+using TypeChainStrechableStep = sl0::StepChainDynamic<TypeVector, DIM, TypeView, TypeRef, TypeMemberStep>;
 
 }
 

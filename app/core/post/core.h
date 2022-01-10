@@ -40,7 +40,7 @@ class Post {
         // output
         std::map<std::string, std::map<std::string, std::vector<TypeScalar>>> processed;
     public:
-        Post() : env(), postObjects(env.objects), postMesh(mesh.sData), postFlow(env.sFlow, mesh.sData) {
+        Post() : env(), postObjects(env.sObjects, env.sObjectsParameters), postMesh(mesh.sData), postFlow(env.sFlow, mesh.sData) {
             std::cout << "INFO : Running post-processing" << std::endl;
             // Init time and processed
             init();
@@ -49,7 +49,7 @@ class Post {
                 load(env, t);
                 // // objects
                 if(parameters.isPostProcessingObjects) {
-                    for(const auto& p : postObjects(env.objects.state, t)) {
+                    for(const auto& p : postObjects(env.sObjects->stateStatic.data(), env.sObjects->statesDynamic, t)) {
                         processed["objects"][p.first].push_back(p.second);
                     }
                 }
@@ -99,7 +99,7 @@ class Post {
                     if(parameters.isPostProcessingObjects) {
                         processed["objects"] = std::map<std::string, std::vector<TypeScalar>>();
                         processed["objects"]["time"] = time;
-                        for(const auto& p : postObjects(env.objects.state, time.front())) { 
+                        for(const auto& p : postObjects(env.sObjects->stateStatic.data(), env.sObjects->statesDynamic, time.front())) { 
                             processed["objects"][p.first] = std::vector<TypeScalar>();
                             processed["objects"][p.first].push_back(p.second);
                         }
@@ -132,12 +132,20 @@ class Post {
             // Get directory
             std::string folder = "time/" + std::to_string(t);
             // Load
-            l0ad::ascii::loadArrayDouble(folder + "/objects.txt", env.objects.state, '\n');
-            env.objects.t = t;
+            if(not env.sObjects->stateStatic.empty()) {
+                l0ad::ascii::loadArrayDouble(folder + "/static.txt", env.sObjects->stateStatic, '\n');
+            }
+            for(const unsigned int& dynamicIndex : env.sObjects->dynamicIndexs) {
+                env.sObjects->statesDynamic[dynamicIndex].clear();
+                l0ad::ascii::loadArrayDouble(folder + "/dynamic_" + std::to_string(dynamicIndex) + ".txt", env.sObjects->statesDynamic[dynamicIndex], '\n');
+                env.sObjects->sStepsDynamic[dynamicIndex]->registerState(env.sObjects->statesDynamic[dynamicIndex]);
+            }
+            env.sObjects->t = t;
             env.sFlow->init(t);
             if(parameters.isPreparingFlow) {
                 if(parameters.isPostProcessingObjects) {
-                    env.sFlow->prepare(env.objects.sStep->positions(env.objects.state), t);
+                    env.sFlow->prepare(env.sObjects->sStepStatic->positions(env.sObjects->stateStatic.data()), t);
+                    // TODO: all positions
                 }
                 if(parameters.isPostProcessingFlow) {
                     env.sFlow->prepare(mesh.sData->positionCells(), t);

@@ -10,7 +10,8 @@
 #include "core/init/prop.h"
 
 namespace c0p {
-    using TypeObjects = c0p::Objects<c0p::ObjectsParameters>;
+    using TypeObjects = c0p::Objects;
+    using TypeObjectsParameters = c0p::ObjectsParameters;
 }
 
 #endif

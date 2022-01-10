@@ -25,13 +25,13 @@ class Init {
         TypeParameters parameters;
         InitObjects<TypeParametersObjects> initObjects;
     public:
-        Init(const TypeEnv& env) : initObjects(env.objects) {
+        Init(std::shared_ptr<TypeEnv> sEnv) : initObjects(sEnv->sObjects, sEnv->sObjectsParameters) {
         }
     public:
-        void operator()(TypeEnv& env) {
+        void operator()(std::shared_ptr<TypeEnv> sEnv) {
             std::cout << "INFO : Init case start" << std::endl;
-            initObjects(env.objects.state);
-            env.sFlow->init(0.0);
+            initObjects(sEnv->sObjects->stateStatic.data(), sEnv->sObjects->statesDynamic);
+            sEnv->sFlow->init(0.0);
             std::cout << "INFO : Init case end" << std::endl;
         }
 };

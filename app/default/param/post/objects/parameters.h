@@ -21,9 +21,9 @@ namespace c0p {
 struct PostObjectsParameters {
     // make data
     std::vector<std::shared_ptr<PostPostBase>> data;
-    PostObjectsParameters(const TypeObjects& objects) {
+    PostObjectsParameters(std::shared_ptr<ObjectsParameters> sObjectsParameters) {
         // FLAG: MAKE OBJECT BEGIN
-        data.push_back(std::make_shared<PostPost<PostObjectParameters, ObjectStep>>(objects.parameters.sObjectStep));
+        data.push_back(std::make_shared<PostPost<PostObjectParameters, ObjectStep>>(sObjectsParameters->sObjectStep));
         // FLAG: MAKE OBJECT END
     }
 };
