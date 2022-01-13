@@ -45,7 +45,7 @@ def edit(name):
     for line in fileinput.FileInput("../../post/objects/parameters.h", inplace=True):
         if (line == '#include "param/post/objects/{}/parameters.h"\n'.format(name)):
             pass
-        elif (line == '        sPostsDynamic.push_back(std::make_shared<PostPost<Post{Name}Parameters, {Name}Step>>(objects.parameters.s{Name}Step));\n'.format(Name=upper_camel_name)):
+        elif (line == '        sPostsDynamic.push_back(std::make_shared<PostPost<Post{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name)):
             pass
         else:
             print(line, end='')
@@ -53,7 +53,7 @@ def edit(name):
     for line in fileinput.FileInput("../../init/objects/parameters.h", inplace=True):
         if (line == '#include "param/init/objects/{}/parameters.h"\n'.format(name)):
             pass
-        elif (line == '        sInitsDynamic.push_back(std::make_shared<InitInitDynamic<Init{Name}Parameters, {Name}Step>>(objects.parameters.s{Name}Step));\n'.format(Name=upper_camel_name)):
+        elif (line == '        sInitsDynamic.push_back(std::make_shared<InitInitDynamic<Init{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name)):
             pass
         else:
             print(line, end='')

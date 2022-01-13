@@ -21,7 +21,7 @@ def parse():
     # parser
     parser = argparse.ArgumentParser(description='copy all initializers of an object to another object')
     parser.add_argument('source', help='specify the name of source object')
-    parser.add_argument('dest', help='specify the name of the destination object')
+    parser.add_argument('dest', nargs='+', help='specify the name of the destination objects')
     # autocompletion
     argcomplete.autocomplete(parser)
     # parse
@@ -53,4 +53,5 @@ def main(source, name):
 if __name__ == '__main__':
     # main
     args = parse()
-    main(args.source, args.dest)
+    for dest in args.dest:
+        main(args.source, dest)

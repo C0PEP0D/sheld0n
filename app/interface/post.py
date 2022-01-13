@@ -14,6 +14,7 @@ def parse():
     parser.add_argument('-c', '--compiler', default='', help='specify the compiler used')
     parser.add_argument('-m', '--cmake-cmd', default='cmake', help='specify the cmake command')
     parser.add_argument('-t', '--tbb-dir', default='', help='specify the path to the TBB directory')
+    parser.add_argument('-j', '--jobs', type=int, default=1, help='specify the number a compiling jobs')
     return parser.parse_args()
 
 def main():
@@ -32,7 +33,7 @@ def main():
     # configure
     subprocess.run("{cmake_cmd} .. {flags}".format(cmake_cmd=args.cmake_cmd, flags=flags), cwd="build", shell=True)
     # build
-    subprocess.run("{cmake_cmd} --build . --parallel --target post".format(cmake_cmd=args.cmake_cmd), cwd="build", shell=True)
+    subprocess.run("{cmake_cmd} --build . -j {jobs} --target post".format(cmake_cmd=args.cmake_cmd, jobs=args.jobs), cwd="build", shell=True)
     # run
     subprocess.run("./build/post", shell=True)
 

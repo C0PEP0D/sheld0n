@@ -224,8 +224,20 @@ def get_property_from_object_name(name, prop):
     for prop_name in all_properties:
         if prop_name.startswith(prop):
             return float(prop_name[len(prop)+1:].replace("o", ".").replace("_", "."))
-    if prop == "reorientationtime":
+    if prop == "surftimeconst":
         return 0.0
+    elif prop == "reorientationtime":
+        return 0.0
+    elif prop == "surftimeprefactor":
+        return 0.0
+    elif prop == "dirnoise":
+        return 0.0
+    elif prop == "jnoise":
+        return 0.0
+    elif prop == "swimnoise":
+        return 0.0
+    elif prop == "proportion":
+        return 1.0
     else:
         return np.nan
 

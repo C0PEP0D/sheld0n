@@ -22,7 +22,7 @@ class AgentBehaviourNavigatorLocalAxisSwimmer : public sl0::sa0::Behaviour<Agent
         TypeBehaviourDirection behaviourDirection;
         TypeBehaviourVelocity behaviourVelocity;
     public:
-        AgentBehaviourNavigatorLocalAxisSwimmer(std::shared_ptr<Objects> sObjects) : sensorDirection(std::shared_ptr<Objects> sObjects) {
+        AgentBehaviourNavigatorLocalAxisSwimmer(std::shared_ptr<Objects> sObjects) : sensorDirection(sObjects) {
         }
     public:
         TypeContainer<TypeSpaceVector> positions(const double* pState, const AgentActiveStep& stepActive) const override {

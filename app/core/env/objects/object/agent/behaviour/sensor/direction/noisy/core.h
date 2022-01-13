@@ -11,14 +11,14 @@ namespace c0p {
 template<typename TypeParameters, typename AgentActiveStep>
 class AgentBehaviourSensorDirectionNoisy : public AgentBehaviourSensorDirection<AgentActiveStep> {
     public:
-        using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
+        using Type = AgentBehaviourSensorDirection<AgentActiveStep>;
     public:
         TypeParameters parameters;
     public:
-        AgentBehaviourSensorDirectionNoisy() {
+        AgentBehaviourSensorDirectionNoisy(std::shared_ptr<Objects> sObjects) : Type(sObjects) {
         }
     public:
-        TypeSpaceVector operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep&  stepActive) const override {
+        TypeSpaceVector operator()(const double* pState, const double& t, const AgentActiveStep&  stepActive) const override {
             TypeSpaceVector direction = parameters.direction;
             for(unsigned int i = 0; i < direction.size(); i++) {
                 direction[i] += parameters.noiseIntensity * rand0m::standardNormalDistribution(rand0m::engine);

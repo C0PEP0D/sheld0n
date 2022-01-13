@@ -25,11 +25,11 @@ class PostObjects {
             // compute
             std::vector<std::map<std::string, TypeScalar>> processedMembers(parameters.sPostsStatic.size() + parameters.sPostsDynamic.size());
             // static
-            std::for_each(/*std::execution::par_unseq, */sObjects->sStepStatic->memberIndexs.cbegin(), sObjects->sStepStatic->memberIndexs.cend(), [this, pStateStatic, t, &processedMembers](const unsigned int& memberIndex){ 
+            std::for_each(std::execution::par_unseq, sObjects->sStepStatic->memberIndexs.cbegin(), sObjects->sStepStatic->memberIndexs.cend(), [this, pStateStatic, t, &processedMembers](const unsigned int& memberIndex){ 
                 processedMembers[memberIndex] = (*parameters.sPostsStatic[memberIndex])(sObjects->sStepStatic->cMemberState(pStateStatic, memberIndex), t);
             });
             // dynamic
-            std::for_each(/*std::execution::par_unseq, */sObjects->dynamicIndexs.cbegin(), sObjects->dynamicIndexs.cend(), [this, statesDynamic, t, &processedMembers](const unsigned int& dynamicIndex){ 
+            std::for_each(std::execution::par_unseq, sObjects->dynamicIndexs.cbegin(), sObjects->dynamicIndexs.cend(), [this, statesDynamic, t, &processedMembers](const unsigned int& dynamicIndex){ 
                 processedMembers[sObjects->sStepStatic->size() + dynamicIndex] = (*parameters.sPostsDynamic[dynamicIndex])(statesDynamic[dynamicIndex].data(), t);
             });
             // return
