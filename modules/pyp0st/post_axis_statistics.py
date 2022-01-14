@@ -54,7 +54,7 @@ def main():
                 axis[1] = objects_axis_1[object_name]["value"][i, j]
                 axis[2] = objects_axis_2[object_name]["value"][i, j]
                 # compute
-                surf = np.dot(scipy.linalg.expm(gradients * TAU).T, DIRECTION)
+                surf = np.dot(sp.linalg.expm(gradients * TAU).T, DIRECTION)
                 objects_axis_dot_surf[object_name]["value"][i, j] = np.dot(surf / np.linalg.norm(surf), axis)
         # info
         objects_axis_dot_surf[object_name]["info"] = [info.replace("axis_0", "axis_dot_surf") for info in objects_axis_reduction[object_name]["info"]]
