@@ -2,7 +2,7 @@
 
 import os
 
-choices_dir = "env/objects/object/__passive"
+choices_dir = "init/objects/object/pos/__passive/__velocity"
 choices_exceptions = []
 
 if __name__ == '__main__':
@@ -13,4 +13,4 @@ if __name__ == '__main__':
         lib_code = compile(lib_source_file.read(), lib_filename, "exec")
     exec(lib_code)
     # run tests
-    choose(choices_dir, choices_exceptions)
+    choose_init(choices_dir, choices_exceptions)
