@@ -2,8 +2,10 @@
 #define C0P_PARAM_OBJECTS_OBJECT_ACTIVE_LOCAL_AXIS_SWIMMER_PARAMETERS_H
 #pragma once
 
+// core
 #include "core/env/objects/object/active/local_axis_swimmer/prop.h"
 
+// parameters
 #include "param/parameters.h"
 
 namespace c0p {
