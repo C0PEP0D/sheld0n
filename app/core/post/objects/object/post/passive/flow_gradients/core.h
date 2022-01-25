@@ -1,5 +1,5 @@
-#ifndef C0P_CORE_POST_OBJECTS_OBJECT_POST_PASSIVE_JAC_CORE_H
-#define C0P_CORE_POST_OBJECTS_OBJECT_POST_PASSIVE_JAC_CORE_H
+#ifndef C0P_CORE_POST_OBJECTS_OBJECT_POST_PASSIVE_FLOW_GRADIENTS_CORE_H
+#define C0P_CORE_POST_OBJECTS_OBJECT_POST_PASSIVE_FLOW_GRADIENTS_CORE_H
 #pragma once
 
 // std includes
@@ -7,12 +7,12 @@
 #include <map>
 // app includes
 #include "core/post/objects/object/post/core.h"
-#include "core/post/objects/object/post/passive/jac/prop.h"
+#include "core/post/objects/object/post/passive/flow_gradients/prop.h"
 
 namespace c0p {
 
 template<typename Parameters, typename TypeObjectStep>
-class PostPostPassiveJac : public PostPostPost<TypeObjectStep> {
+class PostPostPassiveFlowGradients : public PostPostPost<TypeObjectStep> {
     public:
         Parameters parameters;
     public:

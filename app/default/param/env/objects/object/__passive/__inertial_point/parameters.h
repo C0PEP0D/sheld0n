@@ -13,7 +13,7 @@ namespace c0p {
 // Parameters of a spheroid that can be advected and rotated by the flow
 struct ObjectPassiveInertialPointStepParameters {
     // Delay: inertial delay, characteristic time to reach a steady velocity in a steady flow
-    static TypeScalar delay = 1.0 * Parameters::cTime;
+    constexpr static TypeScalar delay = 1.0 * Parameters::cTime;
 };
 
 }

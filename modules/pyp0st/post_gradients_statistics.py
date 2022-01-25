@@ -109,7 +109,7 @@ def main():
         objects_time_estimates[key] = {}
         for object_name in objects_average_fft_invariants[key]:
             reduced_object_name = object_name.split("__")[0]
-            if not reduced_object_name in objects_time_estimate[key]:
+            if not reduced_object_name in objects_time_estimates[key]:
                 objects_time_estimates[key][reduced_object_name] = {"value":[], "info":["us/u_eta", "reorientationtime/tau_eta", "time_estimate"]}
             # value
             objects_time_estimates[key][reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), libpost.get_property_from_object_name(object_name, "reorientationtime"), np.trapz(objects_average_fft_invariants[key][object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_invariants[key][object_name]["value"][:, 0], x=angular_frequency)]))

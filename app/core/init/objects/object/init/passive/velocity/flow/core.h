@@ -21,7 +21,7 @@ class InitInitPassiveVelocityFlow : public InitInitInitStatic<TypeObjectStep> {
         using InitInitInitStatic<TypeObjectStep>::InitInitInitStatic;
     public:
         void operator()(double* pState) override {
-            sObjectStep->u(pState) = sObjectsStep->sFlow->getVelocity(sObjectStep->x(pState), 0.0) + parameters.velocityDifference;
+            sObjectStep->u(pState) = sObjectStep->sFlow->getVelocity(sObjectStep->x(pState), 0.0) + parameters.velocityDifference;
         };
 };
 

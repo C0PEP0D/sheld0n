@@ -7,12 +7,12 @@
 // CHOOSE COMMAND IS USED
 
 // choose your init
-#include "core/init/objects/object/init/passive/velocity/value/core.h"
-#include "param/init/objects/object/pos/passive/velocity/value/parameters.h"
+#include "core/init/objects/object/init/passive/velocity/flow/core.h"
+#include "param/init/objects/object/pos/passive/velocity/flow/parameters.h"
 
 namespace c0p {
     template<typename TypeObjectStep>
-    using InitObjectPosPassiveVelocity = InitInitPassiveVelocityValue<InitObjectPosPassiveVelocityValueParameters, TypeObjectStep>;
+    using InitObjectPosPassiveVelocity = InitInitPassiveVelocityFlow<InitObjectPosPassiveVelocityFlowParameters, TypeObjectStep>;
 }
 
 #endif

@@ -7,10 +7,10 @@
 
 namespace c0p {
 
-// Flow velocity post processing
+// Position post processing parameter
 struct PostObjectPxPassiveVelocityParameters {
-    std::string name = "u";
-    // Component index of the flow velocity to extract. 0:x, 1:y, 2:z
+    std::string name = "v";
+    // Component index of the velocity to extract. 0:x, 1:y, 2:z
     std::size_t i = 0;
 };
 

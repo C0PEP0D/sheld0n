@@ -1,5 +1,5 @@
-#ifndef C0P_CORE_POST_OBJECTS_OBJECT_POST_PASSIVE_VELOCITY_CORE_H
-#define C0P_CORE_POST_OBJECTS_OBJECT_POST_PASSIVE_VELOCITY_CORE_H
+#ifndef C0P_CORE_POST_OBJECTS_OBJECT_POST_PASSIVE_FLOW_VELOCITY_CORE_H
+#define C0P_CORE_POST_OBJECTS_OBJECT_POST_PASSIVE_FLOW_VELOCITY_CORE_H
 #pragma once
 
 // std includes
@@ -7,12 +7,12 @@
 #include <map>
 // app includes
 #include "core/post/objects/object/post/core.h"
-#include "core/post/objects/object/post/passive/velocity/prop.h"
+#include "core/post/objects/object/post/passive/flow_velocity/prop.h"
 
 namespace c0p {
 
 template<typename Parameters, typename TypeObjectStep>
-class PostPostPassiveVelocity : public PostPostPost<TypeObjectStep> {
+class PostPostPassiveFlowVelocity : public PostPostPost<TypeObjectStep> {
     public:
         Parameters parameters;
     public:
@@ -22,7 +22,7 @@ class PostPostPassiveVelocity : public PostPostPost<TypeObjectStep> {
     public:
         std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
             return {
-                { parameters.name + "_" + std::to_string(parameters.i), sObjectStep->cU(pState)[parameters.i] }
+                { parameters.name + "_" + std::to_string(parameters.i), sObjectStep->sFlow->getVelocity(sObjectStep->cX(pState), t)[parameters.i] }
             };
         };
 };
