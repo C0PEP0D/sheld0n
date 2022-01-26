@@ -114,8 +114,8 @@ def main():
             # value
             objects_time_estimates[key][reduced_object_name]["value"].append(np.array([libpost.get_property_from_object_name(object_name, "us"), libpost.get_property_from_object_name(object_name, "reorientationtime"), np.trapz(objects_average_fft_invariants[key][object_name]["value"][:, 0] * 2 * np.pi / angular_frequency, x=angular_frequency) / np.trapz(objects_average_fft_invariants[key][object_name]["value"][:, 0], x=angular_frequency)]))
         # stack
-        for reduced_object_name in objects_time_estimate[key]:
-            objects_time_estimates[key][reduced_object_name]["value"] = np.stack(objects_time_estimate[key][reduced_object_name]["value"])
+        for reduced_object_name in objects_time_estimates[key]:
+            objects_time_estimates[key][reduced_object_name]["value"] = np.stack(objects_time_estimates[key][reduced_object_name]["value"])
     # save
     for key in objects_time_estimates:
         libpost.save(objects_time_estimates[key], "time_estimate_" + key)
