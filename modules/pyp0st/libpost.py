@@ -55,9 +55,9 @@ def get_time():
     loaded = np.loadtxt("objects.csv", delimiter=",")
     return loaded[:, header.index("time")]
 
-def get_objects():
-    # get names
-    object_names = get_object_names()
+def get_objects(object_names = []):
+    if not object_names:
+        object_names = get_object_names()
     # load
     header = get_file_header("objects.csv")
     loaded = np.loadtxt("objects.csv", delimiter=",")
@@ -140,9 +140,11 @@ def get_flow():
     # end sort
     return {"value":np.column_stack(sorted_data), "info":sorted_info}
 
-def get_objects_properties(properties):
+def get_objects_properties(properties, object_names = []):
     # objects
-    objects = get_objects()
+    if not object_names:
+        object_names = get_object_names()
+    objects = get_objects(object_names)
     # regex
     regex = ""
     for prop in properties:
