@@ -108,7 +108,7 @@ def main():
             objects_average_fft_invariants[key][object_name]["value"] = np.column_stack([np.average(objects_fft_invariants[key][object_name]["value"], axis=1), 1.96 * np.std(objects_fft_invariants[key][object_name]["value"], axis=1) / np.sqrt(objects_fft_invariants[key][object_name]["value"].shape[1])])
             # info
             objects_average_fft_invariants[key][object_name]["info"] = ["average_fft_" + key, "95CLI"]
-    print("INFO: Done...")
+    print("INFO: Done.")
     # save
     print("INFO: Saving Fast Fourrier Transforms...")
     angular_frequency = 2 * np.pi / (time[-1] - time[0]) * np.linspace(1, len(time)//2+2, num=len(time)//2+1)
