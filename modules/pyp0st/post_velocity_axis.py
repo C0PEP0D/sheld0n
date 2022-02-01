@@ -6,6 +6,8 @@ import argparse
 import copy
 # numpy
 import numpy as np
+import scipy as sp
+import scipy.optimize
 # internal modules
 import libpost
 
@@ -13,6 +15,9 @@ def parse():
     parser = argparse.ArgumentParser(description='Computes the average velocity along a specific direction')
     parser.add_argument('axis', nargs='?', type=int, default=0, help='specify the axis')
     return parser.parse_args()
+
+def fit_func(x, a, b, c):
+    return 1.0 + x * (a + b * x + c * x**2)
 
 def main(axis):
     # get positions
@@ -74,8 +79,8 @@ def main(axis):
             #info
             fits_objects[object_name]["info"] += ["average_velocity_axis_us_{us}_rt_{rt}_sn_{sn}_dn_{dn}_jn_{jn}".format(us=us, rt=rt, sn=sn, dn=dn, jn=jn)]
             # value
-            fit = np.polynomial.Chebyshev.fit(us_sorted[(us, rt, sn, dn, jn)][:, 3], us_sorted[(us, rt, sn, dn, jn)][:, 0], deg=3)
-            fits_objects[object_name]["value"] += [fit(fits_objects[object_name]["value"][0])]
+            fit, cov = sp.optimize.curve_fit(fit_func, us_sorted[(us, rt, sn, dn, jn)][:, 3], us_sorted[(us, rt, sn, dn, jn)][:, 0] / (us * 0.066))
+            fits_objects[object_name]["value"] += [0.006 * us * fit_func(fits_objects[object_name]["value"][0], fit[0], fit[1], fit[2])]
             # max
             index_max = np.argmax(fits_objects[object_name]["value"][-1])
             fits_max_objects[object_name]["value"] += [[us, rt, sn, dn, jn, fits_objects[object_name]["value"][0][index_max], fits_objects[object_name]["value"][-1][index_max]]]
