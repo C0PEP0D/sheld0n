@@ -41,8 +41,12 @@ def main():
         "z.(J.z)":copy.deepcopy(objects_j_0_0),
         "p.(J.p)":copy.deepcopy(objects_j_0_0),
         "p.(J.z)":copy.deepcopy(objects_j_0_0),
-        "z.(J.p)":copy.deepcopy(objects_j_0_0)
+        "z.(J.p)":copy.deepcopy(objects_j_0_0),
+        "sqrt(tr(J.J))":copy.deepcopy(objects_j_0_0)
     }
+    # flow properties
+    strain_rate = copy.deepcopy(objects_j_0_0)
+    vorticity = copy.deepcopy(objects_j_0_0)
     print("INFO: Computing invariants...")
     for object_name in objects_j_0_0:
         # value
@@ -59,8 +63,8 @@ def main():
                 gradients[2, 0] = objects_j_2_0[object_name]["value"][i, j]
                 gradients[2, 1] = objects_j_2_1[object_name]["value"][i, j]
                 gradients[2, 2] = objects_j_2_2[object_name]["value"][i, j]
-                vorticity = 0.5 * (gradients - gradients.transpose())
-                strain_rate = 0.5 * (gradients + gradients.transpose())
+                skew_gradients = 0.5 * (gradients - gradients.transpose())
+                sym_gradients = 0.5 * (gradients + gradients.transpose())
                 # set axis
                 axis = np.empty((3, 1))
                 axis[0, 0] = objects_axis_0[object_name]["value"][i, j]
@@ -71,6 +75,9 @@ def main():
                 objects_invariants["p.(J.p)"][object_name]["value"][i, j] = np.dot(axis.T, np.dot(gradients, axis))
                 objects_invariants["p.(J.z)"][object_name]["value"][i, j] = np.dot(axis.T, np.dot(gradients, DIRECTION))
                 objects_invariants["z.(J.p)"][object_name]["value"][i, j] = np.dot(DIRECTION.T, np.dot(gradients, axis))
+                objects_invariants["sqrt(tr(J.J))"][object_name]["value"][i, j] = np.sqrt(np.trace(np.matmul(gradients, gradients)))                # flow properties
+                strain_rate[object_name]["value"][i, j] = np.linalg.norm(sym_gradients) / np.sqrt(6)
+                vorticity[object_name]["value"][i, j] = 2.0 * np.linalg.norm(np.array([-skew_gradients[1, 2], skew_gradients[0, 2], -skew_gradients[0, 1]]))
         # info
         for key in objects_invariants:
             objects_invariants[key][object_name]["info"] = [info.replace("j_0_0", key) for info in objects_invariants[key][object_name]["info"]]
@@ -89,6 +96,13 @@ def main():
     del objects_axis_0
     del objects_axis_1
     del objects_axis_2
+    print("INFO: Done.")
+
+    print("INFO: Saving flow statistics...")
+    for object_name in strain_rate:
+        np.savetxt("flow_statistics__"+object_name+".csv", np.array([np.average(strain_rate[object_name]["value"]), np.average(vorticity[object_name]["value"])]).reshape(1, 2), header="lambda, omega", delimiter=",")
+    del strain_rate
+    del vorticity
     print("INFO: Done.")
     
     # compute fft
