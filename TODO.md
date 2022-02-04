@@ -1,9 +1,10 @@
 # TODO
 
 * Current:
+	- correct flow vorticity and spheroids rotation
     - agent follow line case
     - sensor line
-    - conform/unconform mesh
+    - conform/nonconform mesh
     - space partition and geometry
 * App:
     - Python custom behaviour
