@@ -54,7 +54,7 @@ The executables are in the [cases](./cases) directory.
 A simple pull should be enough.
 
 ```sh
-$ git pull
+$ git pull --recurse-submodules
 ```
 
 ## Usage
