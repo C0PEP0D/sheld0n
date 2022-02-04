@@ -13,25 +13,26 @@
 #include "core/env/objects/core.h"
 #include "param/env/flow/choice.h"
 // FLAG: INCLUDE OBJECT BEGIN
-#include "param/env/objects/tracers/choice.h"
+#include "param/env/objects/pagent/choice.h"
 // FLAG: INCLUDE OBJECT END
 
 namespace c0p {
 
 struct ObjectsParameters {
     // FLAG: DECLARE OBJECT BEGIN
-    std::shared_ptr<TracersStep> sTracersStep;
-    unsigned int tracersIndex;
+    std::shared_ptr<PagentStep> sPagentStep;
+    unsigned int pagentIndex;
     // FLAG: DECLARE OBJECT END
     
     // construct data
-    std::vector<std::shared_ptr<StepObject>> data;
-    ObjectsParameters(std::shared_ptr<Flow> sFlow, Objects<ObjectsParameters>* pObjects) {
+    std::vector<std::shared_ptr<StepObjectStatic>> sObjectsStaticSteps;
+    std::vector<std::shared_ptr<StepObjectDynamic>> sObjectsDynamicSteps;
+    ObjectsParameters(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) {
         // FLAG: MAKE OBJECT BEGIN
-        // // tracers
-        sTracersStep = std::make_shared<TracersStep>(sFlow, pObjects);
-        data.push_back(sTracersStep);
-        tracersIndex = data.size() - 1;
+        // // pagent
+        sPagentStep = std::make_shared<PagentStep>(sFlow, sObjects);
+        sObjectsStaticSteps.push_back(sPagentStep);
+        pagentIndex = sObjectsStaticSteps.size() - 1;
         // FLAG: MAKE OBJECT END
     }
 };

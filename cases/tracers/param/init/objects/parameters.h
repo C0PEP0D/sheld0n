@@ -12,17 +12,18 @@
 #include "core/init/objects/object/core.h"
 #include "core/init/objects/prop.h"
 // FLAG: INCLUDE OBJECT BEGIN
-#include "param/init/objects/tracers/parameters.h"
+#include "param/init/objects/pagent/parameters.h"
 // FLAG: INCLUDE OBJECT END
 
 namespace c0p {
 
 struct InitObjectsParameters {
     // make data
-    std::vector<std::shared_ptr<InitInitBase>> data;
-    InitObjectsParameters(const TypeObjects& objects) {
+    std::vector<std::shared_ptr<InitInitStaticBase>> sInitsStatic;
+    std::vector<std::shared_ptr<InitInitDynamicBase>> sInitsDynamic;
+    InitObjectsParameters(std::shared_ptr<TypeObjectsParameters> sObjectsParameters) {
         // FLAG: MAKE OBJECT BEGIN
-        data.push_back(std::make_shared<InitInit<InitTracersParameters, TracersStep>>(objects.parameters.sTracersStep));
+        sInitsStatic.push_back(std::make_shared<InitInitStatic<InitPagentParameters, PagentStep>>(sObjectsParameters->sPagentStep));
         // FLAG: MAKE OBJECT END
     }
 };
