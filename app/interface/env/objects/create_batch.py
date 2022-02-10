@@ -87,9 +87,9 @@ def set_parameter(dest, prop, value):
         for file_name in glob.glob(dest + "/**/_behaviour/navigator/rotating_swimmer/parameters.h", recursive=True):
             file_replace(file_name, r"time = [^\*]* \*", "time = {value} *".format(value=float(value)))
             print("edited: ", file_name)
-    elif prop == "reacttime":
+    elif prop == "omegamax":
         for file_name in glob.glob(dest + "/**/_behaviour/navigator/rotating_swimmer/parameters.h", recursive=True):
-            file_replace(file_name, r"maxSwimmingAngularVelocity = [^\/]* \*", "maxSwimmingAngularVelocity = {value} /".format(value=float(value)))
+            file_replace(file_name, r"maxSwimmingAngularVelocity = [^\*/]* /", "maxSwimmingAngularVelocity = {value} /".format(value=float(value)))
             print("edited: ", file_name)
 
 def compute(sources, prop, values):
