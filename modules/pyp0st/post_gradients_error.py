@@ -40,51 +40,54 @@ def main():
     objects_j_2_2 = libpost.get_objects_properties(["j_2_2"], object_names)
     print("INFO: Done.")
     # compute gradients error
-    objects_init_gradients = {}
-    objects_init_skew_gradients = {}
-    objects_init_sym_gradients = {}
-    for object_name in objects_j_0_0:
-        objects_init_gradients[object_name] = []#[np.empty((3, 3))] * objects_j_0_0[object_name]["value"].shape[1]
-        objects_init_skew_gradients[object_name] = []
-        objects_init_sym_gradients[object_name] = []
-        for j in range(0, objects_j_0_0[object_name]["value"].shape[1]):
-            objects_init_gradients[object_name].append(np.empty((3, 3)))
-            objects_init_gradients[object_name][j][0, 0] = objects_j_0_0[object_name]["value"][0, j]
-            objects_init_gradients[object_name][j][0, 1] = objects_j_0_1[object_name]["value"][0, j]
-            objects_init_gradients[object_name][j][0, 2] = objects_j_0_2[object_name]["value"][0, j]
-            objects_init_gradients[object_name][j][1, 0] = objects_j_1_0[object_name]["value"][0, j]
-            objects_init_gradients[object_name][j][1, 1] = objects_j_1_1[object_name]["value"][0, j]
-            objects_init_gradients[object_name][j][1, 2] = objects_j_1_2[object_name]["value"][0, j]
-            objects_init_gradients[object_name][j][2, 0] = objects_j_2_0[object_name]["value"][0, j]
-            objects_init_gradients[object_name][j][2, 1] = objects_j_2_1[object_name]["value"][0, j]
-            objects_init_gradients[object_name][j][2, 2] = objects_j_2_2[object_name]["value"][0, j]
-            objects_init_skew_gradients[object_name].append(0.5 * (objects_init_gradients[object_name][j] - objects_init_gradients[object_name][j].transpose()))
-            objects_init_sym_gradients[object_name].append(0.5 * (objects_init_gradients[object_name][j] + objects_init_gradients[object_name][j].transpose()))
     objects_gradients_error = copy.deepcopy(objects_j_0_0)
     objects_skew_gradients_error = copy.deepcopy(objects_j_0_0)
     objects_sym_gradients_error = copy.deepcopy(objects_j_0_0)
+    objects_gradients_nb = copy.deepcopy(objects_j_0_0)
     print("INFO: Computing gradients error...")
     for object_name in objects_j_0_0:
+        objects_gradients_error[object_name]["value"][:, :] = 0.0
+        objects_skew_gradients_error[object_name]["value"][:, :] = 0.0
+        objects_sym_gradients_error[object_name]["value"][:, :] = 0.0
+        objects_gradients_nb[object_name]["value"][:, :] = 0.0
         # value
-        for i in range(0, objects_j_0_0[object_name]["value"].shape[0]):
+        for k in range(0, objects_j_0_0[object_name]["value"].shape[0]):
             for j in range(0, objects_j_0_0[object_name]["value"].shape[1]):
-                # set gradients
-                gradients = np.empty((3, 3))
-                gradients[0, 0] = objects_j_0_0[object_name]["value"][i, j]
-                gradients[0, 1] = objects_j_0_1[object_name]["value"][i, j]
-                gradients[0, 2] = objects_j_0_2[object_name]["value"][i, j]
-                gradients[1, 0] = objects_j_1_0[object_name]["value"][i, j]
-                gradients[1, 1] = objects_j_1_1[object_name]["value"][i, j]
-                gradients[1, 2] = objects_j_1_2[object_name]["value"][i, j]
-                gradients[2, 0] = objects_j_2_0[object_name]["value"][i, j]
-                gradients[2, 1] = objects_j_2_1[object_name]["value"][i, j]
-                gradients[2, 2] = objects_j_2_2[object_name]["value"][i, j]
-                skew_gradients = 0.5 * (gradients - gradients.transpose())
-                sym_gradients = 0.5 * (gradients + gradients.transpose())
-                # error
-                objects_gradients_error[object_name]["value"][i, j] = np.linalg.norm(gradients - objects_init_gradients[object_name][j])
-                objects_skew_gradients_error[object_name]["value"][i, j] = np.linalg.norm(skew_gradients - objects_init_skew_gradients[object_name][j])
-                objects_sym_gradients_error[object_name]["value"][i, j] = np.linalg.norm(sym_gradients - objects_init_sym_gradients[object_name][j])
+                init_gradients = np.empty((3, 3))
+                init_gradients[0, 0] = objects_j_0_0[object_name]["value"][k, j]
+                init_gradients[0, 1] = objects_j_0_1[object_name]["value"][k, j]
+                init_gradients[0, 2] = objects_j_0_2[object_name]["value"][k, j]
+                init_gradients[1, 0] = objects_j_1_0[object_name]["value"][k, j]
+                init_gradients[1, 1] = objects_j_1_1[object_name]["value"][k, j]
+                init_gradients[1, 2] = objects_j_1_2[object_name]["value"][k, j]
+                init_gradients[2, 0] = objects_j_2_0[object_name]["value"][k, j]
+                init_gradients[2, 1] = objects_j_2_1[object_name]["value"][k, j]
+                init_gradients[2, 2] = objects_j_2_2[object_name]["value"][k, j]
+                init_skew_gradients = 0.5 * (init_gradients - init_gradients.transpose())
+                init_sym_gradients = 0.5 * (init_gradients + init_gradients.transpose())
+                for i in range(0, objects_j_0_0[object_name]["value"].shape[0]):
+                    # set gradients
+                    gradients = np.empty((3, 3))
+                    gradients[0, 0] = objects_j_0_0[object_name]["value"][i, j]
+                    gradients[0, 1] = objects_j_0_1[object_name]["value"][i, j]
+                    gradients[0, 2] = objects_j_0_2[object_name]["value"][i, j]
+                    gradients[1, 0] = objects_j_1_0[object_name]["value"][i, j]
+                    gradients[1, 1] = objects_j_1_1[object_name]["value"][i, j]
+                    gradients[1, 2] = objects_j_1_2[object_name]["value"][i, j]
+                    gradients[2, 0] = objects_j_2_0[object_name]["value"][i, j]
+                    gradients[2, 1] = objects_j_2_1[object_name]["value"][i, j]
+                    gradients[2, 2] = objects_j_2_2[object_name]["value"][i, j]
+                    skew_gradients = 0.5 * (gradients - gradients.transpose())
+                    sym_gradients = 0.5 * (gradients + gradients.transpose())
+                    # error
+                    objects_gradients_error[object_name]["value"][abs(i-k), j] += np.linalg.norm(gradients - init_gradients)
+                    objects_skew_gradients_error[object_name]["value"][abs(i-k), j] += np.linalg.norm(skew_gradients - init_skew_gradients)
+                    objects_sym_gradients_error[object_name]["value"][abs(i-k), j] += np.linalg.norm(sym_gradients - init_sym_gradients)
+                    objects_gradients_nb[object_name]["value"][abs(i-k), j] += 1.0
+        # averaging division
+        objects_gradients_error[object_name]["value"] /= objects_gradients_nb[object_name]["value"]
+        objects_skew_gradients_error[object_name]["value"] /= objects_gradients_nb[object_name]["value"]
+        objects_sym_gradients_error[object_name]["value"] /= objects_gradients_nb[object_name]["value"]
         # info
         objects_gradients_error[object_name]["info"] = [info.replace("j_0_0", "|J_t - J_0|") for info in objects_gradients_error[object_name]["info"]]
         objects_skew_gradients_error[object_name]["info"] = [info.replace("j_0_0", "|O_t - O_0|") for info in objects_skew_gradients_error[object_name]["info"]]
@@ -101,6 +104,7 @@ def main():
     del objects_j_2_0
     del objects_j_2_1
     del objects_j_2_2
+    del objects_gradients_nb
     print("INFO: Done.")
     
     # average
