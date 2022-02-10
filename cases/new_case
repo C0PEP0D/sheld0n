@@ -50,6 +50,7 @@ def main():
     ### env
     #### flow
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/flow/choose.py", args.name + "/param/env/flow"), args.name + "/param/env/flow/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/flow/jhtdb/choose.py", args.name + "/param/env/flow/jhtdb"), args.name + "/param/env/flow/jhtdb/choose")
     #### objects
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/copy_object_static.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/copy_object_static")
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/copy_object_dynamic.py", args.name + "/param/env/objects"), args.name + "/param/env/objects/copy_object_dynamic")
