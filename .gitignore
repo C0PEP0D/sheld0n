@@ -29,3 +29,5 @@ cases/*/
 !cases/spherical_surfers/
 !cases/comparison/
 !cases/tracers/
+!cases/surfers_in_channel_flow
+!cases/adaptive_surfers_in_channel_flow
