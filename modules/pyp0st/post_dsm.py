@@ -65,22 +65,23 @@ def main():
     for object_name in gradients_value:
         print("INFO:    Processing " + object_name + "...")
         # value
-        l_value[object_name] = sp.integrate.cumtrapz(gradients_value[object_name], time, axis=0)
+        l_value[object_name] = sp.integrate.cumtrapz(-gradients_value[object_name].transpose(0, 1, 3, 2), time, axis=0)
         print("INFO:    " + object_name + " done.")
     print("INFO: Done.")
     print("INFO: Computing lambda matrix...")
     lambda_value = copy.deepcopy(l_value)
+    eigen_values = []
     for object_name in l_value:
         print("INFO:    Processing " + object_name + "...")
         # value
-        for i in range(l_value[object_name].shape[0]):
+        for i in range(4900, l_value[object_name].shape[0]):
             print("INFO:        "+str(i)+"/"+str(l_value[object_name].shape[0])+" ...")
             for j in range(l_value[object_name].shape[1]):
                 lambda_value[object_name][i, j, :, :] = 1/(2.0 * time[1+i]) * sp.linalg.logm(np.matmul(l_value[object_name][i, j, :, :],l_value[object_name][i, j, :, :].transpose()))
         print("INFO:    " + object_name + " done.")
     print("INFO: Done.")
     print("INFO: Computing eigen values...")
-    print(np.linalg.eig(np.average(lambda_value["pagent"], axis=0)[:, :, 0]))
+    print(np.average(np.linalg.eig(lambda_value["pagent"], axis=1)[-1, :, :]))
     print("INFO: Done.")
     # save
     print("INFO: Saving...")
