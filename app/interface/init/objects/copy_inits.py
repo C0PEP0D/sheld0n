@@ -54,4 +54,5 @@ if __name__ == '__main__':
     # main
     args = parse()
     for dest in args.dest:
-        main(args.source, dest)
+        if dest != args.source:
+            main(args.source, dest)
