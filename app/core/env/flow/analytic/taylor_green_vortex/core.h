@@ -1,5 +1,5 @@
-#ifndef C0P_CORE_ENV_FLOW_TAYLOR_GREEN_VORTEX_SIMPLE_CORE_H
-#define C0P_CORE_ENV_FLOW_TAYLOR_GREEN_VORTEX_SIMPLE_CORE_H
+#ifndef C0P_CORE_ENV_FLOW_ANALYTIC_TAYLOR_GREEN_VORTEX_CORE_H
+#define C0P_CORE_ENV_FLOW_ANALYTIC_TAYLOR_GREEN_VORTEX_CORE_H
 #pragma once
 
 // Std includes
@@ -8,23 +8,23 @@
 #include <iostream> // cout, endl
 #include <memory> // shared_ptr
 // Lib includes
-#include "fl0w/taylor_green_vortex.h"
+#include "fl0w/analytic/taylor_green_vortex.h"
 // App includes
 #include "core/env/prop.h"
-#include "core/env/flow/taylor_green_vortex/simple/prop.h"
+#include "core/env/flow/analytic/taylor_green_vortex/prop.h"
 
 namespace c0p {
 
-using TypeFlowTaylorGreenVortexSimple = fl0w::TaylorGreenVortex<TypeSpaceVector, TypeSpaceMatrix, TypeRef>;
+using TypeFlowAnalyticTaylorGreenVortex = fl0w::analytic::TaylorGreenVortex<TypeSpaceVector, TypeSpaceMatrix, TypeRef>;
 
 template<typename TypeParameters>
-class FlowTaylorGreenVortexSimple : public TypeFlowTaylorGreenVortexSimple {
+class FlowAnalyticTaylorGreenVortex : public TypeFlowAnalyticTaylorGreenVortex {
     public:
-        using Type = TypeFlowTaylorGreenVortexSimple;
+        using Type = TypeFlowAnalyticTaylorGreenVortex;
     public:
         TypeParameters parameters;
     public:
-        FlowTaylorGreenVortexSimple() {
+        FlowAnalyticTaylorGreenVortex() {
         }
 
         void init(const TypeScalar& t) {
@@ -39,7 +39,7 @@ class FlowTaylorGreenVortexSimple : public TypeFlowTaylorGreenVortexSimple {
         void info() const {
             std::string separation(" -------------------- ");
             std::string space(" = ");
-            std::cout << separation << "TAYLOR GREEN VORTEX FLOW" << std::endl;
+            std::cout << separation << "Flow Analytic Taylor Green Vortex" << std::endl;
         }
 
 };
