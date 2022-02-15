@@ -13,6 +13,7 @@
 #include "core/post/objects/prop.h"
 // FLAG: INCLUDE OBJECT BEGIN
 #include "param/post/objects/object/parameters.h"
+#include "param/post/objects/dobject/parameters.h"
 // FLAG: INCLUDE OBJECT END
 
 namespace c0p {
@@ -25,6 +26,7 @@ struct PostObjectsParameters {
     PostObjectsParameters(std::shared_ptr<ObjectsParameters> sObjectsParameters) {
         // FLAG: MAKE OBJECT BEGIN
         sPostsStatic.push_back(std::make_shared<PostPost<PostObjectParameters, ObjectStep>>(sObjectsParameters->sObjectStep));
+        sPostsDynamic.push_back(std::make_shared<PostPost<PostDobjectParameters, DobjectStep>>(sObjectsParameters->sDobjectStep));
         // FLAG: MAKE OBJECT END
     }
 };

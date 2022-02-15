@@ -13,7 +13,8 @@
 #include "core/env/objects/core.h"
 #include "param/env/flow/choice.h"
 // FLAG: INCLUDE OBJECT BEGIN
-#include "param/env/objects/object/choice.h"
+#include "param/env/objects/static/object/choice.h"
+#include "param/env/objects/dynamic/dobject/choice.h"
 // FLAG: INCLUDE OBJECT END
 
 namespace c0p {
@@ -22,6 +23,8 @@ struct ObjectsParameters {
     // FLAG: DECLARE OBJECT BEGIN
     std::shared_ptr<ObjectStep> sObjectStep;
     unsigned int objectIndex;
+    std::shared_ptr<DobjectStep> sDobjectStep;
+    unsigned int dobjectIndex;
     // FLAG: DECLARE OBJECT END
     
     // construct data
@@ -33,6 +36,10 @@ struct ObjectsParameters {
         sObjectStep = std::make_shared<ObjectStep>(sFlow, sObjects);
         sObjectsStaticSteps.push_back(sObjectStep);
         objectIndex = sObjectsStaticSteps.size() - 1;
+        // // dobject
+        sDobjectStep = std::make_shared<DobjectStep>(sFlow, sObjects);
+        sObjectsDynamicSteps.push_back(sDobjectStep);
+        dobjectIndex = sObjectsDynamicSteps.size() - 1;
         // FLAG: MAKE OBJECT END
     }
 };
