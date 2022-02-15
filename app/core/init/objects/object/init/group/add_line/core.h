@@ -25,6 +25,7 @@ class InitInitGroupAddLine : public InitInitInitDynamic<TypeObjectStep> {
             for(unsigned int memberIndex = 0; memberIndex < membersNumber; memberIndex++) {
                 sObjectStep->addMember(state);
                 sObjectStep->sMemberStep->x(sObjectStep->memberState(state.data(), memberIndex)) = parameters.origin + memberIndex * dl;
+                sObjectStep->sMemberStep->axis(sObjectStep->memberState(state.data(), memberIndex)) = TypeSpaceVector({0.0, 1.0, 0.0}); // TMP
             }
         };
 };
