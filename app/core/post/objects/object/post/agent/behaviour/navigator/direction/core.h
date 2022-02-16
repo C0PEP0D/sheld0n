@@ -20,9 +20,9 @@ class PostPostAgentBehaviourNavigatorDirection : public PostPostPost<TypeObjectS
     public:
         using PostPostPost<TypeObjectStep>::PostPostPost;
     public:
-        std::map<std::string, TypeScalar> operator()(const TypeVector<Eigen::Dynamic>& state, const double& t) override {
+        std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
             return {
-                { parameters.name + "_" + std::to_string(parameters.i), sObjectStep->sBehaviour->behaviourDirection(state, t, *sObjectStep).normalized()[parameters.i] }
+                { parameters.name + "_" + std::to_string(parameters.i), sObjectStep->sBehaviour->behaviourDirection(pState, t, *sObjectStep).normalized()[parameters.i] }
             };
         };
 };
