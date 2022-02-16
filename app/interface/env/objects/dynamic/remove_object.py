@@ -39,6 +39,8 @@ def edit(name):
             pass
         elif (line == '        {name}Index = sObjectsDynamicSteps.size() - 1;\n'.format(name=name)):
             pass
+        elif (line == '        objectsDynamicNames.push_back("{name}");\n'.format(name=name)):
+            pass
         else:
             print(line, end='')
     # remove object from param/post/objects/parameters.h

@@ -27,7 +27,6 @@ class StepObjectsStatic : public sl0::StepGroupDynamic<TypeVector, DIM, TypeView
         }
     public:
         TypeStateVectorDynamic operator()(const double* pState, const double& t) const override {
-            // TODO
             sFlow->prepare(positions(pState), t);
             return Type::operator()(pState, t);
         }

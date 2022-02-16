@@ -7,7 +7,9 @@
 // COPY/REMOVE COMMAND ARE USED
 
 // std includes
-#include <memory>
+#include <memory> // shared_ptr
+#include <vector>
+#include <string>
 // app includes
 #include "core/env/objects/prop.h"
 #include "core/env/objects/core.h"
@@ -28,7 +30,9 @@ struct ObjectsParameters {
     // FLAG: DECLARE OBJECT END
     
     // construct data
+    std::vector<std::string> objectsStaticNames;
     std::vector<std::shared_ptr<StepObjectStatic>> sObjectsStaticSteps;
+    std::vector<std::string> objectsDynamicNames;
     std::vector<std::shared_ptr<StepObjectDynamic>> sObjectsDynamicSteps;
     ObjectsParameters(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) {
         // FLAG: MAKE OBJECT BEGIN
@@ -36,10 +40,12 @@ struct ObjectsParameters {
         sObjectStep = std::make_shared<ObjectStep>(sFlow, sObjects);
         sObjectsStaticSteps.push_back(sObjectStep);
         objectIndex = sObjectsStaticSteps.size() - 1;
+        objectsStaticNames.push_back("object");
         // // dobject
         sDobjectStep = std::make_shared<DobjectStep>(sFlow, sObjects);
         sObjectsDynamicSteps.push_back(sDobjectStep);
         dobjectIndex = sObjectsDynamicSteps.size() - 1;
+        objectsDynamicNames.push_back("dobject");
         // FLAG: MAKE OBJECT END
     }
 };

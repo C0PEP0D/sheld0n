@@ -44,6 +44,7 @@ def edit(source, name):
             print('        s{Name}Step = std::make_shared<{Name}Step>(sFlow, sObjects);\n'.format(Name=upper_camel_name), end='')
             print('        sObjectsStaticSteps.push_back(s{Name}Step);\n'.format(Name=upper_camel_name), end='')
             print('        {name}Index = sObjectsStaticSteps.size() - 1;\n'.format(name=name), end='')
+            print('        objectsStaticNames.push_back("{name}");\n'.format(name=name), end='')
         print(line, end='')
     # post
     ## replace source by name
