@@ -10,13 +10,13 @@
 namespace c0p {
 
 template<typename TypeParameters, typename TypeObjectStep, template<typename> typename TypeInitInitMember>
-class InitInitGroupLine : public InitInitInit<TypeObjectStep> {
+class InitInitGroupLine : public InitInitInitStatic<TypeObjectStep> {
     public:
         TypeParameters parameters;
     public:
-        using InitInitInit<TypeObjectStep>::sObjectStep;
+        using InitInitInitStatic<TypeObjectStep>::sObjectStep;
     public:
-        InitInitGroupLine(std::shared_ptr<TypeObjectStep> p_sObjectStep) : InitInitInit<TypeObjectStep>(p_sObjectStep) {
+        InitInitGroupLine(std::shared_ptr<TypeObjectStep> p_sObjectStep) : InitInitInitStatic<TypeObjectStep>(p_sObjectStep) {
         }
     public:
         void operator()(double* pState) override {

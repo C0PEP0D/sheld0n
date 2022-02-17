@@ -7,10 +7,10 @@
 // CHOOSE COMMAND IS USED
 
 // choose your object
-#include "core/env/objects/object/passive/point/core.h"
-#include "param/env/objects/dynamic/dobject/chain/strechable/_member/passive/point/parameters.h"
+#include "core/env/objects/object/passive/surface_element/core.h"
+#include "param/env/objects/dynamic/dobject/chain/strechable/_member/passive/surface_element/parameters.h"
 namespace c0p {
-    using DobjectChainStrechableMemberPassiveStep = PassivePointStep<DobjectChainStrechableMemberPassivePointStepParameters>;
+    using DobjectChainStrechableMemberPassiveStep = PassiveSurfaceElementStep<DobjectChainStrechableMemberPassiveSurfaceElementStepParameters>;
 }
 
 #endif

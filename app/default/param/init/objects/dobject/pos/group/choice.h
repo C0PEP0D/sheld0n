@@ -9,12 +9,12 @@
 // member
 #include "param/init/objects/dobject/pos/group/_member/choice.h"
 // choose your init
-#include "core/init/objects/object/init/group/all/core.h"
-#include "param/init/objects/dobject/pos/group/all/parameters.h"
+#include "core/init/objects/object/init/group/line/core.h"
+#include "param/init/objects/dobject/pos/group/line/parameters.h"
 
 namespace c0p {
     template<typename TypeDobjectStep>
-    using InitDobjectPosGroup = InitInitGroupAll<InitDobjectPosGroupAllParameters, TypeDobjectStep, InitDobjectPosGroupMember>;
+    using InitDobjectPosGroup = InitInitGroupLine<InitDobjectPosGroupLineParameters, TypeDobjectStep, InitDobjectPosGroupMember>;
 }
 
 #endif

@@ -7,12 +7,12 @@
 // CHOOSE COMMAND IS USED
 
 // choose your init
-#include "core/init/objects/object/init/passive/axis/random/core.h"
-#include "param/init/objects/dobject/orient/group/_member/passive/axis/random/parameters.h"
+#include "core/init/objects/object/init/passive/axis/value/core.h"
+#include "param/init/objects/dobject/orient/group/_member/passive/axis/value/parameters.h"
 
 namespace c0p {
     template<typename TypeDobjectStep>
-    using InitDobjectOrientGroupMemberPassiveAxis = InitInitPassiveAxisRandom<InitDobjectOrientGroupMemberPassiveAxisRandomParameters, TypeDobjectStep>;
+    using InitDobjectOrientGroupMemberPassiveAxis = InitInitPassiveAxisValue<InitDobjectOrientGroupMemberPassiveAxisValueParameters, TypeDobjectStep>;
 }
 
 #endif

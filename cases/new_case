@@ -71,12 +71,16 @@ def main():
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_velocity/choose.py", args.name + "/param/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_velocity"), args.name + "/param/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/navigator/_behaviour_velocity/choose")
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/_sensor/direction/choose.py", args.name + "/param/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/_sensor/direction"), args.name + "/param/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/_sensor/direction/choose")
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients/choose.py", args.name + "/param/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients"), args.name + "/param/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients/choose")
+    #### dobject
+    ##### chain of surface elements
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/dynamic/object/chain/strechable/_member/choose.py", args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member"), args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/dynamic/object/chain/strechable/_member/passive/choose.py", args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member/passive"), args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member/passive/choose")
     ### init
     #### objects
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/copy_inits.py", args.name + "/param/init/objects"), args.name + "/param/init/objects/copy_inits")
+    ##### object
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/copy_init.py", args.name + "/param/init/objects/object"), args.name + "/param/init/objects/object/copy_init")
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/remove_init.py", args.name + "/param/init/objects/object"), args.name + "/param/init/objects/object/remove_init")
-    ##### object
     ###### pos
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/choose.py", args.name + "/param/init/objects/object/pos"), args.name + "/param/init/objects/object/pos/choose")
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/choose.py", args.name + "/param/init/objects/object/pos/group"), args.name + "/param/init/objects/object/pos/group/choose")
@@ -87,7 +91,21 @@ def main():
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/choose.py", args.name + "/param/init/objects/object/orient/group"), args.name + "/param/init/objects/object/orient/group/choose")
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/choose.py", args.name + "/param/init/objects/object/orient/group/_member"), args.name + "/param/init/objects/object/orient/group/_member/choose")
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/passive/choose.py", args.name + "/param/init/objects/object/orient/group/_member/passive"), args.name + "/param/init/objects/object/orient/group/_member/passive/choose")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/passive//axis/choose.py", args.name + "/param/init/objects/object/orient/group/_member/passive/axis"), args.name + "/param/init/objects/object/orient/group/_member/passive/axis/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/__passive/__axis/choose.py", args.name + "/param/init/objects/object/orient/group/_member/passive/axis"), args.name + "/param/init/objects/object/orient/group/_member/passive/axis/choose")
+    ##### dobject
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/copy_init.py", args.name + "/param/init/objects/dobject"), args.name + "/param/init/objects/dobject/copy_init")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/remove_init.py", args.name + "/param/init/objects/dobject"), args.name + "/param/init/objects/dobject/remove_init")
+    ###### pos
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/choose.py", args.name + "/param/init/objects/dobject/pos"), args.name + "/param/init/objects/dobject/pos/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/choose.py", args.name + "/param/init/objects/dobject/pos/group"), args.name + "/param/init/objects/dobject/pos/group/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/choose.py", args.name + "/param/init/objects/dobject/pos/group/_member"), args.name + "/param/init/objects/dobject/pos/group/_member/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/passive/choose.py", args.name + "/param/init/objects/dobject/pos/group/_member/passive"), args.name + "/param/init/objects/dobject/pos/group/_member/passive/choose")
+    ###### orient
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/choose.py", args.name + "/param/init/objects/dobject/orient"), args.name + "/param/init/objects/dobject/orient/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/choose.py", args.name + "/param/init/objects/dobject/orient/group"), args.name + "/param/init/objects/dobject/orient/group/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/choose.py", args.name + "/param/init/objects/dobject/orient/group/_member"), args.name + "/param/init/objects/dobject/orient/group/_member/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/passive/choose.py", args.name + "/param/init/objects/dobject/orient/group/_member/passive"), args.name + "/param/init/objects/dobject/orient/group/_member/passive/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/__passive/__axis/choose.py", args.name + "/param/init/objects/dobject/orient/group/_member/passive/axis"), args.name + "/param/init/objects/dobject/orient/group/_member/passive/axis/choose")
     ### post
     #### objects
     os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/copy_posts.py", args.name + "/param/post/objects"), args.name + "/param/post/objects/copy_posts")

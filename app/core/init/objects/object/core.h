@@ -54,8 +54,11 @@ class InitInitDynamic : public InitInitDynamicBase {
         }
     public:
         void operator()(std::vector<double>& state) override {
-            for(const std::shared_ptr<InitInitInitDynamic<TypeObjectStep>>& sInitObjectStep : parameters.sInits) {
-                (*sInitObjectStep)(state);
+        	// dynamic init
+        	(*parameters.sDynamicInit)(state);
+        	// static inits
+            for(const std::shared_ptr<InitInitInitStatic<TypeObjectStep>>& sInitObjectStep : parameters.sInits) {
+                (*sInitObjectStep)(state.data());
             }
         }
 };
