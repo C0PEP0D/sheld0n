@@ -11,6 +11,7 @@ __pycache__/
 *.html
 *.svg
 *.csv
+*.npy
 case_*/
 nohup.out
 img/

@@ -33,18 +33,18 @@ def get_object_names():
         with open("objects.csv") as f:
             _line = f.readline()[1:].split(",")
             for _column_name in _line:
-                _found_index = _column_name.find("__particle") # group
+                _found_index = _column_name.find("__particle_") # group
                 if _found_index > -1:
                     _object_name = _column_name[:_found_index]
                     if not _object_name in object_names:
                         object_names.append(_object_name)
                 else:
-                    _found_index = _column_name.find("__s") # chain
+                    _found_index = _column_name.find("__s_") # chain
                     if _found_index > -1:
                         _object_name = _column_name[:_found_index]
                         if not _object_name in object_names:
                             object_names.append(_object_name)
-                    else: # simple object
+                    elif _column_name != "time\n": # simple object
                         object_names.append(_column_name.split("__")[0])
     else:
         raise NameError('objects.csv not found')
