@@ -6,6 +6,7 @@
 import argparse
 # system
 import os
+import os.path
 import shlex
 import subprocess
 # regex
@@ -51,9 +52,14 @@ def get_object_names():
     return object_names
 
 def get_time():
-    header = get_file_header("objects.csv")
-    loaded = np.loadtxt("objects.csv", delimiter=",")
-    return loaded[:, header.index("time")]
+    if os.path.isfile("time.npy"):
+        time = np.load("time.npy")
+    else:
+        header = get_file_header("objects.csv")
+        loaded = np.loadtxt("objects.csv", delimiter=",")
+        time = loaded[:, header.index("time")]
+        np.save("time", time)
+    return time
 
 def get_objects(object_names = []):
     if not object_names:
