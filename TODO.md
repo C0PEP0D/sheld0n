@@ -1,7 +1,7 @@
 # TODO
 
 * Current:
-	- correct flow vorticity and spheroids rotation
+	- correct flow vorticity and spheroids rotation (remove get vorticity and get strain rate)
     - agent follow line case
     - sensor line
     - conform/nonconform mesh
