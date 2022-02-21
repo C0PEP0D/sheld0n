@@ -15,17 +15,15 @@ objects_name_info = ["us/u_eta", "surftimeconst/t_eta", "reorientationtime/t_eta
 objects_name_properties = ["us", "surftimeconst", "reorientationtime", "surftimeprefactor", "proportion", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]
 
 # filtering
-for prop in ["surftimeprefactor", "swimnoise", "dirnoise", "jnoise"]:
+for prop in ["surftimeconst", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]:
     i = objects_name_properties.index(prop)
     objects_name_info.pop(i)
     objects_name_properties.pop(i)
 
-sorting_property = "surftimeconst"
-sorting_index = 2 + objects_name_properties.index(sorting_property)
+sorting_property = "surftimeprefactor"
+sorting_index = objects_name_properties.index(sorting_property)
 sorting_info = objects_name_info.copy()
 sorting_info.pop(sorting_index)
-sorting_info.pop(1)
-sorting_info.pop(0)
 
 def parse():
     parser = argparse.ArgumentParser(description='Computes the average velocity along a specific direction')
@@ -40,7 +38,7 @@ def main(axis):
     object_names = libpost.get_object_names()
     print("INFO: Object names are:", " ".join(object_names), flush=True)
     print("INFO: Reading time...", flush=True)
-    time = libpost.get_time();
+    time = libpost.get_time()
     print("INFO: Done.", flush=True)
     print("INFO: Reading objects properties...", flush=True)
     objects_pos = libpost.get_objects_properties(["pos_{axis}".format(axis=axis)], object_names)
@@ -59,7 +57,7 @@ def main(axis):
     # print("INFO: Saving...", flush=True)
     # libpost.savet(time, objects_average_velocity, "average_velocity_axis_{axis}".format(axis=axis))
     # print("INFO: Done.", flush=True)
-    print("INFO: Reading merging objects...", flush=True)
+    print("INFO: Merging objects...", flush=True)
     merged_objects = {}
     for object_name in objects_average_velocity:
         reduced_object_name = object_name.split("__")[0]
@@ -85,10 +83,8 @@ def main(axis):
     for object_name in merged_objects:
         object_sorted = {}
         for row in merged_objects[reduced_object_name]["value"]:
-            row_list = row.tolist()
+            row_list = row.tolist()[2:]
             row_list.pop(sorting_index)
-            row_list.pop(1)
-            row_list.pop(0)
             row_tuple = tuple(row_list)
             if not row_tuple in object_sorted:
                 object_sorted[row_tuple] = [row]
