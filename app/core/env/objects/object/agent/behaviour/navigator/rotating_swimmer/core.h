@@ -63,9 +63,9 @@ class AgentBehaviourNavigatorRotatingSwimmer : public sl0::sa0::Behaviour<AgentA
 			// // set actuators
 			if (angularVelocityNorm > 0.0){
 				if (angularVelocityNorm > parameters.maxSwimmingAngularVelocity) {
-					stepActive.sStepAxisRotate->angularVelocity = angularVelocity;
-				} else {
 					stepActive.sStepAxisRotate->angularVelocity = parameters.maxSwimmingAngularVelocity * angularVelocity / angularVelocityNorm;
+				} else {
+					stepActive.sStepAxisRotate->angularVelocity = angularVelocity;
 				}
 			} else {
 				stepActive.sStepAxisRotate->angularVelocity = angularVelocity;
