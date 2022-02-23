@@ -52,18 +52,15 @@ def main():
     object_names = libpost.get_object_names()
     print("INFO: Object names are:", " ".join(object_names), flush=True)
     print("INFO: Reading time...", flush=True)
-    if os.path.isfile("time.npy"):
-        time = np.load("time.npy")
-    else:
-        time = libpost.get_time();
-        np.save("time", time)
+    time = libpost.get_time()
+    time_list = time.tolist()
     print("INFO: Done.", flush=True)
     print("INFO: Reading int L^t L...", flush=True)
     int_Lt_L_to_process = []
     int_Lt_L_value = {}
     for object_name in object_names:
-        if os.path.isfile(object_name + "_int_Lt_L.npy"):
-            int_Lt_L_value[object_name] = np.load(object_name + "_int_Lt_L.npy")
+        if os.path.isfile("objects_npy/" + object_name + "_int_Lt_L.npy"):
+            int_Lt_L_value[object_name] = np.load("objects_npy/" + object_name + "_int_Lt_L.npy")
         else:
             int_Lt_L_to_process.append(object_name)
     print("INFO: Done.", flush=True)
@@ -72,8 +69,8 @@ def main():
         L_to_process = []
         L_value = {}
         for object_name in int_Lt_L_to_process:
-            if os.path.isfile(object_name + "_L.npy"):
-                L_value[object_name] = np.load(object_name + "_L.npy")
+            if os.path.isfile("objects_npy/" + object_name + "_L.npy"):
+                L_value[object_name] = np.load("objects_npy/" + object_name + "_L.npy")
             else:
                 L_to_process.append(object_name)
         print("INFO: Done.", flush=True)
@@ -130,7 +127,7 @@ def main():
             print("INFO: Done.", flush=True)
             print("INFO: Saving L...", flush=True)
             for object_name in gradients_value:
-                np.save(object_name + "_L", L_value[object_name])
+                np.save("objects_npy/" + object_name + "_L", L_value[object_name])
             print("INFO: Done.", flush=True)
         print("INFO: Computing int L^t L...", flush=True)
         for object_name in int_Lt_L_to_process:
@@ -141,7 +138,7 @@ def main():
         print("INFO: Done.", flush=True)
         print("INFO: Saving int_Lt_L...", flush=True)
         for object_name in int_Lt_L_to_process:
-            np.save(object_name + "_int_Lt_L", L_value[object_name])
+            np.save("objects_npy/" + object_name + "_int_Lt_L", L_value[object_name])
         print("INFO: Done.", flush=True)
     print("INFO: Computing Tau...", flush=True)
     Tau_value = {}
@@ -152,12 +149,13 @@ def main():
         print("INFO:    " + object_name + " done.", flush=True)
     print("INFO: Done.", flush=True)
     print("INFO: Computing c pdf...", flush=True)
-    c_pdf = {object_name:np.zeros((Tau_value[object_name].shape[0], nc)) for object_name in Tau_value}
+    cs = np.array([ic * dc for ic in range(nc)])
+    c_pdf = {object_name:{"value":np.zeros((Tau_value[object_name].shape[0], nc)), "info":["p(c={})".format(ic * dc) for ic in range(nc)]} for object_name in Tau_value}
     for object_name in Tau_value:
         print("INFO:    Processing " + object_name + "...", flush=True)
         # value
         # for i in range(Tau_value[object_name].shape[0]):
-        for i in range(10,11):
+        for i in [time_list.index(t) for t in [0.02, 0.04, 0.08, 0.12, 0.32, 0.64, 1.28, 2.56, 5.12, 10.0]]:
             for ic in range(1, nc):
                 c = ic * dc
                 val = np.zeros(nC)
@@ -167,17 +165,16 @@ def main():
                         etas = np.linalg.eigvalsh(Tau_value[object_name][i,j]).tolist()
                         etas.sort()
                         etas.reverse()
-                        if etas[0] < 1.0:
-                            print(etas, flush=True)
                         val[iC] += Q(C, etas[0], etas[1], etas[2])
                     val[iC] /= c * np.sqrt(np.log(C/c))
-                c_pdf[object_name][i, ic] = np.trapz(val, dx=dC) / Tau_value[object_name].shape[1]
-            plt.plot(np.linspace(0.0, 1.0, nc), c_pdf[object_name][i, :])
-        plt.savefig("test.png")
+                c_pdf[object_name]["value"][i, ic] = np.trapz(val, dx=dC) / Tau_value[object_name].shape[1]
+            # save snapshot
+            np.savetxt("c_pdf__{}__time_{}.csv".format(object_name, time[i]), np.column_stack((cs, c_pdf[object_name]["value"][i, :])), delimiter=",", header="c, p(c)")
         print("INFO:    " + object_name + " done.", flush=True)
-    # print("INFO: Done.")
-    # print("INFO: Saving pdfs (not done yet)...")
-    # print("INFO: Done.")
+    print("INFO: Done.", flush=True)
+    # print("INFO: Saving pdfs...", flush=True)
+    # libpost.savet(time, c_pdf, "c_pdf")
+    # print("INFO: Done.", flush=True)
 
 if __name__ == '__main__':
     args = parse()

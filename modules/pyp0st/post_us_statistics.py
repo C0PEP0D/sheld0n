@@ -49,7 +49,7 @@ def main():
             merged_objects[reduced_object_name] = {}
             merged_objects[reduced_object_name]["value"] = []
             merged_objects[reduced_object_name]["info"] = ["average_E_perf/c_d", "95CLI"] + objects_name_info
-        e_eff = 2.0 * libpost.get_property_from_object_name(object_name, "us") * (objects_pos[object_name]["value"][-1, :] - objects_pos[object_name]["value"][0, :]) - np.trapz(objects_us[object_name]["value"]**2, x=time, axis=0)
+        e_eff = 2.0 * libpost.get_property_from_object_name(object_name, "us") * 0.066 * (objects_pos[object_name]["value"][-1, :] - objects_pos[object_name]["value"][0, :]) - np.trapz(objects_us[object_name]["value"]**2, x=time, axis=0)
         merged_objects[reduced_object_name]["value"].append(
             np.array(
                 [np.average(e_eff), 1.96 * np.std(e_eff) / np.sqrt(e_eff.size)] + [libpost.get_property_from_object_name(object_name, prop) for prop in objects_name_properties]

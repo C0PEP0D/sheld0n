@@ -11,7 +11,7 @@ namespace c0p {
 // Accurate direction sensor parameters
 struct SurferUs2O0Surftimeprefactor0O0GroupHomogeneousMemberAgentBehaviourSensorDirectionAccurateParameters {
     // Direction sensed
-    const TypeSpaceVector direction = {1.0, 0.0, 0.0};
+    const TypeSpaceVector direction = {0.0, 1.0, 0.0};
 };
 
 }

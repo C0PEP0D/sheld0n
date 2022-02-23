@@ -6,47 +6,161 @@ import argparse
 import copy
 # numpy
 import numpy as np
+import scipy as sp
+import scipy.integrate
 # internal modules
 import libpost
 
-DIRECTION = np.array([[1.0, 0.0, 0.0]]).T
+BIN_NB = 'auto'
 
 def parse():
     parser = argparse.ArgumentParser(description='Computes statistics of the lagrangian gradients matrix (computed along particle trajectories)')
     return parser.parse_args()
 
-def main():
-    print("INFO: Post processing flow velocity gradients statistics sampled by lagrangian objects.")
+def main_gradients():
+    print("INFO: Post processing flow velocity gradients statistics sampled by lagrangian objects.", flush=True)
     object_names = libpost.get_object_names()
-    print("INFO: Object names are:", " ".join(object_names))
+    print("INFO: Object names are:", " ".join(object_names), flush=True)
     # get gradient matrix
-    print("INFO: Reading objects properties...")
+    print("INFO: Reading objects properties...", flush=True)
     time = libpost.get_time();
     objects_j_0_0 = libpost.get_objects_properties(["j_0_0"], object_names)
-    print("INFO: Done.")
-    print("INFO: Computing f(t) using pdfs...")
-    f = {object_name:{"value":np.empty((objects_j_0_0[object_name]["value"].shape[0], 1)), "info":["f"]} for object_name in objects_j_0_0}
+    print("INFO: Done.", flush=True)
+    print("INFO: Computing f(t) using pdfs...", flush=True)
+    average_f = {object_name:{"value":np.empty((objects_j_0_0[object_name]["value"].shape[0], 2)), "info":["f", "95CLI"]} for object_name in objects_j_0_0}
+    average_integral_f = {object_name:{"value":np.empty((objects_j_0_0[object_name]["value"].shape[0], 2)), "info":["integral_f", "95CLI"]} for object_name in objects_j_0_0}
+    average_tau = {object_name:{"value":np.empty(2), "info":["tau", "95CLI"]} for object_name in objects_j_0_0}
     for object_name in objects_j_0_0:
-        print("INFO:    Processing " + object_name + "...")
-        f[object_name]["value"][0, 0] = 1.0
+        print("INFO:    Processing " + object_name + "...", flush=True)
+        # init
+        average_f[object_name]["value"][0, 0] = 1.0
+        average_f[object_name]["value"][0, 1] = 0.0
+        average_integral_f[object_name]["value"][0, 0] = 0.0
+        average_integral_f[object_name]["value"][0, 1] = 0.0
         for k in range(1, objects_j_0_0[object_name]["value"].shape[0]):
+            j_t = objects_j_0_0[object_name]["value"][:-k, :].flatten()
+            j_0 = objects_j_0_0[object_name]["value"][k:, :].flatten()
+            mask = j_0 != 0.0
+            j_t = j_t[mask]
+            j_0 = j_0[mask]
+            f_tmp = j_t / j_0
             pdf, edges = np.histogramdd((
-                objects_j_0_0[object_name]["value"][:-k, :].flatten(),
-                objects_j_0_0[object_name]["value"][k:, :].flatten(),
-            ), density=True)
+                j_0,
+                j_t
+            ), bins=(np.histogram_bin_edges(j_0, bins=BIN_NB), np.histogram_bin_edges(j_t, bins=BIN_NB)), range=((j_0.min(), j_0.max()), (j_t.min(), j_t.max())), density=True)
             # compute f
             ## remove zeros
-            expected_j_t_j_0 = np.sum(0.5 * (edges[1][1:] + edges[1][:-1]) * pdf * np.diff(edges[1]), axis=1)
-            probability_j_t = np.sum(pdf * np.diff(edges[1]), axis=1)
-            mask = np.logical_and((edges[0][1:] + edges[0][:-1] != 0.0), (probability_j_t != 0.0))
+            sum__j_t__p_j_t_j_0 = np.sum(pdf * 0.5 * (edges[1][1:] + edges[1][:-1]) * np.diff(edges[1]), axis=1)
+            j_0_p_j_0 = np.sum(pdf * np.diff(edges[1]), axis=1) * 0.5 * (edges[0][1:] + edges[0][:-1])
+            mask = (j_0_p_j_0 != 0.0)
+            f_value = sum__j_t__p_j_t_j_0[mask] / j_0_p_j_0[mask]
             ## computation
-            f[object_name]["value"][k, 0] = np.average(expected_j_t_j_0[mask] / probability_j_t[mask] / (0.5 * (edges[0][1:] + edges[0][:-1])[mask]))
-        print("INFO:    " + object_name + " done.")
-    print("INFO: Done.")
+            average_f[object_name]["value"][k, 0] = np.average(f_value)
+            average_f[object_name]["value"][k, 1] = 1.96 * np.std(f_value) / np.sqrt(f_value.size)
+        # compute integral f
+        average_integral_f[object_name]["value"][0, 0] = 0.0
+        average_integral_f[object_name]["value"][1:, 0] = sp.integrate.cumtrapz(average_f[object_name]["value"][:, 0], x=time, axis=0)
+        average_integral_f[object_name]["value"][:, 1] = -1.0
+        # compute tau
+        average_tau[object_name]["value"][0] = np.trapz(average_integral_f[object_name]["value"][:, 0], x=time, axis=0) / time[-1]
+        average_tau[object_name]["value"][1] = -1.0
+        print("INFO:    " + object_name + " done.", flush=True)
+    print("INFO: Done.", flush=True)
     # save
-    print("INFO: Saving...")
-    libpost.savet(time, f, "f_0_0")
-    print("INFO: Done.")
+    print("INFO: Saving...", flush=True)
+    libpost.savet(time, average_f, "f_0_0")
+    libpost.savet(time, average_integral_f, "integral_f_0_0")
+    libpost.save(average_tau, "tau_f_0_0")
+    print("INFO: Done.", flush=True)
+
+def main_velocity():
+    print("INFO: Post processing flow velocity statistics sampled by lagrangian objects.", flush=True)
+    object_names = libpost.get_object_names()
+    print("INFO: Object names are:", " ".join(object_names), flush=True)
+    # get gradient matrix
+    print("INFO: Reading objects properties...", flush=True)
+    time = libpost.get_time();
+    # gradients
+    objects_j_0_0 = libpost.get_objects_properties(["j_0_0"], object_names)
+    objects_j_0_1 = libpost.get_objects_properties(["j_0_1"], object_names)
+    objects_j_0_2 = libpost.get_objects_properties(["j_0_2"], object_names)
+    objects_j_1_0 = libpost.get_objects_properties(["j_1_0"], object_names)
+    objects_j_1_1 = libpost.get_objects_properties(["j_1_1"], object_names)
+    objects_j_1_2 = libpost.get_objects_properties(["j_1_2"], object_names)
+    objects_j_2_0 = libpost.get_objects_properties(["j_2_0"], object_names)
+    objects_j_2_1 = libpost.get_objects_properties(["j_2_1"], object_names)
+    objects_j_2_2 = libpost.get_objects_properties(["j_2_2"], object_names)
+    # velocity
+    objects_u_0 = libpost.get_objects_properties(["u_0"], object_names)
+    objects_u_1 = libpost.get_objects_properties(["u_1"], object_names)
+    objects_u_2 = libpost.get_objects_properties(["u_2"], object_names)
+    print("INFO: Done.", flush=True)
+    print("INFO: Reconstructing gradients.", flush=True)
+    gradients_value = {}
+    velocity_value = {}
+    for object_name in objects_j_0_0:
+        # gradients
+        gradients_value[object_name] = np.empty((objects_j_0_0[object_name]["value"].shape[0], objects_j_0_0[object_name]["value"].shape[1], 3, 3))
+        gradients_value[object_name][:, :, 0, 0] = objects_j_0_0[object_name]["value"]
+        gradients_value[object_name][:, :, 0, 1] = objects_j_0_1[object_name]["value"]
+        gradients_value[object_name][:, :, 0, 2] = objects_j_0_2[object_name]["value"]
+        gradients_value[object_name][:, :, 1, 0] = objects_j_1_0[object_name]["value"]
+        gradients_value[object_name][:, :, 1, 1] = objects_j_1_1[object_name]["value"]
+        gradients_value[object_name][:, :, 1, 2] = objects_j_1_2[object_name]["value"]
+        gradients_value[object_name][:, :, 2, 0] = objects_j_2_0[object_name]["value"]
+        gradients_value[object_name][:, :, 2, 1] = objects_j_2_1[object_name]["value"]
+        gradients_value[object_name][:, :, 2, 2] = objects_j_2_2[object_name]["value"]
+        # velocity
+        velocity_value[object_name][:, :, 0] = np.empty((objects_u_0[object_name]["value"].shape[0], objects_u_0[object_name]["value"].shape[1], 3))
+        velocity_value[object_name][:, :, 1] = np.empty((objects_u_0[object_name]["value"].shape[0], objects_u_0[object_name]["value"].shape[1], 3))
+        velocity_value[object_name][:, :, 2] = np.empty((objects_u_0[object_name]["value"].shape[0], objects_u_0[object_name]["value"].shape[1], 3))
+    print("INFO: Done.", flush=True)
+    print("INFO: Computing f(t) using pdfs...", flush=True)
+    average_f = {object_name:{"value":np.empty((objects_j_0_0[object_name]["value"].shape[0], 2)), "info":["f", "95CLI"]} for object_name in objects_j_0_0}
+    average_integral_f = {object_name:{"value":np.empty((objects_j_0_0[object_name]["value"].shape[0], 2)), "info":["integral_f", "95CLI"]} for object_name in objects_j_0_0}
+    average_tau = {object_name:{"value":np.empty(2), "info":["tau", "95CLI"]} for object_name in objects_j_0_0}
+    for object_name in objects_j_0_0:
+        print("INFO:    Processing " + object_name + "...", flush=True)
+        # init
+        average_f[object_name]["value"][0, 0] = 1.0
+        average_f[object_name]["value"][0, 1] = 0.0
+        average_integral_f[object_name]["value"][0, 0] = 0.0
+        average_integral_f[object_name]["value"][0, 1] = 0.0
+        for k in range(1, objects_j_0_0[object_name]["value"].shape[0]):
+            j_t = objects_j_0_0[object_name]["value"][:-k, :].flatten()
+            j_0 = objects_j_0_0[object_name]["value"][k:, :].flatten()
+            mask = j_0 != 0.0
+            j_t = j_t[mask]
+            j_0 = j_0[mask]
+            f_tmp = j_t / j_0
+            pdf, edges = np.histogramdd((
+                j_0,
+                j_t
+            ), bins=(np.histogram_bin_edges(j_0, bins=BIN_NB), np.histogram_bin_edges(j_t, bins=BIN_NB)), range=((j_0.min(), j_0.max()), (j_t.min(), j_t.max())), density=True)
+            # compute f
+            ## remove zeros
+            sum__j_t__p_j_t_j_0 = np.sum(pdf * 0.5 * (edges[1][1:] + edges[1][:-1]) * np.diff(edges[1]), axis=1)
+            j_0_p_j_0 = np.sum(pdf * np.diff(edges[1]), axis=1) * 0.5 * (edges[0][1:] + edges[0][:-1])
+            mask = (j_0_p_j_0 != 0.0)
+            f_value = sum__j_t__p_j_t_j_0[mask] / j_0_p_j_0[mask]
+            ## computation
+            average_f[object_name]["value"][k, 0] = np.average(f_value)
+            average_f[object_name]["value"][k, 1] = 1.96 * np.std(f_value) / np.sqrt(f_value.size)
+        # compute integral f
+        average_integral_f[object_name]["value"][0, 0] = 0.0
+        average_integral_f[object_name]["value"][1:, 0] = sp.integrate.cumtrapz(average_f[object_name]["value"][:, 0], x=time, axis=0)
+        average_integral_f[object_name]["value"][:, 1] = -1.0
+        # compute tau
+        average_tau[object_name]["value"][0] = np.trapz(average_integral_f[object_name]["value"][:, 0], x=time, axis=0) / time[-1]
+        average_tau[object_name]["value"][1] = -1.0
+        print("INFO:    " + object_name + " done.", flush=True)
+    print("INFO: Done.", flush=True)
+    # save
+    print("INFO: Saving...", flush=True)
+    libpost.savet(time, average_f, "f_0_0")
+    libpost.savet(time, average_integral_f, "integral_f_0_0")
+    libpost.save(average_tau, "tau_f_0_0")
+    print("INFO: Done.", flush=True)
 
 # def main_save():
     # print("INFO: Post processing flow velocity gradients statistics sampled by lagrangian objects.")
@@ -180,4 +294,4 @@ def main():
 
 if __name__ == '__main__':
     args = parse()
-    main()
+    main_velocity()
