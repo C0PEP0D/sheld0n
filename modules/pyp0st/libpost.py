@@ -52,34 +52,52 @@ def get_object_names():
     return object_names
 
 def get_time():
-    if os.path.isfile("time.npy"):
-        time = np.load("time.npy")
+    # dir test
+    if not os.path.isdir("objects_npy"):
+        os.mkdir("objects_npy")
+    # read time
+    if os.path.isfile("objects_npy/time.npy"):
+        time = np.load("objects_npy/time.npy")
     else:
         header = get_file_header("objects.csv")
         loaded = np.loadtxt("objects.csv", delimiter=",")
         time = loaded[:, header.index("time")]
-        np.save("time", time)
+        np.save("objects_npy/time", time)
     return time
 
 def get_objects(object_names = []):
+    # dir test
+    if not os.path.isdir("objects_npy"):
+        os.mkdir("objects_npy")
+    # read objects
     if not object_names:
         object_names = get_object_names()
-    # load
     header = get_file_header("objects.csv")
-    loaded = np.loadtxt("objects.csv", delimiter=",")
-    # init
-    objects = {}
-    # compute
+    # reading objects
+    objects = {object_name:{} for object_name in object_names}
+    objects_to_process = []
     for object_name in object_names:
-        regex = "^{name}.*".format(name=object_name)
-        indexs = [index for index, name in enumerate(header) if re.search(regex, name)]
-        obj = []
-        for index in indexs:
-            obj.append(loaded[:, index])
-        if len(obj) > 1:
-            objects[object_name] = {"value":np.column_stack(obj), "info":[header[index] for index in indexs]}
+        if os.path.isfile("objects_npy/" + object_name + ".npy"):
+            objects[object_name]["value"] = np.load("objects_npy/" + object_name + ".npy")
+            regex = "^{name}.*".format(name=object_name)
+            objects[object_name]["info"] = [name for name in header if re.search(regex, name)]
         else:
-            objects[object_name] = {"value":np.array(obj), "info":[header[index] for index in indexs]}
+            objects_to_process.append(object_name)
+    # load
+    if objects_to_process:
+        loaded = np.loadtxt("objects.csv", delimiter=",")
+        # compute
+        for object_name in objects_to_process:
+            regex = "^{name}.*".format(name=object_name)
+            indexs = [index for index, name in enumerate(header) if re.search(regex, name)]
+            obj = []
+            for index in indexs:
+                obj.append(loaded[:, index])
+            if len(obj) > 1:
+                objects[object_name] = {"value":np.column_stack(obj), "info":[header[index] for index in indexs]}
+            else:
+                objects[object_name] = {"value":np.array(obj), "info":[header[index] for index in indexs]}
+            np.save("objects_npy/" + object_name, objects[object_name]["value"])
     return objects
 
 def get_mesh():

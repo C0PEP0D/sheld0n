@@ -14,11 +14,15 @@ import libpost
 objects_name_info = ["us/u_eta", "surftimeconst/t_eta", "reorientationtime/t_eta", "surftimeprefactor", "proportion", "swimnoise", "dirnoise", "jnoise", "omegamax * t_eta", "reacttime/t_eta"]
 objects_name_properties = ["us", "surftimeconst", "reorientationtime", "surftimeprefactor", "proportion", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]
 
+# filtering
+for prop in ["surftimeprefactor", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]:
+    i = objects_name_properties.index(prop)
+    objects_name_info.pop(i)
+    objects_name_properties.pop(i)
+
 sorting_property = "surftimeconst"
-sorting_index = 2 + objects_name_properties.index(sorting_property)
+sorting_index = objects_name_properties.index(sorting_property)
 sorting_info = objects_name_info.copy()
-sorting_info.pop(0)
-sorting_info.pop(1)
 sorting_info.pop(sorting_index)
 
 def parse():
@@ -34,7 +38,7 @@ def main(axis):
     object_names = libpost.get_object_names()
     print("INFO: Object names are:", " ".join(object_names), flush=True)
     print("INFO: Reading time...", flush=True)
-    time = libpost.get_time();
+    time = libpost.get_time()
     print("INFO: Done.", flush=True)
     print("INFO: Reading objects properties...", flush=True)
     objects_pos = libpost.get_objects_properties(["pos_{axis}".format(axis=axis)], object_names)
@@ -42,11 +46,10 @@ def main(axis):
     print("INFO: Computing effective velocity...", flush=True)
     objects_average_velocity = {object_name:{"value":np.empty((time.size, 2)), "info":["average_velocity_axis_{axis}".format(axis=axis), "95CLI"]} for object_name in objects_pos}
     for object_name in objects_average_velocity:
-        effective_velocity_value = objects_pos[object_name]["value"][:, :]
+        effective_velocity_value = np.empty(objects_pos[object_name]["value"].shape)
         # value
         effective_velocity_value[0, :] = 0.0
-        print(effective_velocity_value[1:, :].shape, objects_pos[object_name]["value"][0, :].shape, time[1:].shape)
-        effective_velocity_value[1:, :] = (effective_velocity_value[1:, :] - objects_pos[object_name]["value"][0, :]) / time[1:].reshape((time.shape[0]-1, 1))
+        effective_velocity_value[1:, :] = (objects_pos[object_name]["value"][1:, :] - objects_pos[object_name]["value"][0, :]) / time[1:].reshape((time.shape[0]-1, 1))
         # info
         objects_average_velocity[object_name]["value"][:, 0] = np.average(effective_velocity_value, axis=1)
         objects_average_velocity[object_name]["value"][:, 1] = 1.96 * np.std(effective_velocity_value, axis=1) / np.sqrt(effective_velocity_value.shape[1])
@@ -54,7 +57,7 @@ def main(axis):
     # print("INFO: Saving...", flush=True)
     # libpost.savet(time, objects_average_velocity, "average_velocity_axis_{axis}".format(axis=axis))
     # print("INFO: Done.", flush=True)
-    print("INFO: Reading merging objects...", flush=True)
+    print("INFO: Merging objects...", flush=True)
     merged_objects = {}
     for object_name in objects_average_velocity:
         reduced_object_name = object_name.split("__")[0]
@@ -80,15 +83,13 @@ def main(axis):
     for object_name in merged_objects:
         object_sorted = {}
         for row in merged_objects[reduced_object_name]["value"]:
-            row_list = row.tolist()
-            row_list.pop(0)
-            row_list.pop(1)
+            row_list = row.tolist()[2:]
             row_list.pop(sorting_index)
             row_tuple = tuple(row_list)
             if not row_tuple in object_sorted:
                 object_sorted[row_tuple] = [row]
             else:
-                object_sorted[row_tuple].apend(row)
+                object_sorted[row_tuple].append(row)
         for row_tuple in object_sorted:
             object_sorted[row_tuple] = np.stack(object_sorted[row_tuple])
         # max
@@ -113,11 +114,11 @@ def main(axis):
         fits_max_objects[object_name]["value"] = np.stack(fits_max_objects[object_name]["value"])
     print("INFO: Done.", flush=True)
     # save
-    print("Saving...", flush=True)
+    print("INFO: Saving...", flush=True)
     libpost.save(max_objects, "max_average_velocity_axis_{axis}".format(axis=axis))
     libpost.save(fits_objects, "fits_average_velocity_axis_{axis}".format(axis=axis))
     libpost.save(fits_max_objects, "fits_max_average_velocity_axis_{axis}".format(axis=axis))
-    print("Done.", flush=True)
+    print("INFO: Done.", flush=True)
 
 if __name__ == '__main__':
     args = parse()
