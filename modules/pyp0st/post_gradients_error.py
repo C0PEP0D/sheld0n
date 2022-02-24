@@ -40,10 +40,6 @@ def main_gradients():
         for k in range(1, objects_j_0_0[object_name]["value"].shape[0]):
             j_t = objects_j_0_0[object_name]["value"][:-k, :].flatten()
             j_0 = objects_j_0_0[object_name]["value"][k:, :].flatten()
-            mask = j_0 != 0.0
-            j_t = j_t[mask]
-            j_0 = j_0[mask]
-            f_tmp = j_t / j_0
             pdf, edges = np.histogramdd((
                 j_0,
                 j_t
@@ -82,39 +78,50 @@ def main_velocity():
     time = libpost.get_time();
     # gradients
     objects_j_0_0 = libpost.get_objects_properties(["j_0_0"], object_names)
-    objects_j_0_1 = libpost.get_objects_properties(["j_0_1"], object_names)
-    objects_j_0_2 = libpost.get_objects_properties(["j_0_2"], object_names)
-    objects_j_1_0 = libpost.get_objects_properties(["j_1_0"], object_names)
-    objects_j_1_1 = libpost.get_objects_properties(["j_1_1"], object_names)
-    objects_j_1_2 = libpost.get_objects_properties(["j_1_2"], object_names)
-    objects_j_2_0 = libpost.get_objects_properties(["j_2_0"], object_names)
-    objects_j_2_1 = libpost.get_objects_properties(["j_2_1"], object_names)
-    objects_j_2_2 = libpost.get_objects_properties(["j_2_2"], object_names)
+    # objects_j_0_1 = libpost.get_objects_properties(["j_0_1"], object_names)
+    # objects_j_0_2 = libpost.get_objects_properties(["j_0_2"], object_names)
+    # objects_j_1_0 = libpost.get_objects_properties(["j_1_0"], object_names)
+    # objects_j_1_1 = libpost.get_objects_properties(["j_1_1"], object_names)
+    # objects_j_1_2 = libpost.get_objects_properties(["j_1_2"], object_names)
+    # objects_j_2_0 = libpost.get_objects_properties(["j_2_0"], object_names)
+    # objects_j_2_1 = libpost.get_objects_properties(["j_2_1"], object_names)
+    # objects_j_2_2 = libpost.get_objects_properties(["j_2_2"], object_names)
     # velocity
     objects_u_0 = libpost.get_objects_properties(["u_0"], object_names)
-    objects_u_1 = libpost.get_objects_properties(["u_1"], object_names)
-    objects_u_2 = libpost.get_objects_properties(["u_2"], object_names)
+    # objects_u_1 = libpost.get_objects_properties(["u_1"], object_names)
+    # objects_u_2 = libpost.get_objects_properties(["u_2"], object_names)
+    # position
+    objects_pos_0 = libpost.get_objects_properties(["pos_0"], object_names)
+    # objects_pos_1 = libpost.get_objects_properties(["pos_1"], object_names)
+    # objects_pos_2 = libpost.get_objects_properties(["pos_2"], object_names)
     print("INFO: Done.", flush=True)
-    print("INFO: Reconstructing gradients.", flush=True)
-    gradients_value = {}
-    velocity_value = {}
-    for object_name in objects_j_0_0:
-        # gradients
-        gradients_value[object_name] = np.empty((objects_j_0_0[object_name]["value"].shape[0], objects_j_0_0[object_name]["value"].shape[1], 3, 3))
-        gradients_value[object_name][:, :, 0, 0] = objects_j_0_0[object_name]["value"]
-        gradients_value[object_name][:, :, 0, 1] = objects_j_0_1[object_name]["value"]
-        gradients_value[object_name][:, :, 0, 2] = objects_j_0_2[object_name]["value"]
-        gradients_value[object_name][:, :, 1, 0] = objects_j_1_0[object_name]["value"]
-        gradients_value[object_name][:, :, 1, 1] = objects_j_1_1[object_name]["value"]
-        gradients_value[object_name][:, :, 1, 2] = objects_j_1_2[object_name]["value"]
-        gradients_value[object_name][:, :, 2, 0] = objects_j_2_0[object_name]["value"]
-        gradients_value[object_name][:, :, 2, 1] = objects_j_2_1[object_name]["value"]
-        gradients_value[object_name][:, :, 2, 2] = objects_j_2_2[object_name]["value"]
-        # velocity
-        velocity_value[object_name][:, :, 0] = np.empty((objects_u_0[object_name]["value"].shape[0], objects_u_0[object_name]["value"].shape[1], 3))
-        velocity_value[object_name][:, :, 1] = np.empty((objects_u_0[object_name]["value"].shape[0], objects_u_0[object_name]["value"].shape[1], 3))
-        velocity_value[object_name][:, :, 2] = np.empty((objects_u_0[object_name]["value"].shape[0], objects_u_0[object_name]["value"].shape[1], 3))
-    print("INFO: Done.", flush=True)
+    # print("INFO: Reconstructing gradients, velocity and position.", flush=True)
+    # gradients_value = {}
+    # velocity_value = {}
+    # position_value = {}
+    # for object_name in objects_j_0_0:
+        # # gradients
+        # gradients_value[object_name] = np.empty((objects_j_0_0[object_name]["value"].shape[0], objects_j_0_0[object_name]["value"].shape[1], 3, 3))
+        # gradients_value[object_name][:, :, 0, 0] = objects_j_0_0[object_name]["value"]
+        # gradients_value[object_name][:, :, 0, 1] = objects_j_0_1[object_name]["value"]
+        # gradients_value[object_name][:, :, 0, 2] = objects_j_0_2[object_name]["value"]
+        # gradients_value[object_name][:, :, 1, 0] = objects_j_1_0[object_name]["value"]
+        # gradients_value[object_name][:, :, 1, 1] = objects_j_1_1[object_name]["value"]
+        # gradients_value[object_name][:, :, 1, 2] = objects_j_1_2[object_name]["value"]
+        # gradients_value[object_name][:, :, 2, 0] = objects_j_2_0[object_name]["value"]
+        # gradients_value[object_name][:, :, 2, 1] = objects_j_2_1[object_name]["value"]
+        # gradients_value[object_name][:, :, 2, 2] = objects_j_2_2[object_name]["value"]
+        # # velocity
+        # velocity_value[object_name] = np.empty((objects_u_0[object_name]["value"].shape[0], objects_u_0[object_name]["value"].shape[1], 3))
+        # velocity_value[object_name][:, :, 0] = np.empty((objects_u_0[object_name]["value"].shape[0], objects_u_0[object_name]["value"].shape[1], 3))
+        # velocity_value[object_name][:, :, 1] = np.empty((objects_u_1[object_name]["value"].shape[0], objects_u_1[object_name]["value"].shape[1], 3))
+        # velocity_value[object_name][:, :, 2] = np.empty((objects_u_2[object_name]["value"].shape[0], objects_u_2[object_name]["value"].shape[1], 3))
+        # # position
+        # position_value[object_name] = np.empty((objects_pos_0[object_name]["value"].shape[0], objects_pos_0[object_name]["value"].shape[1], 3))
+        # position_value[object_name][:, :, 0] = np.empty((objects_pos_0[object_name]["value"].shape[0], objects_pos_0[object_name]["value"].shape[1], 3))
+        # position_value[object_name][:, :, 1] = np.empty((objects_pos_1[object_name]["value"].shape[0], objects_pos_1[object_name]["value"].shape[1], 3))
+        # position_value[object_name][:, :, 2] = np.empty((objects_pos_2[object_name]["value"].shape[0], objects_pos_2[object_name]["value"].shape[1], 3))
+    # print("INFO: Done.", flush=True)
     print("INFO: Computing f(t) using pdfs...", flush=True)
     average_f = {object_name:{"value":np.empty((objects_j_0_0[object_name]["value"].shape[0], 2)), "info":["f", "95CLI"]} for object_name in objects_j_0_0}
     average_integral_f = {object_name:{"value":np.empty((objects_j_0_0[object_name]["value"].shape[0], 2)), "info":["integral_f", "95CLI"]} for object_name in objects_j_0_0}
@@ -127,22 +134,23 @@ def main_velocity():
         average_integral_f[object_name]["value"][0, 0] = 0.0
         average_integral_f[object_name]["value"][0, 1] = 0.0
         for k in range(1, objects_j_0_0[object_name]["value"].shape[0]):
-            j_t = objects_j_0_0[object_name]["value"][:-k, :].flatten()
-            j_0 = objects_j_0_0[object_name]["value"][k:, :].flatten()
-            mask = j_0 != 0.0
-            j_t = j_t[mask]
-            j_0 = j_0[mask]
-            f_tmp = j_t / j_0
-            pdf, edges = np.histogramdd((
+            u_t = np.concatenate(objects_u_0[object_name]["value"][:-k, :].flatten(), objects_u_0[object_name]["value"][:k, :].flatten())
+            x_t = np.concatenate(objects_pos_0[object_name]["value"][:-k, :].flatten(), objects_pos_0[object_name]["value"][:k, :].flatten())
+            j_0 = np.concatenate(objects_j_0_0[object_name]["value"][k:, :].flatten(), objects_j_0_0[object_name]["value"][:-k, :].flatten())
+            pdf_j_u, edges_j_u = np.histogramdd((
                 j_0,
-                j_t
-            ), bins=(np.histogram_bin_edges(j_0, bins=BIN_NB), np.histogram_bin_edges(j_t, bins=BIN_NB)), range=((j_0.min(), j_0.max()), (j_t.min(), j_t.max())), density=True)
+                u_t
+            ), bins=(np.histogram_bin_edges(j_0, bins=BIN_NB), np.histogram_bin_edges(u_t, bins=BIN_NB)), range=((j_0.min(), j_0.max()), (u_t.min(), u_t.max())), density=True)
+            pdf_j_x, edges_j_x = np.histogramdd((
+                j_0,
+                x_t
+            ), bins=(np.histogram_bin_edges(j_0, bins=BIN_NB), np.histogram_bin_edges(x_t, bins=BIN_NB)), range=((j_0.min(), j_0.max()), (x_t.min(), x_t.max())), density=True)
             # compute f
             ## remove zeros
-            sum__j_t__p_j_t_j_0 = np.sum(pdf * 0.5 * (edges[1][1:] + edges[1][:-1]) * np.diff(edges[1]), axis=1)
-            j_0_p_j_0 = np.sum(pdf * np.diff(edges[1]), axis=1) * 0.5 * (edges[0][1:] + edges[0][:-1])
-            mask = (j_0_p_j_0 != 0.0)
-            f_value = sum__j_t__p_j_t_j_0[mask] / j_0_p_j_0[mask]
+            sum_u_t_p_j_0_u_t = np.sum(pdf_j_u * 0.5 * (edges_j_u[1][1:] + edges_j_u[1][:-1]) * np.diff(edges_j_u[1]), axis=1)
+            j_0__sum_j_t_p_j_0_x_t = 0.5 * (edges_j_u[0][1:] + edges_j_u[0][:-1]) * np.sum(pdf_j_x * 0.5 * (edges_j_x[1][1:] + edges_j_x[1][:-1]) * np.diff(edges_j_x[1]), axis=1)
+            mask = (j_0__sum_j_t_p_j_0_x_t != 0.0)
+            f_value = sum__j_t__p_j_0_u_t[mask] / j_0_p_j_0[mask]
             ## computation
             average_f[object_name]["value"][k, 0] = np.average(f_value)
             average_f[object_name]["value"][k, 1] = 1.96 * np.std(f_value) / np.sqrt(f_value.size)
