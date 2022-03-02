@@ -15,25 +15,31 @@ objects_name_info = ["us/u_eta", "surftimeconst/t_eta", "reorientationtime/t_eta
 objects_name_properties = ["us", "surftimeconst", "reorientationtime", "surftimeprefactor", "proportion", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]
 
 # filtering
-for prop in ["surftimeprefactor", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]:
+for prop in ["surftimeconst", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]: # adaptive surf
+# for prop in ["surftimeprefactor", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]: #surf
+# for prop in ["surftimeprefactor", "reorientationtime", "swimnoise", "dirnoise", "jnoise"]: # control surf
     i = objects_name_properties.index(prop)
     objects_name_info.pop(i)
     objects_name_properties.pop(i)
 
-sorting_property = "surftimeconst"
+sorting_property = "surftimeprefactor" # adaptive surf
+#sorting_property = "surftimeconst" # surf
 sorting_index = objects_name_properties.index(sorting_property)
 sorting_info = objects_name_info.copy()
 sorting_info.pop(sorting_index)
 
-def parse():
-    parser = argparse.ArgumentParser(description='Computes the average velocity along a specific direction')
-    parser.add_argument('axis', nargs='?', type=int, default=0, help='specify the axis')
-    return parser.parse_args()
+fit_max = 3.0
 
 def fit_func(x, a, b, c, d):
     return a + b * x + c * x**2 + d * x**3
 
-def main(axis):
+def parse():
+    parser = argparse.ArgumentParser(description='Computes the average velocity along a specific direction')
+    parser.add_argument('axis', nargs='?', type=int, default=0, help='specify the axis')
+    parser.add_argument('-n', '--negative', action='store_true', help='consider axis as negative')
+    return parser.parse_args()
+
+def main(axis, negative):
     print("INFO: Post processing the effective velocity of lagrangian objects along the axis {axis}.".format(axis=axis), flush=True)
     object_names = libpost.get_object_names()
     print("INFO: Object names are:", " ".join(object_names), flush=True)
@@ -49,7 +55,10 @@ def main(axis):
         effective_velocity_value = np.empty(objects_pos[object_name]["value"].shape)
         # value
         effective_velocity_value[0, :] = 0.0
-        effective_velocity_value[1:, :] = (objects_pos[object_name]["value"][1:, :] - objects_pos[object_name]["value"][0, :]) / time[1:].reshape((time.shape[0]-1, 1))
+        if negative:
+            effective_velocity_value[1:, :] = -(objects_pos[object_name]["value"][1:, :] - objects_pos[object_name]["value"][0, :]) / time[1:].reshape((time.shape[0]-1, 1))
+        else:
+            effective_velocity_value[1:, :] = (objects_pos[object_name]["value"][1:, :] - objects_pos[object_name]["value"][0, :]) / time[1:].reshape((time.shape[0]-1, 1))
         # info
         objects_average_velocity[object_name]["value"][:, 0] = np.average(effective_velocity_value, axis=1)
         objects_average_velocity[object_name]["value"][:, 1] = 1.96 * np.std(effective_velocity_value, axis=1) / np.sqrt(effective_velocity_value.shape[1])
@@ -101,7 +110,7 @@ def main(axis):
         fits_objects[object_name]["info"] = [sorting_property, "average_velocity_axis_{axis}_t_inf".format(axis=axis)]
         fits_max_objects[object_name]["info"] = sorting_info + ["max_surftimeconst", "max_average_velocity_axis"]
         # value
-        fits_objects[object_name]["value"] = [np.linspace(0.0, 8.0, num=50)]
+        fits_objects[object_name]["value"] = [np.linspace(0.0, fit_max, num=50)]
         fits_max_objects[object_name]["value"] = []
         for row_tuple in object_sorted:
             # value
@@ -122,4 +131,4 @@ def main(axis):
 
 if __name__ == '__main__':
     args = parse()
-    main(args.axis)
+    main(args.axis, args.negative)

@@ -8,10 +8,13 @@ import copy
 import numpy as np
 import scipy as sp
 import scipy.integrate
+# test
+import matplotlib.pyplot as plt
 # internal modules
 import libpost
 
-BIN_NB = 'auto'
+BIN_RANGE = (-40.0, 40.0)#(-10.0, 10.0)
+BIN_NB = 128#64#'auto'
 
 def parse():
     parser = argparse.ArgumentParser(description='Computes statistics of the lagrangian gradients matrix (computed along particle trajectories)')
@@ -30,6 +33,10 @@ def main_gradients():
     average_f = {object_name:{"value":np.empty((objects_j_0_0[object_name]["value"].shape[0], 2)), "info":["f", "95CLI"]} for object_name in objects_j_0_0}
     average_integral_f = {object_name:{"value":np.empty((objects_j_0_0[object_name]["value"].shape[0], 2)), "info":["integral_f", "95CLI"]} for object_name in objects_j_0_0}
     average_tau = {object_name:{"value":np.empty(2), "info":["tau", "95CLI"]} for object_name in objects_j_0_0}
+    fig = plt.figure() # PLT
+    fig.add_axes(plt.gca()) # PLT
+    ax = fig.get_axes()[0] # PLT
+    ax.set_aspect('equal', 'box') # PLT
     for object_name in objects_j_0_0:
         print("INFO:    Processing " + object_name + "...", flush=True)
         # init
@@ -43,7 +50,11 @@ def main_gradients():
             pdf, edges = np.histogramdd((
                 j_0,
                 j_t
-            ), bins=(np.histogram_bin_edges(j_0, bins=BIN_NB), np.histogram_bin_edges(j_t, bins=BIN_NB)), range=((j_0.min(), j_0.max()), (j_t.min(), j_t.max())), density=True)
+            ), bins=(np.histogram_bin_edges(j_0, bins=BIN_NB, range=BIN_RANGE), np.histogram_bin_edges(j_t, bins=BIN_NB, range=BIN_RANGE)), density=True)
+            if k < 128: # PLT
+                ax.clear() # PLT
+                ax.pcolormesh(edges[0], edges[1], pdf) # PLT
+                fig.savefig("test_{0}_{1:03d}.png".format(object_name, k)) # PLT
             # compute f
             ## remove zeros
             sum__j_t__p_j_t_j_0 = np.sum(pdf * 0.5 * (edges[1][1:] + edges[1][:-1]) * np.diff(edges[1]), axis=1)
@@ -134,9 +145,9 @@ def main_velocity():
         average_integral_f[object_name]["value"][0, 0] = 0.0
         average_integral_f[object_name]["value"][0, 1] = 0.0
         for k in range(1, objects_j_0_0[object_name]["value"].shape[0]):
-            u_t = np.concatenate(objects_u_0[object_name]["value"][:-k, :].flatten(), objects_u_0[object_name]["value"][:k, :].flatten())
-            x_t = np.concatenate(objects_pos_0[object_name]["value"][:-k, :].flatten(), objects_pos_0[object_name]["value"][:k, :].flatten())
-            j_0 = np.concatenate(objects_j_0_0[object_name]["value"][k:, :].flatten(), objects_j_0_0[object_name]["value"][:-k, :].flatten())
+            u_t = np.concatenate((objects_u_0[object_name]["value"][:-k, :].flatten(), objects_u_0[object_name]["value"][k:, :].flatten()))
+            x_t = np.concatenate((objects_pos_0[object_name]["value"][:-k, :].flatten(), objects_pos_0[object_name]["value"][k:, :].flatten()))
+            j_0 = np.concatenate((objects_j_0_0[object_name]["value"][k:, :].flatten(), objects_j_0_0[object_name]["value"][:-k, :].flatten()))
             pdf_j_u, edges_j_u = np.histogramdd((
                 j_0,
                 u_t
@@ -150,7 +161,7 @@ def main_velocity():
             sum_u_t_p_j_0_u_t = np.sum(pdf_j_u * 0.5 * (edges_j_u[1][1:] + edges_j_u[1][:-1]) * np.diff(edges_j_u[1]), axis=1)
             j_0__sum_j_t_p_j_0_x_t = 0.5 * (edges_j_u[0][1:] + edges_j_u[0][:-1]) * np.sum(pdf_j_x * 0.5 * (edges_j_x[1][1:] + edges_j_x[1][:-1]) * np.diff(edges_j_x[1]), axis=1)
             mask = (j_0__sum_j_t_p_j_0_x_t != 0.0)
-            f_value = sum__j_t__p_j_0_u_t[mask] / j_0_p_j_0[mask]
+            f_value = sum_u_t_p_j_0_u_t[mask] / j_0__sum_j_t_p_j_0_x_t[mask]
             ## computation
             average_f[object_name]["value"][k, 0] = np.average(f_value)
             average_f[object_name]["value"][k, 1] = 1.96 * np.std(f_value) / np.sqrt(f_value.size)
@@ -302,4 +313,4 @@ def main_velocity():
 
 if __name__ == '__main__':
     args = parse()
-    main_velocity()
+    main_gradients()
