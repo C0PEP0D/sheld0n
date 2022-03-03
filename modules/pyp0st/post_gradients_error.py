@@ -51,10 +51,10 @@ def main_gradients():
                 j_0,
                 j_t
             ), bins=(np.histogram_bin_edges(j_0, bins=BIN_NB, range=BIN_RANGE), np.histogram_bin_edges(j_t, bins=BIN_NB, range=BIN_RANGE)), density=True)
-            if k < 128: # PLT
+            if k < 64: # PLT
                 ax.clear() # PLT
                 ax.pcolormesh(edges[0], edges[1], pdf) # PLT
-                fig.savefig("test_{0}_{1:03d}.png".format(object_name, k)) # PLT
+                fig.savefig("pdf_{0}_{1:03d}.png".format(object_name, k)) # PLT
             # compute f
             ## remove zeros
             sum__j_t__p_j_t_j_0 = np.sum(pdf * 0.5 * (edges[1][1:] + edges[1][:-1]) * np.diff(edges[1]), axis=1)
