@@ -63,6 +63,8 @@ def get_time():
         loaded = np.loadtxt("objects.csv", delimiter=",")
         time = loaded[:, header.index("time")]
         np.save("objects_npy/time", time)
+        # clean
+        del loaded
     return time
 
 def get_objects(object_names = []):
@@ -98,6 +100,8 @@ def get_objects(object_names = []):
             else:
                 objects[object_name] = {"value":np.array(obj), "info":[header[index] for index in indexs]}
             np.save("objects_npy/" + object_name, objects[object_name]["value"])
+        # clean
+        del loaded
     return objects
 
 def get_mesh():
@@ -183,6 +187,9 @@ def get_objects_properties(properties, object_names = []):
             obj.append(objects[object_name]["value"][:, index])
         if obj:
             objects_filtered[object_name] = {"value":np.column_stack(obj), "info":[objects[object_name]["info"][index] for index in indexs]}
+    # clean
+    del objects
+    # return
     return objects_filtered
 
 def get_mesh_properties(properties):

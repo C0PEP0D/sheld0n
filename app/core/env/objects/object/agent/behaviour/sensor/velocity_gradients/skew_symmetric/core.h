@@ -13,7 +13,7 @@ class AgentBehaviourSensorVelocityGradientsSkewSymmetric : public AgentBehaviour
     public:
         TypeParameters parameters;
     public:
-        AgentBehaviourSensorVelocityGradientsSkewSymmetricAsym() {
+        AgentBehaviourSensorVelocityGradientsSkewSymmetric() {
         }
     public:
         TypeSpaceMatrix operator()(const double* pState, const double& t, const AgentActiveStep&  stepActive) const override {

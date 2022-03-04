@@ -14,17 +14,21 @@ TAU = 1.0
 SYM_TAU = 1.0
 ASYM_TAU = TAU
 
+BIN_RANGE = (0.0, np.pi)
+BIN_NB = 'auto'
+
 def parse():
     parser = argparse.ArgumentParser(description='Computes particles axis statistics.')
     return parser.parse_args()
 
 def main():
-    print("INFO: Post processing orientation statistics of lagrangian objects.")
+    print("INFO: Post processing orientation statistics of lagrangian objects.", flush=True)
     object_names = libpost.get_object_names()
-    print("INFO: Object names are:", " ".join(object_names)[:-1])
-    # get gradient matrix
-    print("INFO: Reading objects properties...")
+    print("INFO: Object names are:", " ".join(object_names), flush=True)
+    print("INFO: Reading time...", flush=True)
     time = libpost.get_time();
+    print("INFO: Done.", flush=True)
+    print("INFO: Reading objects properties...", flush=True)
     objects_j_0_0 = libpost.get_objects_properties(["j_0_0"], object_names)
     objects_j_0_1 = libpost.get_objects_properties(["j_0_1"], object_names)
     objects_j_0_2 = libpost.get_objects_properties(["j_0_2"], object_names)
@@ -38,7 +42,7 @@ def main():
     objects_axis_0 = libpost.get_objects_properties(["axis_0"], object_names)
     objects_axis_1 = libpost.get_objects_properties(["axis_1"], object_names)
     objects_axis_2 = libpost.get_objects_properties(["axis_2"], object_names)
-    print("INFO: Done.")
+    print("INFO: Done.", flush=True)
     # reduce axis to a scalar
     objects_axis_angle_surf = copy.deepcopy(objects_axis_0)
     objects_axis_angle_surf_sym = copy.deepcopy(objects_axis_0)
@@ -46,7 +50,7 @@ def main():
     objects_axis_angle_surf_orth_z = copy.deepcopy(objects_axis_0)
     objects_axis_angle_surf_sym_orth_z = copy.deepcopy(objects_axis_0)
     objects_axis_angle_surf_asym_orth_z = copy.deepcopy(objects_axis_0)
-    print("INFO: Computing orientation statistics...")
+    print("INFO: Computing orientation statistics...", flush=True)
     for object_name in objects_axis_angle_surf:
         # value
         for i in range(0, objects_axis_angle_surf[object_name]["value"].shape[0]):
@@ -100,9 +104,9 @@ def main():
         objects_axis_angle_surf_orth_z[object_name]["info"] = [info.replace("axis_0", "axis_angle_surf_orth_z") for info in objects_axis_angle_surf_orth_z[object_name]["info"]]
         objects_axis_angle_surf_sym_orth_z[object_name]["info"] = [info.replace("axis_0", "axis_angle_surf_sym_orth_z") for info in objects_axis_angle_surf_sym_orth_z[object_name]["info"]]
         objects_axis_angle_surf_asym_orth_z[object_name]["info"] = [info.replace("axis_0", "axis_angle_surf_asym_orth_z") for info in objects_axis_angle_surf_asym_orth_z[object_name]["info"]]
-    print("INFO: Done.")
+    print("INFO: Done.", flush=True)
     # clean
-    print("INFO: Cleaning...")
+    print("INFO: Cleaning...", flush=True)
     del objects_j_0_0;
     del objects_j_0_1;
     del objects_j_0_2;
@@ -112,50 +116,7 @@ def main():
     del objects_j_2_0;
     del objects_j_2_1;
     del objects_j_2_2;
-    print("INFO: Done.")
-
-    # compute fft
-    # objects_fft_axis_0 = copy.deepcopy(objects_axis_0)
-    # objects_fft_axis_1 = copy.deepcopy(objects_axis_1)
-    # objects_fft_axis_2 = copy.deepcopy(objects_axis_2)
-    # objects_fft_axis_dot_surf = copy.deepcopy(objects_axis_dot_surf)
-    # for object_name in objects_fft_axis_0:
-        # # value
-        # objects_fft_axis_0[object_name]["value"] = np.abs(np.fft.rfft(objects_fft_axis_0[object_name]["value"], axis=0))/objects_fft_axis_0[object_name]["value"].shape[0]
-        # objects_fft_axis_1[object_name]["value"] = np.abs(np.fft.rfft(objects_fft_axis_1[object_name]["value"], axis=0))/objects_fft_axis_1[object_name]["value"].shape[0]
-        # objects_fft_axis_2[object_name]["value"] = np.abs(np.fft.rfft(objects_fft_axis_2[object_name]["value"], axis=0))/objects_fft_axis_2[object_name]["value"].shape[0]
-        # objects_fft_axis_dot_surf[object_name]["value"] = np.abs(np.fft.rfft(objects_fft_axis_dot_surf[object_name]["value"], axis=0))/objects_fft_axis_dot_surf[object_name]["value"].shape[0]
-        # # info
-        # objects_fft_axis_0[object_name]["info"] = [info.replace("axis_0", "fft_axis_0") for info in objects_axis_0[object_name]["info"]]
-        # objects_fft_axis_1[object_name]["info"] = [info.replace("axis_1", "fft_axis_1") for info in objects_axis_1[object_name]["info"]]
-        # objects_fft_axis_2[object_name]["info"] = [info.replace("axis_2", "fft_axis_2") for info in objects_axis_2[object_name]["info"]]
-        # objects_fft_axis_dot_surf[object_name]["info"] = [info.replace("axis_dot_surf", "fft_axis_dot_surf") for info in objects_axis_dot_surf[object_name]["info"]]
-    # # average fft and 95CLI
-    # objects_average_fft_axis_0 = copy.deepcopy(objects_fft_axis_0)
-    # objects_average_fft_axis_1 = copy.deepcopy(objects_fft_axis_1)
-    # objects_average_fft_axis_2 = copy.deepcopy(objects_fft_axis_2)
-    # objects_average_fft_axis_dot_surf = copy.deepcopy(objects_fft_axis_dot_surf)
-    # for object_name in objects_average_fft_axis_0:
-        # # value
-        # objects_average_fft_axis_0[object_name]["value"] = np.column_stack([np.average(objects_fft_axis_0[object_name]["value"], axis=1), 1.96 * np.std(objects_fft_axis_0[object_name]["value"], axis=1) / np.sqrt(objects_fft_axis_0[object_name]["value"].shape[1])])
-        # objects_average_fft_axis_1[object_name]["value"] = np.column_stack([np.average(objects_fft_axis_1[object_name]["value"], axis=1), 1.96 * np.std(objects_fft_axis_1[object_name]["value"], axis=1) / np.sqrt(objects_fft_axis_1[object_name]["value"].shape[1])])
-        # objects_average_fft_axis_2[object_name]["value"] = np.column_stack([np.average(objects_fft_axis_2[object_name]["value"], axis=1), 1.96 * np.std(objects_fft_axis_2[object_name]["value"], axis=1) / np.sqrt(objects_fft_axis_2[object_name]["value"].shape[1])])
-        # objects_average_fft_axis_dot_surf[object_name]["value"] = np.column_stack([np.average(objects_fft_axis_dot_surf[object_name]["value"], axis=1), 1.96 * np.std(objects_fft_axis_dot_surf[object_name]["value"], axis=1) / np.sqrt(objects_fft_axis_dot_surf[object_name]["value"].shape[1])])
-        # # info
-        # objects_average_fft_axis_0[object_name]["info"] = ["average_fft_axis_0", "95CLI"]
-        # objects_average_fft_axis_1[object_name]["info"] = ["average_fft_axis_1", "95CLI"]
-        # objects_average_fft_axis_2[object_name]["info"] = ["average_fft_axis_2", "95CLI"]
-        # objects_average_fft_axis_dot_surf[object_name]["info"] = ["average_fft_axis_dot_surf", "95CLI"]
-    # del objects_fft_axis_0;
-    # del objects_fft_axis_1;
-    # del objects_fft_axis_2;
-    # del objects_fft_axis_dot_surf;
-    # # save
-    # angular_frequency = 2 * np.pi / (time[-1] - time[0]) * np.linspace(1, len(time)//2+2, num=len(time)//2+1)
-    # libpost.saveaf(angular_frequency, objects_average_fft_axis_0, "average_fft_axis_0")
-    # libpost.saveaf(angular_frequency, objects_average_fft_axis_1, "average_fft_axis_1")
-    # libpost.saveaf(angular_frequency, objects_average_fft_axis_2, "average_fft_axis_2")
-    # libpost.saveaf(angular_frequency, objects_average_fft_axis_dot_surf, "average_fft_axis_dot_surf")
+    print("INFO: Done.", flush=True)
 
     # compute pdf
     objects_pdf_angle_axis_0 = {object_name:{} for object_name in objects_axis_0}
@@ -167,43 +128,52 @@ def main():
     objects_pdf_axis_angle_surf_orth_z = {object_name:{} for object_name in objects_axis_angle_surf_orth_z}
     objects_pdf_axis_angle_surf_sym_orth_z = {object_name:{} for object_name in objects_axis_angle_surf_sym_orth_z}
     objects_pdf_axis_angle_surf_asym_orth_z = {object_name:{} for object_name in objects_axis_angle_surf_asym_orth_z}
-    print("INFO: Computing pdfs...")
+    print("INFO: Computing pdfs...", flush=True)
     for object_name in objects_pdf_angle_axis_0:
         # value
         ## axis 0
-        hist, bin_edges = np.histogram(np.arccos(objects_axis_0[object_name]["value"]), range=(0.0, np.pi), density=True)
+        angles = np.arccos(objects_axis_0[object_name]["value"])
+        hist, bin_edges = np.histogram(angles, bins=np.histogram_bin_edges(angles, bins=BIN_NB, range=BIN_RANGE), range=BIN_RANGE, density=True)
         bins = (bin_edges[1:] + bin_edges[:-1])/2
         objects_pdf_angle_axis_0[object_name]["value"] = np.column_stack([bins, hist])
         ## axis 1
-        hist, bin_edges = np.histogram(np.arccos(objects_axis_1[object_name]["value"]), range=(0.0, np.pi), density=True)
+        angles = np.arccos(objects_axis_1[object_name]["value"])
+        hist, bin_edges = np.histogram(angles, bins=np.histogram_bin_edges(angles, bins=BIN_NB, range=BIN_RANGE), range=BIN_RANGE, density=True)
         bins = (bin_edges[1:] + bin_edges[:-1])/2
         objects_pdf_angle_axis_1[object_name]["value"] = np.column_stack([bins, hist])
         ## axis 2
-        hist, bin_edges = np.histogram(np.arccos(objects_axis_2[object_name]["value"]), range=(0.0, np.pi), density=True)
+        angles = np.arccos(objects_axis_2[object_name]["value"])
+        hist, bin_edges = np.histogram(angles, bins=np.histogram_bin_edges(angles, bins=BIN_NB, range=BIN_RANGE), range=BIN_RANGE, density=True)
         bins = (bin_edges[1:] + bin_edges[:-1])/2
         objects_pdf_angle_axis_2[object_name]["value"] = np.column_stack([bins, hist])
         ## axis angle surf
-        hist, bin_edges = np.histogram(objects_axis_angle_surf[object_name]["value"], range=(0.0, np.pi), density=True)
+        angles = objects_axis_angle_surf[object_name]["value"]
+        hist, bin_edges = np.histogram(angles, bins=np.histogram_bin_edges(angles, bins=BIN_NB, range=BIN_RANGE), range=BIN_RANGE, density=True)
         bins = (bin_edges[1:] + bin_edges[:-1])/2
         objects_pdf_axis_angle_surf[object_name]["value"] = np.column_stack([bins, hist])
         ## axis angle surf orth z
-        hist, bin_edges = np.histogram(objects_axis_angle_surf_orth_z[object_name]["value"], range=(0.0, np.pi), density=True)
+        angles = objects_axis_angle_surf_orth_z[object_name]["value"]
+        hist, bin_edges = np.histogram(angles, bins=np.histogram_bin_edges(angles, bins=BIN_NB, range=BIN_RANGE), range=BIN_RANGE, density=True)
         bins = (bin_edges[1:] + bin_edges[:-1])/2
         objects_pdf_axis_angle_surf_orth_z[object_name]["value"] = np.column_stack([bins, hist])
         ## axis angle surf sym
-        hist, bin_edges = np.histogram(objects_axis_angle_surf_sym[object_name]["value"], range=(0.0, np.pi), density=True)
+        angles = objects_axis_angle_surf_sym[object_name]["value"]
+        hist, bin_edges = np.histogram(angles, bins=np.histogram_bin_edges(angles, bins=BIN_NB, range=BIN_RANGE), range=BIN_RANGE, density=True)
         bins = (bin_edges[1:] + bin_edges[:-1])/2
         objects_pdf_axis_angle_surf_sym[object_name]["value"] = np.column_stack([bins, hist])
         ## axis angle surf sym orth z
-        hist, bin_edges = np.histogram(objects_axis_angle_surf_sym_orth_z[object_name]["value"], range=(0.0, np.pi), density=True)
+        angles = objects_axis_angle_surf_sym_orth_z[object_name]["value"]
+        hist, bin_edges = np.histogram(angles, bins=np.histogram_bin_edges(angles, bins=BIN_NB, range=BIN_RANGE), range=BIN_RANGE, density=True)
         bins = (bin_edges[1:] + bin_edges[:-1])/2
         objects_pdf_axis_angle_surf_sym_orth_z[object_name]["value"] = np.column_stack([bins, hist])
         ## axis angle surf asym
-        hist, bin_edges = np.histogram(objects_axis_angle_surf_asym[object_name]["value"], range=(0.0, np.pi), density=True)
+        angles = objects_axis_angle_surf_asym[object_name]["value"]
+        hist, bin_edges = np.histogram(angles, bins=np.histogram_bin_edges(angles, bins=BIN_NB, range=BIN_RANGE), range=BIN_RANGE, density=True)
         bins = (bin_edges[1:] + bin_edges[:-1])/2
         objects_pdf_axis_angle_surf_asym[object_name]["value"] = np.column_stack([bins, hist])
         ## axis angle surf asym orth z
-        hist, bin_edges = np.histogram(objects_axis_angle_surf_asym_orth_z[object_name]["value"], range=(0.0, np.pi), density=True)
+        angles = objects_axis_angle_surf_asym_orth_z[object_name]["value"]
+        hist, bin_edges = np.histogram(angles, bins=np.histogram_bin_edges(angles, bins=BIN_NB, range=BIN_RANGE), range=BIN_RANGE, density=True)
         bins = (bin_edges[1:] + bin_edges[:-1])/2
         objects_pdf_axis_angle_surf_asym_orth_z[object_name]["value"] = np.column_stack([bins, hist])
         # info
@@ -216,9 +186,9 @@ def main():
         objects_pdf_axis_angle_surf_sym_orth_z[object_name]["info"] = ["axis_angle_surf_sym_orth_z", "pdf"]
         objects_pdf_axis_angle_surf_asym[object_name]["info"] = ["axis_angle_surf_asym", "pdf"]
         objects_pdf_axis_angle_surf_asym_orth_z[object_name]["info"] = ["axis_angle_surf_asym_orth_z", "pdf"]
-    print("INFO: Done.")
+    print("INFO: Done.", flush=True)
     # save
-    print("INFO: Saving...")
+    print("INFO: Saving...", flush=True)
     libpost.save(objects_pdf_angle_axis_0, "pdf_axis_angle_0")
     libpost.save(objects_pdf_angle_axis_1, "pdf_axis_angle_1")
     libpost.save(objects_pdf_angle_axis_2, "pdf_axis_angle_2")
@@ -228,7 +198,7 @@ def main():
     libpost.save(objects_pdf_axis_angle_surf_orth_z, "pdf_axis_angle_surf_orth_z")
     libpost.save(objects_pdf_axis_angle_surf_sym_orth_z, "pdf_axis_angle_surf_sym_orth_z")
     libpost.save(objects_pdf_axis_angle_surf_asym_orth_z, "pdf_axis_angle_surf_asym_orth_z")
-    print("INFO: Done.")
+    print("INFO: Done.", flush=True)
 
 if __name__ == '__main__':
     args = parse()
