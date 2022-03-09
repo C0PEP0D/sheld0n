@@ -13,9 +13,7 @@
 // app include
 #include "core/post/objects/object/post/core.h"
 // FLAG: INCLUDE POST BEGIN
-#include "param/post/objects/dobject/px/choice.h"
-#include "param/post/objects/dobject/py/choice.h"
-#include "param/post/objects/dobject/pz/choice.h"
+#include "param/post/objects/dobject/pos/choice.h"
 // FLAG: INCLUDE POST END
 
 namespace c0p {
@@ -28,9 +26,7 @@ struct PostDobjectParameters {
     std::vector<std::shared_ptr<PostPostPost<TypeDobjectStep>>> data;
     PostDobjectParameters(std::shared_ptr<TypeDobjectStep> sDobjectStep) {
         // FLAG: MAKE POST BEGIN
-        data.push_back(std::make_shared<PostDobjectPx<TypeDobjectStep>>(sDobjectStep));
-        data.push_back(std::make_shared<PostDobjectPy<TypeDobjectStep>>(sDobjectStep));
-        data.push_back(std::make_shared<PostDobjectPz<TypeDobjectStep>>(sDobjectStep));
+        data.push_back(std::make_shared<PostDobjectPos<TypeDobjectStep>>(sDobjectStep));
         // FLAG: MAKE POST END
     }
 };

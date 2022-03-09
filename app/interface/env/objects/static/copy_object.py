@@ -36,15 +36,15 @@ def edit(source, name):
     for line in fileinput.FileInput("../parameters.h", inplace=True):
         if line == '// FLAG: INCLUDE OBJECT END\n':
             print('#include "param/env/objects/static/{}/choice.h"\n'.format(name), end='')
-        if line == '    // FLAG: DECLARE OBJECT END\n':
-            print('    std::shared_ptr<{Name}Step> s{Name}Step;\n'.format(Name=upper_camel_name), end='')
-            print('    unsigned int {name}Index;\n'.format(name=name), end='')
-        if line == '        // FLAG: MAKE OBJECT END\n':
-            print('        // // {}\n'.format(name), end='')
-            print('        s{Name}Step = std::make_shared<{Name}Step>(sFlow, sObjects);\n'.format(Name=upper_camel_name), end='')
-            print('        sObjectsStaticSteps.push_back(s{Name}Step);\n'.format(Name=upper_camel_name), end='')
-            print('        {name}Index = sObjectsStaticSteps.size() - 1;\n'.format(name=name), end='')
-            print('        objectsStaticNames.push_back("{name}");\n'.format(name=name), end='')
+        if line == '\t// FLAG: DECLARE OBJECT END\n':
+            print('\tstd::shared_ptr<{Name}Step> s{Name}Step;\n'.format(Name=upper_camel_name), end='')
+            print('\tunsigned int {name}Index;\n'.format(name=name), end='')
+        if line == '\t\t// FLAG: MAKE OBJECT END\n':
+            print('\t\t// // {}\n'.format(name), end='')
+            print('\t\ts{Name}Step = std::make_shared<{Name}Step>(sFlow, sObjects);\n'.format(Name=upper_camel_name), end='')
+            print('\t\tsObjectsStaticSteps.push_back(s{Name}Step);\n'.format(Name=upper_camel_name), end='')
+            print('\t\t{name}Index = sObjectsStaticSteps.size() - 1;\n'.format(name=name), end='')
+            print('\t\tobjectsStaticNames.push_back("{name}");\n'.format(name=name), end='')
         print(line, end='')
     # post
     ## replace source by name
@@ -55,8 +55,8 @@ def edit(source, name):
     for line in fileinput.FileInput("../../../post/objects/parameters.h", inplace=True):
         if line == '// FLAG: INCLUDE OBJECT END\n':
             print('#include "param/post/objects/{}/parameters.h"\n'.format(name), end='')
-        if line == '        // FLAG: MAKE OBJECT END\n':
-            print('        sPostsStatic.push_back(std::make_shared<PostPost<Post{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name), end='')
+        if line == '\t\t// FLAG: MAKE OBJECT END\n':
+            print('\t\tsPostsStatic.push_back(std::make_shared<PostPost<Post{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name), end='')
         print(line, end='')
     # init
     ## replace source by name
@@ -65,8 +65,8 @@ def edit(source, name):
     for line in fileinput.FileInput("../../../init/objects/parameters.h", inplace=True):
         if line == '// FLAG: INCLUDE OBJECT END\n':
             print('#include "param/init/objects/{}/parameters.h"\n'.format(name), end='')
-        if line == '        // FLAG: MAKE OBJECT END\n':
-            print('        sInitsStatic.push_back(std::make_shared<InitInitStatic<Init{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name), end='')
+        if line == '\t\t// FLAG: MAKE OBJECT END\n':
+            print('\t\tsInitsStatic.push_back(std::make_shared<InitInitStatic<Init{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name), end='')
         print(line, end='')
 
 def main(source, name):

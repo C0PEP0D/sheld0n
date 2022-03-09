@@ -30,7 +30,7 @@ class Init {
     public:
         void operator()(std::shared_ptr<TypeEnv> sEnv) {
             std::cout << "INFO : Init case start" << std::endl;
-            initObjects(sEnv->sObjects->stateStatic.data(), sEnv->sObjects->statesDynamic);
+            initObjects(sEnv->sObjects->stateStatic, sEnv->sObjects->statesDynamic, sEnv->sObjects->statesManager);
             sEnv->sFlow->init(0.0);
             std::cout << "INFO : Init case end" << std::endl;
         }

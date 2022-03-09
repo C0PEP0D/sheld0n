@@ -23,12 +23,16 @@ class PostPostChainPosition : public PostPostPost<TypeObjectStep> {
     public:
         std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
             std::map<std::string, TypeScalar> processed;
-            const unsigned int n = std::ceil(1.0 / parameters.ds);
+            const double length = sObjectStep->length(pState);
+            const unsigned int n = std::ceil(length / parameters.dl);
             for(unsigned int i = 0; i < n + 1; i++) {
-                const double s = i * parameters.ds;
-                std::string sStr = std::to_string(s);
-                std::replace(sStr.begin(), sStr.end(), '.', 'o');
-                processed["s_" + sStr + "__" + parameters.name + "_" + std::to_string(parameters.i)] = sObjectStep->cX(pState, s)[parameters.i];
+                const double l = i * parameters.dl;
+                std::string lStr = std::to_string(l);
+                std::replace(lStr.begin(), lStr.end(), '.', 'o');
+                const TypeSpaceVector x = sObjectStep->cX(pState, l / length);
+                for(unsigned int j = 0; j < x.size(); j++) {
+                	processed["s_" + lStr + "__" + parameters.name + "_" + std::to_string(j)] = x[j];
+                }
             }
             return processed;
         };

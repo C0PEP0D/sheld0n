@@ -54,8 +54,10 @@ def main():
     #### objects
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/static/copy_object.py", args.name + "/param/env/objects/static"), args.name + "/param/env/objects/static/copy_object")
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/dynamic/copy_object.py", args.name + "/param/env/objects/dynamic"), args.name + "/param/env/objects/dynamic/copy_object")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/manager/copy_object.py", args.name + "/param/env/objects/manager"), args.name + "/param/env/objects/manager/copy_object")
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/static/remove_object.py", args.name + "/param/env/objects/static"), args.name + "/param/env/objects/static/remove_object")
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/dynamic/remove_object.py", args.name + "/param/env/objects/dynamic"), args.name + "/param/env/objects/dynamic/remove_object")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/manager/remove_object.py", args.name + "/param/env/objects/manager"), args.name + "/param/env/objects/manager/remove_object")
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/static/create_batch.py", args.name + "/param/env/objects/static"), args.name + "/param/env/objects/static/create_batch")
     #### object
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/static/object/choose.py", args.name + "/param/env/objects/static/object"), args.name + "/param/env/objects/static/object/choose")
@@ -73,8 +75,12 @@ def main():
     os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients/choose.py", args.name + "/param/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients"), args.name + "/param/env/objects/static/object/group/homogeneous/_member/agent/_behaviour/_sensor/velocity_gradients/choose")
     #### dobject
     ##### chain of surface elements
-    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/dynamic/object/chain/strechable/_member/choose.py", args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member"), args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member/choose")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/dynamic/object/chain/strechable/_member/passive/choose.py", args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member/passive"), args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member/passive/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/dynamic/dobject/chain/strechable/_member/choose.py", args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member"), args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/dynamic/dobject/chain/strechable/_member/passive/choose.py", args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member/passive"), args.name + "/param/env/objects/dynamic/dobject/chain/strechable/_member/passive/choose")
+    #### mobject
+    ##### dicontinuous chain of surface elements
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/manager/mobject/chain/discontinuous/_member/choose.py", args.name + "/param/env/objects/manager/mobject/chain/discontinuous/_member"), args.name + "/param/env/objects/manager/mobject/chain/discontinuous/_member/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/env/objects/manager/mobject/chain/discontinuous/_member/passive/choose.py", args.name + "/param/env/objects/manager/mobject/chain/discontinuous/_member/passive"), args.name + "/param/env/objects/manager/mobject/chain/discontinuous/_member/passive/choose")
     ### init
     #### objects
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/copy_inits.py", args.name + "/param/init/objects"), args.name + "/param/init/objects/copy_inits")

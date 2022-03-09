@@ -20,6 +20,7 @@ class InitInitGroupAll : public InitInitInitStatic<TypeObjectStep> {
         InitInitGroupAll(std::shared_ptr<TypeObjectStep> p_sObjectStep) : InitInitInitStatic<TypeObjectStep>(p_sObjectStep), initMember(sObjectStep->sMemberStep) {
         }
     public:
+    	using InitInitInitStatic<TypeObjectStep>::operator();
         void operator()(double* pState) override {
             std::for_each(std::execution::par_unseq, sObjectStep->memberIndexs.cbegin(), sObjectStep->memberIndexs.cend(), [this, pState](const unsigned int& memberIndex){ 
                 initMember(sObjectStep->memberState(pState, memberIndex));

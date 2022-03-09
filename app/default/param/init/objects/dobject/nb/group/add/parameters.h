@@ -12,7 +12,7 @@ namespace c0p {
 // Add group members
 struct InitDobjectNbGroupAddParameters {
 	// Number of group members to add
-    const unsigned int nb = 2;
+    const unsigned int nb = 16;
 };
 
 }

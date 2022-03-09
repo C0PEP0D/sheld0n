@@ -27,19 +27,19 @@ def edit(name):
     for line in fileinput.FileInput("../parameters.h", inplace=True):
         if (line == '#include "param/env/objects/static/{}/choice.h"\n'.format(name)):
             pass
-        elif (line == '    std::shared_ptr<{Name}Step> s{Name}Step;\n'.format(Name=upper_camel_name)):
+        elif (line == '\tstd::shared_ptr<{Name}Step> s{Name}Step;\n'.format(Name=upper_camel_name)):
             pass
-        elif (line == '    unsigned int {name}Index;\n'.format(name=name)):
+        elif (line == '\tunsigned int {name}Index;\n'.format(name=name)):
             pass
-        elif (line == '        // // {}\n'.format(name)):
+        elif (line == '\t\t// // {}\n'.format(name)):
             pass
-        elif (line == '        s{Name}Step = std::make_shared<{Name}Step>(sFlow, sObjects);\n'.format(Name=upper_camel_name)):
+        elif (line == '\t\ts{Name}Step = std::make_shared<{Name}Step>(sFlow, sObjects);\n'.format(Name=upper_camel_name)):
             pass
-        elif (line == '        sObjectsStaticSteps.push_back(s{Name}Step);\n'.format(Name=upper_camel_name)):
+        elif (line == '\t\tsObjectsStaticSteps.push_back(s{Name}Step);\n'.format(Name=upper_camel_name)):
             pass
-        elif (line == '        {name}Index = sObjectsStaticSteps.size() - 1;\n'.format(name=name)):
+        elif (line == '\t\t{name}Index = sObjectsStaticSteps.size() - 1;\n'.format(name=name)):
             pass
-        elif (line == '        objectsStaticNames.push_back("{name}");\n'.format(name=name)):
+        elif (line == '\t\tobjectsStaticNames.push_back("{name}");\n'.format(name=name)):
             pass
         else:
             print(line, end='')
@@ -47,7 +47,7 @@ def edit(name):
     for line in fileinput.FileInput("../../../post/objects/parameters.h", inplace=True):
         if (line == '#include "param/post/objects/{}/parameters.h"\n'.format(name)):
             pass
-        elif (line == '        sPostsStatic.push_back(std::make_shared<PostPost<Post{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name)):
+        elif (line == '\t\tsPostsStatic.push_back(std::make_shared<PostPost<Post{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name)):
             pass
         else:
             print(line, end='')
@@ -55,7 +55,7 @@ def edit(name):
     for line in fileinput.FileInput("../../../init/objects/parameters.h", inplace=True):
         if (line == '#include "param/init/objects/{}/parameters.h"\n'.format(name)):
             pass
-        elif (line == '        sInitsStatic.push_back(std::make_shared<InitInitStatic<Init{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name)):
+        elif (line == '\t\tsInitsStatic.push_back(std::make_shared<InitInitStatic<Init{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name)):
             pass
         else:
             print(line, end='')

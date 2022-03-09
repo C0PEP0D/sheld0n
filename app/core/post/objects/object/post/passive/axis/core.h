@@ -13,18 +13,21 @@ namespace c0p {
 
 template<typename Parameters, typename TypeObjectStep>
 class PostPostPassiveAxis : public PostPostPost<TypeObjectStep> {
-    public:
-        Parameters parameters;
-    public:
-        using PostPostPost<TypeObjectStep>::sObjectStep;
-    public:
-        using PostPostPost<TypeObjectStep>::PostPostPost;
-    public:
-        std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
-            return {
-                { parameters.name + "_" + std::to_string(parameters.i), sObjectStep->cAxis(pState)[parameters.i] }
-            };
-        };
+	public:
+		Parameters parameters;
+	public:
+		using PostPostPost<TypeObjectStep>::sObjectStep;
+	public:
+		using PostPostPost<TypeObjectStep>::PostPostPost;
+	public:
+		std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
+			std::map<std::string, TypeScalar> result;
+		   	const TypeSpaceVector axis = sObjectStep->cAxis(pState);
+		   	for(unsigned int i = 0; i < axis.size(); i++) {
+		   		result[parameters.name + "_" + std::to_string(i)] = axis[i];
+		   	}
+		   	return result;
+		};
 };
 
 }

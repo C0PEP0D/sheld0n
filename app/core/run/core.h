@@ -86,6 +86,7 @@ class Run {
 			std::string folder = "time/" + std::to_string(t);
 			std::filesystem::create_directory(folder);
 			// Save
+			// // Static
 			if (parameters.saveStaticMerge) {
 				if(not sEnv->sObjects->stateStatic.empty()) {
 					s0ve::saveDouble(folder + "/static.txt", sEnv->sObjects->stateStatic.data(), sEnv->sObjects->stateStatic.size());
@@ -95,8 +96,17 @@ class Run {
 					s0ve::saveDouble(folder + "/" + sEnv->sObjectsParameters->objectsStaticNames[staticIndex] + ".txt", sEnv->sObjects->sStepStatic->cMemberState(sEnv->sObjects->stateStatic.data(), staticIndex), sEnv->sObjects->sStepStatic->memberStateSizes[staticIndex]);
 				}
 			}
+			// // Dynamic
 			for(const unsigned int& dynamicIndex : sEnv->sObjects->dynamicIndexs) {
 				s0ve::saveDouble(folder + "/" + sEnv->sObjectsParameters->objectsDynamicNames[dynamicIndex] + ".txt", sEnv->sObjects->statesDynamic[dynamicIndex].data(), sEnv->sObjects->statesDynamic[dynamicIndex].size());
+			}
+			// // Manager
+			for(const unsigned int& managerIndex : sEnv->sObjects->managerIndexs) {
+				
+				std::filesystem::create_directory(folder + "/" + sEnv->sObjectsParameters->objectsManagerNames[managerIndex]);
+				for(unsigned int managedIndex = 0; managedIndex < sEnv->sObjects->sStepsManager[managerIndex]->number(); managedIndex++) {
+					s0ve::saveDouble(folder + "/" + sEnv->sObjectsParameters->objectsManagerNames[managerIndex] + "/" + std::to_string(managedIndex) + ".txt", sEnv->sObjects->statesManager[managerIndex][managedIndex].data(), sEnv->sObjects->statesManager[managerIndex][managedIndex].size());
+				}
 			}
 		}
 		
@@ -104,6 +114,7 @@ class Run {
 			// Get directory
 			std::string folder = "time/" + std::to_string(t);
 			// Load
+			// // Static
 			if (parameters.saveStaticMerge) {
 				if(not sEnv->sObjects->stateStatic.empty()) {
 					l0ad::ascii::loadDouble(folder + "/static.txt", sEnv->sObjects->stateStatic.data(), sEnv->sObjects->stateStatic.size());
@@ -113,9 +124,24 @@ class Run {
 					l0ad::ascii::loadDouble(folder + "/" + sEnv->sObjectsParameters->objectsStaticNames[staticIndex] + ".txt", sEnv->sObjects->sStepStatic->memberState(sEnv->sObjects->stateStatic.data(), staticIndex), sEnv->sObjects->sStepStatic->memberStateSizes[staticIndex]);
 				}
 			}
+			// // Dynamic
 			for(const unsigned int& dynamicIndex : sEnv->sObjects->dynamicIndexs) {
 				l0ad::ascii::loadVectorDouble(folder + "/" + sEnv->sObjectsParameters->objectsDynamicNames[dynamicIndex] + ".txt", sEnv->sObjects->statesDynamic[dynamicIndex]);
+				sEnv->sObjects->sStepsDynamic[dynamicIndex]->registerState(sEnv->sObjects->statesDynamic[dynamicIndex]);
 			}
+			// // Manager
+			for(const unsigned int& managerIndex : sEnv->sObjects->managerIndexs) {
+				unsigned int managedIndex = 0;
+				for (const std::filesystem::directory_entry& dir_entry : std::filesystem::directory_iterator(folder + "/" + sEnv->sObjectsParameters->objectsManagerNames[managerIndex])) {
+					if(sEnv->sObjects->statesManager[managerIndex].size() == managedIndex) {
+						sEnv->sObjects->statesManager[managerIndex].emplace_back();
+					}
+					l0ad::ascii::loadVectorDouble(dir_entry.path(), sEnv->sObjects->statesManager[managerIndex][managedIndex]);
+					sEnv->sObjects->sStepsManager[managerIndex]->registerStates(sEnv->sObjects->statesManager[managerIndex]);
+					managedIndex += 1;
+				}
+			}
+			// Set time
 			sEnv->sObjects->t = t;
 			sEnv->sFlow->init(t);
 		}

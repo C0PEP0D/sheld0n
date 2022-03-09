@@ -28,7 +28,16 @@ def get_object():
         line = reader.readline()
         while line and re_include.match(line) == None:
             line = reader.readline()
-    return line.split("/")[3:-2]
+    return line.split("/")[4:-2]
+
+## get object
+def get_object_type():
+    re_include = re.compile(r'^#include "param/env/objects/.*/(parameters.h|choice.h)"')
+    with open('choice.h', 'r') as reader:
+        line = reader.readline()
+        while line and re_include.match(line) == None:
+            line = reader.readline()
+    return line.split("/")[3]
 
 ## get flow
 def get_flow():
@@ -87,7 +96,16 @@ def get_default_object(abs_choices_dir):
         line = reader.readline()
         while line and re_include.match(line) == None:
             line = reader.readline()
-    return line.split("/")[3:-2]
+    return line.split("/")[4:-2]
+
+## get default object
+def get_default_object_type(abs_choices_dir):
+    re_include = re.compile(r'^#include "param/env/objects/.*/(parameters.h|choice.h)"')
+    with open(abs_choices_dir + '/choice.h', 'r') as reader:
+        line = reader.readline()
+        while line and re_include.match(line) == None:
+            line = reader.readline()
+    return line.split("/")[3]
 
 ## get default flow
 def get_default_flow(abs_choices_dir):
@@ -188,11 +206,14 @@ def find_replace(folder, file_pattern, text, replacement, condition = lambda lin
 #    find_replace(choice, "*.h", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
 #    find_replace(choice, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
 #    find_replace(choice, "*.h", object_to_upper_camel_case(default_obj), object_to_upper_camel_case(obj))
-def edit_choice(choice, default_obj, obj, size = 1):
+def edit_choice(choice, default_obj, default_obj_type, obj, obj_type, size = 1):
     obj = obj[0:len(obj) - len(default_obj) + size]
     default_obj = default_obj[0:size]
     find_replace(choice, "*.h", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
-    find_replace(choice, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
+    if default_obj_type and obj_type:
+        find_replace(choice, "*.h", "/" + default_obj_type + "/" + object_to_path(default_obj) + "/", "/" + obj_type + "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
+    else:
+        find_replace(choice, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
     find_replace(choice, "*.h", object_to_upper_camel_case(default_obj), object_to_upper_camel_case(obj))
 
 # create sym links
@@ -231,7 +252,7 @@ def choose(choices_dir, choices_exceptions):
     shutil.rmtree(selected)
     # edit
     edit_header(selected, args.choice)
-    edit_choice(args.choice, get_default_object(get_abs_choices_dir(choices_dir)), get_object())
+    edit_choice(args.choice, get_default_object(get_abs_choices_dir(choices_dir)), get_default_object_type(get_abs_choices_dir(choices_dir)), get_object(), get_object_type())
     # create sym links
     create_sym_links(args.choice, choices[args.choice])
 
@@ -248,7 +269,7 @@ def choose_flow(choices_dir, choices_exceptions):
     shutil.rmtree(selected)
     # edit
     edit_header(selected, args.choice)
-    edit_choice(args.choice, get_default_flow(get_abs_choices_dir(choices_dir)), get_flow())
+    edit_choice(args.choice, get_default_flow(get_abs_choices_dir(choices_dir)), "", get_flow(), "")
     # create sym links
     create_sym_links(args.choice, choices[args.choice])
 
@@ -265,7 +286,7 @@ def choose_init(choices_dir, choices_exceptions):
     shutil.rmtree(selected)
     # edit
     edit_header(selected, args.choice)
-    edit_choice(args.choice, get_default_init(get_abs_choices_dir(choices_dir)), get_init(), 2)
+    edit_choice(args.choice, get_default_init(get_abs_choices_dir(choices_dir)), "", get_init(), "", 2)
     # create sym links
     create_sym_links(args.choice, choices[args.choice])
 
@@ -282,6 +303,6 @@ def choose_post(choices_dir, choices_exceptions):
     shutil.rmtree(selected)
     # edit
     edit_header(selected, args.choice)
-    edit_choice(args.choice, get_default_post(get_abs_choices_dir(choices_dir)), get_post(), 2)
+    edit_choice(args.choice, get_default_post(get_abs_choices_dir(choices_dir)), "", get_post(), "", 2)
     # create sym links
     create_sym_links(args.choice, choices[args.choice])

@@ -21,9 +21,12 @@ class PostPostPassivePosition : public PostPostPost<TypeObjectStep> {
         using PostPostPost<TypeObjectStep>::PostPostPost;
     public:
         std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
-            return {
-                { parameters.name + "_" + std::to_string(parameters.i), sObjectStep->cX(pState)[parameters.i] }
-            };
+        	std::map<std::string, TypeScalar> result;
+        	const TypeSpaceVector x = sObjectStep->cX(pState);
+        	for(unsigned int i = 0; i < x.size(); i++) {
+        		result[parameters.name + "_" + std::to_string(i)] = x[i];
+        	}
+        	return result;
         };
 };
 
