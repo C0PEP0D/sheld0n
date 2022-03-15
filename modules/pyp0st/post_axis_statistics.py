@@ -53,7 +53,9 @@ def main():
     print("INFO: Computing orientation statistics...", flush=True)
     for object_name in objects_axis_angle_surf:
         # value
-        for i in range(0, objects_axis_angle_surf[object_name]["value"].shape[0]):
+        print("INFO: Processing {}".format(object_name), flush=True)
+        for i in range(0, objects_axis_angle_surf[object_name]["value"].shape[0], 500):
+            print("INFO: Processing {i}/{nb}".format(i=i, nb=objects_axis_angle_surf[object_name]["value"].shape[0]), flush=True)
             for j in range(0, objects_axis_angle_surf[object_name]["value"].shape[1]):
                 # set gradients
                 gradients = np.empty((3, 3))
