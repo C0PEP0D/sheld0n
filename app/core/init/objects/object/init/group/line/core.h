@@ -23,7 +23,7 @@ class InitInitGroupLine : public InitInitInitStatic<TypeObjectStep> {
 		void operator()(double* pState) override {
 			std::for_each(std::execution::seq, sObjectStep->memberIndexs.cbegin(), sObjectStep->memberIndexs.cend(), [this, pState](const unsigned int& memberIndex){ 
 				sObjectStep->sMemberStep->x(sObjectStep->memberState(pState, memberIndex)) = parameters.origin + parameters.l * double(memberIndex) / double(sObjectStep->size() - 1);
-				*sObjectStep->sMemberStep->scalar(sObjectStep->memberState(pState, memberIndex)) = parameters.origin + parameters.l * double(memberIndex) / double(sObjectStep->size() - 1);
+				*sObjectStep->sMemberStep->scalar(sObjectStep->memberState(pState, memberIndex)) = parameters.l.norm() * double(memberIndex) / double(sObjectStep->size() - 1);
 			});
 		};
 };

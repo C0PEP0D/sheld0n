@@ -1,3 +1,4 @@
+
 #ifndef C0P_CORE_POST_OBJECTS_OBJECT_POST_PAIR_BOTH_CORE_H
 #define C0P_CORE_POST_OBJECTS_OBJECT_POST_PAIR_BOTH_CORE_H
 #pragma once
@@ -26,13 +27,13 @@ class PostPostPairBoth : public PostPostPost<TypeObjectStep> {
         PostPostPairBoth(std::shared_ptr<TypeObjectStep> p_sObjectStep) : PostPostPost<TypeObjectStep>(p_sObjectStep), postA(sObjectStep->sAStep), postB(sObjectStep->sBStep) {
         }
     public:
-        std::map<std::string, TypeScalar> operator()(const TypeVector<Eigen::Dynamic>& state, const double& t) override {
+        std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
             // compute
             std::map<std::string, TypeScalar> processed;
-            for(const auto& p : postA(sObjectStep->cAState(state), t)) {
+            for(const auto& p : postA(sObjectStep->cAState(pState), t)) {
                 processed["a__" + p.first] = p.second;
             }
-            for(const auto& p : postB(sObjectStep->cBState(state), t)) {
+            for(const auto& p : postB(sObjectStep->cBState(pState), t)) {
                 processed["b__" + p.first] = p.second;
             }
             // return

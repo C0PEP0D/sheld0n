@@ -53,7 +53,7 @@ class AgentBehaviourSensorVelocityGradientsFiltered : public AgentBehaviourSenso
                         xTmp[1] += j * parameters.dx - 0.5 * parameters.l;
                         xTmp[2] += k * parameters.dx - 0.5 * parameters.l;
                         // compute gradients
-                        gradients += stepActive.sFlow->getJacobian(xTmp, t);
+                        gradients += stepActive.sFlow->getVelocityGradients(xTmp, t);
                     }
                 }
             }

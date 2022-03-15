@@ -7,12 +7,12 @@
 // CHOOSE COMMAND IS USED
 
 // choose your init
-#include "core/init/objects/object/init/pair/distance/core.h"
-#include "param/init/objects/object/pos/pair/distance/parameters.h"
+#include "core/init/objects/object/init/pair/relative/core.h"
+#include "param/init/objects/object/pos/pair/relative/parameters.h"
 
 namespace c0p {
     template<typename TypeObjectStep>
-    using InitObjectPosPair = InitInitPairDistance<InitObjectPosPairDistanceParameters, TypeObjectStep>;
+    using InitObjectPosPair = InitInitPairRelative<InitObjectPosPairRelativeParameters, TypeObjectStep>;
 }
 
 #endif

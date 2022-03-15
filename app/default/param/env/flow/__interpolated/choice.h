@@ -6,7 +6,7 @@
 #include "core/env/flow/interpolated/unstationary/core.h"
 #include "param/env/flow/interpolated/unstationary/parameters.h"
 namespace c0p {
-    using FlowInterpolated = FlowInterpolatedUnstationary<FlowInterpolatedUnstationaryParameters>;
+    using FlowInterpolated = BaseFlowInterpolatedUnstationary<FlowInterpolatedUnstationaryParameters>;
 }
 
 #endif

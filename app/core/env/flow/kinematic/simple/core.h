@@ -18,14 +18,14 @@ namespace c0p {
 using TypeFlowKinematicSimple = fl0w::kinematic::Kinematic<TypeSpaceVector, TypeSpaceMatrix, TypeRef, TypeContainer>;
 
 template<typename TypeParameters>
-class FlowKinematicSimple {
+class BaseFlowKinematicSimple {
     public:
         using Type = TypeFlowKinematicSimple;
         std::shared_ptr<Type> sData; // Fluid
 
         TypeParameters parameters;
 
-        FlowKinematicSimple() {
+        BaseFlowKinematicSimple() {
             sData = std::make_shared<Type>();
             sData->sRandomGenerator->setSeed(parameters.seed);
             *sData->sNk = parameters.nk; // number of fourier modes

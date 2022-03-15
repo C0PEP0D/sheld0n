@@ -18,13 +18,13 @@ namespace c0p {
 using TypeFlowAnalyticTaylorGreenVortex = fl0w::analytic::TaylorGreenVortex<TypeSpaceVector, TypeSpaceMatrix, TypeRef>;
 
 template<typename TypeParameters>
-class FlowAnalyticTaylorGreenVortex : public TypeFlowAnalyticTaylorGreenVortex {
+class BaseFlowAnalyticTaylorGreenVortex : public TypeFlowAnalyticTaylorGreenVortex {
     public:
         using Type = TypeFlowAnalyticTaylorGreenVortex;
     public:
         TypeParameters parameters;
     public:
-        FlowAnalyticTaylorGreenVortex() {
+        BaseFlowAnalyticTaylorGreenVortex() {
         }
 
         void init(const TypeScalar& t) {

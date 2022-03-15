@@ -17,8 +17,8 @@ class AgentBehaviourSensorVelocityGradientsSymmetric : public AgentBehaviourSens
         }
     public:
         TypeSpaceMatrix operator()(const double* pState, const double& t, const AgentActiveStep&  stepActive) const override {
-            const TypeSpaceMatrix J = stepActive.sFlow->getJacobian(stepActive.cX(pState), t);
-            return 0.5 * (J + J.transpose());
+            const TypeSpaceMatrix velocityGradients = stepActive.sFlow->getVelocityGradients(stepActive.cX(pState), t);
+            return 0.5 * (velocityGradients + velocityGradients.transpose());
         }
 };
 

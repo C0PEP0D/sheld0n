@@ -118,10 +118,10 @@ def main():
     os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/copy_post.py", args.name + "/param/post/objects/object"), args.name + "/param/post/objects/object/copy_post")
     os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/remove_post.py", args.name + "/param/post/objects/object"), args.name + "/param/post/objects/object/remove_post")
     ##### object
-    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/px/choose.py", args.name + "/param/post/objects/object/px"), args.name + "/param/post/objects/object/px/choose")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/px/group/choose.py", args.name + "/param/post/objects/object/px/group"), args.name + "/param/post/objects/object/px/group/choose")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/px/group/_member/choose.py", args.name + "/param/post/objects/object/px/group/_member"), args.name + "/param/post/objects/object/px/group/_member/choose")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/px/group/_member/passive/choose.py", args.name + "/param/post/objects/object/px/group/_member/passive"), args.name + "/param/post/objects/object/px/group/_member/passive/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/pos/choose.py", args.name + "/param/post/objects/object/pos"), args.name + "/param/post/objects/object/pos/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/pos/group/choose.py", args.name + "/param/post/objects/object/pos/group"), args.name + "/param/post/objects/object/pos/group/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/pos/group/_member/choose.py", args.name + "/param/post/objects/object/pos/group/_member"), args.name + "/param/post/objects/object/pos/group/_member/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/object/pos/group/_member/passive/choose.py", args.name + "/param/post/objects/object/pos/group/_member/passive"), args.name + "/param/post/objects/object/pos/group/_member/passive/choose")
     #### mesh
     os.symlink(os.path.relpath(code_dir + "/app/interface/post/mesh/copy_post.py", args.name + "/param/post/mesh"),  args.name + "/param/post/mesh/copy_post")
     os.symlink(os.path.relpath(code_dir + "/app/interface/post/mesh/remove_post.py", args.name + "/param/post/mesh"), args.name + "/param/post/mesh/remove_post")

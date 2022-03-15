@@ -3,7 +3,6 @@
 * Current:
 	- object manager -> state = indexs
 	- objects prefix naming
-	- correct flow vorticity and spheroids rotation
     - agent follow line case
     - sensor line
     - conform/nonconform mesh

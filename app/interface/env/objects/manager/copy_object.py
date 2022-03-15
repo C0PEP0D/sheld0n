@@ -56,7 +56,7 @@ def edit(source, name):
         if line == '// FLAG: INCLUDE OBJECT END\n':
             print('#include "param/post/objects/{}/parameters.h"\n'.format(name), end='')
         if line == '\t\t// FLAG: MAKE OBJECT END\n':
-            print('\t\tsPostsManager.push_back(std::make_shared<PostPost<Post{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name), end='')
+            print('\t\tsPostsManager.push_back(std::make_shared<PostPostManager<Post{Name}Parameters, {Name}Step>>(sObjectsParameters->s{Name}Step));\n'.format(Name=upper_camel_name), end='')
         print(line, end='')
     # init
     ## replace source by name

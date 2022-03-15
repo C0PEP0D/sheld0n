@@ -13,67 +13,68 @@
 namespace c0p {
 
 template<typename TypeParameters, typename TypeAStep_, typename TypeBStep_>
-class PairSimpleStep : public sl0::StepObjectStatic<TypeVector, DIM, TypeRef, TypeAStep_::StateSize + TypeBStep_::StateSize> {
-    public:
-        TypeParameters parameters;
-    public:
-        using TypeAStep = TypeAStep_;
-        using TypeBStep = TypeBStep_;
-    public:
-        using Type = sl0::StepObjectStatic<TypeVector, DIM, TypeRef, TypeAStep::StateSize+TypeBStep::StateSize>;
-        using Type::StateSize;
-        using typename Type::TypeStateStatic;
-    public:
-        PairSimpleStep(const std::shared_ptr<Flow>& sFlow, Objects<ObjectsParameters>* pObjects) : Type(), sAStep(std::make_shared<TypeAStep>(sFlow, pObjects)), sBStep(std::make_shared<TypeBStep>(sFlow, pObjects)) {
+class PairSimpleStep : public sl0::StepObjectStatic<TypeVector, DIM, TypeAStep_::StateSize + TypeBStep_::StateSize> {
+	public:
+		TypeParameters parameters;
+	public:
+		using TypeAStep = TypeAStep_;
+		using TypeBStep = TypeBStep_;
+	public:
+		using Type = sl0::StepObjectStatic<TypeVector, DIM, TypeAStep::StateSize+TypeBStep::StateSize>;
+		using typename Type::StateSize;
+		using typename Type::TypeSpaceVector;
+		using typename Type::TypeStateVectorDynamic;
+	public:
+		PairSimpleStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : Type(), sAStep(std::make_shared<TypeAStep>(sFlow, sObjects)), sBStep(std::make_shared<TypeBStep>(sFlow, sObjects)) {
 
-        }
+		}
 
-        TypeStateStatic operator()(const TypeRef<const TypeStateStatic>& state, const double& t) const override {
-            TypeStateStatic dState;
-            // a
-            TypeView<typename TypeAStep::TypeStateStatic> dA = aState(dState);
-            dA = (*sAStep)(cAState(state), t);
-            // b
-            TypeView<typename TypeBStep::TypeStateStatic> dB = bState(dState);
-            dB = (*sBStep)(cBState(state), t);
-            // return
-            return dState;
-        }
-        
-        void update(TypeRef<TypeStateStatic> state, const double& t) override {
-            sAStep->update(TypeRef<typename TypeAStep::TypeStateStatic>(aState(state)), t);
-            sBStep->update(TypeRef<typename TypeBStep::TypeStateStatic>(bState(state)), t);
-        }
-    public:
-        TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeStateStatic>& state) const override {
-            TypeContainer<TypeSpaceVector> result;
-            // sensors
-            const TypeContainer<TypeSpaceVector> positionsA = sAStep->positions(cAState(state));
-            result.insert(result.end(), positionsA.begin(), positionsA.end());
-            const TypeContainer<TypeSpaceVector> positionsB = sBStep->positions(cBState(state));
-            result.insert(result.end(), positionsB.begin(), positionsB.end());
-            // return
-            return result;
-        }
-    public:
-        TypeView<const typename TypeAStep::TypeStateStatic> cAState(const TypeRef<const TypeStateStatic>& state) const {
-            return TypeView<const typename TypeAStep::TypeStateStatic>(state.data());
-        }
+		TypeStateVectorDynamic operator()(const double* pState, const double& t) const override {
+			TypeStateVectorDynamic dState(Type::stateSize());
+			// a
+			TypeView<TypeStateVectorDynamic> dA(aState(dState.data()), sAStep->stateSize());
+			dA = (*sAStep)(cAState(pState), t);
+			// b
+			TypeView<TypeStateVectorDynamic> dB(bState(dState.data()), sBStep->stateSize());
+			dB = (*sBStep)(cBState(pState), t);
+			// return
+			return dState;
+		}
+		
+		void update(double* pState, const double& t) override {
+			sAStep->update(aState(pState), t);
+			sBStep->update(bState(pState), t);
+		}
+	public:
+		TypeContainer<TypeSpaceVector> positions(const double* pState) const override {
+			TypeContainer<TypeSpaceVector> result;
+			// sensors
+			const TypeContainer<TypeSpaceVector> positionsA = sAStep->positions(cAState(pState));
+			result.insert(result.end(), positionsA.begin(), positionsA.end());
+			const TypeContainer<TypeSpaceVector> positionsB = sBStep->positions(cBState(pState));
+			result.insert(result.end(), positionsB.begin(), positionsB.end());
+			// return
+			return result;
+		}
+	public:
+		const double* cAState(const double* pState) const {
+			return pState;
+		}
 
-        TypeView<typename TypeAStep::TypeStateStatic> aState(TypeRef<TypeStateStatic> state) const {
-            return TypeView<typename TypeAStep::TypeStateStatic>(state.data());
-        }
+		double* aState(double* pState) const {
+			return pState;
+		}
 
-        TypeView<const typename TypeBStep::TypeStateStatic> cBState(const TypeRef<const TypeStateStatic>& state) const {
-            return TypeView<const typename TypeBStep::TypeStateStatic>(state.data() + TypeAStep::StateSize);
-        }
+		const double* cBState(const double* pState) const {
+			return pState + TypeAStep::StateSize;
+		}
 
-        TypeView<typename TypeBStep::TypeStateStatic> bState(TypeRef<TypeStateStatic> state) const {
-            return TypeView<typename TypeBStep::TypeStateStatic>(state.data() + TypeAStep::StateSize);
-        }
-    public:
-        std::shared_ptr<TypeAStep> sAStep;
-        std::shared_ptr<TypeBStep> sBStep;
+	   	double* bState(double* pState) const {
+			return pState + TypeAStep::StateSize;
+		}
+	public:
+		std::shared_ptr<TypeAStep> sAStep;
+		std::shared_ptr<TypeBStep> sBStep;
 };
 
 }

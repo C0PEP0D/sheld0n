@@ -26,14 +26,14 @@ using TypeFlowInterpolatedMeshTimeSub = m0sh::StructuredSub<TypeVector<1>, TypeR
 using TypeFlowInterpolated = fl0w::fl0p::Unstationary<TypeSpaceVector, TypeSpaceMatrix, TypeRef, TypeFlowInterpolatedMesh, TypeContainer, TypeFlowInterpolatedMeshSub, TypeFlowInterpolatedMeshTime, TypeFlowInterpolatedMeshTimeSub, TypeVector<1>, v0l::FileData>;
 
 template<typename TypeParameters>
-class FlowInterpolatedUnstationary : public TypeFlowInterpolated {
+class BaseFlowInterpolatedUnstationary : public TypeFlowInterpolated {
     public:
         using Type = TypeFlowInterpolated;
     public:
         TypeParameters parameters;
         std::vector<std::string> files;
     public:
-        FlowInterpolatedUnstationary() : Type() {
+        BaseFlowInterpolatedUnstationary() : Type() {
             // Files
             for (const auto & file : std::filesystem::directory_iterator(parameters.directory)) {
                 files.push_back(file.path());

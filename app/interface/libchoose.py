@@ -46,7 +46,7 @@ def get_flow():
         line = reader.readline()
         while line and re_include.match(line) == None:
             line = reader.readline()
-    return line.split("/")[3:-2]
+    return line.split("/")[2:-2]
 
 ## get init
 def get_init():
@@ -114,7 +114,7 @@ def get_default_flow(abs_choices_dir):
         line = reader.readline()
         while line and re_include.match(line) == None:
             line = reader.readline()
-    return line.split("/")[3:-2]
+    return line.split("/")[2:-2]
 
 ## get default init
 def get_default_init(abs_choices_dir):
@@ -197,7 +197,7 @@ def find_replace(folder, file_pattern, text, replacement, condition = lambda lin
         if files:
             for line in fileinput.FileInput(files, inplace=True):
                 if condition(line):
-                    print(line.replace(text, replacement), end='')
+                    print(re.sub(text, replacement, line), end='')
                 else:
                     print(line, end='')
 
@@ -214,7 +214,7 @@ def edit_choice(choice, default_obj, default_obj_type, obj, obj_type, size = 1):
         find_replace(choice, "*.h", "/" + default_obj_type + "/" + object_to_path(default_obj) + "/", "/" + obj_type + "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
     else:
         find_replace(choice, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
-    find_replace(choice, "*.h", object_to_upper_camel_case(default_obj), object_to_upper_camel_case(obj))
+    find_replace(choice, "*.h", "\\b" + object_to_upper_camel_case(default_obj), object_to_upper_camel_case(obj))
 
 # create sym links
 def create_sym_links(choice, choice_alt):
