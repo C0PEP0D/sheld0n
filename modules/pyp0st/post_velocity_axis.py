@@ -15,15 +15,15 @@ objects_name_info = ["us/u_eta", "surftimeconst/t_eta", "reorientationtime/t_eta
 objects_name_properties = ["us", "surftimeconst", "reorientationtime", "surftimeprefactor", "proportion", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]
 
 # filtering
-for prop in ["surftimeconst", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]: # adaptive surf
-# for prop in ["surftimeprefactor", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]: #surf
+#for prop in ["surftimeconst", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]: # adaptive surf
+for prop in ["surftimeprefactor", "swimnoise", "dirnoise", "jnoise", "omegamax", "reacttime"]: #surf
 # for prop in ["surftimeprefactor", "reorientationtime", "swimnoise", "dirnoise", "jnoise"]: # control surf
     i = objects_name_properties.index(prop)
     objects_name_info.pop(i)
     objects_name_properties.pop(i)
 
-sorting_property = "surftimeprefactor" # adaptive surf
-#sorting_property = "surftimeconst" # surf
+#sorting_property = "surftimeprefactor" # adaptive surf
+sorting_property = "surftimeconst" # surf
 sorting_index = objects_name_properties.index(sorting_property)
 sorting_info = objects_name_info.copy()
 sorting_info.pop(sorting_index)
