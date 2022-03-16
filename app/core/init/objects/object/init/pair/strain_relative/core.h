@@ -23,8 +23,8 @@ class InitInitPairStrainRelative : public InitInitInitStatic<TypeObjectStep> {
         	const TypeSpaceMatrix symVelocityGradients = 0.5 * (velocityGradients + velocityGradients.transpose());
 
 			Eigen::SelfAdjointEigenSolver<TypeSpaceMatrix> eigenSolver;
-        	eigenSolver.compute(symVelocityGradients, true);
-			
+        	eigenSolver.compute(symVelocityGradients, Eigen::ComputeEigenvectors);
+
             sObjectStep->sBStep->x(sObjectStep->bState(pState)) = xA + eigenSolver.eigenvectors() * parameters.position;
         };
 };

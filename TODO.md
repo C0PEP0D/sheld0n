@@ -1,7 +1,6 @@
 # TODO
 
 * Current:
-	- object manager -> state = indexs
 	- objects prefix naming
     - agent follow line case
     - sensor line

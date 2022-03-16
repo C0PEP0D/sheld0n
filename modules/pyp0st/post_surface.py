@@ -2,14 +2,10 @@
 
 # command line program
 import argparse
-# deepcopy
-import copy
 # numpy
 import numpy as np
-# glob
-import glob
-# regular expression
-import re
+# custom lib
+import libpost
 
 def parse():
     parser = argparse.ArgumentParser(description='Flame post processing')
@@ -17,44 +13,13 @@ def parse():
     parser.add_argument('timestep', type=int, help='specify the time step to post process')
     return parser.parse_args()
 
-def get_file_header(file_name):
-    head_str = ""
-    with open(file_name) as f:
-        head_str = f.readline()
-    head_str = head_str.replace("#", "")
-    head_str = head_str.replace(" ", "")
-    head_str = head_str.replace("\n", "")
-    head = head_str.split(",")
-    return head
-
-def get_time():
-    time_dirs = glob.glob("time/*")
-    time_list = [float(s.split("/")[1]) for s in glob.glob("time/*")]
-    time_list_copy = time_list.copy()
-    time_list_copy.sort()
-    return time_dirs, time_list, np.array(time_list_copy)
-
-def get_object(time_dir, object_name):
-    object_filename = time_dir + "/" + object_name + ".csv"
-    return {"info":get_file_header(object_filename), "value":np.loadtxt(object_filename, delimiter=",")}
-
-def get_object_properties(obj, properties):
-    regex = ""
-    for prop in properties:
-        regex += "_{prop}$|".format(prop=prop)
-    regex = regex[:-1]
-    # extract indexs
-    indexs = [index for index, name in enumerate(obj["info"]) if re.search(regex, name)]
-    # return
-    return {"info":[obj["info"][i] for i in indexs], "value":obj["value"][indexs]}
-
 def main(name, timestep):
-    time_dirs, time_list, time = get_time()
-    mobject = get_object(time_dirs[time_list.index(time[timestep])], name)
+    time_dirs, time_list, time = libpost.get_time()
+    obj = libpost.get_object(time_dirs[time_list.index(time[timestep])], name)
     # # get positions
-    objects_pos_0 = get_object_properties(mobject, ["s_.*__pos_0"])
-    objects_pos_1 = get_object_properties(mobject, ["s_.*__pos_1"])
-    objects_pos_2 = get_object_properties(mobject, ["s_.*__pos_2"])
+    objects_pos_0 = libpost.get_object_properties(obj, ["s_.*__pos_0"])
+    objects_pos_1 = libpost.get_object_properties(obj, ["s_.*__pos_1"])
+    objects_pos_2 = libpost.get_object_properties(obj, ["s_.*__pos_2"])
     # sort stuff based on s
     # result = {}
     # for object_name in objects_pos:

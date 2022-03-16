@@ -215,6 +215,8 @@ def edit_choice(choice, default_obj, default_obj_type, obj, obj_type, size = 1):
     else:
         find_replace(choice, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
     find_replace(choice, "*.h", "\\b" + object_to_upper_camel_case(default_obj), object_to_upper_camel_case(obj))
+    find_replace(choice, "*.h", "\\bInit" + object_to_upper_camel_case(default_obj), "Init" + object_to_upper_camel_case(obj))
+    find_replace(choice, "*.h", "\\bPost" + object_to_upper_camel_case(default_obj), "Post" + object_to_upper_camel_case(obj))
 
 # create sym links
 def create_sym_links(choice, choice_alt):

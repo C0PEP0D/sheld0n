@@ -31,7 +31,7 @@ def edit(source, name):
     # object
     upper_camel_name = libchoose.object_to_upper_camel_case([name])
     ## replace source by name
-    libchoose.edit_choice(name, [source], [name])
+    libchoose.edit_choice(name, [source], "manager", [name], "manager")
     ## add object to param/env/objects/parameters.h
     for line in fileinput.FileInput("../parameters.h", inplace=True):
         if line == '// FLAG: INCLUDE OBJECT END\n':
@@ -48,7 +48,7 @@ def edit(source, name):
         print(line, end='')
     # post
     ## replace source by name
-    libchoose.edit_choice("../../../post/objects/" + name, [source], [name])
+    libchoose.edit_choice("../../../post/objects/" + name, [source], "", [name], "")
     for line in fileinput.FileInput("../../../post/objects/" + name + "/parameters.h", inplace=True):
         print(line.replace('name = "{}"'.format(source), 'name = "{}"'.format(name)), end='')
     ## add object to param/post/objects/parameters.h
@@ -60,7 +60,7 @@ def edit(source, name):
         print(line, end='')
     # init
     ## replace source by name
-    libchoose.edit_choice("../../../init/objects/" + name, [source], [name])
+    libchoose.edit_choice("../../../init/objects/" + name, [source], "", [name], "")
     ## add object to param/init/objects/parameters.h
     for line in fileinput.FileInput("../../../init/objects/parameters.h", inplace=True):
         if line == '// FLAG: INCLUDE OBJECT END\n':
