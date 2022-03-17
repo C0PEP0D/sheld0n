@@ -48,6 +48,17 @@ def get_object_properties(obj, properties):
     # return
     return {"info":[obj["info"][i] for i in indexs], "value":obj["value"][indexs]}
 
+def get_object_names():
+    object_names = []
+    time_dirs = glob.glob("time/*")
+    if time_dirs:
+        object_paths= glob.glob(time_dirs[0] + "/*")
+        for path in object_paths:
+            object_names.append(path.split("/")[-1].split(".")[0])
+    else:
+        raise NameError('No data found')
+    return object_names
+
 # def get_file_header(file_name):
     # head_str = ""
     # with open(file_name) as f:
