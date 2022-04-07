@@ -1,6 +1,7 @@
 # Sheld0n: Lagrangian active particles advection
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![DOI](https://zenodo.org/badge/421041396.svg)](https://zenodo.org/badge/latestdoi/421041396)
 
 A code that enables complex active particle advection in flows. 
 The code is still in active developpement, feel free to ask for features.
