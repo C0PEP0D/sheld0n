@@ -12,10 +12,10 @@ namespace c0p {
 
 // Group post processing parameters
 struct PostObjectPosGroupAllParameters {
-    // Specify the post processing to apply to group members.
-    // This parameter should not be changed by the user.
-    template<typename TypeMemberStep>
-    using TypePostPostMember = PostObjectPosGroupMember<TypeMemberStep>;
+	// Specify the post processing to apply to group members.
+	// This parameter should not be changed by the user.
+	template<typename TypeMemberStep>
+	using TypePostPostMember = PostObjectPosGroupMember<TypeMemberStep>;
 };
 
 }

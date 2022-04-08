@@ -13,7 +13,7 @@ struct RunParameters {
     double dt = 0.002;
     // Number of time steps of the simulation.
     // Should be greater than zero.
-    std::size_t nt = std::round(10.0 / dt);
+    std::size_t nt = std::round(1.0 / dt);
     // Number of time steps that will be saved.
     // Currently, post processing will only be
     // possible to be performed on saved time steps.

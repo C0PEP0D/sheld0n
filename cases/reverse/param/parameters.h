@@ -11,7 +11,7 @@ namespace c0p {
 struct Parameters {
     // Characteristic group size. 
     // Should be greater than zero.
-    constexpr static const double cGroupSize = 128;
+    constexpr static const double cGroupSize = 2048;
     // Characteristic scales used to parametrize objects.
     // Currently corresponds to the Kolmogorov scales of the JHTDB flow.
     constexpr static const double cLength = 0.00280;

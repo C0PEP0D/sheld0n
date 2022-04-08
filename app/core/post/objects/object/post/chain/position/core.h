@@ -31,7 +31,7 @@ class PostPostChainPosition : public PostPostPost<TypeObjectStep> {
                 std::replace(lStr.begin(), lStr.end(), '.', 'o');
                 const TypeSpaceVector x = sObjectStep->cX(pState, l / length);
                 for(unsigned int j = 0; j < x.size(); j++) {
-                	processed["s_" + lStr + "__" + parameters.name + "_" + std::to_string(j)] = x[j];
+                	processed["l_" + lStr + "__" + parameters.name + "_" + std::to_string(j)] = x[j];
                 }
             }
             return processed;
