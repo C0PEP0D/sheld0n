@@ -10,12 +10,15 @@ import scipy.optimize
 import libpost
 
 DIRECTION = np.array([[1.0, 0.0, 0.0]]).T
-TAU = 1.0
-SYM_TAU = 1.0
+TAU_KOLMOGOROV = 0.12842
+TAU = 1.0 * TAU_KOLMOGOROV
+SYM_TAU = TAU
 ASYM_TAU = TAU
 
 BIN_RANGE = (0.0, np.pi)
 BIN_NB = 'auto'
+
+STEP_T = 1
 
 def parse():
     parser = argparse.ArgumentParser(description='Computes particles axis statistics.')
@@ -29,6 +32,7 @@ def main():
     time = libpost.get_time();
     print("INFO: Done.", flush=True)
     print("INFO: Reading objects properties...", flush=True)
+    # get gradients
     objects_j_0_0 = libpost.get_objects_properties(["j_0_0"], object_names)
     objects_j_0_1 = libpost.get_objects_properties(["j_0_1"], object_names)
     objects_j_0_2 = libpost.get_objects_properties(["j_0_2"], object_names)
@@ -43,18 +47,35 @@ def main():
     objects_axis_1 = libpost.get_objects_properties(["axis_1"], object_names)
     objects_axis_2 = libpost.get_objects_properties(["axis_2"], object_names)
     print("INFO: Done.", flush=True)
+    print("INFO: Reducing time data...", flush=True)
+    for object_name in objects_j_0_0:
+        # get gradients
+        objects_j_0_0[object_name]["value"] = objects_j_0_0[object_name]["value"][::STEP_T, :]
+        objects_j_0_1[object_name]["value"] = objects_j_0_1[object_name]["value"][::STEP_T, :]
+        objects_j_0_2[object_name]["value"] = objects_j_0_2[object_name]["value"][::STEP_T, :]
+        objects_j_1_0[object_name]["value"] = objects_j_1_0[object_name]["value"][::STEP_T, :]
+        objects_j_1_1[object_name]["value"] = objects_j_1_1[object_name]["value"][::STEP_T, :]
+        objects_j_1_2[object_name]["value"] = objects_j_1_2[object_name]["value"][::STEP_T, :]
+        objects_j_2_0[object_name]["value"] = objects_j_2_0[object_name]["value"][::STEP_T, :]
+        objects_j_2_1[object_name]["value"] = objects_j_2_1[object_name]["value"][::STEP_T, :]
+        objects_j_2_2[object_name]["value"] = objects_j_2_2[object_name]["value"][::STEP_T, :]
+        # axis data
+        objects_axis_0[object_name]["value"] = objects_axis_0[object_name]["value"][::STEP_T, :]
+        objects_axis_1[object_name]["value"] = objects_axis_1[object_name]["value"][::STEP_T, :]
+        objects_axis_2[object_name]["value"] = objects_axis_2[object_name]["value"][::STEP_T, :]
+    print("INFO: Done.", flush=True)
     # reduce axis to a scalar
-    objects_axis_angle_surf = copy.deepcopy(objects_axis_0)
-    objects_axis_angle_surf_sym = copy.deepcopy(objects_axis_0)
-    objects_axis_angle_surf_asym = copy.deepcopy(objects_axis_0)
-    objects_axis_angle_surf_orth_z = copy.deepcopy(objects_axis_0)
-    objects_axis_angle_surf_sym_orth_z = copy.deepcopy(objects_axis_0)
-    objects_axis_angle_surf_asym_orth_z = copy.deepcopy(objects_axis_0)
+    objects_axis_angle_surf = {object_name:{"value":np.empty(objects_axis_0[object_name]["value"].shape), "info":objects_axis_0[object_name]["info"].copy()} for object_name in objects_axis_0}
+    objects_axis_angle_surf_sym = {object_name:{"value":np.empty(objects_axis_0[object_name]["value"].shape), "info":objects_axis_0[object_name]["info"].copy()} for object_name in objects_axis_0}
+    objects_axis_angle_surf_asym = {object_name:{"value":np.empty(objects_axis_0[object_name]["value"].shape), "info":objects_axis_0[object_name]["info"].copy()} for object_name in objects_axis_0}
+    objects_axis_angle_surf_orth_z = {object_name:{"value":np.empty(objects_axis_0[object_name]["value"].shape), "info":objects_axis_0[object_name]["info"].copy()} for object_name in objects_axis_0}
+    objects_axis_angle_surf_sym_orth_z = {object_name:{"value":np.empty(objects_axis_0[object_name]["value"].shape), "info":objects_axis_0[object_name]["info"].copy()} for object_name in objects_axis_0}
+    objects_axis_angle_surf_asym_orth_z = {object_name:{"value":np.empty(objects_axis_0[object_name]["value"].shape), "info":objects_axis_0[object_name]["info"].copy()} for object_name in objects_axis_0}
     print("INFO: Computing orientation statistics...", flush=True)
     for object_name in objects_axis_angle_surf:
         # value
         print("INFO: Processing {}".format(object_name), flush=True)
-        for i in range(0, objects_axis_angle_surf[object_name]["value"].shape[0], 500):
+        for i in range(0, objects_axis_angle_surf[object_name]["value"].shape[0]):
             print("INFO: Processing {i}/{nb}".format(i=i, nb=objects_axis_angle_surf[object_name]["value"].shape[0]), flush=True)
             for j in range(0, objects_axis_angle_surf[object_name]["value"].shape[1]):
                 # set gradients
@@ -118,6 +139,67 @@ def main():
     del objects_j_2_0;
     del objects_j_2_1;
     del objects_j_2_2;
+    print("INFO: Done.", flush=True)
+
+    # compute average
+    objects_average_angles = {object_name:{} for object_name in objects_axis_0}
+    print("INFO: Computing average angles...", flush=True)
+    for object_name in objects_average_angles:
+        # value
+        angles = []
+        ## axis 0
+        angles.append(np.average(np.arccos(objects_axis_0[object_name]["value"])))
+        angles.append(np.std(np.arccos(objects_axis_0[object_name]["value"])))
+        ## axis 1
+        angles.append(np.average(np.arccos(objects_axis_1[object_name]["value"])))
+        angles.append(np.std(np.arccos(objects_axis_1[object_name]["value"])))
+        ## axis 2
+        angles.append(np.average(np.arccos(objects_axis_2[object_name]["value"])))
+        angles.append(np.std(np.arccos(objects_axis_2[object_name]["value"])))
+        ## axis surf
+        angles.append(np.average(objects_axis_angle_surf[object_name]["value"]))
+        angles.append(np.std(objects_axis_angle_surf[object_name]["value"]))
+        ## axis surf orth z
+        angles.append(np.average(objects_axis_angle_surf_orth_z[object_name]["value"]))
+        angles.append(np.std(objects_axis_angle_surf_orth_z[object_name]["value"]))
+        ## axis surf sym
+        angles.append(np.average(objects_axis_angle_surf_sym[object_name]["value"]))
+        angles.append(np.std(objects_axis_angle_surf_sym[object_name]["value"]))
+        ## axis surf sym orth z
+        angles.append(np.average(objects_axis_angle_surf_sym_orth_z[object_name]["value"]))
+        angles.append(np.std(objects_axis_angle_surf_sym_orth_z[object_name]["value"]))
+        # axis surf asym
+        angles.append(np.average(objects_axis_angle_surf_asym[object_name]["value"]))
+        angles.append(np.std(objects_axis_angle_surf_asym[object_name]["value"]))
+        # axis surf asym orth z
+        angles.append(np.average(objects_axis_angle_surf_asym_orth_z[object_name]["value"]))
+        angles.append(np.std(objects_axis_angle_surf_asym_orth_z[object_name]["value"]))
+        ## data
+        objects_average_angles[object_name]["value"] = np.column_stack(angles)
+        objects_average_angles[object_name]["info"] = [
+            "average_axis_angle_0", 
+            "std_axis_angle_0",
+            "average_axis_angle_1", 
+            "std_axis_angle_1",
+            "average_axis_angle_2", 
+            "std_axis_angle_2",
+            "average_axis_angle_surf", 
+            "std_axis_angle_surf",
+            "average_axis_angle_surf_orth_z", 
+            "std_axis_angle_surf_orth_z",
+            "average_axis_angle_surf_sym", 
+            "std_axis_angle_surf_sym",
+            "average_axis_angle_surf_sym_orth_z", 
+            "std_axis_angle_surf_sym_orth_z",
+            "average_axis_angle_surf_asym", 
+            "std_axis_angle_surf_asym",
+            "average_axis_angle_surf_asym_orth_z", 
+            "std_axis_angle_surf_asym_orth_z",
+        ]
+    print("INFO: Done.", flush=True)
+    # save
+    print("INFO: Saving...", flush=True)
+    libpost.save(objects_average_angles, "average_axis_angles")
     print("INFO: Done.", flush=True)
 
     # compute pdf
