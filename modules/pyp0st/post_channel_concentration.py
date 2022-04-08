@@ -12,7 +12,8 @@ import scipy.optimize
 import libpost
 
 BIN_RANGE = (-1.0, 1.0)
-BIN_NB = 'auto'
+BIN_NB = 10
+BINS = np.logspace(-4.0, 0.0, num=BIN_NB+1)
 
 def parse():
     parser = argparse.ArgumentParser(description='Computes particle concentration along an axis')
@@ -39,7 +40,12 @@ def main(nb):
         index = int(round(float(i / (nb - 1.0)) * (len(time) - 1)))
         for object_name in objects_concentration_pdfs:
             mod_pos_value = np.remainder(1.0 + objects_pos_axis[object_name]["value"][index, :], 2.0) - 1.0
-            hist, bin_edges = np.histogram(mod_pos_value, bins=np.histogram_bin_edges(mod_pos_value, bins=BIN_NB, range=BIN_RANGE), range=BIN_RANGE, density=True)
+            # symmetry
+            mask = (mod_pos_value > 0.0)
+            mod_pos_value[mask] = -mod_pos_value[mask]
+            mod_pos_value += 1.0
+            # compute concentration
+            hist, bin_edges = np.histogram(mod_pos_value, bins=BINS, range=BIN_RANGE, density=True)
             bins = (bin_edges[1:] + bin_edges[:-1])/2
             # info
             objects_concentration_pdfs[object_name]["value"] = np.column_stack((bins, hist))

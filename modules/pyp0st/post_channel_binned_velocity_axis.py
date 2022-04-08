@@ -13,6 +13,7 @@ import libpost
 
 BIN_RANGE = (-1.0, 1.0)
 BIN_NB = 20
+BINS = np.logspace(-4.0, 0.0, num=BIN_NB+1)
 
 def parse():
     parser = argparse.ArgumentParser(description='Computes particle concentration along an axis')
@@ -38,14 +39,18 @@ def main(axis, negative):
     objects_velocity_axis = {object_name:{"value":np.empty((BIN_NB, 3)), "info":["pos_1", "velocity_{axis}".format(axis=axis), "95CLI"]} for object_name in objects_pos_axis}
     for object_name in objects_velocity_axis:
         mod_pos_value = np.remainder(1.0 + objects_pos_vertical[object_name]["value"], 2.0) - 1.0
+        # symmetry
+        mask = (mod_pos_value > 0.0)
+        mod_pos_value[mask] = -mod_pos_value[mask]
+        mod_pos_value += 1.0
+        # compute velocity
         if negative:
             velocity_axis_value = -(np.diff(objects_pos_axis[object_name]["value"], axis=0).transpose() / np.diff(time)).transpose()
         else:
             velocity_axis_value = (np.diff(objects_pos_axis[object_name]["value"], axis=0).transpose() / np.diff(time)).transpose()
-        dy = 2.0 / BIN_NB
         for i in range(BIN_NB):
-            y_min = i * dy - 1.0
-            y_max = (i + 1) * dy - 1.0
+            y_min = BINS[i]
+            y_max = BINS[i+1]
             objects_velocity_axis[object_name]["value"][i, 0] = 0.5 * (y_min + y_max)
             objects_velocity_axis[object_name]["value"][i, 1] = np.average(velocity_axis_value[np.logical_and(mod_pos_value[:-1, :] > y_min, mod_pos_value[:-1, :] < y_max)])
             objects_velocity_axis[object_name]["value"][i, 2] = 1.96 * np.std(velocity_axis_value[np.logical_and(mod_pos_value[:-1, :] > y_min, mod_pos_value[:-1, :] < y_max)]) / np.sqrt(velocity_axis_value.size)

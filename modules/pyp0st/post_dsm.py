@@ -17,13 +17,24 @@ import libpost
 # tmp plot
 import matplotlib.pyplot as plt
 
-D = 1e-4
-s0 = 1.0
-dS0 = 1.0
+# nu: 0.000185
+# epsilon: 0.103
+# kolmogorov length scale: 0.0028
+# kolmogorov time scale: 0.0424
+# batchelor scale: (nu D^2 / epsilon)^(1/4)
+# batchelor (scale < kolmogorov length) eq (D < nu)
+# D < 1.85e-4
+
+D = 1e-1 * 1.85e-4
+s0 = 1e-1 * 0.0028 # initial thickness
+dS0 = (1e-4 * 0.0028)**2 # initial surface
+
 nc = 100
 dc = 1.0 / (nc - 1.0)
 nC = nc
 dC = 1.0 / (nC - 1.0)
+
+process_times = [0.02, 0.04, 0.08, 0.12, 0.32, 0.64, 1.28, 2.56, 5.12, 9.998]
 
 def parse():
     parser = argparse.ArgumentParser(description='Computes statistics of the lagrangian gradients matrix (computed along particle trajectories)')
@@ -151,11 +162,14 @@ def main():
     print("INFO: Computing c pdf...", flush=True)
     cs = np.array([ic * dc for ic in range(nc)])
     c_pdf = {object_name:{"value":np.zeros((Tau_value[object_name].shape[0], nc)), "info":["p(c={})".format(ic * dc) for ic in range(nc)]} for object_name in Tau_value}
+    c_stats = {object_name:{"value":np.zeros((len(process_times), 2)), "info":["c_mean, c_std"]} for object_name in Tau_value}
     for object_name in Tau_value:
         print("INFO:    Processing " + object_name + "...", flush=True)
         # value
         # for i in range(Tau_value[object_name].shape[0]):
-        for i in [time_list.index(t) for t in [0.02, 0.04, 0.08, 0.12, 0.32, 0.64, 1.28, 2.56, 5.12, 10.0]]:
+        for it in range(len(process_times)):
+            t = process_times[it]
+            i = time_list.index(t)
             for ic in range(1, nc):
                 c = ic * dc
                 val = np.zeros(nC)
@@ -168,13 +182,22 @@ def main():
                         val[iC] += Q(C, etas[0], etas[1], etas[2])
                     val[iC] /= c * np.sqrt(np.log(C/c))
                 c_pdf[object_name]["value"][i, ic] = np.trapz(val, dx=dC) / Tau_value[object_name].shape[1]
+            # compute average
+            for ic in range(1, nc):
+                c = ic * dc
+                c_stats[object_name]["value"][it, 0] += c * c_pdf[object_name]["value"][i, ic] * dc
+            # compute std
+            for ic in range(1, nc):
+                c = ic * dc
+                c_stats[object_name]["value"][it, 1] += (c - c_stats[object_name]["value"][it, 0])**2 * c_pdf[object_name]["value"][i, ic] * dc
+            c_stats[object_name]["value"][:, 1] = np.sqrt(c_stats[object_name]["value"][:, 1])
             # save snapshot
             np.savetxt("c_pdf__{}__time_{}.csv".format(object_name, time[i]), np.column_stack((cs, c_pdf[object_name]["value"][i, :])), delimiter=",", header="c, p(c)")
         print("INFO:    " + object_name + " done.", flush=True)
     print("INFO: Done.", flush=True)
-    # print("INFO: Saving pdfs...", flush=True)
-    # libpost.savet(time, c_pdf, "c_pdf")
-    # print("INFO: Done.", flush=True)
+    print("INFO: Saving stats...", flush=True)
+    libpost.savet(process_times, c_stats, "c_stats")
+    print("INFO: Done.", flush=True)
 
 if __name__ == '__main__':
     args = parse()
