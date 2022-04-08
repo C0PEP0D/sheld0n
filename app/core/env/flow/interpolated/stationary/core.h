@@ -23,14 +23,14 @@ using TypeFlowInterpolatedMeshSub = m0sh::StructuredSub<TypeVector, TypeRef, Typ
 using TypeFlowInterpolated = fl0w::fl0p::Stationary<TypeVector, TypeMatrix, TypeRef, TypeFlowInterpolatedMesh, TypeContainer, TypeFlowInterpolatedMeshSub, v0l::FileData>;
 
 template<typename TypeParameters>
-class FlowInterpolatedStationary {
+class BaseFlowInterpolatedStationary {
     public:
         using Type = TypeFlowInterpolated;
         std::shared_ptr<Type> sData;
 
         TypeParameters parameters;
         
-        FlowInterpolatedStationary() {
+        BaseFlowInterpolatedStationary() {
             // load scalars
             v0l::FileData<float> ux(parameters.fileName, 0);
             v0l::FileData<float> uy(parameters.fileName, 1);

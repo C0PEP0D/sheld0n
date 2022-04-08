@@ -22,6 +22,17 @@ class PostPostPost {
         virtual std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) = 0;
 };
 
+template<typename TypeObjectStep>
+class PostPostManagerPost {
+    public:
+        std::shared_ptr<TypeObjectStep> sObjectStep;
+    public:
+        PostPostManagerPost(std::shared_ptr<TypeObjectStep> p_sObjectStep) : sObjectStep(p_sObjectStep) {
+        }
+    public:
+        virtual std::map<std::string, TypeScalar> operator()(const std::vector<std::vector<double>>& states, const double& t) = 0;
+};
+
 }
 
 #endif

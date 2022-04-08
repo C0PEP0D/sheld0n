@@ -6,7 +6,7 @@
 #include "core/env/flow/kinematic/simple/core.h"
 #include "param/env/flow/kinematic/simple/parameters.h"
 namespace c0p {
-    using FlowKinematic = FlowKinematicSimple<FlowKinematicSimpleParameters>;
+    using FlowKinematic = BaseFlowKinematicSimple<FlowKinematicSimpleParameters>;
 }
 
 #endif

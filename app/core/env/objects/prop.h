@@ -12,7 +12,8 @@ namespace c0p {
     class ObjectsParameters;
 
     using StepObjectStatic = sl0::StepObjectStaticBase<TypeVector, DIM>;
-    using StepObjectDynamic = sl0::StepGroupDynamicHomogeneousBase<TypeVector, DIM, TypeView>;
+    using StepObjectDynamic = sl0::StepGroupDynamicHomogeneousBase<TypeVector, DIM>;
+    using StepObjectManager = sl0::StepManagerHomogeneousBase<TypeVector, DIM>;
 }
 
 #endif

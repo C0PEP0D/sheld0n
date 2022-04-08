@@ -17,7 +17,7 @@ class AgentBehaviourSensorVelocityGradientsAccurate : public AgentBehaviourSenso
         }
     public:
         TypeSpaceMatrix operator()(const double* pState, const double& t, const AgentActiveStep&  stepActive) const override {
-            return stepActive.sFlow->getJacobian(stepActive.cX(pState), t);
+            return stepActive.sFlow->getVelocityGradients(stepActive.cX(pState), t);
         }
 };
 

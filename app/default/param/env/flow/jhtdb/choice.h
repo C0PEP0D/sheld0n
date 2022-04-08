@@ -6,7 +6,7 @@
 #include "core/env/flow/jhtdb/forced_isotropic_turbulence/core.h"
 #include "param/env/flow/jhtdb/forced_isotropic_turbulence/parameters.h"
 namespace c0p {
-    using FlowJhtdb = FlowJhtdbForcedIsotropicTurbulence<FlowJhtdbForcedIsotropicTurbulenceParameters>;
+    using FlowJhtdb = BaseFlowJhtdbForcedIsotropicTurbulence<FlowJhtdbForcedIsotropicTurbulenceParameters>;
 }
 
 #endif

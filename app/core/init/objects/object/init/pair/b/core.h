@@ -8,18 +8,18 @@
 namespace c0p {
 
 template<typename TypeParameters, typename TypeObjectStep>
-class InitInitPairB : public InitInitInit<TypeObjectStep> {
+class InitInitPairB : public InitInitInitStatic<TypeObjectStep> {
     public:
         TypeParameters parameters;
         typename TypeParameters::TypeInitInitB<typename TypeObjectStep::TypeAStep> initB;
     public:
-        using InitInitInit<TypeObjectStep>::sObjectStep;
+        using InitInitInitStatic<TypeObjectStep>::sObjectStep;
     public:
-        InitInitPairB(std::shared_ptr<TypeObjectStep> p_sObjectStep) : InitInitInit<TypeObjectStep>(p_sObjectStep), initB(sObjectStep->sBStep) {
+        InitInitPairB(std::shared_ptr<TypeObjectStep> p_sObjectStep) : InitInitInitStatic<TypeObjectStep>(p_sObjectStep), initB(sObjectStep->sBStep) {
         }
     public:
-        void operator()(TypeRef<TypeVector<Eigen::Dynamic>> state) override {
-            initB(sObjectStep->bState(state));
+        void operator()(double* pState) override {
+            initB(sObjectStep->bState(pState));
         };
 };
 

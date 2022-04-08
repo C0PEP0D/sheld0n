@@ -17,7 +17,7 @@ class AgentBehaviourSensorVelocityGradientsNoisy : public AgentBehaviourSensorVe
         }
     public:
         TypeSpaceMatrix operator()(const double* pState, const double& t, const AgentActiveStep&  stepActive) const override {
-            TypeSpaceMatrix velocityGradients = stepActive.sFlow->getJacobian(stepActive.cX(pState), t);
+            TypeSpaceMatrix velocityGradients = stepActive.sFlow->getVelocityGradients(stepActive.cX(pState), t);
             for(unsigned int i = 0; i < velocityGradients.rows(); i++) {
                 for(unsigned int j = 0; j < velocityGradients.cols(); j++) {
                     velocityGradients(i,j) += parameters.noiseIntensity * rand0m::standardNormalDistribution(rand0m::engine);

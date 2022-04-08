@@ -6,7 +6,7 @@
 #include "core/env/flow/analytic/taylor_green_vortex/core.h"
 #include "param/env/flow/analytic/taylor_green_vortex/parameters.h"
 namespace c0p {
-    using FlowAnalytic = FlowAnalyticTaylorGreenVortex<FlowAnalyticTaylorGreenVortexParameters>;
+    using FlowAnalytic = BaseFlowAnalyticTaylorGreenVortex<FlowAnalyticTaylorGreenVortexParameters>;
 }
 
 #endif

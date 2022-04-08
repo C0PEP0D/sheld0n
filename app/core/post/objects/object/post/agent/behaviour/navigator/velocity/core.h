@@ -13,21 +13,21 @@ namespace c0p {
 
 template<typename Parameters, typename TypeObjectStep>
 class PostPostAgentBehaviourNavigatorVelocity : public PostPostPost<TypeObjectStep> {
-    public:
-        Parameters parameters;
-    public:
-        using PostPostPost<TypeObjectStep>::sObjectStep;
-    public:
-        using PostPostPost<TypeObjectStep>::PostPostPost;
-    public:
-        std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
-            const TypeSpaceVector direction = sObjectStep->sBehaviour->sensorDirection(pState, t, *sObjectStep);
-            const TypeSpaceMatrix velocityGradients = sObjectStep->sBehaviour->sensorVelocityGradients(pState, t, *sObjectStep);
-            const TypeSpaceVector swimmingDirection = sObjectStep->cAxis(pState);
-            return {
-                { parameters.name, sObjectStep->sBehaviour->behaviourVelocity(pState, t, *sObjectStep, direction, velocityGradients, swimmingDirection) * (*sObjectStep).parameters.velocity }
-            };
-        };
+	public:
+		Parameters parameters;
+	public:
+		using PostPostPost<TypeObjectStep>::sObjectStep;
+	public:
+		using PostPostPost<TypeObjectStep>::PostPostPost;
+	public:
+		std::map<std::string, TypeScalar> operator()(const double pState, const double& t) override {
+			const TypeSpaceVector direction = sObjectStep->sBehaviour->sensorDirection(pState, t, *sObjectStep);
+			const TypeSpaceMatrix velocityGradients = sObjectStep->sBehaviour->sensorVelocityGradients(pState, t, *sObjectStep);
+			const TypeSpaceVector swimmingDirection = sObjectStep->cAxis(state);
+			return {
+				{ parameters.name, sObjectStep->sBehaviour->behaviourVelocity(state, t, *sObjectStep, direction, velocityGradients, swimmingDirection) * (*sObjectStep).parameters.velocity }
+			};
+		};
 };
 
 }

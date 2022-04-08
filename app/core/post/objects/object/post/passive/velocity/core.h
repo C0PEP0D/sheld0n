@@ -21,9 +21,12 @@ class PostPostPassiveVelocity : public PostPostPost<TypeObjectStep> {
         using PostPostPost<TypeObjectStep>::PostPostPost;
     public:
         std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
-            return {
-                { parameters.name + "_" + std::to_string(parameters.i), sObjectStep->cU(pState)[parameters.i] }
-            };
+        	std::map<std::string, TypeScalar> result;
+        	const TypeSpaceVector u = sObjectStep->cU(pState);
+        	for(unsigned int i = 0; i < u.size(); i++) {
+        		result[parameters.name + "_" + std::to_string(i)] = u[i];
+        	}
+        	return result;
         };
 };
 

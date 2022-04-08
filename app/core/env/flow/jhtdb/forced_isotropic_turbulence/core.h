@@ -18,13 +18,13 @@ namespace c0p {
 using TypeFlowJhtdbForcedIsotropicTurbulence = fl0w::jhtdb::ForcedIsotropicTurbulence<TypeSpaceVector, TypeSpaceMatrix, TypeRef>;
 
 template<typename TypeParameters>
-class FlowJhtdbForcedIsotropicTurbulence : public TypeFlowJhtdbForcedIsotropicTurbulence {
+class BaseFlowJhtdbForcedIsotropicTurbulence : public TypeFlowJhtdbForcedIsotropicTurbulence {
     public:
         using Type = TypeFlowJhtdbForcedIsotropicTurbulence;
     public:
         TypeParameters parameters;
     public:
-        FlowJhtdbForcedIsotropicTurbulence() : Type() {
+        BaseFlowJhtdbForcedIsotropicTurbulence() : Type() {
             *Type::sAuthtoken = parameters.authtoken;
         }
 
@@ -36,7 +36,7 @@ class FlowJhtdbForcedIsotropicTurbulence : public TypeFlowJhtdbForcedIsotropicTu
 
         void prepare(const TypeContainer<TypeSpaceVector>& positions, const TypeScalar& t) {
             Type::prepareVelocities(positions, t);
-            Type::prepareJacobians(positions, t);
+            Type::prepareVelocityGradientss(positions, t);
         }
 
         void info() const {

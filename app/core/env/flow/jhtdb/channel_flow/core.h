@@ -18,13 +18,13 @@ namespace c0p {
 using TypeFlowJhtdbChannelFlow = fl0w::jhtdb::ChannelFlow<TypeSpaceVector, TypeSpaceMatrix, TypeRef>;
 
 template<typename TypeParameters>
-class FlowJhtdbChannelFlow : public TypeFlowJhtdbChannelFlow {
+class BaseFlowJhtdbChannelFlow : public TypeFlowJhtdbChannelFlow {
     public:
         using Type = TypeFlowJhtdbChannelFlow;
     public:
         TypeParameters parameters;
     public:
-        FlowJhtdbChannelFlow() : Type() {
+        BaseFlowJhtdbChannelFlow() : Type() {
             *sAuthtoken = parameters.authtoken;
         }
 
@@ -36,7 +36,7 @@ class FlowJhtdbChannelFlow : public TypeFlowJhtdbChannelFlow {
 
         void prepare(const TypeContainer<TypeSpaceVector>& positions, const TypeScalar& t) {
             Type::prepareVelocities(positions, t);
-            Type::prepareJacobians(positions, t);
+            Type::prepareVelocityGradientss(positions, t);
         }
 
         void info() const {
