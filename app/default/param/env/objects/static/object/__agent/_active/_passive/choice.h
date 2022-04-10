@@ -8,7 +8,7 @@
 
 // choose your object
 #include "core/env/objects/object/passive/spheroid/core.h"
-#include "param/env/objects/object/agent/_active/_passive/spheroid/parameters.h"
+#include "param/env/objects/static/object/agent/_active/_passive/spheroid/parameters.h"
 namespace c0p {
     using ObjectAgentActivePassiveStep = PassiveSpheroidStep<ObjectAgentActivePassiveSpheroidStepParameters>;
 }

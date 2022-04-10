@@ -28,7 +28,8 @@ cases/*/
 !cases/surfers/
 !cases/adaptative_surfers/
 !cases/spherical_surfers/
-!cases/comparison/
+!cases/comparison_navigators/
+!cases/comparison_trackers/
 !cases/tracers/
 !cases/surfers_in_channel_flow
 !cases/adaptive_surfers_in_channel_flow

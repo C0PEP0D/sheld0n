@@ -10,14 +10,12 @@ namespace c0p {
 template<typename AgentActiveStep>
 class AgentBehaviourTrackerBehaviourDirection {
     public:
-        using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
-    public:
         AgentBehaviourTrackerBehaviourDirection() {
         }
     public:
-        virtual TypeSpaceVector operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep& stepActive, const TypeSpaceVector& position, const TypeSpaceMatrix& velocityGradients) const = 0;
+        virtual TypeSpaceVector operator()(const double* pState, const double& t, const AgentActiveStep& stepActive, const TypeSpaceVector& position, const TypeSpaceMatrix& velocityGradients) const = 0;
     public:
-        virtual TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeAgentStateStatic>& state, const AgentActiveStep& stepActive) const {
+        virtual TypeContainer<TypeSpaceVector> positions(const double* pState, const AgentActiveStep& stepActive) const {
             return {};
         }
 };

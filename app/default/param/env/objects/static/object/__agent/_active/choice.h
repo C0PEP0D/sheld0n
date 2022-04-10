@@ -6,9 +6,9 @@
 // THIS FILE WILL BE AUTOMATICALLY EDITED WHEN THE
 // CHOOSE COMMAND IS USED
 
-#include "param/env/objects/object/agent/_active/_passive/choice.h"
+#include "param/env/objects/static/object/agent/_active/_passive/choice.h"
 // choose your object
-#include "param/env/objects/object/agent/_active/local_axis_swimmer/parameters.h"
+#include "param/env/objects/static/object/agent/_active/local_axis_swimmer/parameters.h"
 #include "core/env/objects/object/active/local_axis_swimmer/core.h"
 namespace c0p {
     using ObjectAgentActiveStep = ActiveLocalAxisSwimmerStep<ObjectAgentActiveLocalAxisSwimmerStepParameters, ObjectAgentActivePassiveStep>;

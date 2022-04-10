@@ -31,7 +31,7 @@ def edit(source, name):
     upper_camel_name = libchoose.object_to_upper_camel_case([name])
     # init
     ## replace source by name
-    libchoose.edit_choice(name, [source], [name])
+    libchoose.edit_choice(name, [source], "", [name], "")
     for line in fileinput.FileInput(name + "/parameters.h", inplace=True):
         print(line.replace('name = "{}"'.format(source), 'name = "{}"'.format(name)), end='')
 

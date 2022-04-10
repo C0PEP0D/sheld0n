@@ -7,11 +7,11 @@
 // CHOOSE COMMAND IS USED
 
 // choose your post
-#include "param/post/objects/object/pos/agent/behaviour/navigator/choice.h"
+#include "param/post/objects/object/pos/agent/behaviour/choice.h"
 
 namespace c0p {
     template<typename TypeMemberStep>
-    using PostObjectPosAgent = PostObjectPosAgentBehaviourNavigator<TypeMemberStep>;
+    using PostObjectPosAgent = PostObjectPosAgentBehaviour<TypeMemberStep>;
 }
 
 #endif

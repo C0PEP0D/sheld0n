@@ -8,7 +8,7 @@
 
 // choose your behaviour
 #include "core/env/objects/object/agent/behaviour/navigator/behaviour_velocity/const/core.h"
-#include "param/env/objects/object/agent/_behaviour/navigator/_behaviour_velocity/const/parameters.h"
+#include "param/env/objects/static/object/agent/_behaviour/navigator/_behaviour_velocity/const/parameters.h"
 namespace c0p {
     template<typename ObjectAgentActiveStep>
     using ObjectAgentBehaviourNavigatorBehaviourVelocityConst = AgentBehaviourNavigatorBehaviourVelocityConst<ObjectAgentBehaviourNavigatorBehaviourVelocityConstParameters, ObjectAgentActiveStep>;

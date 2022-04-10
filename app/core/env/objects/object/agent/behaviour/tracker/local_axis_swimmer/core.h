@@ -9,10 +9,10 @@
 namespace c0p {
 
 template<typename TypeParameters, typename AgentActiveStep, typename TypeSensorPosition, typename TypeSensorVelocityGradients, typename TypeBehaviourDirection, typename TypeBehaviourVelocity>
-class AgentBehaviourTrackerLocalAxisSwimmer : public sl0::sa0::Behaviour<typename AgentActiveStep::TypeStateStatic, TypeRef, AgentActiveStep> {
+class AgentBehaviourTrackerLocalAxisSwimmer : public sl0::sa0::Behaviour<AgentActiveStep> {
     public:
-        using Type = sl0::sa0::Behaviour<typename AgentActiveStep::TypeStateStatic, TypeRef, AgentActiveStep>;
-        using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
+        using Type = sl0::sa0::Behaviour<AgentActiveStep>;
+        using TypeStateVectorDynamic = typename AgentActiveStep::TypeStateVectorDynamic;
     public:
         TypeParameters parameters;
         // sensors
@@ -22,31 +22,31 @@ class AgentBehaviourTrackerLocalAxisSwimmer : public sl0::sa0::Behaviour<typenam
         TypeBehaviourDirection behaviourDirection;
         TypeBehaviourVelocity behaviourVelocity;
     public:
-        AgentBehaviourTrackerLocalAxisSwimmer(std::shared_ptr<Objects> sObjects) : sensorPosition(std::shared_ptr<Objects> sObjects) {
+        AgentBehaviourTrackerLocalAxisSwimmer(std::shared_ptr<Objects> sObjects) : sensorPosition(sObjects) {
         }
     public:
-        TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeAgentStateStatic>& state, const AgentActiveStep& stepActive) const override {
+        TypeContainer<TypeSpaceVector> positions(const double* pState, const AgentActiveStep& stepActive) const override {
             TypeContainer<TypeSpaceVector> result;
             // sensors
-            const TypeContainer<TypeSpaceVector> positionsSensorPosition = sensorPosition.positions(state, stepActive);
+            const TypeContainer<TypeSpaceVector> positionsSensorPosition = sensorPosition.positions(pState, stepActive);
             result.insert(result.end(), positionsSensorPosition.begin(), positionsSensorPosition.end());
-            const TypeContainer<TypeSpaceVector> positionsSensorVelocityGradients = sensorVelocityGradients.positions(state, stepActive);
+            const TypeContainer<TypeSpaceVector> positionsSensorVelocityGradients = sensorVelocityGradients.positions(pState, stepActive);
             result.insert(result.end(), positionsSensorVelocityGradients.begin(), positionsSensorVelocityGradients.end());
             // sub behaviours
-            const TypeContainer<TypeSpaceVector> positionsBehaviourDirection = behaviourDirection.positions(state, stepActive);
+            const TypeContainer<TypeSpaceVector> positionsBehaviourDirection = behaviourDirection.positions(pState, stepActive);
             result.insert(result.end(), positionsBehaviourDirection.begin(), positionsBehaviourDirection.end());
-            const TypeContainer<TypeSpaceVector> positionsBehaviourVelocity = behaviourVelocity.positions(state, stepActive);
+            const TypeContainer<TypeSpaceVector> positionsBehaviourVelocity = behaviourVelocity.positions(pState, stepActive);
             result.insert(result.end(), positionsBehaviourVelocity.begin(), positionsBehaviourVelocity.end());
             // return
             return result;
         }
     public:
-        void operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep& stepActive) const override {
-            const TypeSpaceVector direction = sensorPosition(state, t, stepActive);
-            const TypeSpaceMatrix velocityGradients = sensorVelocityGradients(state, t, stepActive);
-            const TypeSpaceVector swimmingDirection = stepActive.cAxis(state);
-            stepActive.sStepAxisOrient->direction = behaviourDirection(state, t, stepActive, direction, velocityGradients).normalized();
-            stepActive.sStepLocalAxisSwim->velocity = behaviourVelocity(state, t, stepActive, direction, velocityGradients, swimmingDirection) * stepActive.parameters.velocity;
+        void operator()(const double* pState, const double& t, const AgentActiveStep& stepActive) const override {
+            const TypeSpaceVector direction = sensorPosition(pState, t, stepActive);
+            const TypeSpaceMatrix velocityGradients = sensorVelocityGradients(pState, t, stepActive);
+            const TypeSpaceVector swimmingDirection = stepActive.cAxis(pState);
+            stepActive.sStepAxisOrient->direction = behaviourDirection(pState, t, stepActive, direction, velocityGradients).normalized();
+            stepActive.sStepLocalAxisSwim->velocity = behaviourVelocity(pState, t, stepActive, direction, velocityGradients, swimmingDirection) * stepActive.parameters.velocity;
         }
 };
 

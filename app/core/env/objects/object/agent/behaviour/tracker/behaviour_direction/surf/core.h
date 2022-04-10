@@ -13,8 +13,6 @@ namespace c0p {
 template<typename TypeParameters, typename AgentActiveStep, typename TypeBehaviourTimeHorizon>
 class AgentBehaviourTrackerBehaviourDirectionSurf : public AgentBehaviourTrackerBehaviourDirection<AgentActiveStep> {
     public:
-        using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
-    public:
         TypeParameters parameters;
         // Sub behaviours
         TypeBehaviourTimeHorizon behaviourTimeHorizon;
@@ -22,9 +20,9 @@ class AgentBehaviourTrackerBehaviourDirectionSurf : public AgentBehaviourTracker
         AgentBehaviourTrackerBehaviourDirectionSurf() {
         }
     public:
-        TypeSpaceVector operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& position, const TypeSpaceMatrix& velocityGradients) const override {
-            const TypeSpaceVector direction = (position - stepActive.cX(state)).normalized();
-            return ((velocityGradients * behaviourTimeHorizon(state, t, stepActive, position, velocityGradients)).exp()).transpose() * direction;
+        TypeSpaceVector operator()(const double* pState, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& position, const TypeSpaceMatrix& velocityGradients) const override {
+            const TypeSpaceVector direction = (position - stepActive.cX(pState)).normalized();
+            return ((velocityGradients * behaviourTimeHorizon(pState, t, stepActive, position, velocityGradients)).exp()).transpose() * direction;
         }
 };
 

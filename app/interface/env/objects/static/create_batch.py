@@ -97,7 +97,7 @@ def compute(sources, prop, values):
         for value in values:
             dest = set_property_from_dir_name(source, prop, value)
             # execute command
-            cmd = "./copy_object_static {source} {dest}".format(source=source, dest=dest)
+            cmd = "./copy_object {source} {dest}".format(source=source, dest=dest)
             print("INFO: running " + cmd)
             subprocess.call(shlex.split(cmd))
             # set parameter
