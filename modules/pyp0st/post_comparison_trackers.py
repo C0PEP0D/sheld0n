@@ -32,8 +32,13 @@ def main(name, distance):
             mask = np.logical_or(mask, objects_distance["value"] < distance)
         # append result
         arrival_number = np.sum(mask)
+        print("\tINFO: Number of arrivals: {}".format(arrival_number), flush=True)
         if arrival_number > len(arrival_time):
             arrival_time.append([t] * (arrival_number - len(arrival_time)))
+            if arrival_number == objects_distance["value"].size():
+                print("\tINFO: All particles arrived.", flush=True)
+                print("\tINFO: Done.", flush=True)
+                break
         # print
         print("\tINFO: Done.", flush=True)
     # save snapshot
