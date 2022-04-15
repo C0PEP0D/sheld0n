@@ -34,8 +34,8 @@ def main(name, distance):
         arrival_number = np.sum(mask)
         print("\tINFO: Number of arrivals: {}".format(arrival_number), flush=True)
         if arrival_number > len(arrival_time):
-            arrival_time.append([t] * (arrival_number - len(arrival_time)))
-            if arrival_number == objects_distance["value"].size():
+            arrival_time.extend([t] * (arrival_number - len(arrival_time)))
+            if arrival_number == objects_distance["value"].size:
                 print("\tINFO: All particles arrived.", flush=True)
                 print("\tINFO: Done.", flush=True)
                 break

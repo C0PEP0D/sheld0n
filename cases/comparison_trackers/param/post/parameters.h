@@ -23,7 +23,7 @@ struct PostParameters {
 	bool isPostProcessingFlow = false;
 	// isPreparingFlow: true or false. Specify if the flow needs to be prepared or not. 
 	// If the post processing does not require the flow, isPreparingFlow should be set to false for performance improvements.
-	bool isPreparingFlow = true;
+	bool isPreparingFlow = false;
 	// Specify if all static objects are merge in one unique file.
 	bool savedStaticMerge = false;
 };
