@@ -48,7 +48,7 @@ def edit(source, name, source_object_name = ""):
         if line == '// FLAG: INCLUDE INIT END\n':
             print('#include "param/init/objects/{object_name}/{name}/choice.h"\n'.format(name=name, object_name=object_name), end='')
         if line == '        // FLAG: MAKE INIT END\n':
-            print('        sInits.push_back(std::make_shared<Init{object_name}{name}<Type{object_name}Step>>(s{object_name}Step));\n'.format(name=upper_camel_name, object_name=upper_camel_object_name), end='')
+            print('        sInits.push_back(std::make_shared<Init{object_name}{name}<TypeObjectStep>>(sObjectStep));\n'.format(name=upper_camel_name, object_name=upper_camel_object_name), end='')
         print(line, end='')
 
 def main(source, name):

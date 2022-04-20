@@ -61,22 +61,17 @@ class Post {
 							}
 						}
 					}
-					// // // flow
-					// if(parameters.isPostProcessingFlow) {
-						// for(const auto& processed : postFlow(t)) {
-							// s0ve::saveMapToCsvDouble(folder + "/flow.csv", processed, ",", "#");
-						// }
-					// }
+					// // flow
+					if(parameters.isPostProcessingFlow) {
+						s0ve::saveMapToCsvDouble(folder + "/flow.csv", postFlow(t), ",", "#");
+					}
 					// // msg
 					std::cout << "INFO : Processed " << t << "/" << time.back() << std::endl;
 				}
-				// // // mesh
-				// if(parameters.isPostProcessingMesh) {
-					// processed["mesh"] = std::map<std::string, std::vector<TypeScalar>>();
-					// for(const auto& p : postMesh()) {
-						// processed["mesh"][p.first].push_back(p.second);
-					// }
-				// }
+				// // mesh
+				if(parameters.isPostProcessingMesh) {
+					s0ve::saveMapToCsvDouble("post_process/mesh.csv", postMesh(), ",", "#");
+				}
 			}
 			std::cout << "INFO : Post-processing end" << std::endl;
 		}

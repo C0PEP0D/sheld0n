@@ -7,34 +7,41 @@
 // COPY/REMOVE COMMAND ARE USED
 
 // std includes
-#include <memory>
+#include <memory> // shared_ptr
+#include <vector>
+#include <string>
 // app includes
 #include "core/env/objects/prop.h"
 #include "core/env/objects/core.h"
 #include "param/env/flow/choice.h"
 // FLAG: INCLUDE OBJECT BEGIN
-#include "param/env/objects/pagent/choice.h"
+#include "param/env/objects/static/tracer/choice.h"
 // FLAG: INCLUDE OBJECT END
 
 namespace c0p {
 
 struct ObjectsParameters {
-    // FLAG: DECLARE OBJECT BEGIN
-    std::shared_ptr<PagentStep> sPagentStep;
-    unsigned int pagentIndex;
-    // FLAG: DECLARE OBJECT END
-    
-    // construct data
-    std::vector<std::shared_ptr<StepObjectStatic>> sObjectsStaticSteps;
-    std::vector<std::shared_ptr<StepObjectDynamic>> sObjectsDynamicSteps;
-    ObjectsParameters(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) {
-        // FLAG: MAKE OBJECT BEGIN
-        // // pagent
-        sPagentStep = std::make_shared<PagentStep>(sFlow, sObjects);
-        sObjectsStaticSteps.push_back(sPagentStep);
-        pagentIndex = sObjectsStaticSteps.size() - 1;
-        // FLAG: MAKE OBJECT END
-    }
+	// FLAG: DECLARE OBJECT BEGIN
+	std::shared_ptr<TracerStep> sTracerStep;
+	unsigned int tracerIndex;
+	// FLAG: DECLARE OBJECT END
+	
+	// construct data
+	std::vector<std::string> objectsStaticNames;
+	std::vector<std::shared_ptr<StepObjectStatic>> sObjectsStaticSteps;
+	std::vector<std::string> objectsDynamicNames;
+	std::vector<std::shared_ptr<StepObjectDynamic>> sObjectsDynamicSteps;
+	std::vector<std::string> objectsManagerNames;
+	std::vector<std::shared_ptr<StepObjectManager>> sObjectsManagerSteps;
+	ObjectsParameters(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) {
+		// FLAG: MAKE OBJECT BEGIN
+		// // tracer
+		sTracerStep = std::make_shared<TracerStep>(sFlow, sObjects);
+		sObjectsStaticSteps.push_back(sTracerStep);
+		tracerIndex = sObjectsStaticSteps.size() - 1;
+		objectsStaticNames.push_back("tracer");
+		// FLAG: MAKE OBJECT END
+	}
 };
 
 }

@@ -12,20 +12,21 @@
 #include "core/init/objects/object/core.h"
 #include "core/init/objects/prop.h"
 // FLAG: INCLUDE OBJECT BEGIN
-#include "param/init/objects/pagent/parameters.h"
+#include "param/init/objects/tracer/parameters.h"
 // FLAG: INCLUDE OBJECT END
 
 namespace c0p {
 
 struct InitObjectsParameters {
-    // make data
-    std::vector<std::shared_ptr<InitInitStaticBase>> sInitsStatic;
-    std::vector<std::shared_ptr<InitInitDynamicBase>> sInitsDynamic;
-    InitObjectsParameters(std::shared_ptr<TypeObjectsParameters> sObjectsParameters) {
-        // FLAG: MAKE OBJECT BEGIN
-        sInitsStatic.push_back(std::make_shared<InitInitStatic<InitPagentParameters, PagentStep>>(sObjectsParameters->sPagentStep));
-        // FLAG: MAKE OBJECT END
-    }
+	// make data
+	std::vector<std::shared_ptr<InitInitStaticBase>> sInitsStatic;
+	std::vector<std::shared_ptr<InitInitDynamicBase>> sInitsDynamic;
+	std::vector<std::shared_ptr<InitInitManagerBase>> sInitsManager;
+	InitObjectsParameters(std::shared_ptr<TypeObjectsParameters> sObjectsParameters) {
+		// FLAG: MAKE OBJECT BEGIN
+		sInitsStatic.push_back(std::make_shared<InitInitStatic<InitTracerParameters, TracerStep>>(sObjectsParameters->sTracerStep));
+		// FLAG: MAKE OBJECT END
+	}
 };
 
 }

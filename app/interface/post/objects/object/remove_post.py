@@ -27,7 +27,7 @@ def edit(name):
     for line in fileinput.FileInput("parameters.h", inplace=True):
         if (line == '#include "param/post/objects/{object_name}/{name}/choice.h"\n'.format(name=name, object_name=object_name)):
             pass
-        elif (line == '        data.push_back(std::make_shared<Post{object_name}{name}<Type{object_name}Step>>(s{object_name}Step));\n'.format(name=upper_camel_name, object_name=upper_camel_object_name)):
+        elif (line == '        data.push_back(std::make_shared<Post{object_name}{name}<TypeObjectStep>>(sObjectStep));\n'.format(name=upper_camel_name, object_name=upper_camel_object_name)):
             pass
         else:
             print(line, end='')

@@ -7,7 +7,7 @@ import numpy as np
 # custom lib
 import libpost
 
-BIN_NB = 100
+BIN_NB = 1000
 BIN_RANGE = (0, 0.0028)
 
 def parse():

@@ -10,7 +10,7 @@ namespace c0p {
 // Uniform post processing mesh parameters
 struct PostMeshMeshUniformParameters {
     // Number of nodes of the mesh for each dimension
-    std::vector<std::size_t> n = { 16, 16, 16 };
+    std::vector<std::size_t> n = { 2, 2, 2 };
     // Length of the mesh for each dimension
     std::vector<TypeScalar> length = { 2.0 * M_PI, 2.0 * M_PI, 2.0 * M_PI };
     // Origin position of the mesh

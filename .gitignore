@@ -31,6 +31,12 @@ cases/*/
 !cases/comparison_navigators/
 !cases/comparison_trackers/
 !cases/tracers/
-!cases/surfers_in_channel_flow
-!cases/adaptive_surfers_in_channel_flow
+!cases/surfers_in_channel_flow_x
+!cases/surfers_in_channel_flow_mx
+!cases/surfers_in_channel_flow_y
+!cases/surfers_in_channel_flow_z
+!cases/adaptive_surfers_in_channel_flow_x
+!cases/adaptive_surfers_in_channel_flow_mx
+!cases/adaptive_surfers_in_channel_flow_y
+!cases/adaptive_surfers_in_channel_flow_z
 !cases/reverse/

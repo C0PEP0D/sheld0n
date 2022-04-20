@@ -3,10 +3,10 @@
 #pragma once
 
 // choose your flow
-#include "core/env/flow/jhtdb/simple/core.h"
-#include "param/env/flow/jhtdb/simple/parameters.h"
+#include "core/env/flow/jhtdb/forced_isotropic_turbulence/core.h"
+#include "param/env/flow/jhtdb/forced_isotropic_turbulence/parameters.h"
 namespace c0p {
-    using FlowJhtdb = FlowJhtdbSimple<FlowJhtdbSimpleParameters>;
+    using FlowJhtdb = BaseFlowJhtdbForcedIsotropicTurbulence<FlowJhtdbForcedIsotropicTurbulenceParameters>;
 }
 
 #endif
