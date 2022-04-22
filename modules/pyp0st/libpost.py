@@ -38,6 +38,13 @@ def get_object(time_dir, object_name):
     object_filename = time_dir + "/" + object_name + ".csv"
     return {"info":get_file_header(object_filename), "value":np.loadtxt(object_filename, delimiter=",")}
 
+def get_flow(time_dir):
+    return get_object(time_dir, "flow")
+
+def get_mesh():
+    object_filename = "mesh.csv"
+    return {"info":get_file_header(object_filename), "value":np.loadtxt(object_filename, delimiter=",")}
+
 def get_object_properties(obj, properties):
     regex = ""
     for prop in properties:

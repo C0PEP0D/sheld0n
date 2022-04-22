@@ -2,7 +2,7 @@
 
 import os
 
-choices_dir = "env/objects/object/__agent/_behaviour/__tracker/_behaviour_direction"
+choices_dir = "env/objects/static/object/__agent/_behaviour/__tracker/_behaviour_direction"
 choices_exceptions = []
 
 if __name__ == '__main__':

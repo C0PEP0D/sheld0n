@@ -10,14 +10,14 @@
 #include "core/env/objects/object/agent/behaviour/tracker/local_axis_swimmer/core.h"
 #include "param/env/objects/static/object/agent/_behaviour/tracker/local_axis_swimmer/parameters.h"
 // sensor choice
-#include "param/env/objects/static/object/agent/_behaviour/_sensor/direction/choice.h"
+#include "param/env/objects/static/object/agent/_behaviour/_sensor/position/choice.h"
 #include "param/env/objects/static/object/agent/_behaviour/_sensor/velocity_gradients/choice.h"
 // sub behaviour choice
 #include "param/env/objects/static/object/agent/_behaviour/tracker/_behaviour_direction/choice.h"
 #include "param/env/objects/static/object/agent/_behaviour/tracker/_behaviour_velocity/choice.h"
 namespace c0p {
     template<typename ObjectAgentActiveStep>
-    using ObjectAgentBehaviourTracker = AgentBehaviourTrackerLocalAxisSwimmer<ObjectAgentBehaviourTrackerLocalAxisSwimmerParameters, ObjectAgentActiveStep, ObjectAgentBehaviourSensorDirection<ObjectAgentActiveStep>, ObjectAgentBehaviourSensorVelocityGradients<ObjectAgentActiveStep>, ObjectAgentBehaviourTrackerBehaviourDirection<ObjectAgentActiveStep>, ObjectAgentBehaviourTrackerBehaviourVelocity<ObjectAgentActiveStep>>;
+    using ObjectAgentBehaviourTracker = AgentBehaviourTrackerLocalAxisSwimmer<ObjectAgentBehaviourTrackerLocalAxisSwimmerParameters, ObjectAgentActiveStep, ObjectAgentBehaviourSensorPosition<ObjectAgentActiveStep>, ObjectAgentBehaviourSensorVelocityGradients<ObjectAgentActiveStep>, ObjectAgentBehaviourTrackerBehaviourDirection<ObjectAgentActiveStep>, ObjectAgentBehaviourTrackerBehaviourVelocity<ObjectAgentActiveStep>>;
 }
 
 #endif
