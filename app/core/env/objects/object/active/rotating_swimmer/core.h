@@ -21,13 +21,22 @@ class ActiveRotatingSwimmerStep : public TypeActiveStep<ActivePassiveStep>  {
         std::shared_ptr<TypeAxisRotateStep<ActivePassiveStep>> sStepAxisRotate;
     public:
         ActiveRotatingSwimmerStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : 
-            Type(ActivePassiveStep(sFlow, sObjects)), 
+            Type(ActivePassiveStep(sFlow, sObjects)),
             sStepLocalAxisSwim(std::make_shared<TypeLocalAxisSwimStep<ActivePassiveStep>>(parameters.velocity)),
             sStepAxisRotate(std::make_shared<TypeAxisRotateStep<ActivePassiveStep>>(parameters.angularVelocity))
         {
-            Type::register_actuator(sStepLocalAxisSwim);
-            Type::register_actuator(sStepAxisRotate);
+            Type::registerActuator(sStepLocalAxisSwim);
+            Type::registerActuator(sStepAxisRotate);
         }
+
+        ActiveRotatingSwimmerStep(const ActiveLocalAxisSwimmerStep& step) : Type(step)
+   		{
+   			Type::clearActuators();
+   			sStepLocalAxisSwim = std::make_shared<TypeLocalAxisSwimStep<ActivePassiveStep>>(parameters.velocity);
+   			sStepAxisRotate = std::make_shared<TypeAxisRotateStep<ActivePassiveStep>>(parameters.angularVelocity);
+   			Type::registerActuator(sStepLocalAxisSwim);
+   			Type::registerActuator(sStepAxisRotate);
+   		}
 };
 
 }

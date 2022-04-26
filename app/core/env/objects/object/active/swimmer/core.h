@@ -12,15 +12,22 @@ namespace c0p {
 
 template<typename TypeParameters, typename ActivePassiveStep>
 class ActiveSwimmerStep : public TypeActiveStep<ActivePassiveStep>  {
-    public:
-        using Type = TypeActiveStep<ActivePassiveStep>;
-    public:
-        TypeParameters parameters;
-        std::shared_ptr<TypeSwimStep<ActivePassiveStep>> sStepSwim;
+	public:
+		using Type = TypeActiveStep<ActivePassiveStep>;
+	public:
+		TypeParameters parameters;
+		std::shared_ptr<TypeSwimStep<ActivePassiveStep>> sStepSwim;
 
-        ActiveSwimmerStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : Type(ActivePassiveStep(sFlow, sObjects)), sStepSwim(std::make_shared<TypeSwimStep<ActivePassiveStep>>(parameters.velocity)) {
-            Type::register_actuator(sStepSwim);
-        }
+		ActiveSwimmerStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : Type(ActivePassiveStep(sFlow, sObjects)), sStepSwim(std::make_shared<TypeSwimStep<ActivePassiveStep>>(parameters.velocity)) {
+			Type::registerActuator(sStepSwim);
+		}
+
+		ActiveInertialSwimmerStep(const ActiveLocalAxisSwimmerStep& step) : Type(step)
+   		{
+   			Type::clearActuators();
+   			sStepSwim = std::make_shared<TypeSwimStep<ActivePassiveStep>>(parameters.velocity);
+   			Type::registerActuator(sStepSwim);
+   		}
 };
 
 }
