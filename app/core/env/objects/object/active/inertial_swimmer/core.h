@@ -26,7 +26,7 @@ class ActiveInertialSwimmerStep : public TypeActiveStep<ActivePassiveStep>  {
             Type::registerActuator(sStepInertialSwim);
         }
 
-        ActiveInertialSwimmerStep(const ActiveLocalAxisSwimmerStep& step) : Type(step)
+        ActiveInertialSwimmerStep(const ActiveInertialSwimmerStep& step) : Type(step)
    		{
    			Type::clearActuators();
    			sStepInertialSwim = std::make_shared<TypeInertialSwimStep<ActivePassiveStep>>(parameters.velocity);
