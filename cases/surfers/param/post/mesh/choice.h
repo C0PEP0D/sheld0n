@@ -7,10 +7,10 @@
 // CHOOSE COMMAND IS USED
 
 // choose your mesh
-#include "core/post/mesh/regular/core.h"
-#include "param/post/mesh/regular/parameters.h"
+#include "core/post/mesh/uniform/core.h"
+#include "param/post/mesh/uniform/parameters.h"
 namespace c0p {
-    using PostMeshMesh = PostMeshMeshRegular<PostMeshMeshRegularParameters>;
+    using PostMeshMesh = PostMeshMeshUniform<PostMeshMeshUniformParameters>;
 }
 
 #endif

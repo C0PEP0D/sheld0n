@@ -13,9 +13,7 @@
 // app include
 #include "core/post/mesh/post/core.h"
 // FLAG: INCLUDE POST BEGIN
-#include "param/post/mesh/px/choice.h"
-#include "param/post/mesh/py/choice.h"
-#include "param/post/mesh/pz/choice.h"
+#include "param/post/mesh/pos/choice.h"
 // FLAG: INCLUDE POST END
 
 namespace c0p {
@@ -25,9 +23,7 @@ struct PostMeshParameters {
     std::vector<std::shared_ptr<PostMeshPost>> data;
     PostMeshParameters(std::shared_ptr<PostMeshMesh::Type> sMesh) {
         // FLAG: MAKE POST BEGIN
-        data.push_back(std::make_shared<PostMeshPx>(sMesh));
-        data.push_back(std::make_shared<PostMeshPy>(sMesh));
-        data.push_back(std::make_shared<PostMeshPz>(sMesh));
+        data.push_back(std::make_shared<PostMeshPos>(sMesh));
         // FLAG: MAKE POST END
     }
 };

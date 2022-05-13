@@ -51,6 +51,12 @@ def set_parameter(dest, prop, value):
             print("edited: ", file_name)
         file_replace(dest + "/group/homogeneous/parameters.h", r"size = [^\*]* \*", "size = 1/({value}*{value}) *".format(value=float(value)))
         print("edited: ", dest + "/group/homogeneous/parameters.h")
+    elif prop == "vs":
+        for file_name in glob.glob(dest + "/**/*active/**/*swimmer/parameters.h", recursive=True):
+            file_replace(file_name, r"velocity = [^\*]* \*", "velocity = {value} *".format(value=float(value)))
+            print("edited: ", file_name)
+        file_replace(dest + "/group/homogeneous/parameters.h", r"size = [^\*]* \*", "size = 1/({value}*{value}) *".format(value=float(value)))
+        print("edited: ", dest + "/group/homogeneous/parameters.h")
     elif prop == "rtime":
         for file_name in glob.glob(dest + "/**/*active/axis/swim/parameters.h", recursive=True):
             file_replace(file_name, r"time = [^\*]* \*", "time = {value} *".format(value=float(value)))

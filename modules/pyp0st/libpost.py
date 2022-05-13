@@ -66,6 +66,40 @@ def get_object_names():
         raise NameError('No data found')
     return object_names
 
+def get_properties_from_string(name):
+    # init
+    properties = {}
+    # extract properties
+    name_properties = name.replace(r"/", "__").split(".")[0].split("__")
+    for prop in name_properties:
+        prop_split = prop.split("_")
+        if len(prop_split) > 1:
+            properties["_".join(prop_split[:-1])] = float(prop_split[-1].replace("o", "."))
+    # return
+    return properties
+
+# def get_property_from_object_name(name, prop):
+    # all_properties = name.replace(r"/", "__").split(".")[0].split("__")
+    # for prop_name in all_properties:
+        # if prop_name.startswith(prop):
+            # return float(prop_name[len(prop)+1:].replace("o", ".").replace("_", "."))
+    # if prop == "surftimeconst":
+        # return 0.0
+    # elif prop == "reorientationtime":
+        # return 0.0
+    # elif prop == "surftimeprefactor":
+        # return 0.0
+    # elif prop == "dirnoise":
+        # return 0.0
+    # elif prop == "jnoise":
+        # return 0.0
+    # elif prop == "swimnoise":
+        # return 0.0
+    # elif prop == "proportion":
+        # return 1.0
+    # else:
+        # return np.nan
+
 # def get_file_header(file_name):
     # head_str = ""
     # with open(file_name) as f:
@@ -268,29 +302,28 @@ def get_object_names():
             # header += "{info},".format(info=info)
         # header = header[:-1]
         # # save
-        # np.savetxt(fname + "__" + object_name + ".csv", np.column_stack([angular_frequency] + [objects[object_name]["value"]]), delimiter=",", header=header)
-# 
-# def get_property_from_object_name(name, prop):
-    # all_properties = name.replace(r"/", "__").split(".")[0].split("__")
-    # for prop_name in all_properties:
-        # if prop_name.startswith(prop):
-            # return float(prop_name[len(prop)+1:].replace("o", ".").replace("_", "."))
-    # if prop == "surftimeconst":
-        # return 0.0
-    # elif prop == "reorientationtime":
-        # return 0.0
-    # elif prop == "surftimeprefactor":
-        # return 0.0
-    # elif prop == "dirnoise":
-        # return 0.0
-    # elif prop == "jnoise":
-        # return 0.0
-    # elif prop == "swimnoise":
-        # return 0.0
-    # elif prop == "proportion":
-        # return 1.0
-    # else:
-        # return np.nan
+        # np.savetxt(fname + "__" + object_name + ".csv", np.column_stack([angular_frequency] + [objects[object_name]["value"]]), delimiter=",", header=header)# 
+        # def get_property_from_object_name(name, prop):
+            # all_properties = name.replace(r"/", "__").split(".")[0].split("__")
+            # for prop_name in all_properties:
+                # if prop_name.startswith(prop):
+                    # return float(prop_name[len(prop)+1:].replace("o", ".").replace("_", "."))
+            # if prop == "surftimeconst":
+                # return 0.0
+            # elif prop == "reorientationtime":
+                # return 0.0
+            # elif prop == "surftimeprefactor":
+                # return 0.0
+            # elif prop == "dirnoise":
+                # return 0.0
+            # elif prop == "jnoise":
+                # return 0.0
+            # elif prop == "swimnoise":
+                # return 0.0
+            # elif prop == "proportion":
+                # return 1.0
+            # else:
+                # return np.nan
 
 if __name__ == '__main__':
     parse()

@@ -29,6 +29,7 @@ def main(nu):
     average_streching = np.empty(time.size)
     average_vorticity = np.empty(time.size)
     integral_length_scale = np.empty(time.size)
+    taylor_micro_scale_spectrum = np.empty(time.size)
     for index in range(time.size):
         t = time[index]
         print("\tINFO: Processing t={t}/{t_f}...".format(t=t, t_f=time[-1]), flush=True)
@@ -92,6 +93,8 @@ def main(nu):
         average_vorticity[index] = np.average(np.linalg.norm(vorticity, axis=1))
         ## integral scales
         integral_length_scale[index] = np.pi / (2 * rms_flow_velocity[index]**2) * np.trapz(0.5 * np.average(np.abs(np.fft.rfft(flow_velocity_meshed[0, :, :, :], axis=0) / flow_velocity_meshed[0, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[1, :, :, :], axis=0) / flow_velocity_meshed[1, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[2, :, :, :], axis=0) / flow_velocity_meshed[2, :, :, :].shape[0])**2, axis=(1, 2)) / kx, x=kx)
+        # tests
+        taylor_micro_scale_spectrum[index] = (np.trapz(0.5 * np.average(np.abs(np.fft.rfft(flow_velocity_meshed[0, :, :, :], axis=0) / flow_velocity_meshed[0, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[1, :, :, :], axis=0) / flow_velocity_meshed[1, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[2, :, :, :], axis=0) / flow_velocity_meshed[2, :, :, :].shape[0])**2, axis=(1, 2)) * kx**2, x=kx) / np.trapz(0.5 * np.average(np.abs(np.fft.rfft(flow_velocity_meshed[0, :, :, :], axis=0) / flow_velocity_meshed[0, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[1, :, :, :], axis=0) / flow_velocity_meshed[1, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[2, :, :, :], axis=0) / flow_velocity_meshed[2, :, :, :].shape[0])**2, axis=(1, 2)), x=kx))**(-0.5)
         # print
         print("\tINFO: Done.", flush=True)
     dissipation_rate = np.average(dissipation_rate)
@@ -104,10 +107,13 @@ def main(nu):
     kolmogorov_length_scale = nu**(3.0/4.0) * dissipation_rate**(-1.0/4.0)
     integral_length_scale = np.average(integral_length_scale)
     large_eddy_turnover_time = integral_length_scale / rms_flow_velocity
+    # tests
+    taylor_micro_scale_spectrum = np.average(taylor_micro_scale_spectrum)
+    print(taylor_micro_scale_spectrum, rms_flow_velocity * taylor_micro_scale_spectrum / nu)
     print("INFO: Done.", flush=True)
     # save snapshot
     print("INFO: Saving...", flush=True)
-    np.savetxt("flow_statistics.csv", np.column_stack([dissipation_rate, rms_flow_velocity, average_streching, average_vorticity, taylor_micro_scale, taylor_scale_reynolds, kolmogorov_time_scale, kolmogorov_length_scale, integral_length_scale, large_eddy_turnover_time]), delimiter=",", header="dissipation_rate,rms_flow_velocity,average_streching,average_vorticity,taylor_micro_scale,taylor_scale_reynolds,kolmogorov_time_scale,kolmogorov_length_scale, integral_length_scale,large_eddy_turnover_time")
+    np.savetxt("flow_statistics.csv", np.column_stack([dissipation_rate, rms_flow_velocity, average_streching, average_vorticity, taylor_micro_scale, taylor_scale_reynolds, kolmogorov_time_scale, kolmogorov_length_scale, integral_length_scale, large_eddy_turnover_time]), delimiter=",", header="dissipation_rate,rms_flow_velocity,average_streching,average_vorticity,taylor_micro_scale,taylor_scale_reynolds,kolmogorov_time_scale,kolmogorov_length_scale,integral_length_scale,large_eddy_turnover_time")
     print("INFO: Done.", flush=True)
 
 if __name__ == '__main__':

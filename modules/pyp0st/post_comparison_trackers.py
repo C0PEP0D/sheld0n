@@ -10,8 +10,8 @@ import libpost
 BINS_NB = 100
 
 def parse():
-    parser = argparse.ArgumentParser(description='Filament post processing')
-    parser.add_argument('name', help='specify the filament object name')
+    parser = argparse.ArgumentParser(description='Tracker comparison post processing')
+    parser.add_argument('name', help='specify the object name to perform the post processing on')
     parser.add_argument('--arrival-distance', '-d', type=float, default=0.0, help='arrival distance')
     parser.add_argument('--number-average', '-n', nargs='?', type=int, default=30, help='number of time steps for wich average quantities are computed')
     parser.add_argument('--number-profiles', '-p', nargs='?', type=int, default=5, help='number of time steps for wich profiles are computed')
@@ -109,7 +109,8 @@ def main(name, arrival_distance, n_average, n_profiles):
     print("INFO: Done.", flush=True)
     # save snapshot
     print("INFO: Saving...", flush=True)
-    np.savetxt("{name}__average_arrival_time__distance_{distance}.csv".format(name=name, distance=str(arrival_distance).replace(".", "o")), np.column_stack((time[average_time_steps], average_arrival_time, cli_arrival_time)), delimiter=",", header="time,average_arrival_time,95CLI")
+    if arrival_distance > 0.0:
+        np.savetxt("{name}__average_arrival_time__distance_{distance}.csv".format(name=name, distance=str(arrival_distance).replace(".", "o")), np.column_stack((time[average_time_steps], average_arrival_time, cli_arrival_time)), delimiter=",", header="time,average_arrival_time,95CLI")
     np.savetxt("{name}__average_distance.csv".format(name=name), np.column_stack((time[average_time_steps], average_distance, cli_distance, average_effective_velocity, cli_effective_velocity)), delimiter=",", header="time,average_distance,95CLI,average_effective_velocity,95CLI")
     np.savetxt("{name}__distance_pdf.csv".format(name=name), np.column_stack(pdfs), delimiter=",", header=",".join(pdfs_header))
     print("INFO: Done.", flush=True)

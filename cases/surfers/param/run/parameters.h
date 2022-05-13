@@ -19,6 +19,10 @@ struct RunParameters {
     // possible to be performed on saved time steps.
     // Should be greater than zero.
     std::size_t nsave = nt;
+    // If enbaled all static objects are saved
+    // in the same file. May lead to slightly
+    // faster simulations.
+    bool saveStaticMerge = false;
 };
 
 }
