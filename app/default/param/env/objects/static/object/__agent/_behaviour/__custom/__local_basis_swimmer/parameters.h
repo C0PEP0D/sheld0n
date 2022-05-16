@@ -3,7 +3,7 @@
 #pragma once
 
 // app includes
-#include "core/env/objects/object/agent/behaviour/custom/local_axis_swimmer/prop.h"
+#include "core/env/objects/object/agent/behaviour/custom/local_basis_swimmer/prop.h"
 
 // sensor choice
 #include "param/env/objects/object/agent/_behaviour/_sensor/direction/choice.h"
@@ -14,7 +14,7 @@ namespace c0p {
 // Parameters of the step of a custom that controls its swimming direction
 // delayed by a finite reorientation time
 template<typename TypeAgentStateStatic, typename AgentActiveStep>
-struct ObjectAgentBehaviourCustomLocalAxisSwimmerParameters {
+struct ObjectAgentBehaviourCustomLocalBasisSwimmerParameters {
     public:
         // Sensors declaration
         ObjectAgentBehaviourSensorDirection<AgentActiveStep> sensorDirection;
@@ -24,9 +24,12 @@ struct ObjectAgentBehaviourCustomLocalAxisSwimmerParameters {
         void operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep& stepActive) const {
             const TypeSpaceVector direction = sensorDirection(state, t, stepActive);
             const TypeSpaceMatrix velocityGradients = sensorVelocityGradients(state, t, stepActive);
-            const TypeSpaceVector swimmingDirection = stepActive.cAxis(state);
-            stepActive.sStepAxisOrient->direction = direction;
-            stepActive.sStepLocalAxisSwim->velocity = direction.dot(swimmingDirection) * stepActive.parameters.velocity;
+            auto sAxis0 = stepActive.cAxis(state, 0);
+            auto sAxis1 = stepActive.cAxis(state, 1);
+            auto sAxis2 = stepActive.cAxis2(state);
+            const TypeSpaceVector swimmingDirection = stepActive.sStepBasisSwim.localDirection(0) * sAxis0 + stepActive.sStepBasisSwim.localDirection(1) * sAxis1 + stepActive.sStepBasisSwim.localDirection(2) * sAxis2;
+            stepActive.sStepBasisOrient->globalDirection = direction;
+            stepActive.sStepLocalBasisSwim->velocity = direction.dot(swimmingDirection) * stepActive.parameters.velocity;
         }
     public:
         // Positions

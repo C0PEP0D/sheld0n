@@ -17,6 +17,8 @@ struct Parameters {
     constexpr static const double cLength = 0.00280;
     constexpr static const double cTime = 0.0424;
     constexpr static const double cVelocity = cLength / cTime;
+    // Characteristic angle
+    constexpr static const double cAngle = M_PI;
 };
 
 }
