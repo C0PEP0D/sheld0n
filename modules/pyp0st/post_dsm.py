@@ -25,178 +25,200 @@ import matplotlib.pyplot as plt
 # batchelor (scale < kolmogorov length) eq (D < nu)
 # D < 1.85e-4
 
-D = 1e-1 * 1.85e-4
-s0 = 1e-1 * 0.0028 # initial thickness
-dS0 = (1e-4 * 0.0028)**2 # initial surface
+sc = 1e0
+D = 1.85e-4 / sc
+s0 = 1e0 * 0.0028 # initial thickness
+dA0 = (1e0 * 0.0028)**2 # initial surface
 
-nc = 100
-dc = 1.0 / (nc - 1.0)
-nC = nc
-dC = 1.0 / (nC - 1.0)
+c_nb = 100
+c_array = np.linspace(0.0, 1.0, num=c_nb)
+C_nb = c_nb
+C_array = np.linspace(0.0, 1.0, num=C_nb)
+rho_nb = c_nb
+log_rho_array = np.linspace(-np.log(10), np.log(10000), num=rho_nb)
 
-process_times = [0.02, 0.04, 0.08, 0.12, 0.32, 0.64, 1.28, 2.56, 5.12, 9.998]
+#process_times = [0.0, 0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128]
+process_times = [0.002, 0.004, 0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024, 1.536, 2.048, 4.096, 8.192] # step 0.002
 
 def parse():
     parser = argparse.ArgumentParser(description='Computes statistics of the lagrangian gradients matrix (computed along particle trajectories)')
     return parser.parse_args()
 
-def dL_dt(foperator, object_name, j, L, t):
-    return np.matmul(foperator(min(t, 10.0)), L.reshape((3,3), order='C')).flatten(order='C')
+def dL_dt(foperator, L, t):
+    return np.matmul(foperator(t), L.reshape((3,3), order='C')).flatten(order='C')
 
 def F(a):
     return np.log((4.0/a + 1) + np.sqrt((4.0/a + 1)**2 - 1.0)) - 1.6/np.sqrt(a + 1.4)
 
-def Q(C, eta, etap, etapp):
-    if C**(-2.0) > etap:
-        if eta > C**(-2.0):
-            return dS0 * s0 / (np.pi * C**4 * np.sqrt(eta - C**(-2.0)) * np.sqrt(etap - etapp)) * F(2.0 * (C**(-2.0) - etap) * (eta - etapp) / ((eta - C**(-2.0)) * (etap - etapp)))
-        else:
-            return 0.0
-    elif C**(-2.0) < etap:
-        if C**(-2.0) > etapp:
-            return dS0 * s0 / (np.pi * C**4 * np.sqrt(eta - etap) * np.sqrt(C**(-2.0) - etapp)) * F(2.0 * (etap - C**(-2.0)) * (eta - etapp) / ((C**(-2.0) - etapp) * (eta - etap)))
-        else:
-            return 0.0
+def P(rho, mu_pp, mu_p, mu):
+    # init result
+    result = np.zeros((rho.size, mu.size))
+    # broadcast
+    rho = np.broadcast_to(rho.reshape((-1, 1)), result.shape)
+    mu_pp = np.broadcast_to(mu_pp, result.shape)
+    mu_p = np.broadcast_to(mu_p, result.shape)
+    mu = np.broadcast_to(mu, result.shape)
+    #mask
+    mask_eq_2o37 = (np.power(rho, 2) > mu_p) & (np.power(rho, 2) < mu)
+    mask_eq_2o38 = (np.power(rho, 2) > mu_pp) & (np.power(rho, 2) < mu_p)
+    # compute
+    result[mask_eq_2o37] = rho[mask_eq_2o37] / (np.pi * np.sqrt(mu[mask_eq_2o37] - np.power(rho[mask_eq_2o37], 2)) * np.sqrt(mu_p[mask_eq_2o37] - mu_pp[mask_eq_2o37])) * F(2 * (np.power(rho[mask_eq_2o37], 2) - mu_p[mask_eq_2o37]) * (mu[mask_eq_2o37] - mu_pp[mask_eq_2o37]) / ((mu[mask_eq_2o37] - np.power(rho[mask_eq_2o37], 2)) * (mu_p[mask_eq_2o37] - mu_pp[mask_eq_2o37])))
+    result[mask_eq_2o38] = rho[mask_eq_2o38] / (np.pi * np.sqrt(mu[mask_eq_2o38] - mu_p[mask_eq_2o38]) * np.sqrt(np.power(rho[mask_eq_2o38], 2) - mu_pp[mask_eq_2o38])) * F(2 * (mu_p[mask_eq_2o38] - np.power(rho[mask_eq_2o38], 2)) * (mu[mask_eq_2o38] - mu_pp[mask_eq_2o38]) / ((np.power(rho[mask_eq_2o38], 2) - mu_pp[mask_eq_2o38]) * (mu[mask_eq_2o38] - mu_p[mask_eq_2o38])))
+    # return
+    return result
+
+def Q(C, eta_pp, eta_p, eta):
+    # init result
+    result = np.zeros((C.size, eta.size))
+    # broadcast
+    C = np.broadcast_to(C.reshape((-1, 1)), result.shape)
+    eta_pp = np.broadcast_to(eta_pp, result.shape)
+    eta_p = np.broadcast_to(eta_p, result.shape)
+    eta = np.broadcast_to(eta, result.shape)
+    #mask
+    mask_eq_2o43 = (np.power(C, -2) > eta_pp) & (np.power(C, -2) < eta_p)
+    mask_eq_2o44 = (np.power(C, -2) > eta_p) & (np.power(C, -2) < eta)
+    # compute
+    result[mask_eq_2o43] = dA0 * s0 / (np.pi * np.power(C[mask_eq_2o43], 4) * np.sqrt(eta[mask_eq_2o43] - eta_p[mask_eq_2o43]) * np.sqrt(np.power(C[mask_eq_2o43], -2) - eta_pp[mask_eq_2o43])) * F(2 * (eta_p[mask_eq_2o43] - np.power(C[mask_eq_2o43], -2)) * (eta[mask_eq_2o43] - eta_pp[mask_eq_2o43]) / ((np.power(C[mask_eq_2o43], -2) - eta_pp[mask_eq_2o43]) * (eta[mask_eq_2o43] - eta_p[mask_eq_2o43])))
+    result[mask_eq_2o44] = dA0 * s0 / (np.pi * np.power(C[mask_eq_2o44], 4) * np.sqrt(eta[mask_eq_2o44] - np.power(C[mask_eq_2o44], -2)) * np.sqrt(eta_p[mask_eq_2o44] - eta_pp[mask_eq_2o44])) * F(2 * (np.power(C[mask_eq_2o44], -2) - eta_p[mask_eq_2o44]) * (eta[mask_eq_2o44] - eta_pp[mask_eq_2o44]) / ((eta[mask_eq_2o44] - np.power(C[mask_eq_2o44], -2)) * (eta_p[mask_eq_2o44] - eta_pp[mask_eq_2o44])))
+    # return
+    return result
 
 def main():
-    print("INFO: Post processing flow velocity gradients statistics sampled by lagrangian objects.", flush=True)
+    print("INFO: Post processing the diffuselet method.", flush=True)
+    print("INFO: Reading objects...", flush=True)
     object_names = libpost.get_object_names()
-    print("INFO: Object names are:", " ".join(object_names), flush=True)
+    print("INFO: Done. Object names are:", " ".join(object_names), flush=True)
     print("INFO: Reading time...", flush=True)
-    time = libpost.get_time()
-    time_list = time.tolist()
+    time_dirs, time_list, time = libpost.get_time()
+    #average_time_steps = np.round(np.linspace(0, time.size-1, n_average)).astype(int)
     print("INFO: Done.", flush=True)
+    data = {}
+    if not os.path.isdir("objects_npy"):
+        os.mkdir("objects_npy")
     print("INFO: Reading int L^t L...", flush=True)
     int_Lt_L_to_process = []
-    int_Lt_L_value = {}
     for object_name in object_names:
         if os.path.isfile("objects_npy/" + object_name + "_int_Lt_L.npy"):
-            int_Lt_L_value[object_name] = np.load("objects_npy/" + object_name + "_int_Lt_L.npy")
+            data[object_name] = {
+                "L^t_L":np.load("objects_npy/" + object_name + "_Lt_L.npy"),
+                "int_L^t_L":np.load("objects_npy/" + object_name + "_int_Lt_L.npy")
+            }
         else:
             int_Lt_L_to_process.append(object_name)
     print("INFO: Done.", flush=True)
     if int_Lt_L_to_process:
         print("INFO: Reading L...", flush=True)
         L_to_process = []
-        L_value = {}
         for object_name in int_Lt_L_to_process:
             if os.path.isfile("objects_npy/" + object_name + "_L.npy"):
-                L_value[object_name] = np.load("objects_npy/" + object_name + "_L.npy")
+                data[object_name] = {"L":np.load("objects_npy/" + object_name + "_L.npy")}
             else:
                 L_to_process.append(object_name)
         print("INFO: Done.", flush=True)
         if L_to_process:
-            # get gradient matrix
-            print("INFO: Reading objects properties...", flush=True)
-            objects_j_0_0 = libpost.get_objects_properties(["j_0_0"], L_to_process)
-            objects_j_0_1 = libpost.get_objects_properties(["j_0_1"], L_to_process)
-            objects_j_0_2 = libpost.get_objects_properties(["j_0_2"], L_to_process)
-            objects_j_1_0 = libpost.get_objects_properties(["j_1_0"], L_to_process)
-            objects_j_1_1 = libpost.get_objects_properties(["j_1_1"], L_to_process)
-            objects_j_1_2 = libpost.get_objects_properties(["j_1_2"], L_to_process)
-            objects_j_2_0 = libpost.get_objects_properties(["j_2_0"], L_to_process)
-            objects_j_2_1 = libpost.get_objects_properties(["j_2_1"], L_to_process)
-            objects_j_2_2 = libpost.get_objects_properties(["j_2_2"], L_to_process)
-            print("INFO: Done.", flush=True)
-            print("INFO: Gradients reconstruction...", flush=True)
-            gradients_value = {}
-            operator_value = {}
-            for object_name in objects_j_0_0:
-                gradients_value[object_name] = np.empty((objects_j_0_0[object_name]["value"].shape[0], objects_j_0_0[object_name]["value"].shape[1], 3, 3))
-                gradients_value[object_name][:, :, 0, 0] = objects_j_0_0[object_name]["value"]
-                gradients_value[object_name][:, :, 0, 1] = objects_j_0_1[object_name]["value"]
-                gradients_value[object_name][:, :, 0, 2] = objects_j_0_2[object_name]["value"]
-                gradients_value[object_name][:, :, 1, 0] = objects_j_1_0[object_name]["value"]
-                gradients_value[object_name][:, :, 1, 1] = objects_j_1_1[object_name]["value"]
-                gradients_value[object_name][:, :, 1, 2] = objects_j_1_2[object_name]["value"]
-                gradients_value[object_name][:, :, 2, 0] = objects_j_2_0[object_name]["value"]
-                gradients_value[object_name][:, :, 2, 1] = objects_j_2_1[object_name]["value"]
-                gradients_value[object_name][:, :, 2, 2] = objects_j_2_2[object_name]["value"]
-                operator_value[object_name] = -gradients_value[object_name].transpose(0, 1, 3, 2)
-            print("INFO: Done.", flush=True)
-            print("INFO: Cleaning...", flush=True)
-            del objects_j_0_0
-            del objects_j_0_1
-            del objects_j_0_2
-            del objects_j_1_0
-            del objects_j_1_1
-            del objects_j_1_2
-            del objects_j_2_0
-            del objects_j_2_1
-            del objects_j_2_2
+            print("INFO: Extracting gradients...", flush=True)
+            for name in L_to_process:
+                print("\tINFO: Processing object {name}...".format(name=name), flush=True)
+                print("\t\tINFO: Processing t={t}/{t_f}...".format(t=0, t_f=time[-1]), flush=True)
+                obj = libpost.get_object(time_dirs[time_list.index(0.0)], name)
+                obj_j_0_0 = libpost.get_object_properties(obj, ["particle_.*__j_0_0"])["value"]
+                data[name] = {"grads":np.empty((time.size, obj_j_0_0.size, 3, 3))}
+                data[name]["grads"][0, :, 0, 0] = obj_j_0_0
+                del obj_j_0_0
+                data[name]["grads"][0, :, 0, 1] = libpost.get_object_properties(obj, ["particle_.*__j_0_1"])["value"]
+                data[name]["grads"][0, :, 0, 2] = libpost.get_object_properties(obj, ["particle_.*__j_0_2"])["value"]
+                data[name]["grads"][0, :, 1, 0] = libpost.get_object_properties(obj, ["particle_.*__j_1_0"])["value"]
+                data[name]["grads"][0, :, 1, 1] = libpost.get_object_properties(obj, ["particle_.*__j_1_1"])["value"]
+                data[name]["grads"][0, :, 1, 2] = libpost.get_object_properties(obj, ["particle_.*__j_1_2"])["value"]
+                data[name]["grads"][0, :, 2, 0] = libpost.get_object_properties(obj, ["particle_.*__j_2_0"])["value"]
+                data[name]["grads"][0, :, 2, 1] = libpost.get_object_properties(obj, ["particle_.*__j_2_1"])["value"]
+                data[name]["grads"][0, :, 2, 2] = libpost.get_object_properties(obj, ["particle_.*__j_2_2"])["value"]
+                print("\t\tINFO: Done processing t={t}/{t_f}.".format(t=0, t_f=time[-1]), flush=True)
+                for index in range(1, time.size):
+                    t = time[index]
+                    print("\t\tINFO: Processing t={t}/{t_f}...".format(t=t, t_f=time[-1]), flush=True)
+                    # read object
+                    obj = libpost.get_object(time_dirs[time_list.index(t)], name)
+                    data[name]["grads"][index, :, 0, 0] = libpost.get_object_properties(obj, ["particle_.*__j_0_0"])["value"]
+                    data[name]["grads"][index, :, 0, 1] = libpost.get_object_properties(obj, ["particle_.*__j_0_1"])["value"]
+                    data[name]["grads"][index, :, 0, 2] = libpost.get_object_properties(obj, ["particle_.*__j_0_2"])["value"]
+                    data[name]["grads"][index, :, 1, 0] = libpost.get_object_properties(obj, ["particle_.*__j_1_0"])["value"]
+                    data[name]["grads"][index, :, 1, 1] = libpost.get_object_properties(obj, ["particle_.*__j_1_1"])["value"]
+                    data[name]["grads"][index, :, 1, 2] = libpost.get_object_properties(obj, ["particle_.*__j_1_2"])["value"]
+                    data[name]["grads"][index, :, 2, 0] = libpost.get_object_properties(obj, ["particle_.*__j_2_0"])["value"]
+                    data[name]["grads"][index, :, 2, 1] = libpost.get_object_properties(obj, ["particle_.*__j_2_1"])["value"]
+                    data[name]["grads"][index, :, 2, 2] = libpost.get_object_properties(obj, ["particle_.*__j_2_2"])["value"]
+                    print("\t\tINFO: Done processing t={t}/{t_f}.".format(t=t, t_f=time[-1]), flush=True)
+                data[name]["operator"] = -data[name]["grads"].transpose(0, 1, 3, 2)
+                del data[name]["grads"]
+                print("\tINFO: Done processing object {name}.".format(name=name), flush=True)
             print("INFO: Done.", flush=True)
             print("INFO: Computing L...", flush=True)
-            for object_name in gradients_value:
-                L_value[object_name] = copy.deepcopy(gradients_value[object_name])
-            for object_name in gradients_value:
-                print("INFO:    Processing " + object_name + "...", flush=True)
-                # value
-                for j in range(gradients_value[object_name].shape[1]):
-                    foperator = sp.interpolate.interp1d(time, operator_value[object_name][:, j, :, :], kind="cubic", axis=0)
-                    L_value[object_name][:, j, :, :] = sp.integrate.odeint(lambda L, t : dL_dt(foperator, object_name, j, L, t), np.identity(3).flatten(order='C'), time).reshape((gradients_value[object_name].shape[0], 3, 3), order='C')
-                print("INFO:    " + object_name + " done.", flush=True)
+            for object_name in L_to_process:
+                data[object_name]["L"] = np.empty(data[object_name]["operator"].shape)
+                print("\tINFO: Processing object {name}...".format(name=object_name), flush=True)
+                for j in range(data[object_name]["operator"].shape[1]):
+                    foperator = sp.interpolate.interp1d(time, data[object_name]["operator"][:, j, :, :], kind="cubic", axis=0, fill_value="extrapolate")
+                    data[object_name]["L"][:, j, :, :] = sp.integrate.odeint(lambda L, t : dL_dt(foperator, L, t), np.identity(3).flatten(order='C'), time).reshape((data[object_name]["operator"].shape[0], 3, 3), order='C')
+                print("\tINFO: Done processing object {name}.".format(name=object_name), flush=True)
             print("INFO: Done.", flush=True)
             print("INFO: Saving L...", flush=True)
-            for object_name in gradients_value:
-                np.save("objects_npy/" + object_name + "_L", L_value[object_name])
+            for object_name in L_to_process:
+                np.save("objects_npy/" + object_name + "_L", data[object_name]["L"])
             print("INFO: Done.", flush=True)
         print("INFO: Computing int L^t L...", flush=True)
         for object_name in int_Lt_L_to_process:
-            print("INFO:    Processing " + object_name + "...", flush=True)
+            print("\tINFO: Processing object {name}...".format(name=object_name), flush=True)
             # value
-            int_Lt_L_value[object_name] = sp.integrate.cumtrapz(np.matmul(L_value[object_name].transpose(0, 1, 3, 2), L_value[object_name], axes=[(2, 3), (2, 3), (2, 3)]), axis=0, x=time)
-            print("INFO:    " + object_name + " done.", flush=True)
+            data[object_name]["L^t_L"] = np.matmul(data[object_name]["L"].transpose(0, 1, 3, 2), data[object_name]["L"], axes=[(2, 3), (2, 3), (2, 3)])
+            data[object_name]["int_L^t_L"] = sp.integrate.cumtrapz(data[object_name]["L^t_L"], axis=0, x=time, initial=0)
+            print("\tINFO: Done processing object {name}.".format(name=object_name), flush=True)
         print("INFO: Done.", flush=True)
         print("INFO: Saving int_Lt_L...", flush=True)
         for object_name in int_Lt_L_to_process:
-            np.save("objects_npy/" + object_name + "_int_Lt_L", L_value[object_name])
+            np.save("objects_npy/" + object_name + "_Lt_L", data[object_name]["L^t_L"])
+            np.save("objects_npy/" + object_name + "_int_Lt_L", data[object_name]["int_L^t_L"])
         print("INFO: Done.", flush=True)
     print("INFO: Computing Tau...", flush=True)
-    Tau_value = {}
+    tau = {}
     for object_name in object_names:
-        print("INFO:    Processing " + object_name + "...")
+        print("\tINFO: Processing object {name}...".format(name=object_name), flush=True)
         # value
-        Tau_value[object_name] = np.identity(3) + 4.0 * D / s0**2 * int_Lt_L_value[object_name]
-        print("INFO:    " + object_name + " done.", flush=True)
+        tau[object_name] = np.identity(3) + 4.0 * D / s0**2 * data[object_name]["int_L^t_L"]
+        print("\tINFO: Done processing object {name}.".format(name=object_name), flush=True)
     print("INFO: Done.", flush=True)
     print("INFO: Computing c pdf...", flush=True)
-    cs = np.array([ic * dc for ic in range(nc)])
-    c_pdf = {object_name:{"value":np.zeros((Tau_value[object_name].shape[0], nc)), "info":["p(c={})".format(ic * dc) for ic in range(nc)]} for object_name in Tau_value}
-    c_stats = {object_name:{"value":np.zeros((len(process_times), 2)), "info":["c_mean, c_std"]} for object_name in Tau_value}
-    for object_name in Tau_value:
-        print("INFO:    Processing " + object_name + "...", flush=True)
-        # value
-        # for i in range(Tau_value[object_name].shape[0]):
-        for it in range(len(process_times)):
-            t = process_times[it]
-            i = time_list.index(t)
-            for ic in range(1, nc):
-                c = ic * dc
-                val = np.zeros(nC)
-                for iC in range(ic + 1, nC):
-                    C = iC * dC
-                    for j in range(Tau_value[object_name].shape[1]):
-                        etas = np.linalg.eigvalsh(Tau_value[object_name][i,j]).tolist()
-                        etas.sort()
-                        etas.reverse()
-                        val[iC] += Q(C, etas[0], etas[1], etas[2])
-                    val[iC] /= c * np.sqrt(np.log(C/c))
-                c_pdf[object_name]["value"][i, ic] = np.trapz(val, dx=dC) / Tau_value[object_name].shape[1]
-            # compute average
-            for ic in range(1, nc):
-                c = ic * dc
-                c_stats[object_name]["value"][it, 0] += c * c_pdf[object_name]["value"][i, ic] * dc
-            # compute std
-            for ic in range(1, nc):
-                c = ic * dc
-                c_stats[object_name]["value"][it, 1] += (c - c_stats[object_name]["value"][it, 0])**2 * c_pdf[object_name]["value"][i, ic] * dc
-            c_stats[object_name]["value"][:, 1] = np.sqrt(c_stats[object_name]["value"][:, 1])
-            # save snapshot
-            np.savetxt("c_pdf__{}__time_{}.csv".format(object_name, time[i]), np.column_stack((cs, c_pdf[object_name]["value"][i, :])), delimiter=",", header="c, p(c)")
-        print("INFO:    " + object_name + " done.", flush=True)
-    print("INFO: Done.", flush=True)
-    print("INFO: Saving stats...", flush=True)
-    libpost.savet(process_times, c_stats, "c_stats")
+    for object_name in tau:
+        c_var = np.empty(len(process_times))
+        print("\tINFO: Processing object {name}...".format(name=object_name), flush=True)
+        for process_times_index in range(len(process_times)):
+            t = process_times[process_times_index]
+            time_index = time.tolist().index(t)
+            print("\t\tINFO: Processing t={t}/{t_f}...".format(t=t, t_f=process_times[-1]), flush=True)
+            # compute concentration pdf
+            c_pdf = np.zeros(c_nb)
+            eigvals = np.linalg.eigvalsh(tau[object_name][time_index, :, :, :])
+            print(np.sqrt(1.0 / np.average(eigvals, axis=0)))
+            for c_index in range(1, c_nb - 1):
+                c = c_array[c_index]
+                Q_sum = np.zeros(C_nb)
+                Q_sum[c_index + 1:] = np.sum(Q(C_array[c_index + 1:], eigvals[:, 0], eigvals[:, 1], eigvals[:, 2]), axis=1) / (c * np.sqrt(np.log(C_array[c_index + 1:]/c)))
+                c_pdf[c_index] = np.trapz(Q_sum, x=C_array) / tau[object_name].shape[1]
+            # save
+            np.savetxt("{}__time_{}__sc_{}__c_pdf.csv".format(object_name, str(t).replace(".", "o"), str(sc).replace(".", "o")), np.column_stack((c_array, c_pdf)), delimiter=",", header="c, p(c)")
+            # compute variance
+            # c_var[process_times_index] = np.sqrt(0.5 * np.pi) * np.average(np.trapz(np.power(C_array, 2) * Q(C_array, eigvals[:, 0], eigvals[:, 1], eigvals[:, 2]).transpose(), x=C_array))
+            c_var[process_times_index] = np.average(np.trapz(np.power(c_array, 2) * c_pdf, x=c_array))
+            # compute stretching pdf
+            eigvals = np.linalg.eigvalsh(data[object_name]["L^t_L"][time_index, :, :, :])
+            print(np.average(eigvals, axis=0))
+            log_rho_pdf = np.nanmean(np.exp(log_rho_array).reshape(-1, 1) * P(np.exp(log_rho_array), eigvals[:, 0], eigvals[:, 1], eigvals[:, 2]), axis=1)
+            np.savetxt("{}__time_{}__log_rho_pdf.csv".format(object_name, str(t).replace(".", "o")), np.column_stack((log_rho_array, log_rho_pdf)), delimiter=",", header="log(rho), p(log(rho))")
+            # done
+            print("\t\tINFO: Done processing t={t}/{t_f}.".format(t=t, t_f=process_times[-1]), flush=True)
+        np.savetxt("{}__sc_{}__time_c_var.csv".format(object_name, str(sc).replace(".", "o")), np.column_stack((process_times, c_var)), delimiter=",", header="time, c_var")
+        print("\tINFO: Done processing object {name}.".format(name=object_name), flush=True)
     print("INFO: Done.", flush=True)
 
 if __name__ == '__main__':
