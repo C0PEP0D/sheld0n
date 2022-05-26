@@ -21,8 +21,8 @@ class AgentBehaviourNavigatorBehaviourVelocitySurfEcoswimmer : public AgentBehav
     public:
         double operator()(const double* pState, const double& t, const AgentActiveStep&  stepActive, const TypeSpaceVector& direction, const TypeSpaceMatrix& velocityGradients, const TypeSpaceVector& swimmingDirection) const override {
             const double value = (((velocityGradients * behaviourTimeHorizon(pState, t, stepActive, velocityGradients)).exp()).transpose() * swimmingDirection).normalized().dot(direction);
-            if(value > 0.0){
-                return value;
+            if(value > parameters.threshold){
+                return 1.0;
             } else {
                 return 0.0;
             }
