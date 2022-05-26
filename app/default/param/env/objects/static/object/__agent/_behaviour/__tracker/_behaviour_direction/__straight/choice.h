@@ -8,7 +8,7 @@
 
 // choose your behaviour
 #include "core/env/objects/object/agent/behaviour/tracker/behaviour_direction/straight/core.h"
-#include "param/env/objects/object/agent/_behaviour/tracker/_behaviour_direction/straight/parameters.h"
+#include "param/env/objects/static/object/agent/_behaviour/tracker/_behaviour_direction/straight/parameters.h"
 namespace c0p {
     template<typename ObjectAgentActiveStep>
     using ObjectAgentBehaviourTrackerBehaviourDirectionStraight = AgentBehaviourTrackerBehaviourDirectionStraight<ObjectAgentBehaviourTrackerBehaviourDirectionStraightParameters, ObjectAgentActiveStep>;

@@ -18,9 +18,9 @@ struct PostParameters {
 	// based on nb.
 	int step = 0;
 	// Specify what to post process.
-	bool isPostProcessingObjects = false;
-	bool isPostProcessingMesh = true;
-	bool isPostProcessingFlow = true;
+	bool isPostProcessingObjects = true;
+	bool isPostProcessingMesh = false;
+	bool isPostProcessingFlow = false;
 	// isPreparingFlow: true or false. Specify if the flow needs to be prepared or not. 
 	// If the post processing does not require the flow, isPreparingFlow should be set to false for performance improvements.
 	bool isPreparingFlow = true;

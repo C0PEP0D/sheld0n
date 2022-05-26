@@ -30,6 +30,7 @@ def main(axis, sorting_property, fit_max, n_average, reverse):
     print("INFO: Done. Object names are:", " ".join(object_names), flush=True)
     print("INFO: Reading time...", flush=True)
     time_dirs, time_list, time = libpost.get_time()
+    time = time[:-1]
     average_time_steps = np.round(np.linspace(0, time.size-1, n_average)).astype(int)
     print("INFO: Done.", flush=True)
     print("INFO: Processing init...", flush=True)

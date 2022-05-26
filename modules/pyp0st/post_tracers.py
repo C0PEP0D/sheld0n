@@ -10,13 +10,13 @@ import scipy.stats
 # custom lib
 import libpost
 
-BINS_NB = 128
+BINS_NB = 16
 BINS_RANGE = (0.0, 1.0)
 
 def parse():
     parser = argparse.ArgumentParser(description='Tracers post processing')
     parser.add_argument('name', help='specify the object name')
-    parser.add_argument('--number-inits', '-i', nargs='?', type=int, default=10, help='number of time steps considered as initial time steps')
+    parser.add_argument('--number-inits', '-i', nargs='?', type=int, default=100, help='number of time steps considered as initial time steps')
     parser.add_argument('--number-average', '-a', nargs='?', type=int, default=30, help='number of time steps for wich average quantities are computed')
     parser.add_argument('--number-profiles', '-p', nargs='?', type=int, default=5, help='number of time steps for wich profiles are computed')
     parser.add_argument('--flow-kinematic-viscosity', '-f', nargs='?', type=float, default=0.0, help='if non zero, enables flow statistics computation based on the value of kinematic viscosity specified, default: 0')
@@ -163,8 +163,8 @@ def main(name, n_inits, n_average, n_profiles, flow_kinematic_viscosity):
             values, bins, nb = sp.stats.binned_statistic(np.array(tmp_distance[i, :]), np.array(tmp_velocity[i, :]), statistic="mean", bins=BINS_NB, range=BINS_RANGE)
             tmp_distance_velocity.append(values)
         tmp_distance_velocity = np.column_stack(tmp_distance_velocity)
-        distance_velocity.append(np.average(tmp_distance_velocity, axis=1))
-    distance_velocity = np.average(np.column_stack(distance_velocity), axis=1)
+        distance_velocity.append(np.nanmean(tmp_distance_velocity, axis=1))
+    distance_velocity = np.nanmean(np.column_stack(distance_velocity), axis=1)
     bins = 0.5 * (bins[1:] + bins[:-1])
     print("INFO: Saving...", flush=True)
     np.savetxt("{name}__average_dispersion_velocity.csv".format(name=name), np.column_stack((bins, distance_velocity)), delimiter=",", header="distance,velocity")
