@@ -90,6 +90,7 @@ def main(axis, sorting_property, fit_max, n_average, reverse):
     for object_name in merged_objects:
         object_sorted = {}
         sorting_index = merged_objects[reduced_object_name]["info"].index(sorting_property)
+        print(merged_objects[reduced_object_name]["info"])
         for row in merged_objects[reduced_object_name]["value"]:
             row_list = row.tolist()
             row_list.pop(sorting_index)
@@ -106,15 +107,18 @@ def main(axis, sorting_property, fit_max, n_average, reverse):
             max_objects[object_name]["value"].append(object_sorted[row_tuple][np.argmax(object_sorted[row_tuple][:, 1]), :])
         max_objects[object_name]["value"] = np.stack(max_objects[object_name]["value"])
         # info
-        fits_objects[object_name]["info"] = [sorting_property, "average_velocity_axis_{axis}_t_inf".format(axis=axis)]
+        fits_objects[object_name]["info"] = [sorting_property]
         fits_max_objects[object_name]["info"] = merged_objects[object_name]["info"][3:] + ["max_surftimeconst", "max_average_velocity_axis"]
         fits_max_objects[object_name]["info"].pop(sorting_index - 3)
         # value
+        if fit_max == 0.0:
+            fit_max = merged_objects[object_name]["value"][:, sorting_index].max()
         fits_objects[object_name]["value"] = [np.linspace(0.0, fit_max, num=50)]
         fits_max_objects[object_name]["value"] = []
         for row_tuple in object_sorted:
             # value
             fit, cov = sp.optimize.curve_fit(fit_func, object_sorted[row_tuple][:, sorting_index], object_sorted[row_tuple][:, 1])
+            fits_objects[object_name]["info"] += ["average_velocity_axis_{axis}_t_inf__params_{params}".format(axis=axis, params="_".join([str(tmp) for tmp in row_tuple]).replace(".", "o"))]
             fits_objects[object_name]["value"] += [fit_func(fits_objects[object_name]["value"][0], *fit)]
             # max
             index_max = np.argmax(fits_objects[object_name]["value"][-1])
