@@ -29,7 +29,7 @@ class ActiveRotatingSwimmerStep : public TypeActiveStep<ActivePassiveStep>  {
             Type::registerActuator(sStepAxisRotate);
         }
 
-        ActiveRotatingSwimmerStep(const ActiveLocalAxisSwimmerStep& step) : Type(step)
+        ActiveRotatingSwimmerStep(const ActiveRotatingSwimmerStep& step) : Type(step)
    		{
    			Type::clearActuators();
    			sStepLocalAxisSwim = std::make_shared<TypeLocalAxisSwimStep<ActivePassiveStep>>(parameters.velocity);

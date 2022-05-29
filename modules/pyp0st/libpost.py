@@ -74,7 +74,7 @@ def get_properties_from_string(name):
     for prop in name_properties:
         prop_split = prop.split("_")
         if len(prop_split) > 1:
-            properties["_".join(prop_split[:-1])] = float(prop_split[-1].replace("o", "."))
+            properties["_".join(prop_split[:-1])] = float(prop_split[-1].replace("o", ".").replace("m", "-"))
     # return
     return properties
 

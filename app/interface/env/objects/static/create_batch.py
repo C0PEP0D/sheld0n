@@ -19,14 +19,14 @@ def get_property_from_dir_name(name, prop):
     all_properties = name.split("__")
     for prop_name in all_properties:
         if prop_name.startswith(prop):
-            return float(prop_name[len(prop)+1:].replace("o", "."))
+            return float(prop_name[len(prop)+1:].replace("o", ".").replace("m", "-"))
     return np.nan
 
 def set_property_from_dir_name(name, prop, value):
     all_properties = name.split("__")
     for i in range(len(all_properties)):
         if all_properties[i].startswith(prop):
-            all_properties[i] = prop + "_" + str(value).replace(".", "o")
+            all_properties[i] = prop + "_" + str(value).replace(".", "o").replace("-", "m")
     name = ""
     for prop_name in all_properties:
         name += prop_name + "__"

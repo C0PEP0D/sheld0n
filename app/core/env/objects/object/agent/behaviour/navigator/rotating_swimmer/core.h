@@ -70,7 +70,7 @@ class AgentBehaviourNavigatorRotatingSwimmer : public sl0::sa0::Behaviour<AgentA
 			} else {
 				stepActive.sStepAxisRotate->angularVelocity = angularVelocity;
 			}
-			stepActive.sStepLocalAxisSwim->velocity = behaviourVelocity(pState, t, stepActive, direction, velocityGradients, swimmingDirection) * stepActive.parameters.velocity;
+			stepActive.sStepLocalAxisSwim->velocity = behaviourVelocity(pState, t, stepActive, targetDirection, velocityGradients, swimmingDirection) * stepActive.parameters.velocity;
 		}
 };
 

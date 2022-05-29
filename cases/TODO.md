@@ -1,27 +1,34 @@
 # TODO:
 
-## CASES:
+## FLOW__N_128__RE_250
 
-* RE RUNNING: straight_trackers_fixed_target
-* RUNNING: surfing_trackers_fixed_target
+### CASES:
+
 * TO RUN: straight_trackers_passive_target
 * TO RUN: surfing_trackers_passive_target
-* RUNNING: intertial_risers
 * RUNNING: partial_surfers
-* TO RUN: negative_surfers
+* RUNNING: negative_surfers
 * TO RUN: sym_dir_surfers
 * TO RUN: grad_dir_surfers
 * RUNNING: bottom_heavy_spherical_swimmers
-* TO RUN: bottom_heavy_spheroidal_swimmers
+* TO RUN: bottom_heavy_spheroidal_swimmers (wait for bottom_heavy_spherical_swimmers)
 * RUNNING: filtering_surfers
 * RUNNING: exp_surfers
-* TO RUN: on_off_surfers
+* RUNNING: on_off_risers
+* TO RUN: on_off_surfers (prepared: wait for on_off_risers)
 * TO RUN: hessian_surfers
 
-## POST:
+### POST:
 
 * RUNNING: risers
 * RUNNING: tracers post_tracers
 * RUNNING: surfers post_velocity_axis
+* RUNNING: surfing_trackers_fixed_target
+* RUNNING: straight_trackers_fixed_target
+* RUNNING: intertial_risers
 
-## DONE:
+### DONE:
+
+## JHTDB ISOTROPIC (rerun everything)
+
+## JHTDB CHANNEL FLOW (rerun everything)
