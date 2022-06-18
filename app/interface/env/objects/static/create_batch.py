@@ -86,7 +86,7 @@ def set_parameter(dest, prop, value):
             file_replace(file_name, r"noiseIntensity = [^\*]* \*", "noiseIntensity = {value} *".format(value=float(value)))
             print("edited: ", file_name)
     elif prop == "delay":
-        for file_name in glob.glob(dest + "/**/*passive/inertial_point/parameters.h", recursive=True):
+        for file_name in glob.glob(dest + "/**/*passive/*inertial_point/parameters.h", recursive=True):
             file_replace(file_name, r"delay = [^\*]* \*", "delay = {value} *".format(value=float(value)))
             print("edited: ", file_name)
     elif prop == "reacttime":

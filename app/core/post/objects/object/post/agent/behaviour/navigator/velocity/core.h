@@ -20,12 +20,12 @@ class PostPostAgentBehaviourNavigatorVelocity : public PostPostPost<TypeObjectSt
 	public:
 		using PostPostPost<TypeObjectStep>::PostPostPost;
 	public:
-		std::map<std::string, TypeScalar> operator()(const double pState, const double& t) override {
+		std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
 			const TypeSpaceVector direction = sObjectStep->sBehaviour->sensorDirection(pState, t, *sObjectStep);
 			const TypeSpaceMatrix velocityGradients = sObjectStep->sBehaviour->sensorVelocityGradients(pState, t, *sObjectStep);
-			const TypeSpaceVector swimmingDirection = sObjectStep->cAxis(state);
+			const TypeSpaceVector swimmingDirection = sObjectStep->cAxis(pState);
 			return {
-				{ parameters.name, sObjectStep->sBehaviour->behaviourVelocity(state, t, *sObjectStep, direction, velocityGradients, swimmingDirection) * (*sObjectStep).parameters.velocity }
+				{ parameters.name, sObjectStep->sBehaviour->behaviourVelocity(pState, t, *sObjectStep, direction, velocityGradients, swimmingDirection) * (*sObjectStep).parameters.velocity }
 			};
 		};
 };

@@ -34,8 +34,8 @@ c_nb = 100
 c_array = np.linspace(0.0, 1.0, num=c_nb)
 C_nb = c_nb
 C_array = np.linspace(0.0, 1.0, num=C_nb)
-rho_nb = c_nb
-log_rho_array = np.linspace(-np.log(10), np.log(10000), num=rho_nb)
+rho_nb = 10 * c_nb
+log_rho_array = np.linspace(-np.log(10), np.log(100000), num=rho_nb)
 
 #process_times = [0.0, 0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128]
 process_times = [0.002, 0.004, 0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024, 1.536, 2.048, 4.096, 8.192] # step 0.002
@@ -44,7 +44,23 @@ def parse():
     parser = argparse.ArgumentParser(description='Computes statistics of the lagrangian gradients matrix (computed along particle trajectories)')
     return parser.parse_args()
 
-def dL_dt(foperator, L, t):
+# computing lyapunov exponent
+
+def rho_orientation(theta, phi, mu_pp, mu_p, mu):
+    return (np.sin(theta)**2 * (mu_pp * np.cos(phi)**2 + mu_p * np.sin(phi)**2) + mu * np.cos(theta)**2)**0.5
+
+def compute_lyapunov_exponent(mu_pp, mu_p, mu, t):
+    theta = np.linspace(0.0, np.pi/2.0, num=100)
+    phi = np.linspace(0.0, np.pi/2.0, num=100)
+    mu_pp = np.tile(mu_pp, (100, 100, 1)).transpose((2, 0, 1))
+    mu_p = np.tile(mu_p, (100, 100, 1)).transpose((2, 0, 1))
+    mu = np.tile(mu, (100, 100, 1)).transpose((2, 0, 1))
+    THETA, PHI = np.meshgrid(theta, phi)
+    return np.trapz(np.trapz(np.log(rho_orientation(THETA, PHI, mu_pp, mu_p, mu))/t * np.sin(THETA)/(np.pi/2.0), x=theta, axis=2), x=phi, axis=1)
+
+# computing concentration
+
+def dL_dt(foperator, t, L):
     return np.matmul(foperator(t), L.reshape((3,3), order='C')).flatten(order='C')
 
 def F(a):
@@ -91,6 +107,7 @@ def main():
     print("INFO: Done. Object names are:", " ".join(object_names), flush=True)
     print("INFO: Reading time...", flush=True)
     time_dirs, time_list, time = libpost.get_time()
+    #time = time[:10]
     #average_time_steps = np.round(np.linspace(0, time.size-1, n_average)).astype(int)
     print("INFO: Done.", flush=True)
     data = {}
@@ -160,7 +177,7 @@ def main():
                 print("\tINFO: Processing object {name}...".format(name=object_name), flush=True)
                 for j in range(data[object_name]["operator"].shape[1]):
                     foperator = sp.interpolate.interp1d(time, data[object_name]["operator"][:, j, :, :], kind="cubic", axis=0, fill_value="extrapolate")
-                    data[object_name]["L"][:, j, :, :] = sp.integrate.odeint(lambda L, t : dL_dt(foperator, L, t), np.identity(3).flatten(order='C'), time).reshape((data[object_name]["operator"].shape[0], 3, 3), order='C')
+                    data[object_name]["L"][:, j, :, :] = sp.integrate.solve_ivp(lambda t, L : dL_dt(foperator, t, L), (0.0, time[-1]), np.identity(3).flatten(order='C'), t_eval=time).y.reshape((data[object_name]["operator"].shape[0], 3, 3), order='C')
                 print("\tINFO: Done processing object {name}.".format(name=object_name), flush=True)
             print("INFO: Done.", flush=True)
             print("INFO: Saving L...", flush=True)
@@ -191,6 +208,9 @@ def main():
     print("INFO: Computing c pdf...", flush=True)
     for object_name in tau:
         c_var = np.empty(len(process_times))
+        lyapunov_exponent = np.empty(len(process_times))
+        lyapunov_exponent_2 = np.empty(len(process_times))
+        log_rho_var = np.empty(len(process_times))
         print("\tINFO: Processing object {name}...".format(name=object_name), flush=True)
         for process_times_index in range(len(process_times)):
             t = process_times[process_times_index]
@@ -200,6 +220,7 @@ def main():
             c_pdf = np.zeros(c_nb)
             eigvals = np.linalg.eigvalsh(tau[object_name][time_index, :, :, :])
             print(np.sqrt(1.0 / np.average(eigvals, axis=0)))
+            print(np.average(eigvals, axis=0))
             for c_index in range(1, c_nb - 1):
                 c = c_array[c_index]
                 Q_sum = np.zeros(C_nb)
@@ -212,12 +233,18 @@ def main():
             c_var[process_times_index] = np.average(np.trapz(np.power(c_array, 2) * c_pdf, x=c_array))
             # compute stretching pdf
             eigvals = np.linalg.eigvalsh(data[object_name]["L^t_L"][time_index, :, :, :])
-            print(np.average(eigvals, axis=0))
             log_rho_pdf = np.nanmean(np.exp(log_rho_array).reshape(-1, 1) * P(np.exp(log_rho_array), eigvals[:, 0], eigvals[:, 1], eigvals[:, 2]), axis=1)
             np.savetxt("{}__time_{}__log_rho_pdf.csv".format(object_name, str(t).replace(".", "o")), np.column_stack((log_rho_array, log_rho_pdf)), delimiter=",", header="log(rho), p(log(rho))")
+            # compute model values
+            lyapunov_exponent[process_times_index] = np.trapz(log_rho_array/t * log_rho_pdf, x=log_rho_array)
+            lyapunov_exponent_2[process_times_index] = np.nanmean(compute_lyapunov_exponent(eigvals[:, 0], eigvals[:, 1], eigvals[:, 2], t))
+            log_rho_var[process_times_index] = np.trapz((log_rho_array - lyapunov_exponent[process_times_index] * t)**2 * log_rho_pdf, x=log_rho_array)
             # done
             print("\t\tINFO: Done processing t={t}/{t_f}.".format(t=t, t_f=process_times[-1]), flush=True)
         np.savetxt("{}__sc_{}__time_c_var.csv".format(object_name, str(sc).replace(".", "o")), np.column_stack((process_times, c_var)), delimiter=",", header="time, c_var")
+        np.savetxt("{}__time_lyapunov_exponent.csv".format(object_name), np.column_stack((process_times, lyapunov_exponent)), delimiter=",", header="time, lyapunov_exponent")
+        np.savetxt("{}__time_lyapunov_exponent_2.csv".format(object_name), np.column_stack((process_times, lyapunov_exponent_2)), delimiter=",", header="time, lyapunov_exponent_2")
+        np.savetxt("{}__time_log_rho_var.csv".format(object_name), np.column_stack((process_times, log_rho_var)), delimiter=",", header="time, log_rho_var")
         print("\tINFO: Done processing object {name}.".format(name=object_name), flush=True)
     print("INFO: Done.", flush=True)
 

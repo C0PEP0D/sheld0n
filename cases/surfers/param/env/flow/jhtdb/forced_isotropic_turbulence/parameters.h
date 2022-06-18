@@ -8,7 +8,7 @@
 namespace c0p {
 
 struct FlowJhtdbForcedIsotropicTurbulenceParameters {
-    std::string authtoken = "edu.jhu.pha.turbulence.testing-201406";
+    std::string authtoken = "com.gmail.remi.monthiller-fe721580";
 };
 
 }

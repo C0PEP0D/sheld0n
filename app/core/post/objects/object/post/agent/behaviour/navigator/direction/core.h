@@ -21,12 +21,14 @@ class PostPostAgentBehaviourNavigatorDirection : public PostPostPost<TypeObjectS
 		using PostPostPost<TypeObjectStep>::PostPostPost;
 	public:
 		std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
+			const TypeSpaceVector direction = sObjectStep->sBehaviour->sensorDirection(pState, t, *sObjectStep);
+			const TypeSpaceMatrix velocityGradients = sObjectStep->sBehaviour->sensorVelocityGradients(pState, t, *sObjectStep);
+			const TypeSpaceVector dir = sObjectStep->sBehaviour->behaviourDirection(pState, t, *sObjectStep, direction, velocityGradients).normalized();
 			std::map<std::string, TypeScalar> result;
-        	const TypeSpaceVector dir = sObjectStep->sBehaviour->behaviourDirection(pState, t, *sObjectStep).normalized();
-        	for(unsigned int i = 0; i < dir.size(); i++) {
-        		result[parameters.name + "_" + std::to_string(i)] = dir[i];
-        	}
-        	return result;
+			for(unsigned int i = 0; i < dir.size(); i++) {
+				result[parameters.name + "_" + std::to_string(i)] = dir[i];
+			}
+			return result;
 		};
 };
 
