@@ -13,9 +13,8 @@
 // app include
 #include "core/post/flow/post/core.h"
 // FLAG: INCLUDE POST BEGIN
-#include "param/post/flow/ux/choice.h"
-#include "param/post/flow/uz/choice.h"
-#include "param/post/flow/uy/choice.h"
+#include "param/post/flow/vel/choice.h"
+#include "param/post/flow/grad/choice.h"
 // FLAG: INCLUDE POST END
 
 namespace c0p {
@@ -25,9 +24,8 @@ struct PostFlowParameters {
     std::vector<std::shared_ptr<PostFlowPost>> data;
     PostFlowParameters(std::shared_ptr<Flow> sFlow, std::shared_ptr<PostMeshMesh::Type> sMesh) {
         // FLAG: MAKE POST BEGIN
-        data.push_back(std::make_shared<PostFlowUx>(sFlow, sMesh));
-        data.push_back(std::make_shared<PostFlowUz>(sFlow, sMesh));
-        data.push_back(std::make_shared<PostFlowUy>(sFlow, sMesh));
+        data.push_back(std::make_shared<PostFlowVel>(sFlow, sMesh));
+        data.push_back(std::make_shared<PostFlowGrad>(sFlow, sMesh));
         // FLAG: MAKE POST END
     }
 };

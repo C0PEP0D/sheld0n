@@ -15,22 +15,22 @@ namespace c0p {
 
 template<typename TypeParameters, typename TypeObjectStep>
 class PostPostPairDistance : public PostPostPost<TypeObjectStep> {
-    public:
-        TypeParameters parameters;
-    public:
-        using PostPostPost<TypeObjectStep>::sObjectStep;
-    public:
-        using PostPostPost<TypeObjectStep>::PostPostPost;
-        PostPostPairDistance(std::shared_ptr<TypeObjectStep> p_sObjectStep) : PostPostPost<TypeObjectStep>(p_sObjectStep) {
-        }
-    public:
-        std::map<std::string, TypeScalar> operator()(const TypeVector<Eigen::Dynamic>& state, const double& t) override {
-            // compute
-            std::map<std::string, TypeScalar> processed;
-            processed[parameters.name] = (sObjectStep->sAStep->cX(sObjectStep->cAState(state)) - sObjectStep->sBStep->cX(sObjectStep->cBState(state))).norm();
-            // return
-            return processed;
-        };
+	public:
+		TypeParameters parameters;
+	public:
+		using PostPostPost<TypeObjectStep>::sObjectStep;
+	public:
+		using PostPostPost<TypeObjectStep>::PostPostPost;
+		PostPostPairDistance(std::shared_ptr<TypeObjectStep> p_sObjectStep) : PostPostPost<TypeObjectStep>(p_sObjectStep) {
+		}
+	public:
+		std::map<std::string, TypeScalar> operator()(const double* pState, const double& t) override {
+			// compute
+			std::map<std::string, TypeScalar> processed;
+			processed[parameters.name] = (sObjectStep->sAStep->cX(sObjectStep->cAState(pState)) - sObjectStep->sBStep->cX(sObjectStep->cBState(pState))).norm();
+			// return
+			return processed;
+		};
 };
 
 }

@@ -11,7 +11,7 @@ namespace c0p {
 // Accurate position sensor parameters
 struct ObjectAgentBehaviourSensorPositionAccurateParameters {
     // Position sensed
-    const TypeSpaceVector position = {1.0, 0.0, 0.0};
+    TypeSpaceVector position = {0.0, 0.0, 0.0};
 };
 
 }

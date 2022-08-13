@@ -8,23 +8,22 @@
 
 namespace c0p {
 
-template<template<typename, typename> typename TypeParameters, typename AgentActiveStep>
-class AgentBehaviourCustomSwimmer : public sl0::sa0::Behaviour<typename AgentActiveStep::TypeStateStatic, TypeRef, AgentActiveStep> {
+template<template<typename> typename TypeParameters, typename AgentActiveStep>
+class AgentBehaviourCustomSwimmer : public sl0::sa0::Behaviour<AgentActiveStep> {
     public:
-        using Type = sl0::sa0::Behaviour<typename AgentActiveStep::TypeStateStatic, TypeRef, AgentActiveStep>;
-        using TypeAgentStateStatic = typename AgentActiveStep::TypeStateStatic;
+        using Type = sl0::sa0::Behaviour<AgentActiveStep>;
     public:
-        TypeParameters<TypeAgentStatic, AgentActiveStep> parameters;
+        TypeParameters<AgentActiveStep> parameters;
     public:
         AgentBehaviourCustomSwimmer(std::shared_ptr<Objects> sObjects) {
         }
     public:
-        TypeContainer<TypeSpaceVector> positions(const TypeRef<const TypeAgentStateStatic>& state, const AgentActiveStep& stepActive) const override {
-            return parameters.positions(state, stepActive);
+        TypeContainer<TypeSpaceVector> positions(const double* pState, const AgentActiveStep& stepActive) const override {
+            return parameters.positions(pState, stepActive);
         }
     public:
-        void operator()(const TypeRef<const TypeAgentStateStatic>& state, const double& t, const AgentActiveStep& stepActive) const override {
-            parameters(state, t, stepActive);
+        void operator()(const double* pState, const double& t, const AgentActiveStep& stepActive) const override {
+            parameters(pState, t, stepActive);
         }
 };
 

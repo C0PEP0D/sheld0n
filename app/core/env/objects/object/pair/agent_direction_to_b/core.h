@@ -12,14 +12,14 @@
 namespace c0p {
 
 template<typename TypeParameters, typename TypeAStep_, typename TypeBStep_>
-class PairAgentDirectionToBStep : public sl0::StepObjectStatic<TypeVector, DIM, TypeRef, TypeAStep_::StateSize + TypeBStep_::StateSize> {
+class PairAgentDirectionToBStep : public sl0::StepObjectStatic<TypeVector, DIM, TypeAStep_::StateSize + TypeBStep_::StateSize> {
     public:
         TypeParameters parameters;
     public:
         using TypeAStep = TypeAStep_;
         using TypeBStep = TypeBStep_;
     public:
-        using Type = sl0::StepObjectStatic<TypeVector, DIM, TypeRef, TypeAStep::StateSize+TypeBStep::StateSize>;
+        using Type = sl0::StepObjectStatic<TypeVector, DIM, TypeAStep::StateSize+TypeBStep::StateSize>;
         using Type::StateSize;
         using typename Type::TypeStateStatic;
     public:

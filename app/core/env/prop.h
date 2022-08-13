@@ -44,6 +44,14 @@ namespace rand0m {
         engine.seed(p_seed);
         std::srand(p_seed);
     }
+
+    TypeSpaceVector getRandomUnitVector() {
+    	return TypeSpaceVector({
+    		standardNormalDistribution(engine), 
+    		standardNormalDistribution(engine), 
+    		standardNormalDistribution(engine)
+    	}).normalized();
+    }
 }
 
 }

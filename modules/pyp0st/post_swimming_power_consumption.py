@@ -22,7 +22,7 @@ def main():
     print("INFO: Done. Object names are:", " ".join(object_names), flush=True)
     print("INFO: Reading time...", flush=True)
     time_dirs, time_list, time = libpost.get_time()
-    #time = time[-1]
+    time = time[:-1]
     print("INFO: Done.", flush=True)
     print("INFO: Processing power...", flush=True)
     objects_average_swimming_power_consumption = {}
@@ -38,7 +38,7 @@ def main():
             obj_us = libpost.get_object_properties(obj, ["particle_.*__us"])["value"]
             if swimming_power_consumption is None:
                 swimming_power_consumption = np.zeros(obj_us.shape)
-            swimming_power_consumption += np.power(obj_us, 2) * t - time[index-1]
+            swimming_power_consumption += np.power(obj_us, 2) * (t - time[index-1])
             print("\t\tINFO: Done processing t={t}/{t_f}.".format(t=t, t_f=time[-1]), flush=True)
         swimming_power_consumption /= time[-1]
         objects_average_swimming_power_consumption[name] = np.array((time[-1], np.average(swimming_power_consumption), 1.96 * np.std(swimming_power_consumption) / np.sqrt(swimming_power_consumption.size)))
