@@ -21,7 +21,7 @@ class InitInitPassiveAxisRandom : public InitInitInitStatic<TypeObjectStep> {
         using InitInitInitStatic<TypeObjectStep>::InitInitInitStatic;
     public:
         void operator()(double* pState) override {
-            sObjectStep->axis(pState) = TypeSpaceVector::Random().normalized();
+            sObjectStep->axis(pState) = rand0m::getRandomUnitVector();
         };
 };
 
