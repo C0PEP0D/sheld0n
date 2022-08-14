@@ -21,7 +21,7 @@ struct ObjectAgentBehaviourCustomLocalAxisSwimmerParameters {
         ObjectAgentBehaviourSensorVelocityGradients<AgentActiveStep> sensorVelocityGradients;
     public:
         // Behaviour
-        void operator()(const TypeRef<const double* pState, const double& t, const AgentActiveStep& stepActive) const {
+        void operator()(const double* pState, const double& t, const AgentActiveStep& stepActive) const {
             const TypeSpaceVector direction = sensorDirection(pState, t, stepActive);
             const TypeSpaceMatrix velocityGradients = sensorVelocityGradients(pState, t, stepActive);
             const TypeSpaceVector swimmingDirection = stepActive.cAxis(pState);
