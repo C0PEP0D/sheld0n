@@ -22,7 +22,7 @@ def main():
     print("INFO: Done. Object names are:", " ".join(object_names), flush=True)
     print("INFO: Reading time...", flush=True)
     time_dirs, time_list, time = libpost.get_time()
-    #time = time[:10]
+    time = time[:-1]
     print("INFO: Done.", flush=True)
     print("INFO: Processing power...", flush=True)
     objects_average_swimming_power_consumption = {}

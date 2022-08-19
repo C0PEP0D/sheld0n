@@ -29,7 +29,7 @@ def main():
     for name in object_names:
         print("\tINFO: Processing object {name}...".format(name=name), flush=True)
         swimming_power_consumption = None
-        for index in range(0, time.size):
+        for index in range(1, time.size):
             t = time[index]
             print("\t\tINFO: Processing t={t}/{t_f}...".format(t=t, t_f=time[-1]), flush=True)
             # read objects
