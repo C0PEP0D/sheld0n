@@ -16,6 +16,7 @@
 #include "param/post/objects/surfer__vs_4o0__surftimeconst_0o0/pos/choice.h"
 #include "param/post/objects/surfer__vs_4o0__surftimeconst_0o0/grad/choice.h"
 #include "param/post/objects/surfer__vs_4o0__surftimeconst_0o0/vel/choice.h"
+#include "param/post/objects/surfer__vs_4o0__surftimeconst_0o0/dir/choice.h"
 // FLAG: INCLUDE POST END
 
 namespace c0p {
@@ -31,6 +32,7 @@ struct PostSurferVs4O0Surftimeconst0O0Parameters {
         data.push_back(std::make_shared<PostSurferVs4O0Surftimeconst0O0Pos<TypeObjectStep>>(sObjectStep));
         data.push_back(std::make_shared<PostSurferVs4O0Surftimeconst0O0Grad<TypeObjectStep>>(sObjectStep));
         data.push_back(std::make_shared<PostSurferVs4O0Surftimeconst0O0Vel<TypeObjectStep>>(sObjectStep));
+        data.push_back(std::make_shared<PostSurferVs4O0Surftimeconst0O0Dir<TypeObjectStep>>(sObjectStep));
         // FLAG: MAKE POST END
     }
 };
