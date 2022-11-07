@@ -27,6 +27,7 @@ def main(axis, sorting_property, fit_max, n_average, reverse):
     print("INFO: Post processing the effective velocity of lagrangian objects along the axis {axis}.".format(axis=axis), flush=True)
     print("INFO: Reading objects...", flush=True)
     object_names = libpost.get_object_names()
+    #object_names = [name for name in object_names if not "riser" in name]
     print("INFO: Done. Object names are:", " ".join(object_names), flush=True)
     print("INFO: Reading time...", flush=True)
     time_dirs, time_list, time = libpost.get_time()
@@ -90,7 +91,6 @@ def main(axis, sorting_property, fit_max, n_average, reverse):
     for object_name in merged_objects:
         object_sorted = {}
         sorting_index = merged_objects[reduced_object_name]["info"].index(sorting_property)
-        print(merged_objects[reduced_object_name]["info"])
         for row in merged_objects[reduced_object_name]["value"]:
             row_list = row.tolist()
             row_list.pop(sorting_index)

@@ -15,9 +15,10 @@ class PassiveKinematicInertialPointStep : public TypePassiveKinematicInertialPoi
     public:
         TypeParameters parameters;
     public:
-        PassiveKinematicInertialPointStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : Type(sFlow, 0.0, TypeSpaceVector::Zero()) {
+        PassiveKinematicInertialPointStep(std::shared_ptr<Flow> sFlow, std::shared_ptr<Objects> sObjects) : Type(sFlow, 0.0, TypeSpaceVector::Zero(), 0.0) {
         	Type::delay = parameters.delay;
         	Type::velocity = parameters.velocity;
+        	Type::dt = parameters.dt;
         }
 };
 

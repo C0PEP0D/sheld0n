@@ -15,13 +15,28 @@ def parse():
 def main(nu):
     print("INFO: Reading time...", flush=True)
     time_dirs, time_list, time = libpost.get_time()
+    #time = time[:-1]
     print("INFO: Done.", flush=True)
     print("INFO: Reading mesh...", flush=True)
     mesh = libpost.get_mesh()
-    nx = int(round(np.cbrt(mesh["value"].size//3)))
-    mesh = mesh["value"].reshape((3, nx, nx, nx))
-    dx = (mesh[0, 1, 0, 0] - mesh[0, 0, 0, 0])
-    kx = 2 * np.pi / (dx * nx) * np.linspace(1, int(nx/2 + 1)+1, num=int(nx/2 + 1))
+    print("INFO: Done.", flush=True)
+    print("INFO: Mesh sorting...", flush=True)
+    mesh_pos_0 = libpost.get_object_properties(mesh, [".*__pos_0"])
+    nx = int(round(mesh_pos_0["value"].size**(1/3)))
+    sorting_indexs = np.empty(mesh_pos_0["value"].size, dtype=int)
+    for i in range(len(mesh_pos_0["info"])):
+        index = int(mesh_pos_0["info"][i].split("__")[1].split("_")[1])
+        sorting_indexs[i] = index
+    sorting_indexs = np.argsort(sorting_indexs)
+    mesh_pos_0["value"][sorting_indexs].reshape((nx, nx, nx)).transpose((2, 1, 0))
+    mesh =np.stack([
+        mesh_pos_0["value"][sorting_indexs].reshape((nx, nx, nx)).transpose((2, 1, 0)), 
+        libpost.get_object_properties(mesh, [".*__pos_1"])["value"][sorting_indexs].reshape((nx, nx, nx)).transpose((2, 1, 0)),
+        libpost.get_object_properties(mesh, [".*__pos_2"])["value"][sorting_indexs].reshape((nx, nx, nx)).transpose((2, 1, 0))
+    ])
+    dx = (mesh[1, 0, 1, 0] - mesh[0, 0, 0, 0])
+    print(mesh.shape)
+    print("d: ", dx * nx)
     print("INFO: Done.", flush=True)
     print("INFO: Computing flow statistics...", flush=True)
     dissipation_rate = np.empty(time.size)
@@ -35,48 +50,24 @@ def main(nu):
         print("\tINFO: Processing t={t}/{t_f}...".format(t=t, t_f=time[-1]), flush=True)
         # read flow
         flow = libpost.get_flow(time_dirs[time_list.index(t)])
+        print(np.array(libpost.get_object_properties(flow, [".*__u_0"])["info"], dtype=str)[sorting_indexs])
         # extract velocity
-        flow_velocity_0 = libpost.get_object_properties(flow, [".*__u_0"])
-        flow_velocity_1 = libpost.get_object_properties(flow, [".*__u_1"])
-        flow_velocity_2 = libpost.get_object_properties(flow, [".*__u_2"])
-        flow_velocity = np.empty((flow_velocity_0["value"].size, 3))
-        flow_velocity[:, 0] = flow_velocity_0["value"]
-        flow_velocity[:, 1] = flow_velocity_1["value"]
-        flow_velocity[:, 2] = flow_velocity_2["value"]
-        del flow_velocity_0;
-        del flow_velocity_1;
-        del flow_velocity_2;
-        ## meshing velocity
-        flow_velocity_meshed = flow_velocity.reshape((3, nx, nx, nx))
+        flow_velocity = np.stack([
+            libpost.get_object_properties(flow, [".*__u_0"])["value"][sorting_indexs].reshape((nx, nx, nx)).transpose((2, 1, 0)),
+            libpost.get_object_properties(flow, [".*__u_1"])["value"][sorting_indexs].reshape((nx, nx, nx)).transpose((2, 1, 0)),
+            libpost.get_object_properties(flow, [".*__u_2"])["value"][sorting_indexs].reshape((nx, nx, nx)).transpose((2, 1, 0))
+        ])
         # extract gradients
-        flow_gradients_0_0 = libpost.get_object_properties(flow, [".*__j_0_0"])
-        flow_gradients_0_1 = libpost.get_object_properties(flow, [".*__j_0_1"])
-        flow_gradients_0_2 = libpost.get_object_properties(flow, [".*__j_0_2"])
-        flow_gradients_1_0 = libpost.get_object_properties(flow, [".*__j_1_0"])
-        flow_gradients_1_1 = libpost.get_object_properties(flow, [".*__j_1_1"])
-        flow_gradients_1_2 = libpost.get_object_properties(flow, [".*__j_1_2"])
-        flow_gradients_2_0 = libpost.get_object_properties(flow, [".*__j_2_0"])
-        flow_gradients_2_1 = libpost.get_object_properties(flow, [".*__j_2_1"])
-        flow_gradients_2_2 = libpost.get_object_properties(flow, [".*__j_2_2"])
-        flow_gradients = np.empty((flow_gradients_0_0["value"].size, 3, 3))
-        flow_gradients[:, 0, 0] = flow_gradients_0_0["value"]
-        flow_gradients[:, 0, 1] = flow_gradients_0_1["value"]
-        flow_gradients[:, 0, 2] = flow_gradients_0_2["value"]
-        flow_gradients[:, 1, 0] = flow_gradients_1_0["value"]
-        flow_gradients[:, 1, 1] = flow_gradients_1_1["value"]
-        flow_gradients[:, 1, 2] = flow_gradients_1_2["value"]
-        flow_gradients[:, 2, 0] = flow_gradients_2_0["value"]
-        flow_gradients[:, 2, 1] = flow_gradients_2_1["value"]
-        flow_gradients[:, 2, 2] = flow_gradients_2_2["value"]
-        del flow_gradients_0_0;
-        del flow_gradients_0_1;
-        del flow_gradients_0_2;
-        del flow_gradients_1_0;
-        del flow_gradients_1_1;
-        del flow_gradients_1_2;
-        del flow_gradients_2_0;
-        del flow_gradients_2_1;
-        del flow_gradients_2_2;
+        flow_gradients = np.empty((nx**3, 3, 3))
+        flow_gradients[:, 0, 0] = libpost.get_object_properties(flow, [".*__j_0_0"])["value"]
+        flow_gradients[:, 0, 1] = libpost.get_object_properties(flow, [".*__j_0_1"])["value"]
+        flow_gradients[:, 0, 2] = libpost.get_object_properties(flow, [".*__j_0_2"])["value"]
+        flow_gradients[:, 1, 0] = libpost.get_object_properties(flow, [".*__j_1_0"])["value"]
+        flow_gradients[:, 1, 1] = libpost.get_object_properties(flow, [".*__j_1_1"])["value"]
+        flow_gradients[:, 1, 2] = libpost.get_object_properties(flow, [".*__j_1_2"])["value"]
+        flow_gradients[:, 2, 0] = libpost.get_object_properties(flow, [".*__j_2_0"])["value"]
+        flow_gradients[:, 2, 1] = libpost.get_object_properties(flow, [".*__j_2_1"])["value"]
+        flow_gradients[:, 2, 2] = libpost.get_object_properties(flow, [".*__j_2_2"])["value"]
         # more gradients
         sym_flow_gradients = 0.5 * (flow_gradients + flow_gradients.transpose((0, 2, 1)))
         skew_flow_gradients = 0.5 * (flow_gradients - flow_gradients.transpose((0, 2, 1)))
@@ -87,14 +78,23 @@ def main(nu):
         vorticity[:, 2] = 2.0 * -skew_flow_gradients[:, 0, 1]
         # compute statistics
         dissipation_rate[index] = 2.0 * nu * np.average(np.sum(np.square(sym_flow_gradients), axis=(1, 2)))
-        average_flow_velocity = np.average(flow_velocity, axis=0)
-        rms_flow_velocity[index] = (1.0/np.sqrt(3.0)) * np.average(np.sqrt(np.sum(np.square(flow_velocity - average_flow_velocity), axis=1)))
+        average_flow_velocity = np.average(flow_velocity, axis=(1,2,3))
+        # rms_flow_velocity[index] = (1.0/np.sqrt(3.0)) * np.average(np.sqrt(np.sum(np.square(flow_velocity - average_flow_velocity.reshape((3, 1, 1, 1))), axis=0)))
+        rms_flow_velocity[index] = np.std(flow_velocity)
         average_streching[index] = np.average(np.linalg.norm(sym_flow_gradients, axis=(1, 2)))
         average_vorticity[index] = np.average(np.linalg.norm(vorticity, axis=1))
         ## integral scales
-        integral_length_scale[index] = np.pi / (2 * rms_flow_velocity[index]**2) * np.trapz(0.5 * np.average(np.abs(np.fft.rfft(flow_velocity_meshed[0, :, :, :], axis=0) / flow_velocity_meshed[0, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[1, :, :, :], axis=0) / flow_velocity_meshed[1, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[2, :, :, :], axis=0) / flow_velocity_meshed[2, :, :, :].shape[0])**2, axis=(1, 2)) / kx, x=kx)
+        print("u.shape ", flow_velocity.shape)
+        uk = np.fft.rfft(flow_velocity, axis=1) / flow_velocity.shape[1]
+        print("uk.shape ", uk.shape)
+        ek = 0.5 * np.average(np.sum(np.abs(uk)**2, axis=0), axis=(1,2))
+        print("ek.shape ", ek.shape)
+        kx = (2.0 * np.pi / (dx * nx)) * np.linspace(1, uk.shape[1] + 1, num=uk.shape[1])
+        print("k = ", kx)
+        print("ek = ", ek)
+        integral_length_scale[index] = (np.pi / (2.0 * rms_flow_velocity[index]**2)) * np.trapz(ek / kx, x=kx)
         # tests
-        taylor_micro_scale_spectrum[index] = (np.trapz(0.5 * np.average(np.abs(np.fft.rfft(flow_velocity_meshed[0, :, :, :], axis=0) / flow_velocity_meshed[0, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[1, :, :, :], axis=0) / flow_velocity_meshed[1, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[2, :, :, :], axis=0) / flow_velocity_meshed[2, :, :, :].shape[0])**2, axis=(1, 2)) * kx**2, x=kx) / np.trapz(0.5 * np.average(np.abs(np.fft.rfft(flow_velocity_meshed[0, :, :, :], axis=0) / flow_velocity_meshed[0, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[1, :, :, :], axis=0) / flow_velocity_meshed[1, :, :, :].shape[0])**2 + np.abs(np.fft.rfft(flow_velocity_meshed[2, :, :, :], axis=0) / flow_velocity_meshed[2, :, :, :].shape[0])**2, axis=(1, 2)), x=kx))**(-0.5)
+        taylor_micro_scale_spectrum[index] = (np.trapz(ek * kx**2, x=kx) / np.trapz(ek, x=kx))**(-0.5)
         # print
         print("\tINFO: Done.", flush=True)
     dissipation_rate = np.average(dissipation_rate)
@@ -106,6 +106,8 @@ def main(nu):
     kolmogorov_time_scale = np.sqrt(nu / dissipation_rate)
     kolmogorov_length_scale = nu**(3.0/4.0) * dissipation_rate**(-1.0/4.0)
     integral_length_scale = np.average(integral_length_scale)
+    print("u_rms = ", rms_flow_velocity)
+    print("L = ", integral_length_scale)
     large_eddy_turnover_time = integral_length_scale / rms_flow_velocity
     # tests
     taylor_micro_scale_spectrum = np.average(taylor_micro_scale_spectrum)

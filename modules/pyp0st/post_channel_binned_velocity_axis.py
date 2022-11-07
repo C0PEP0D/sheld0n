@@ -12,10 +12,11 @@ import scipy.optimize
 import libpost
 
 BIN_RANGE = (-1.0, 1.0)
-BIN_NB = 20
-BINS = np.logspace(-4.0, 0.0, num=BIN_NB+1)
+BIN_NB = 12
+BINS = np.logspace(-3.0, 0.0, num=BIN_NB+1)
 
 SORTING_PARAMETER_STR = "surftimeconst"
+#SORTING_PARAMETER_STR = "surftimeprefactor"
 
 def parse():
     parser = argparse.ArgumentParser(description='Computes particle concentration along an axis')

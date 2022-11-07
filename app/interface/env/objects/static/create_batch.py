@@ -38,21 +38,21 @@ def file_replace(file_name, text, replacement):
 
 def set_parameter(dest, prop, value):
     if prop == "surftimeconst":
-        for file_name in glob.glob(dest + "/**/surf/_behaviour_time_horizon/const/parameters.h", recursive=True):
+        for file_name in glob.glob(dest + "/**/*surf/_behaviour_time_horizon/const/parameters.h", recursive=True):
             file_replace(file_name, r"value = [^\*]* \*", "value = {value} *".format(value=float(value)))
             print("edited: ", file_name)
     elif prop == "surftimeprefactor":
-        for file_name in glob.glob(dest + "/**/surf/_behaviour_time_horizon/*/parameters.h", recursive=True):
+        for file_name in glob.glob(dest + "/**/*surf/_behaviour_time_horizon/*/parameters.h", recursive=True):
             file_replace(file_name, r"prefactor = [^\*]*;", "prefactor = {value};".format(value=float(value)))
             print("edited: ", file_name)
-    elif prop == "us":
+    elif prop == "vs" or prop == "us":
         for file_name in glob.glob(dest + "/**/*active/**/*swimmer/parameters.h", recursive=True):
             file_replace(file_name, r"velocity = [^\*]* \*", "velocity = {value} *".format(value=float(value)))
             print("edited: ", file_name)
-        file_replace(dest + "/group/homogeneous/parameters.h", r"size = [^\*]* \*", "size = 1/({value}*{value}) *".format(value=float(value)))
-        print("edited: ", dest + "/group/homogeneous/parameters.h")
-    elif prop == "vs":
-        for file_name in glob.glob(dest + "/**/*active/**/*swimmer/parameters.h", recursive=True):
+        for file_name in glob.glob(dest + "/**/*passive/kinematic_inertial_point/parameters.h", recursive=True):
+            file_replace(file_name, r"velocity = [^\*]* \*", "velocity = {value} *".format(value=float(value)))
+            print("edited: ", file_name)
+        for file_name in glob.glob(dest + "/**/*passive/kinematic_inertial_point_filtered/parameters.h", recursive=True):
             file_replace(file_name, r"velocity = [^\*]* \*", "velocity = {value} *".format(value=float(value)))
             print("edited: ", file_name)
         file_replace(dest + "/group/homogeneous/parameters.h", r"size = [^\*]* \*", "size = 1/({value}*{value}) *".format(value=float(value)))
@@ -86,7 +86,7 @@ def set_parameter(dest, prop, value):
             file_replace(file_name, r"noiseIntensity = [^\*]* \*", "noiseIntensity = {value} *".format(value=float(value)))
             print("edited: ", file_name)
     elif prop == "delay":
-        for file_name in glob.glob(dest + "/**/*passive/*inertial_point/parameters.h", recursive=True):
+        for file_name in glob.glob(dest + "/**/*passive/*inertial_point*/parameters.h", recursive=True):
             file_replace(file_name, r"delay = [^\*]* \*", "delay = {value} *".format(value=float(value)))
             print("edited: ", file_name)
     elif prop == "reacttime":

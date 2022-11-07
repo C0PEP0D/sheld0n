@@ -15,6 +15,7 @@ struct ObjectPassiveKinematicInertialPointStepParameters {
     // Delay: inertial delay, characteristic time to reach a steady velocity in a steady flow
     TypeScalar delay = 1.0 * Parameters::cTime;
     TypeSpaceVector velocity = 1.0 * Parameters::cVelocity * TypeSpaceVector({1.0, 0.0, 0.0});
+    TypeScalar dt = 0.25 * Parameters::cTime;
 };
 
 }

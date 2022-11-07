@@ -43,7 +43,7 @@ def get_flow(time_dir):
 
 def get_mesh():
     object_filename = "mesh.csv"
-    return {"info":get_file_header(object_filename), "value":np.loadtxt(object_filename, delimiter=",")}
+    return {"info":np.array(get_file_header(object_filename)), "value":np.loadtxt(object_filename, delimiter=",")}
 
 def get_object_properties(obj, properties):
     regex = ""
