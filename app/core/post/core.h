@@ -94,10 +94,10 @@ class Post {
 					// deal with parameters
 					if(parameters.nb > 0 && parameters.nb < time.size() - parameters.begin) {
 						if(parameters.step == 0) {
-							parameters.step = (time.size() - parameters.begin)/parameters.nb;
+							parameters.step = (time.size() - parameters.begin)/(parameters.nb - 1);
 						}
 						for(int i = time.size() - 1; i > -1; i--) {
-							if(not ((i > parameters.begin) && (i - parameters.begin < parameters.nb * parameters.step) && ((i - parameters.begin) % parameters.step == 0))) {
+							if(not ((i >= parameters.begin) && (i < parameters.begin + parameters.nb * parameters.step) && ((i - parameters.begin) % parameters.step == 0))) {
 								time.erase(time.begin() + i);
 							}
 						}
@@ -131,15 +131,19 @@ class Post {
    			}
    			// // Manager
    			for(const unsigned int& managerIndex : env.sObjects->managerIndexs) {
-   				unsigned int managedIndex = 0;
-   				for (const std::filesystem::directory_entry& dir_entry : std::filesystem::directory_iterator(folder + "/" + env.sObjectsParameters->objectsManagerNames[managerIndex])) {
-   					if(env.sObjects->statesManager[managerIndex].size() == managedIndex) {
-   						env.sObjects->statesManager[managerIndex].emplace_back();
-   					}
-   					l0ad::ascii::loadVectorDouble(dir_entry.path(), env.sObjects->statesManager[managerIndex][managedIndex]);
-   					env.sObjects->sStepsManager[managerIndex]->registerStates(env.sObjects->statesManager[managerIndex]);
-   					managedIndex += 1;
-   				}
+				// load data into states
+				unsigned int managedIndex = 0;
+				for (const std::filesystem::directory_entry& dir_entry : std::filesystem::directory_iterator(folder + "/" + env.sObjectsParameters->objectsManagerNames[managerIndex])) {
+					if(env.sObjects->statesManager[managerIndex].size() == managedIndex) {
+						env.sObjects->statesManager[managerIndex].emplace_back();
+					}
+					l0ad::ascii::loadVectorDouble(dir_entry.path(), env.sObjects->statesManager[managerIndex][managedIndex]);
+					managedIndex += 1;
+				}
+				// clear unecessary data
+				env.sObjects->statesManager[managerIndex].resize(managedIndex);
+				// register states
+				env.sObjects->sStepsManager[managerIndex]->registerStates(env.sObjects->statesManager[managerIndex]);
    			}
 			// Set time
 			env.sObjects->t = t;

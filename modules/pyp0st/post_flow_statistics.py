@@ -35,7 +35,6 @@ def main(nu):
         libpost.get_object_properties(mesh, [".*__pos_2"])["value"][sorting_indexs].reshape((nx, nx, nx)).transpose((2, 1, 0))
     ])
     dx = (mesh[1, 0, 1, 0] - mesh[0, 0, 0, 0])
-    print(mesh.shape)
     print("d: ", dx * nx)
     print("INFO: Done.", flush=True)
     print("INFO: Computing flow statistics...", flush=True)

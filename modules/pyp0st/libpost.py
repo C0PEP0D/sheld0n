@@ -64,6 +64,7 @@ def get_object_names():
             object_names.append(path.split("/")[-1].split(".")[0])
     else:
         raise NameError('No data found')
+    object_names.remove("flow")
     return object_names
 
 def get_properties_from_string(name):

@@ -20,7 +20,7 @@ class ChainStrechableStep : public TypeChainStrechableStep<typename TypeParamete
         std::shared_ptr<Flow> sFlow;
         std::shared_ptr<Objects> sObjects;
     public:
-        ChainStrechableStep(const std::shared_ptr<Flow>& p_sFlow, std::shared_ptr<Objects> p_sObjects) : Type(std::make_shared<TypeMemberStep>(p_sFlow, sObjects), 0.0, 0), parameters(), sFlow(p_sFlow), sObjects(p_sObjects) {
+        ChainStrechableStep(const std::shared_ptr<Flow>& p_sFlow, std::shared_ptr<Objects> p_sObjects) : Type(std::make_shared<TypeMemberStep>(p_sFlow, sObjects), 0.0, 0, TypeParameters::closed), parameters(), sFlow(p_sFlow), sObjects(p_sObjects) {
             Type::dl = parameters.dl;
             Type::interpolationOrder = parameters.interpolationOrder;
         }

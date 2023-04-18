@@ -21,6 +21,8 @@ struct DobjectChainStrechableStepParameters {
     const double dl = 1 * Parameters::cLength;
     // Interpolation order of the chain
     const unsigned int interpolationOrder = 4;
+    // Is the chain closed
+    static const bool closed = true;
 };
 
 }

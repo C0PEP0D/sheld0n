@@ -112,6 +112,9 @@ def main():
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/choose.py", args.name + "/param/init/objects/dobject/orient/group/_member"), args.name + "/param/init/objects/dobject/orient/group/_member/choose")
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/group/_member/passive/choose.py", args.name + "/param/init/objects/dobject/orient/group/_member/passive"), args.name + "/param/init/objects/dobject/orient/group/_member/passive/choose")
     os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/pos/__passive/__axis/choose.py", args.name + "/param/init/objects/dobject/orient/group/_member/passive/axis"), args.name + "/param/init/objects/dobject/orient/group/_member/passive/axis/choose")
+    ##### mobject
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/copy_init.py", args.name + "/param/init/objects/mobject"), args.name + "/param/init/objects/mobject/copy_init")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/init/objects/object/remove_init.py", args.name + "/param/init/objects/mobject"), args.name + "/param/init/objects/mobject/remove_init")
     ### post
     #### objects
     os.symlink(os.path.relpath(code_dir + "/app/interface/post/objects/copy_posts.py", args.name + "/param/post/objects"), args.name + "/param/post/objects/copy_posts")

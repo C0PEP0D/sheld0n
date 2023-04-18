@@ -20,16 +20,16 @@
 
 namespace c0p {
 
-template<typename TypeMobjectStep>
+template<typename TypeObjectStep>
 struct InitMobjectParameters {
     std::string name = "object";
     // make data
-    std::vector<std::shared_ptr<InitInitInitManager<TypeMobjectStep>>> sInits;
-    InitMobjectParameters(std::shared_ptr<TypeMobjectStep> sMobjectStep) {
+    std::vector<std::shared_ptr<InitInitInitManager<TypeObjectStep>>> sInits;
+    InitMobjectParameters(std::shared_ptr<TypeObjectStep> sObjectStep) {
         // FLAG: MAKE INIT BEGIN
-        sInits.push_back(std::make_shared<InitMobjectNb<TypeMobjectStep>>(sMobjectStep));
-        sInits.push_back(std::make_shared<InitMobjectPos<TypeMobjectStep>>(sMobjectStep));
-        sInits.push_back(std::make_shared<InitMobjectOrient<TypeMobjectStep>>(sMobjectStep));
+        sInits.push_back(std::make_shared<InitMobjectNb<TypeObjectStep>>(sObjectStep));
+        sInits.push_back(std::make_shared<InitMobjectPos<TypeObjectStep>>(sObjectStep));
+        sInits.push_back(std::make_shared<InitMobjectOrient<TypeObjectStep>>(sObjectStep));
         // FLAG: MAKE INIT END
     }
 };

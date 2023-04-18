@@ -51,7 +51,7 @@ class Objects {
 				sStepsDynamic[dynamicIndex]->update(statesDynamic[dynamicIndex], t);
 			});
 			// manager
-			std::for_each(std::execution::par_unseq, managerIndexs.cbegin(), managerIndexs.cend(), [this, dt](const unsigned int& managerIndex){ 
+			std::for_each(std::execution::par_unseq, managerIndexs.cbegin(), managerIndexs.cend(), [this, dt](const unsigned int& managerIndex){
 				for (unsigned int managedIndex = 0; managedIndex < statesManager[managerIndex].size(); managedIndex++) {
 					(*sSolver)([this, managerIndex, managedIndex](const double* pState, const double& t) { return (*sStepsManager[managerIndex])(pState, t, managedIndex); }, statesManager[managerIndex][managedIndex].data(), statesManager[managerIndex][managedIndex].size(), t, dt);
 				}

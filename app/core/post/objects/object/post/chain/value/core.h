@@ -28,8 +28,9 @@ class PostPostChainValue : public PostPostPost<TypeObjectStep> {
 			std::map<std::string, TypeScalar> processed;
 			const double length = sObjectStep->length(pState);
 			const unsigned int n = std::ceil(length / parameters.dl);
+			const double dl = length / n;
 			for(unsigned int i = 0; i < n + 1; i++) {
-				const double l = i * parameters.dl;
+				const double l = i * dl;
 				std::string lStr = std::to_string(l);
 				std::replace(lStr.begin(), lStr.end(), '.', 'o');
 				const double s = l/length;
