@@ -13,7 +13,7 @@ This software should be usable on any operating system but only have been tested
 This repository contains:
 
 1. [Lagrangian active particles advection software](./app) that binds low-level c++ modules into a high-level command line tool.
-2. A few low-level c++ modules [modules](./modules) that can be used independently.
+2. A few low-level c++ [modules](./modules) that can be used independently.
 
 ## Table of Contents
 
