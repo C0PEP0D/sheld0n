@@ -10,9 +10,9 @@
 #include <vector>
 // app include
 #include "core/init/solutions/prop.h"
-// FLAG: INCLUDE OBJECT BEGIN
+// FLAG: INCLUDE EQUATION BEGIN
 // #include "param/init/solutions/reactive_front/choice.h"
-// FLAG: INCLUDE OBJECT END
+// FLAG: INCLUDE EQUATION END
 
 namespace c0p {
 

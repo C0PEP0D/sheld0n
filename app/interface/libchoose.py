@@ -220,7 +220,7 @@ def edit_add_equation(name):
     previous_line = ''
     for line in fileinput.FileInput("../../../init/solutions/parameters.h", inplace=True):
         if line == '// FLAG: INCLUDE EQUATION END\n':
-            print('#include "param/init/solutions/{}/parameters.h"\n'.format(name), end='')
+            print('#include "param/init/solutions/{}/choice.h"\n'.format(name), end='')
         if line == '\t\t// FLAG: DECLARE STATIC INIT END\n':
             if previous_line == '\t\t// FLAG: DECLARE STATIC INIT BEGIN\n':
                 print('\t\tInit_{Name}\n'.format(Name=upper_camel_name), end='')
