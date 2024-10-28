@@ -3,10 +3,6 @@
 #pragma once
 
 // Std includes
-#include <vector>
-#include <string>
-#include <iostream> // cout, endl
-#include <memory> // shared_ptr
 // Lib includes
 #include "fl0w/analytic/taylor_green_vortex.h"
 // App includes
@@ -15,33 +11,8 @@
 
 namespace c0p {
 
-using TypeFlowAnalyticTaylorGreenVortex = fl0w::analytic::TaylorGreenVortex<TypeSpaceVector, TypeSpaceMatrix, TypeRef>;
-
-template<typename TypeParameters>
-class BaseFlowAnalyticTaylorGreenVortex : public TypeFlowAnalyticTaylorGreenVortex {
-    public:
-        using Type = TypeFlowAnalyticTaylorGreenVortex;
-    public:
-        TypeParameters parameters;
-    public:
-        BaseFlowAnalyticTaylorGreenVortex() {
-        }
-
-        void init(const TypeScalar& t) {
-        }
-        
-        void update(const TypeScalar& t) {
-        }
-
-        void prepare(const TypeContainer<TypeSpaceVector>& positions, const TypeScalar& t) {
-        }
-
-        void info() const {
-            std::string separation(" -------------------- ");
-            std::string space(" = ");
-            std::cout << separation << "Flow Analytic Taylor Green Vortex" << std::endl;
-        }
-
+template<typename tParameters>
+struct FlowAnalyticTaylorGreenVortex : public fl0w::analytic::FlowTaylorGreenVortex<tSpaceVector, tSpaceMatrix, tView> {
 };
 
 }

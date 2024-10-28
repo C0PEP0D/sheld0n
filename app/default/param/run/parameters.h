@@ -10,19 +10,19 @@ namespace c0p {
 struct RunParameters {
     // Fixed time step of the simulation.
     // Should be greater than zero.
-    double dt = 0.002;
+    static constexpr double Dt = 1.0/128.0;
     // Number of time steps of the simulation.
     // Should be greater than zero.
-    std::size_t nt = std::round(10.0 / dt);
+    static const unsigned int NTime = std::round(10.0 / Dt);
     // Number of time steps that will be saved.
     // Currently, post processing will only be
     // possible to be performed on saved time steps.
     // Should be greater than zero.
-    std::size_t nsave = nt;
+    static const unsigned int NSave = NTime;
     // If enbaled all static objects are saved
     // in the same file. May lead to slightly
     // faster simulations.
-    bool saveStaticMerge = false;
+    static const bool IsMergingStatic = false;
 };
 
 }

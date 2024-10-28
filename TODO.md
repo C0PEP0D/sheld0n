@@ -1,19 +1,14 @@
 # TODO
 
 * Current:
-	- objects prefix naming
-    - agent follow line case
-    - sensor line
-    - conform/nonconform mesh
-    - space partition and geometry
+	- Remove border curves that are too small
+	- Optimise and clean properly the border validity check
+    - Setup a debug output
 * App:
+	- Setup again the surf case properly
     - Python custom behaviour
-    - factorise parameters (ex: behaviourTimeHorizon)
-    - automated choice (local axis swimmer, swimmer ...)
-    - dsm + particle sources
-    - setup GUI
-    - ellipsoids
-    - memory
+    - Setup GUI
+    - Memory
 * Lib:
     - s0ve
     - StepPoint -> PointStep, same for all others

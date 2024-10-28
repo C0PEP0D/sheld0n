@@ -1,5 +1,5 @@
-#ifndef C0P_CORE_ENV_ENV_PROP_H
-#define C0P_CORE_ENV_ENV_PROP_H
+#ifndef C0P_CORE_ENV_PROP_H
+#define C0P_CORE_ENV_PROP_H
 #pragma once
 
 // thirdparties includes
@@ -13,25 +13,21 @@ namespace c0p {
 
 // Type Declarations
 
-using TypeScalar = double;
-//Algebra
+using tScalar = double;
+// Algebra
 template<const int ...Args>
-using TypeMatrix = Eigen::Matrix<TypeScalar, Args...>;
+using tMatrix = Eigen::Matrix<tScalar, Args...>;
 template<const int Size>
-using TypeVector = TypeMatrix<Size, 1>;
+using tVector = tMatrix<Size, 1>;
 template<typename ...Args>
-using TypeRef = Eigen::Ref<Args...>;
-template<typename ...Args>
-using TypeView = Eigen::Map<Args...>;
-// Container type
-template<typename ...Args>
-using TypeContainer = std::vector<Args...>;
+using tView = Eigen::Map<Args...>;
+using tStateVectorDynamic = tVector<Eigen::Dynamic>;
 // Space
-constexpr unsigned int DIM = 3; // 2D or 3D
-using TypeSpaceVector = TypeVector<DIM>;
-using TypeSpaceMatrix = TypeMatrix<DIM, DIM>;
+constexpr unsigned int DIM = 2; // 2D or 3D
+using tSpaceVector = tVector<DIM>;
+using tSpaceMatrix = tMatrix<DIM, DIM>;
 // Solver
-using TypeSolver = s0s::SolverRungeKuttaFehlberg<TypeVector<-1>, TypeView>;
+using tSolver = s0s::SolverRungeKuttaFehlberg<tStateVectorDynamic, tView>;
 
 namespace rand0m {
     std::random_device device;
@@ -45,9 +41,8 @@ namespace rand0m {
         std::srand(p_seed);
     }
 
-    TypeSpaceVector getRandomUnitVector() {
-    	return TypeSpaceVector({
-    		standardNormalDistribution(engine), 
+    tSpaceVector getRandomUnitVector() {
+    	return tSpaceVector({
     		standardNormalDistribution(engine), 
     		standardNormalDistribution(engine)
     	}).normalized();

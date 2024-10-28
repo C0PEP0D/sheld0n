@@ -15,34 +15,30 @@
 
 namespace c0p {
 
-template<typename TypeParameters, typename TypeEnv, typename TypeInit>
+template<typename tParameters>
 class Run {
 	public:
-		TypeParameters parameters;
-		std::shared_ptr<TypeEnv> sEnv;
-		std::shared_ptr<TypeInit> sInit;
+		Env<EnvParameters> env;
 	public:
 		std::size_t startIndex;
 	public:
-		Run() : parameters() {
-			sEnv = std::make_shared<TypeEnv>();
-			sInit = std::make_shared<TypeInit>(sEnv);
-			// Init saving system
+		Run() {
+			// init saving system
 			init();
-			// Run case
-			for(std::size_t index = startIndex; index < parameters.nt; index++) {
-				const TypeScalar t = index * parameters.dt;
-				// Update step
-				update(t);
-				// Save step attempt
-				if(index % (parameters.nt / parameters.nsave) == 0) {
-					std::cout << "INFO : Saving step " << index << "/" << parameters.nt << "." << std::endl;
+			// run case
+			for(std::size_t index = startIndex; index < tParameters::NTime; index++) {
+				const tScalar t = index * tParameters::Dt;
+				// step
+				step(t);
+				// save
+				if(index % (tParameters::NTime / tParameters::NSave) == 0) {
+					std::cout << "INFO : Saving step " << index << "/" << tParameters::NTime << "." << std::endl;
 					save(t);
 				}
 			}
-			if (startIndex < parameters.nt) {
-				std::cout << "INFO : Saving step " << parameters.nt << "/" << parameters.nt << "." << std::endl;
-				save(parameters.nt * parameters.dt);
+			if (startIndex < tParameters::NTime) {
+				std::cout << "INFO : Saving step " << tParameters::NTime << "/" << tParameters::NTime << "." << std::endl;
+				save(tParameters::NTime * tParameters::Dt);
 			}
 		}
 
@@ -54,8 +50,8 @@ class Run {
 				}
 				if(time.size() > 0) {
 					std::sort(time.begin(), time.end());
-					startIndex = std::round(time.back() / parameters.dt) + 1;
-					if (startIndex < parameters.nt) {
+					startIndex = std::round(time.back() / tParameters::Dt) + 1;
+					if (startIndex < tParameters::NTime) {
 						load(time.back());
 					} else {
 						std::cout << "INFO : Computation already finished. Nothing to do." << std::endl;
@@ -63,88 +59,79 @@ class Run {
 				} else {
 					// Init
 					startIndex = 1;
-					(*sInit)(sEnv);
+					Init<InitParameters>::set(env);
 					save(0.0);
 				}
 			} else {
 				// Init
 				startIndex = 1;
-				(*sInit)(sEnv);
+				Init<InitParameters>::set(env);
 				// Create time directory
 				std::filesystem::create_directory("time");
 				save(0.0);
 			}
 		}
 
-		void update(const TypeScalar& t) {
-			sEnv->sFlow->update(t);
-			sEnv->sObjects->update(parameters.dt);
+		void step(const tScalar& t) {
+			env.solutions.step(tParameters::Dt);
 		}
 		
-		void save(const TypeScalar& t) {
+		void save(const tScalar& t) {
 			// Create directory
 			std::string folder = "time/" + std::to_string(t);
 			std::filesystem::create_directory(folder);
 			// Save
 			// // Static
-			if (parameters.saveStaticMerge) {
-				if(not sEnv->sObjects->stateStatic.empty()) {
-					s0ve::saveDouble(folder + "/static.txt", sEnv->sObjects->stateStatic.data(), sEnv->sObjects->stateStatic.size());
+			if (tParameters::IsMergingStatic) {
+				if(not env.solutions.solutionsStatic.state.empty()) {
+					s0ve::saveDouble(folder + "/static.txt", env.solutions.solutionsStatic.state.data(), env.solutions.solutionsStatic.state.size());
 				}
 			} else {
-				for(const unsigned int& staticIndex : sEnv->sObjects->sStepStatic->memberIndexs) {
-					s0ve::saveDouble(folder + "/" + sEnv->sObjectsParameters->objectsStaticNames[staticIndex] + ".txt", sEnv->sObjects->sStepStatic->cMemberState(sEnv->sObjects->stateStatic.data(), staticIndex), sEnv->sObjects->sStepStatic->memberStateSizes[staticIndex]);
-				}
+				_saveStatic(env.solutions.solutionsStatic, folder);
 			}
-			// // Dynamic
-			for(const unsigned int& dynamicIndex : sEnv->sObjects->dynamicIndexs) {
-				s0ve::saveDouble(folder + "/" + sEnv->sObjectsParameters->objectsDynamicNames[dynamicIndex] + ".txt", sEnv->sObjects->statesDynamic[dynamicIndex].data(), sEnv->sObjects->statesDynamic[dynamicIndex].size());
-			}
-			// // Manager
-			for(const unsigned int& managerIndex : sEnv->sObjects->managerIndexs) {
-				
-				std::filesystem::create_directory(folder + "/" + sEnv->sObjectsParameters->objectsManagerNames[managerIndex]);
-				for(unsigned int managedIndex = 0; managedIndex < sEnv->sObjects->sStepsManager[managerIndex]->number(); managedIndex++) {
-					s0ve::saveDouble(folder + "/" + sEnv->sObjectsParameters->objectsManagerNames[managerIndex] + "/" + std::to_string(managedIndex) + ".txt", sEnv->sObjects->statesManager[managerIndex][managedIndex].data(), sEnv->sObjects->statesManager[managerIndex][managedIndex].size());
-				}
-			}
+			SolutionsParameters::saveDynamic(folder);
+			SolutionsParameters::saveGroups(folder);
 		}
+
+		template<unsigned int Index = 0>
+    	static void _saveStatic(const Solutions<SolutionsParameters>::tSolutionStatic& solutionsStatic, const std::string& folder) {
+    		using tStaticEquation = typename Solutions<SolutionsParameters>::tSolutionStatic::tEquation;
+    		using tStaticVariable = typename Solutions<SolutionsParameters>::tSolutionStatic::tEquation::tVariable;
+    		if constexpr(Index < tStaticEquation::Number) {
+        		s0ve::saveDouble(folder + "/" + tStaticEquation::template tEquationComponent<Index>::type::tParameters::name + ".txt", tStaticVariable::template cState<Index>(solutionsStatic.state.data()), tStaticVariable::template tVariableComponent<Index>::type::Size);
+        		// recursion
+        		_saveStatic<Index+1>(solutionsStatic, folder);
+        	}
+        }
 		
-		void load(const TypeScalar& t) {
+		void load(const tScalar& t) {
 			// Get directory
 			std::string folder = "time/" + std::to_string(t);
 			// Load
 			// // Static
-			if (parameters.saveStaticMerge) {
-				if(not sEnv->sObjects->stateStatic.empty()) {
-					l0ad::ascii::loadDouble(folder + "/static.txt", sEnv->sObjects->stateStatic.data(), sEnv->sObjects->stateStatic.size());
+			if (tParameters::IsMergingStatic) {
+				if(not env.solutions.solutionsStatic.state.empty()) {
+					l0ad::ascii::loadDouble(folder + "/static.txt", env.solutions.solutionsStatic.state.data(), env.solutions.solutionsStatic.state.size());
 				}
 			} else {
-				for(const unsigned int& staticIndex : sEnv->sObjects->sStepStatic->memberIndexs) {
-					l0ad::ascii::loadDouble(folder + "/" + sEnv->sObjectsParameters->objectsStaticNames[staticIndex] + ".txt", sEnv->sObjects->sStepStatic->memberState(sEnv->sObjects->stateStatic.data(), staticIndex), sEnv->sObjects->sStepStatic->memberStateSizes[staticIndex]);
-				}
+				_loadStatic(env.solutions.solutionsStatic, folder);
 			}
-			// // Dynamic
-			for(const unsigned int& dynamicIndex : sEnv->sObjects->dynamicIndexs) {
-				l0ad::ascii::loadVectorDouble(folder + "/" + sEnv->sObjectsParameters->objectsDynamicNames[dynamicIndex] + ".txt", sEnv->sObjects->statesDynamic[dynamicIndex]);
-				sEnv->sObjects->sStepsDynamic[dynamicIndex]->registerState(sEnv->sObjects->statesDynamic[dynamicIndex]);
-			}
-			// // Manager
-			for(const unsigned int& managerIndex : sEnv->sObjects->managerIndexs) {
-				unsigned int managedIndex = 0;
-				for (const std::filesystem::directory_entry& dir_entry : std::filesystem::directory_iterator(folder + "/" + sEnv->sObjectsParameters->objectsManagerNames[managerIndex])) {
-					if(sEnv->sObjects->statesManager[managerIndex].size() == managedIndex) {
-						sEnv->sObjects->statesManager[managerIndex].emplace_back();
-					}
-					l0ad::ascii::loadVectorDouble(dir_entry.path(), sEnv->sObjects->statesManager[managerIndex][managedIndex]);
-					sEnv->sObjects->sStepsManager[managerIndex]->registerStates(sEnv->sObjects->statesManager[managerIndex]);
-					managedIndex += 1;
-				}
-			}
-			// Set time
-			sEnv->sObjects->t = t;
-			sEnv->sFlow->init(t);
+			SolutionsParameters::loadDynamic(folder);
+			SolutionsParameters::loadGroups(folder);
+			// set time
+			env.solutions.solutionsStatic.t = t;
 		}
+
+		template<unsigned int Index = 0>
+    	static void _loadStatic(Solutions<SolutionsParameters>::tSolutionStatic& solutionsStatic, const std::string& folder) {
+    		using tStaticEquation = typename Solutions<SolutionsParameters>::tSolutionStatic::tEquation;
+    		using tStaticVariable = typename Solutions<SolutionsParameters>::tSolutionStatic::tEquation::tVariable;
+    		if constexpr(Index < tStaticEquation::Number) {
+        		l0ad::ascii::loadDouble(folder + "/" + tStaticEquation::template tEquationComponent<Index>::type::tParameters::name + ".txt", tStaticVariable::template state<Index>(solutionsStatic.state.data()), tStaticVariable::template tVariableComponent<Index>::type::Size);
+        		// recursion
+        		_loadStatic<Index+1>(solutionsStatic, folder);
+        	}
+        }
 };
 
 }

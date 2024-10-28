@@ -3,9 +3,9 @@
 #pragma once
 
 // choose your flow
-#include "param/env/flow/jhtdb/choice.h"
+#include "param/env/flow/analytic/choice.h"
 namespace c0p {
-    using Flow = FlowJhtdb;
+    using Flow = FlowAnalytic;
 }
 
 #endif

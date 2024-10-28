@@ -4,34 +4,24 @@
 
 // std includes
 #include <iostream> // cout, endl
-#include <algorithm> // sort
-#include <cmath> // round
-#include <vector>
-#include <string> // stod, to_string
-#include <filesystem>
 // app include
 #include "core/init/prop.h"
-#include "core/init/objects/core.h"
+#include "core/init/solutions/core.h"
 // lib include
 #include "l0ad/ascii/double.h"
 #include "s0ve/double.h"
 
 namespace c0p {
 
-template<typename TypeParameters, typename TypeParametersObjects, typename TypeEnv>
+template<typename tParameters>
 class Init {
     public:
-        // input
-        TypeParameters parameters;
-        InitObjects<TypeParametersObjects> initObjects;
-    public:
-        Init(std::shared_ptr<TypeEnv> sEnv) : initObjects(sEnv->sObjects, sEnv->sObjectsParameters) {
+        Init() {
         }
     public:
-        void operator()(std::shared_ptr<TypeEnv> sEnv) {
+        static void set(Env<EnvParameters>& env) {
             std::cout << "INFO : Init case start" << std::endl;
-            initObjects(sEnv->sObjects->stateStatic, sEnv->sObjects->statesDynamic, sEnv->sObjects->statesManager);
-            sEnv->sFlow->init(0.0);
+            InitSolutions<InitSolutionsParameters>::set(env.solutions);
             std::cout << "INFO : Init case end" << std::endl;
         }
 };

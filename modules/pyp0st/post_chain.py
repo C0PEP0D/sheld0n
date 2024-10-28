@@ -19,6 +19,7 @@ LIM = 4.0 * np.pi
 def parse():
     parser = argparse.ArgumentParser(description='Chain post processing')
     parser.add_argument('--plot', '-p', action='store_true', help='plot each frame')
+    parser.add_argument('--save', '-s', action='store_true', help='save each frame as a csv')
     return parser.parse_args()
 
 anim_pos_0 = []
@@ -28,7 +29,7 @@ mesh_pos_1 = None
 anim_u_0 = []
 anim_u_1 = []
 
-def main(plot):
+def main(plot, save):
     global anim_pos_0, anim_pos_1, mesh_pos_0, mesh_pos_1, anim_u_0, anim_u_1
     print("INFO: Post processing chain.", flush=True)
     print("INFO: Reading objects...", flush=True)
@@ -69,6 +70,9 @@ def main(plot):
             sorting_index = {managed_index:sorting_index[managed_index][np.logical_not(np.isnan(sorting_scalar[managed_index][sorting_index[managed_index]]))] for managed_index in sorting_scalar}
             obj_pos_1 = libpost.get_object_properties(obj, ["l_.*__pos_1"])
             obj_pos_2 = libpost.get_object_properties(obj, ["l_.*__pos_2"])
+            obj_axis_0 = libpost.get_object_properties(obj, ["l_.*__axis_0"])
+            obj_axis_1 = libpost.get_object_properties(obj, ["l_.*__axis_1"])
+            obj_axis_2 = libpost.get_object_properties(obj, ["l_.*__axis_2"])
             obj_scalar = libpost.get_object_properties(obj, ["l_.*__scal"])
             
             print("\t\t\t\tINFO: Done.", flush=True)
@@ -79,13 +83,18 @@ def main(plot):
                 managed_anim_pos_0.append(managed_obj_pos_0)
                 managed_obj_pos_1 = obj_pos_1["value"][sorting_index[key]]
                 managed_anim_pos_1.append(managed_obj_pos_1)
+                managed_obj_axis_0 = obj_axis_0["value"][sorting_index[key]]
+                managed_obj_axis_1 = obj_axis_1["value"][sorting_index[key]]
+                managed_obj_axis_2 = obj_axis_2["value"][sorting_index[key]]
                 managed_obj_pos_2 = obj_pos_2["value"][sorting_index[key]]
                 managed_obj_scalar = obj_scalar["value"][sorting_index[key]]
-                print("\t\t\t\tINFO: Saving...", flush=True)
-                np.savetxt("{name}__managed_{index}__time_{time}.csv".format(name=name, index=key, time=str(t).replace(".", "o")), np.column_stack((managed_obj_pos_0, managed_obj_pos_1, managed_obj_pos_2, managed_obj_scalar)), delimiter=",", header="x,y,z,scalar")
+                if save:
+                    print("\t\t\t\tINFO: Saving...", flush=True)
+                    np.savetxt("{name}__managed_{index}__time_{time}.csv".format(name=name, index=key, time=str(t).replace(".", "o")), np.column_stack((managed_obj_pos_0, managed_obj_pos_1, managed_obj_pos_2, managed_obj_scalar)), delimiter=",", header="x,y,z,scalar")
+                    print("\t\t\t\tINFO: Done.", flush=True)
                 if plot:
-                    plt.plot(managed_obj_pos_0, managed_obj_pos_1)# color=(1.0, 0.5, 0.5))
-                print("\t\t\t\tINFO: Done.", flush=True)
+                    plt.plot(managed_obj_pos_0, managed_obj_pos_1, color=(1.0, 0.75, 0.75))
+                    plt.quiver(managed_obj_pos_0, managed_obj_pos_1, managed_obj_axis_0, managed_obj_axis_1, color=(1.0, 0.75, 0.75))
             anim_pos_0.append(managed_anim_pos_0)
             anim_pos_1.append(managed_anim_pos_1)
             print("\t\t\tDone.")
@@ -120,4 +129,4 @@ def animate(i):
 
 if __name__ == '__main__':
     args = parse()
-    main(args.plot)
+    main(args.plot, args.save)
