@@ -1,11 +1,11 @@
 // app includes
 // // env
-#include "param/env/parameters.h"
-#include "core/env/core.h"
+#include "param/parameters.h"
+#include "core/core.h"
 // // init
-#include "param/init/parameters.h"
-#include "param/init/solutions/parameters.h"
-#include "core/init/core.h"
+// #include "param/init/parameters.h"
+// #include "param/init/solutions/parameters.h"
+// #include "core/init/core.h"
 // // run
 #include "param/run/parameters.h"
 #include "core/run/core.h"

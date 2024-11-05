@@ -23,7 +23,7 @@ def get_selected():
 
 ## get object
 def get_object():
-    re_include = re.compile(r'^#include "param/env/solutions/.*/(parameters.h|choice.h)"')
+    re_include = re.compile(r'^#include "param/solutions/.*/(parameters.h|choice.h)"')
     with open('choice.h', 'r') as reader:
         line = reader.readline()
         while line and re_include.match(line) == None:
@@ -32,7 +32,7 @@ def get_object():
 
 ## get object
 def get_object_type():
-    re_include = re.compile(r'^#include "param/env/solutions/.*/(parameters.h|choice.h)"')
+    re_include = re.compile(r'^#include "param/solutions/.*/(parameters.h|choice.h)"')
     with open('choice.h', 'r') as reader:
         line = reader.readline()
         while line and re_include.match(line) == None:
@@ -41,7 +41,7 @@ def get_object_type():
 
 ## get flow
 def get_flow():
-    re_include = re.compile(r'^#include "param/env/flow/.*/(parameters.h|choice.h)"')
+    re_include = re.compile(r'^#include "param/flow/.*/(parameters.h|choice.h)"')
     with open('choice.h', 'r') as reader:
         line = reader.readline()
         while line and re_include.match(line) == None:
@@ -91,7 +91,7 @@ def get_choices(choices_dir, choices_exceptions = []):
 
 ## get default object
 def get_default_object(abs_choices_dir):
-    re_include = re.compile(r'^#include "param/env/solutions/.*/(parameters.h|choice.h)"')
+    re_include = re.compile(r'^#include "param/solutions/.*/(parameters.h|choice.h)"')
     with open(abs_choices_dir + '/choice.h', 'r') as reader:
         line = reader.readline()
         while line and re_include.match(line) == None:
@@ -100,7 +100,7 @@ def get_default_object(abs_choices_dir):
 
 ## get default object
 def get_default_object_type(abs_choices_dir):
-    re_include = re.compile(r'^#include "param/env/solutions/.*/(parameters.h|choice.h)"')
+    re_include = re.compile(r'^#include "param/solutions/.*/(parameters.h|choice.h)"')
     with open(abs_choices_dir + '/choice.h', 'r') as reader:
         line = reader.readline()
         while line and re_include.match(line) == None:
@@ -109,7 +109,7 @@ def get_default_object_type(abs_choices_dir):
 
 ## get default flow
 def get_default_flow(abs_choices_dir):
-    re_include = re.compile(r'^#include "param/env/flow/.*/(parameters.h|choice.h)"')
+    re_include = re.compile(r'^#include "param/flow/.*/(parameters.h|choice.h)"')
     with open(abs_choices_dir + '/choice.h', 'r') as reader:
         line = reader.readline()
         while line and re_include.match(line) == None:
@@ -170,14 +170,14 @@ def object_to_path(obj):
 ## edit header
 def edit_header(selected, choice):
     # edit choice.h
-    re_include = re.compile(r'^#include "core/env/solutions/object/.*/core.h"')
+    re_include = re.compile(r'^#include "core/solutions/object/.*/core.h"')
     with open('choice.h', 'r') as reader:
         line = reader.readline()
         while line and re_include.match(line) == None:
             line = reader.readline()
     upper_camel_obj = object_to_upper_camel_case(line.split("/")[4:-2])
     if not upper_camel_obj:
-        re_include = re.compile(r'^#include "param/env/solutions/.*/(parameters.h|choice.h)"')
+        re_include = re.compile(r'^#include "param/solutions/.*/(parameters.h|choice.h)"')
         with open('choice.h', 'r') as reader:
             line = reader.readline()
             while line and re_include.match(line) == None:
@@ -204,11 +204,11 @@ def find_replace(folder, file_pattern, text, replacement, condition = lambda lin
 ## add equation
 def edit_add_equation(name):
     upper_camel_name = object_to_upper_camel_case([name])
-    ## add equation to param/env/solutions/parameters.h
+    ## add equation to param/solutions/parameters.h
     previous_line = ''
-    for line in fileinput.FileInput("../parameters.h", inplace=True):
+    for line in fileinput.FileInput("parameters.h", inplace=True):
         if line == '// FLAG: INCLUDE EQUATION END\n':
-            print('#include "param/env/solutions/static/{}/choice.h"\n'.format(name), end='')
+            print('#include "param/solutions/{}/choice.h"\n'.format(name), end='')
         if line == '\t\t\t// FLAG: DECLARE STATIC EQUATION END\n':
             if previous_line == '\t\t\t// FLAG: DECLARE STATIC EQUATION BEGIN\n':
                  print('\t\t\t_{Name}\n'.format(Name=upper_camel_name), end='')
@@ -216,28 +216,13 @@ def edit_add_equation(name):
                 print('\t\t\t,_{Name}\n'.format(Name=upper_camel_name), end='')
         previous_line = line
         print(line, end='')
-    ## add equation to param/init/solutions/parameters.h
-    previous_line = ''
-    for line in fileinput.FileInput("../../../init/solutions/parameters.h", inplace=True):
-        if line == '// FLAG: INCLUDE EQUATION END\n':
-            print('#include "param/init/solutions/{}/choice.h"\n'.format(name), end='')
-        if line == '\t\t// FLAG: DECLARE STATIC INIT END\n':
-            if previous_line == '\t\t// FLAG: DECLARE STATIC INIT BEGIN\n':
-                print('\t\tInit_{Name}\n'.format(Name=upper_camel_name), end='')
-            else:
-                print('\t\t,Init_{Name}\n'.format(Name=upper_camel_name), end='')
-        previous_line = line
-        print(line, end='')
 
 ## edit choice
-def edit_choice(choice, default_obj, default_obj_type, obj, obj_type, size = 1):
+def edit_choice(choice, default_obj, obj, size = 1):
     obj = obj[0:len(obj) - len(default_obj) + size]
     default_obj = default_obj[0:size]
     find_replace(choice, "*.h", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
-    if default_obj_type and obj_type:
-        find_replace(choice, "*.h", "/" + default_obj_type + "/" + object_to_path(default_obj) + "/", "/" + obj_type + "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
-    else:
-        find_replace(choice, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
+    find_replace(choice, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
     find_replace(choice, "*.h", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))
     find_replace(choice, "*.h", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))
     find_replace(choice, "*.h", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))

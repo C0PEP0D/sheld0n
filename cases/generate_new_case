@@ -50,15 +50,15 @@ def main():
     os.symlink(os.path.relpath(code_dir + "/app/interface/print_param.py", args.name), args.name + "/print_param")
     ### env
     #### flow
-    os.symlink(os.path.relpath(code_dir + "/app/interface/env/flow/choose.py", args.name + "/param/env/flow"), args.name + "/param/env/flow/choose")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/env/flow/analytic/choose.py", args.name + "/param/env/flow/analytic"), args.name + "/param/env/flow/analytic/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/flow/choose.py", args.name + "/param/flow"), args.name + "/param/flow/choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/flow/analytic/choose.py", args.name + "/param/flow/analytic"), args.name + "/param/flow/analytic/choose")
     #### solutions
-    os.symlink(os.path.relpath(code_dir + "/app/interface/env/solutions/static/copy_equation.py", args.name + "/param/env/solutions/static"), args.name + "/param/env/solutions/static/copy_equation")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/env/solutions/static/remove_equation.py", args.name + "/param/env/solutions/static"), args.name + "/param/env/solutions/static/remove_equation")
-    # os.symlink(os.path.relpath(code_dir + "/app/interface/env/solutions/static/copy_equation_batch.py", args.name + "/param/env/solutions/static"), args.name + "/param/env/solutions/static/copy_equation_batch")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/env/solutions/static/create_new_equation.py", args.name + "/param/env/solutions/static"), args.name + "/param/env/solutions/static/create_new_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/copy_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/remove_equation")
+    # os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/copy_equation_batch.py", args.name + "/param/solutions"), args.name + "/param/solutions/copy_equation_batch")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/create_new_equation")
     #### equation
-    # os.symlink(os.path.relpath(code_dir + "/app/interface/env/solutions/static/equation/choose.py", args.name + "/param/env/solutions/static/group_of_points"), args.name + "/param/env/solutions/static/group_of_points/choose")
+    # os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/choose.py", args.name + "/param/solutions/group_of_points"), args.name + "/param/solutions/group_of_points/choose")
     ### init
     #### solutions
     ##### equation

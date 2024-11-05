@@ -59,13 +59,13 @@ class Run {
 				} else {
 					// Init
 					startIndex = 1;
-					Init<InitParameters>::set(env);
+					env.init();
 					save(0.0);
 				}
 			} else {
 				// Init
 				startIndex = 1;
-				Init<InitParameters>::set(env);
+				env.init();
 				// Create time directory
 				std::filesystem::create_directory("time");
 				save(0.0);
