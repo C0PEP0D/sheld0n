@@ -11,9 +11,6 @@
 #include <filesystem>
 // app include
 #include "core/post/prop.h"
-// #include "core/post/solutions/core.h"
-// #include "core/post/mesh/core.h"
-// #include "core/post/flow/core.h"
 // lib include
 #include "l0ad/ascii/double.h"
 #include "s0ve/double.h"
@@ -38,23 +35,8 @@ class Post {
 					std::filesystem::create_directory(folder);
 					// // load
 					load(env, t);
-					// // // objects
-					// if(tParameters::IsPostProcessingSolutions) {
-						// const auto processed = postObjects(env.sObjects->stateStatic.data(), env.sObjects->statesDynamic, env.sObjects->statesManager, t);
-						// for(unsigned int objectIndex = 0; objectIndex < processed.size(); objectIndex++) {
-							// if(objectIndex < env.sObjectsParameters->objectsStaticNames.size()) {
-								// s0ve::saveMapToCsvDouble(folder + "/" + env.sObjectsParameters->objectsStaticNames[objectIndex] + ".csv", processed[objectIndex], ",", "#");
-							// } else if(objectIndex < env.sObjectsParameters->objectsStaticNames.size() + env.sObjectsParameters->objectsDynamicNames.size()) {
-								// s0ve::saveMapToCsvDouble(folder + "/" + env.sObjectsParameters->objectsDynamicNames[objectIndex - env.sObjectsParameters->objectsStaticNames.size()] + ".csv", processed[objectIndex], ",", "#");
-							// } else {
-								// s0ve::saveMapToCsvDouble(folder + "/" + env.sObjectsParameters->objectsManagerNames[objectIndex - env.sObjectsParameters->objectsStaticNames.size() - env.sObjectsParameters->objectsDynamicNames.size()] + ".csv", processed[objectIndex], ",", "#");
-							// }
-						// }
-					// }
-					// // flow
-					if(tParameters::IsPostProcessingCustom) {
-						s0ve::saveMapToCsvDouble(folder + "/custom.csv", tParameters::custom(env), ",", "#");
-					}
+					// // solutions
+					env.solutions.post(t);
 					// // msg
 					std::cout << "INFO : Processed " << t << "/" << time.back() << std::endl;
 				}
@@ -83,10 +65,13 @@ class Post {
 					std::sort(time.begin(), time.end());
 					// deal with parameters
 					unsigned int number = tParameters::Number;
-					if(tParameters::Number == 0) {
-						number = (time.size() - tParameters::IndexStart)/tParameters::IndexStep + 1;
-					}
 					unsigned int indexStep = tParameters::IndexStep;
+					if(number == 0) {
+						if(indexStep == 0) {
+							indexStep = 1;
+						}
+						number = (time.size() - tParameters::IndexStart)/indexStep + 1;
+					}
 					if(indexStep == 0) {
 						indexStep = (time.size() - tParameters::IndexStart)/(number - 1);
 					}
@@ -107,7 +92,7 @@ class Post {
 			// Get directory
 			std::string folder = "time/" + std::to_string(t);
    			// Load
-   			// // Static
+   			// Static
    			if (tParameters::IsStaticMerged) {
    				if(not env.solutions.solutionsStatic.state.empty()) {
    					l0ad::ascii::loadDouble(folder + "/static.txt", env.solutions.solutionsStatic.state.data(), env.solutions.solutionsStatic.state.size());
@@ -115,6 +100,7 @@ class Post {
    			} else {
    				_loadStatic(env.solutions.solutionsStatic, folder);
    			}
+   			_loadStatic(env.solutions.solutionsStatic, folder);
    			SolutionsParameters::loadDynamic(folder);
 			SolutionsParameters::loadGroups(folder);
 			// Set time

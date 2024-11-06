@@ -42,37 +42,29 @@ def main(anim_step, is_plotting):
             print("\t\tINFO: Processing t={t}/{t_f}...".format(t=current_time, t_f=time[-1]), flush=True)
             print("\t\t\tINFO: Reading data...", flush=True)
             post = libpost.get_post(time_dirs[time_list.index(current_time)], name)
-            pos_0 = libpost.get_post_properties(post, ["source_of_points_.*__pos_0"])["value"]
-            pos_1 = libpost.get_post_properties(post, ["source_of_points_.*__pos_1"])["value"]
-            lifetime = libpost.get_post_properties(post, ["source_of_points_.*__lifetime"])
+            info = libpost.get_post_properties(post, ["test_.*__pos_0"])["info"]
+            pos_0 = libpost.get_post_properties(post, ["test_.*__pos_0"])["value"]
+            pos_1 = libpost.get_post_properties(post, ["test_.*__pos_1"])["value"]
             print("\t\t\tINFO: Done.", flush=True)
             print("\t\t\t\tINFO: Sorting data...", flush=True)
-            sorted_index = np.empty(lifetime["value"].size)
-            sorted_index[:]= np.nan
-            for index in range(len(lifetime["info"])):
-                sorted_index[index] = libpost.get_properties_from_string(lifetime["info"][index])["particle"]
+            sorted_index = np.empty(pos_0.size)
+            sorted_index[:] = np.nan
+            for index in range(len(info)):
+                sorted_index[index] = libpost.get_properties_from_string(info[index])["particle"]
             sorted_index = np.argsort(sorted_index)
             sorted_index = sorted_index[np.logical_not(np.isnan(sorted_index))]
             # updating everything
             pos_0 = pos_0[sorted_index]
             pos_1 = pos_1[sorted_index]
-            lifetime = lifetime["value"][sorted_index]
             print("\t\t\tINFO: Done.", flush=True)
             print("\t\t\tINFO: Processing data...", flush=True)
-            if lifetime.size > 0:
-                for index in range(lifetime.size):
-                    if lifetime[index] == 1.0:
-                        trajectories.append({"x":[pos_0[index]], "y":[pos_1[index]]})
-                dead_points_number = len(trajectories) - lifetime.size
-                for index in range(dead_points_number - 1, -1, -1):
-                    trajectories[index]["x"].pop(0)
-                    trajectories[index]["y"].pop(0)
-                    if not trajectories[index]["x"]:
-                        trajectories.pop(index)
-                        dead_points_number -= 1;
-                for index in range(lifetime.size):
-                    trajectories[dead_points_number + index]["x"].append(pos_0[index])
-                    trajectories[dead_points_number + index]["y"].append(pos_1[index])
+            if not trajectories:
+                for index in range(pos_0.size):
+                    trajectories.append({"x":[pos_0[index]], "y":[pos_1[index]]})
+            else:
+                for index in range(pos_0.size):
+                    trajectories[index]["x"].append(pos_0[index])
+                    trajectories[index]["y"].append(pos_1[index])
             print("\t\t\tINFO: Done.", flush=True)
             print("\t\t\tINFO: Animating...", flush=True)
             if time_index % anim_step == 0:

@@ -25,7 +25,7 @@ def get_file_header(file_name):
     head_str = head_str.replace(" ", "")
     head_str = head_str.replace("\n", "")
     head = head_str.split(",")
-    return head
+    return np.array(head_str.split(","), dtype=str)
 
 def get_time():
     time_dirs = glob.glob("time/*")
@@ -34,28 +34,22 @@ def get_time():
     time_list_copy.sort()
     return time_dirs, time_list, np.array(time_list_copy)
 
-def get_post(time_dir, post_name):
+def get_equation(time_dir, post_name):
     post_filename = time_dir + "/" + post_name + ".csv"
     return {"info":get_file_header(post_filename), "value":np.loadtxt(post_filename, delimiter=",")}
 
-# def get_flow(time_dir):
-    # return get_object(time_dir, "flow")
-# 
-# def get_mesh():
-    # object_filename = "mesh.csv"
-    # return {"info":np.array(get_file_header(object_filename)), "value":np.loadtxt(object_filename, delimiter=",")}
-
-def get_post_properties(obj, properties):
+def get_equation_properties(obj, properties):
     regex = ""
     for prop in properties:
         regex += "{prop}$|".format(prop=prop)
     regex = regex[:-1]
     # extract indexs
-    indexs = [index for index, name in enumerate(obj["info"]) if re.search(regex, name)]
+    # indexs = [index for index, name in enumerate(obj["info"]) if re.search(regex, name)]
+    indexes = np.vectorize(lambda x: bool(re.compile(regex).match(x)))(obj["info"]).nonzero()
     # return
-    return {"info":[obj["info"][i] for i in indexs], "value":obj["value"][indexs]}
+    return {"info":obj["info"][indexes], "value":obj["value"][indexes]}
 
-def get_post_names():
+def get_equation_names():
     post_names = []
     time_dirs = glob.glob("time/*")
     if time_dirs:

@@ -8,6 +8,7 @@
 #include <execution>
 // lib includes
 #include "d0t/equation.h"
+#include "s0ve/double.h"
 // app includes
 #include "core/solutions/prop.h"
 
@@ -21,11 +22,16 @@ class Solutions {
 		Solutions() {
 		}
 	public:
+
+		// step
+		
 		void step(const double dt) {
 			solutionsStatic.step(dt);
 			tParameters::stepDynamic(dt);
 			tParameters::stepGroups(dt);
 		}
+
+		// init
 
 		template<unsigned int Index = 0>
 		void initStatic() {
@@ -45,6 +51,34 @@ class Solutions {
 		void init() {
 			initStatic();
 			tParameters::initGroups();
+		}
+		
+		// post
+
+		template<unsigned int Index = 0>
+		void postStatic(const double t) {
+			using tStaticEquation = typename tSolutionStatic::tEquation;
+			using tStaticVariable = typename tSolutionStatic::tEquation::tVariable;
+			if constexpr(Index < tStaticEquation::Number) {
+				s0ve::saveMapToCsvDouble(
+					"post_process/time/" + std::to_string(t) + "/" + tStaticEquation::template tEquationComponent<Index>::type::tParameters::name + ".csv",
+					tStaticEquation::template tEquationComponent<Index>::type::tParameters::post(
+						tStaticVariable::template state<Index>(
+							solutionsStatic.state.data()
+						),
+						t
+					),
+					",", 
+					"#"
+				);
+				// recursion
+				postStatic<Index+1>(t);
+			}
+		}
+		
+		void post(const double t) {
+			postStatic(t);
+			tParameters::postGroups(t);
 		}
 	public:
 		typename tParameters::tSolutionStatic solutionsStatic;

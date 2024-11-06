@@ -208,7 +208,7 @@ def edit_add_equation(name):
     previous_line = ''
     for line in fileinput.FileInput("parameters.h", inplace=True):
         if line == '// FLAG: INCLUDE EQUATION END\n':
-            print('#include "param/solutions/{}/choice.h"\n'.format(name), end='')
+            print('#include "param/solutions/{}/parameters.h"\n'.format(name), end='')
         if line == '\t\t\t// FLAG: DECLARE STATIC EQUATION END\n':
             if previous_line == '\t\t\t// FLAG: DECLARE STATIC EQUATION BEGIN\n':
                  print('\t\t\t_{Name}\n'.format(Name=upper_camel_name), end='')
@@ -221,6 +221,7 @@ def edit_add_equation(name):
 def edit_choice(choice, default_obj, obj, size = 1):
     obj = obj[0:len(obj) - len(default_obj) + size]
     default_obj = default_obj[0:size]
+    find_replace(choice, "*.h", '"' + "".join(default_obj), '"' + "".join(obj))
     find_replace(choice, "*.h", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
     find_replace(choice, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
     find_replace(choice, "*.h", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))

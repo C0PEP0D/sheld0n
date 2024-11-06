@@ -30,16 +30,13 @@ def main():
     #    else:
     #        print(line, end='')
     # copy symlinks
-    ## post process
-    if not os.path.exists(args.name + '/post_process'):
-        os.makedirs(args.name + '/post_process')
     ### csv scripts
     #for script in glob.glob(code_dir + "/modules/py0csv/csv_*.py"):
     #    os.symlink(script, args.name + "/post_process/" + os.path.basename(script).split(".")[0])
     ### post scripts
-    for script in glob.glob(code_dir + "/modules/pyp0st/plot_*.py"):
-        dest = args.name + "/post_process/"
-        os.symlink(os.path.relpath(script, dest), dest + os.path.basename(script))
+    # for script in glob.glob(code_dir + "/modules/pyp0st/plot_*.py"):
+    #     dest = args.name + "/post_process/"
+    #     os.symlink(os.path.relpath(script, dest), dest + os.path.basename(script))
     os.symlink(os.path.relpath(code_dir + "/modules/pyp0st/libpost.py", args.name + "/post_process/"), args.name + "/post_process/libpost.py")
     ### post scripts defaults
     #shutil.copy(code_dir + "/modules/pyp0st/post_default.py", args.name + "/post_process/post_default.py")

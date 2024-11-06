@@ -25,6 +25,12 @@ class Env {
 			solutions.init();
 			std::cout << "INFO : Init case end" << std::endl;
 		}
+
+		void post(const double t) {
+			std::cout << "INFO : Post case start" << std::endl;
+			solutions.post(t);
+			std::cout << "INFO : Post case end" << std::endl;
+		}
 };
 
 }

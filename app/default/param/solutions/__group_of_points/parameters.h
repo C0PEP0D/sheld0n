@@ -2,20 +2,23 @@
 #define C0P_SOLUTIONS_GROUP_OF_POINTS_CUSTOM_PARAMETERS_H
 #pragma once
 
+// std includes
+#include <map>
+
+// include lib
+#include "d0t/equations/advection.h"
+
 // app includes
 #include "core/solutions/prop.h"
 #include "core/solutions/core.h"
 #include "param/flow/choice.h"
 
-#include "core/solutions/equation/custom/prop.h"
+#include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
-
-// include lib
-#include "d0t/equations/advection.h"
 
 namespace c0p {
 
-struct _GroupOfPointsCustomParameters {
+struct _GroupOfPointsParameters {
 	inline static std::string name = "group_of_points";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
@@ -28,22 +31,18 @@ struct _GroupOfPointsCustomParameters {
 	using tSubVariable = d0t::VariableComposed<d0t::VariableVector<tVector, tView, StateSize>>;
 	struct tSubEquation : public d0t::Equation<tSubVariable> {
 		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
+			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START
-			// initializing output
-			tStateVectorDynamic output = tStateVectorDynamic::Zero(tVariable::Size);
-			// interpret output as a tSpaceVector
-			tView<tSpaceVector> dX(output.data());
-			// interpret input as a tSpaceVector
-			const tView<const tSpaceVector> x(output.data());
-			// get flow velocity
-			const tSpaceVector u = Flow::getVelocity(x.data(), t);
-			// define the temporal derivative of the state
-			dX = u; // example : simple advection equation
+			// input
+			const tView<const tSpaceVector> x(pState);
+			// output
+			tView<tSpaceVector> dX(dState.data());
+			dX = Flow::getVelocity(x.data(), t);
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
-			return output;
+			return dState;
 		}
 	};
 	// creating tVariable and tEquation
@@ -71,7 +70,22 @@ struct _GroupOfPointsCustomParameters {
 		}
 		// ---------------- CUSTOM INIT END
 	}
+
+	static std::map<std::string, tScalar> post(const double* pState, const double t) {
+		std::map<std::string, double> output;
+		// ---------------- CUSTOM INIT START
+		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
+			const double* pSubState = tVariable::cState(pState, subIndex);
+			const tView<const tSpaceVector> x(pSubState);
+			output["group_of_points__particle_" + std::to_string(subIndex) + "__pos_0"] = x[0];
+			output["group_of_points__particle_" + std::to_string(subIndex) + "__pos_1"] = x[1];
+		}
+		// ---------------- CUSTOM INIT END
+		return output;
+	}
 };
+
+using _GroupOfPoints = EquationCustom<_GroupOfPointsParameters>;
 
 }
 

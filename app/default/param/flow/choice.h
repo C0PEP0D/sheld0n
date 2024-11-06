@@ -3,7 +3,7 @@
 #pragma once
 
 // choose your flow
-#include "param/flow/analytic/choice.h"
+#include "param/flow/analytic/parameters.h"
 namespace c0p {
     using Flow = FlowAnalytic;
 }

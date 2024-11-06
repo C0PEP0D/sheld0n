@@ -14,8 +14,8 @@
 #include "l0ad/ascii/double.h"
 
 // FLAG: INCLUDE EQUATION BEGIN
-// #include "param/solutions/source_of_points/choice.h"
-// #include "param/solutions/reactive_front/choice.h"
+// #include "param/solutions/source_of_points/parameters.h"
+// #include "param/solutions/reactive_front/parameters.h"
 // FLAG: INCLUDE EQUATION END
 
 namespace c0p {
@@ -107,6 +107,15 @@ struct SolutionsParameters {
 		// Init_ReactiveFront::set(SolutionsParameters::solutionReactiveFront.states);
 		// FLAG: DECLARE GROUPS INIT END
 	}
+
+	// ---------------- POST
+
+	static void postGroups(const double t) {
+		// FLAG: DECLARE GROUPS INIT BEGIN
+		// Init_ReactiveFront::set(SolutionsParameters::solutionReactiveFront.states);
+		// FLAG: DECLARE GROUPS INIT END
+	}
+	
 };
 
 }
