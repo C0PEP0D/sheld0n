@@ -9,6 +9,7 @@
 #include <vector>
 #include <string> // stod, to_string
 #include <filesystem>
+#include <format>
 // lib includes
 #include "s0ve/double.h"
 #include "l0ad/ascii/double.h"
@@ -78,7 +79,7 @@ class Run {
 		
 		void save(const tScalar& t) {
 			// Create directory
-			std::string folder = "time/" + std::to_string(t);
+			std::string folder = "time/" + std::format("{:0>10f}", t);
 			std::filesystem::create_directory(folder);
 			// Save
 			// // Static

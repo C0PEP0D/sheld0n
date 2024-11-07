@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include <execution>
+#include <format>
 // lib includes
 #include "d0t/equation.h"
 #include "s0ve/double.h"
@@ -61,7 +62,7 @@ class Solutions {
 			using tStaticVariable = typename tSolutionStatic::tEquation::tVariable;
 			if constexpr(Index < tStaticEquation::Number) {
 				s0ve::saveMapToCsvDouble(
-					"post_process/time/" + std::to_string(t) + "/" + tStaticEquation::template tEquationComponent<Index>::type::tParameters::name + ".csv",
+					"post_process/time/" + std::format("{:0>10f}", t) + "/" + tStaticEquation::template tEquationComponent<Index>::type::tParameters::name + ".csv",
 					tStaticEquation::template tEquationComponent<Index>::type::tParameters::post(
 						tStaticVariable::template state<Index>(
 							solutionsStatic.state.data()

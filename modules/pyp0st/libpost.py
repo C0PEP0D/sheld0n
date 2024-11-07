@@ -28,19 +28,29 @@ def get_file_header(file_name):
     return np.array(head_str.split(","), dtype=str)
 
 def get_time():
-    time_dirs = glob.glob("time/*")
-    time_list = [float(s.split("/")[1]) for s in glob.glob("time/*")]
-    time_list_copy = time_list.copy()
-    time_list_copy.sort()
-    return time_dirs, time_list, np.array(time_list_copy)
+    time_dir_list = glob.glob("time/*")
+    time_dir_list.sort()
+    time_list = [float(s.split("/")[1]) for s in time_dir_list]
+    return np.array(time_dir_list, dtype=str), np.array(time_list)
 
-def get_equation(time_dir, post_name):
-    post_filename = time_dir + "/" + post_name + ".csv"
+def get_equation_property_over_time(equation_name, prop, time_dir_array):
+    property_array_over_time = []
+    for time_dir in time_dir_array:
+        equation = get_equation(time_dir, equation_name)
+        property_array = get_equation_properties(equation, [prop])
+        info = property_array["info"]
+        if info.size > 0:
+            property_array = property_array["value"]
+            property_array_over_time.append(property_array)
+    return property_array_over_time
+
+def get_equation(time_dir, equation_name):
+    post_filename = time_dir + "/" + equation_name + ".csv"
     return {"info":get_file_header(post_filename), "value":np.loadtxt(post_filename, delimiter=",")}
 
-def get_equation_properties(obj, properties):
+def get_equation_properties(obj, property_list):
     regex = ""
-    for prop in properties:
+    for prop in property_list:
         regex += "{prop}$|".format(prop=prop)
     regex = regex[:-1]
     # extract indexs

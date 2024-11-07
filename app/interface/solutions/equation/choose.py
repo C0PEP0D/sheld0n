@@ -2,7 +2,7 @@
 
 import os
 
-choices_dir = "solutions/equation"
+choices_dir = "solutions/passive_particles"
 choices_exceptions = []
 
 if __name__ == '__main__':
@@ -12,5 +12,8 @@ if __name__ == '__main__':
     with open(lib_filename, "rb") as lib_source_file:
         lib_code = compile(lib_source_file.read(), lib_filename, "exec")
     exec(lib_code)
-    # run tests
-    choose(choices_dir, choices_exceptions)
+    # choose
+    choose_file(choices_dir, choices_exceptions)
+    # edit
+    name = os.path.basename(os.getcwd())
+    edit_file(name, ["passive_particles"], [name])

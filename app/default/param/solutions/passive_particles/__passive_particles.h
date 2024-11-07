@@ -1,12 +1,10 @@
-#ifndef C0P_SOLUTIONS_GROUP_OF_POINTS_CUSTOM_PARAMETERS_H
-#define C0P_SOLUTIONS_GROUP_OF_POINTS_CUSTOM_PARAMETERS_H
+#ifndef C0P_SOLUTIONS_PASSIVE_PARTICLES_CUSTOM_PARAMETERS_H
+#define C0P_SOLUTIONS_PASSIVE_PARTICLES_CUSTOM_PARAMETERS_H
 #pragma once
 
 // std includes
 #include <map>
-
-// include lib
-#include "d0t/equations/advection.h"
+#include <format>
 
 // app includes
 #include "core/solutions/prop.h"
@@ -18,13 +16,13 @@
 
 namespace c0p {
 
-struct _GroupOfPointsParameters {
-	inline static std::string name = "group_of_points";
+struct _PassiveParticlesParameters {
+	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
-	static const unsigned StateSize = DIM; // Dimension of the state variable 
-	// Feel free to add parameters if you need
-	static const unsigned Number = EnvParameters::cGroupSize; // Number of members in the group
+	static const unsigned StateSize = DIM; // dimension of the state variable 
+	// feel free to add parameters if you need
+	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// definition of the member data
@@ -36,9 +34,11 @@ struct _GroupOfPointsParameters {
 			// ---------------- CUSTOM EQUATION START
 			// input
 			const tView<const tSpaceVector> x(pState);
+			// flow
+			const tSpaceVector u = Flow::getVelocity(x.data(), t);
 			// output
 			tView<tSpaceVector> dX(dState.data());
-			dX = Flow::getVelocity(x.data(), t);
+			dX = u;
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
@@ -71,21 +71,28 @@ struct _GroupOfPointsParameters {
 		// ---------------- CUSTOM INIT END
 	}
 
+	static constexpr unsigned FormatNumber = std::ceil(Number/10.0);
+
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;
 		// ---------------- CUSTOM INIT START
+		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
 			const double* pSubState = tVariable::cState(pState, subIndex);
 			const tView<const tSpaceVector> x(pSubState);
-			output["group_of_points__particle_" + std::to_string(subIndex) + "__pos_0"] = x[0];
-			output["group_of_points__particle_" + std::to_string(subIndex) + "__pos_1"] = x[1];
+			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_0"] = x[0];
+			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_1"] = x[1];
+			xAverage += x;
 		}
+		xAverage /= Number;
+		output["passive_particles__average_pos_0"] = xAverage[0];
+		output["passive_particles__average_pos_1"] = xAverage[1];
 		// ---------------- CUSTOM INIT END
 		return output;
 	}
 };
 
-using _GroupOfPoints = EquationCustom<_GroupOfPointsParameters>;
+using _PassiveParticles = EquationCustom<_PassiveParticlesParameters>;
 
 }
 

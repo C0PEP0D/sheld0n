@@ -33,10 +33,10 @@ def main(name):
         script_dir = os.path.dirname(os.path.realpath(__file__))
         param_dir = ".."
         code_dir = script_dir + "/../../.."
-        shutil.copytree(code_dir + "/app/default/param/solutions/__group_of_points", args.name, ignore=shutil.ignore_patterns('__*'))
+        shutil.copytree(code_dir + "/app/default/param/solutions/passive_particles", args.name, ignore=shutil.ignore_patterns('__*'))
         os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/choose.py", args.name), args.name + "/choose")
         # edit
-        libchoose.edit_choice(name, ["group_of_points"], [name])
+        libchoose.edit_choice(name, ["passive_particles"], [name])
         libchoose.edit_add_equation(name)
     else:
         print("ERROR: name shouldn't contain special characters")

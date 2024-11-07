@@ -12,7 +12,7 @@ namespace c0p {
 struct EnvParameters {
     // Characteristic group size. 
     // Should be greater than zero.
-    constexpr static const double cGroupSize = 128;
+    constexpr static const double cGroupSize = 16;
     // Characteristic scales used to parametrize objects.
     // Currently corresponds to the Kolmogorov scales of the JHTDB flow.
     constexpr static const double cLength = M_PI;

@@ -22,7 +22,7 @@ class Post {
 	public:
 		// base
 		Env<EnvParameters> env;
-		std::vector<double> time;
+		std::vector<std::string> time;
 	public:
 		Post() {
 			std::cout << "INFO : Running post-processing" << std::endl;
@@ -30,13 +30,13 @@ class Post {
 			init();
 			// PostProcess case
 			for(const auto& t : time) {
-				std::string folder = "post_process/time/" + std::to_string(t);
+				std::string folder = "post_process/time/" + t;
 				if(not std::filesystem::exists(folder)) {
 					std::filesystem::create_directory(folder);
 					// // load
 					load(env, t);
 					// // solutions
-					env.solutions.post(t);
+					env.solutions.post(std::stod(t));
 					// // msg
 					std::cout << "INFO : Processed " << t << "/" << time.back() << std::endl;
 				}
@@ -59,7 +59,7 @@ class Post {
 			// load time
 			if(std::filesystem::exists("time")) {
 				for (const auto & entry : std::filesystem::directory_iterator("time")) {
-					time.emplace_back(std::stod(entry.path().filename()));
+					time.emplace_back(entry.path().filename());
 				}
 				if(time.size() > 0) {
 					std::sort(time.begin(), time.end());
@@ -88,9 +88,9 @@ class Post {
 			}
 		}
 
-		void load(Env<EnvParameters>& env, const tScalar t) {
+		void load(Env<EnvParameters>& env, const std::string& t) {
 			// Get directory
-			std::string folder = "time/" + std::to_string(t);
+			std::string folder = "time/" + t;
    			// Load
    			// Static
    			if (tParameters::IsStaticMerged) {
@@ -104,7 +104,7 @@ class Post {
    			SolutionsParameters::loadDynamic(folder);
 			SolutionsParameters::loadGroups(folder);
 			// Set time
-			env.solutions.solutionsStatic.t = t;
+			env.solutions.solutionsStatic.t = std::stod(t);
 		}
 
 		template<unsigned int Index = 0>

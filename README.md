@@ -36,7 +36,7 @@ If not, you should be able to install these dependencies with your package manag
 
 * [**Python**](https://www.python.org/) must be installed
 * [**CMake** `v?`](https://cmake.org/download/) or higher must be installed
-* a c++17 compliant compiler, such as [**gcc** `v9`](https://cmake.org/download/) or higher must be installed
+* a c++20 compliant compiler, such as [**gcc** `v10`](https://askubuntu.com/questions/1192955/how-to-install-g-10-on-ubuntu-18-04) or higher must be installed
 * the [**Threading Building Block Library** `v2018`](https://github.com/ibaned/tbb) or higher must be installed ([this version](https://github.com/wjakob/tbb) that enables is installing it using CMake is advised)
 
 ### Installing
@@ -75,18 +75,17 @@ $ script --help
 
 ### Quick start
 
-Go to the cases folder and a choose a case:
+Go to the cases folder and and execute the script `generate_new_case` providing a name for that case:
 
 ```sh
 $ cd cases
-$ ls
-adaptative_surfers spherical_surfers comparison surfers tracers
+$ ./generate_new_case my_new_case
 ```
 
-Then navigate in the case you choose, **surfers** for example, and run the case.
+Then navigate in the case you new case, and run the case.
 
 ```sh
-$ cd surfers
+$ cd my_new_case
 $ ./run
 ```
 
@@ -96,23 +95,15 @@ Once the simulation has started or finished, one can run some post processing:
 $ ./post
 ```
 
-Final data should be in the `post_process` directory. Further post processing can be done using various scripts in that directory. Post processing will generated CSV files that can then be processed thirdparty softwares to plot curves.
-
-### Creating a new case
-
-Go to the cases folder and run the new_case script
-
-```sh
-$ cd cases
-$ ./new_case new_case_name
-```
+Final data should be in the `post_process` directory. Further post processing can be done using various scripts in that directory.
+Feel free to run the `--help` option of these scripts to learn how to use them.
 
 ### Editing simulation parameters
 
-All parameters are included in the `param`.
-One can edit any `parameters.h` file in this subtree.
-Furthermore can choose between different simulation parameters using the `choose` scripts.
-The `print_param` is a helper script to print all parameters that can be used to check all simulation parameters before running a simulation.
+All parameters are included in the `param` directory.
+One can edit any `parameters.h` file in this subtree as you see fit.
+Furthermore can choose between different default simulation parameters using the `choose` scripts.
+Again, feel free to use the `--help` option to learn how to use those scripts.
 
 ### Known issue
 

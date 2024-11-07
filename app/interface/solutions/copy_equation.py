@@ -28,7 +28,7 @@ def parse():
     return parser.parse_args()
 
 def main(source, name):
-    name_check = re.compile('[][@!#$%^&*()<>?/\|}{~:+.\'"]')
+    name_check = re.compile('[][@!#$%^&*()<>?/\\|}{~:+.\'"]')
     if(name_check.search(name) == None):
         # copy
         shutil.copytree(source, name, symlinks=True)
