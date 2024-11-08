@@ -37,7 +37,7 @@ If not, you should be able to install these dependencies with your package manag
 * [**Python**](https://www.python.org/) must be installed
 * [**CMake** `v?`](https://cmake.org/download/) or higher must be installed
 * a c++20 compliant compiler, such as **gcc** `v10` or higher must be installed (`sudo apt install gcc-10`)
-* the [**Threading Building Block Library** `v2018`](https://github.com/ibaned/tbb) or higher must be installed ([this version](https://github.com/wjakob/tbb) that enables is installing it using CMake is advised)
+* the **Threading Building Block Library** `v2018` or more recent must be installed (`sudo apt install tbb`)
 
 ### Installing
 
