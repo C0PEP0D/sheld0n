@@ -54,6 +54,7 @@ def main():
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/remove_equation")
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/batch_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/batch_copy_equation")
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/create_new_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/rename_equation")
     #### equation
     # os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/choose.py", args.name + "/param/solutions/group_of_points"), args.name + "/param/solutions/group_of_points/choose")
     ### init

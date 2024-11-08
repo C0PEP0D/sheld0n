@@ -19,8 +19,8 @@ import libchoose
 
 def parse():
     # parser
-    parser = argparse.ArgumentParser(description='copy an object')
-    parser.add_argument('source', help='specify the name of source object')
+    parser = argparse.ArgumentParser(description='copy an equation')
+    parser.add_argument('source', help='specify the name of source equation')
     parser.add_argument('name', help='specify the name of the copy')
     # autocompletion
     argcomplete.autocomplete(parser)

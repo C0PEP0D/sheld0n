@@ -16,7 +16,7 @@
 // FLAG: INCLUDE EQUATION BEGIN
 // #include "param/solutions/source_of_points/parameters.h"
 // #include "param/solutions/reactive_front/parameters.h"
- #include "param/solutions/passive_particles/parameters.h"
+#include "param/solutions/passive_particles/parameters.h"
 // FLAG: INCLUDE EQUATION END
 
 namespace c0p {
