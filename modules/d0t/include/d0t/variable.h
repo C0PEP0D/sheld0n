@@ -31,13 +31,13 @@ class VariableStatic : public Variable<_tVector, _tView, _Size> {
 	public:
 		using tBase = Variable<_tVector, _tView, _Size>;
 	public:
-   		template<int _SizeTmp> using tVector = typename tBase::tVector<_SizeTmp>;
-   		template<typename... Args> using tView = typename tBase::tView<Args...>;
+   		template<int _SizeTmp> using tVector = typename tBase::template tVector<_SizeTmp>;
+   		template<typename... Args> using tView = typename tBase::template tView<Args...>;
    		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
    		using tBase::MinSize;
     public:
 		static const unsigned int Size = _Size;
-		using tStateVectorStatic = typename tBase::tVector<Size>;
+		using tStateVectorStatic = typename tBase::template tVector<Size>;
     public:
     	// // apply variable constraints
 		// static void constrain(std::vector<double>& state) override {
@@ -52,8 +52,8 @@ class VariableNone : public VariableStatic<_tVector, _tView, 0> {
 	public:
 		using tBase = VariableStatic<_tVector, _tView, 0>;
     public:
-    	template<int _Size> using tVector = typename tBase::tVector<_Size>;
-   		template<typename... Args> using tView = typename tBase::tView<Args...>;
+    	template<int _Size> using tVector = typename tBase::template tVector<_Size>;
+   		template<typename... Args> using tView = typename tBase::template tView<Args...>;
    		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
    		using tBase::MinSize;
    		using tBase::Size;
@@ -110,8 +110,8 @@ class VariableComposed<tVariable> : public VariableStatic<tVariable::template tV
 	public:
 		using tBase = VariableStatic<tVariable::template tVector, tVariable::template tView, tVariable::Size>;
 	public:
-   		template<int _Size> using tVector = typename tBase::tVector<_Size>;
-   		template<typename... Args> using tView = typename tBase::tView<Args...>;
+   		template<int _Size> using tVector = typename tBase::template tVector<_Size>;
+   		template<typename... Args> using tView = typename tBase::template tView<Args...>;
    		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
    		using tBase::MinSize;
    		using tBase::Size;
@@ -141,8 +141,8 @@ class VariableComposed<tVariable, tVariables...> : public VariableStatic<tVariab
 	public:
 		using tBase = VariableStatic<tVariable::template tVector, tVariable::template tView, tVariable::Size + VariableComposed<tVariables...>::Size>;
 	public:
-   		template<int _Size> using tVector = typename tBase::tVector<_Size>;
-   		template<typename... Args> using tView = typename tBase::tView<Args...>;
+   		template<int _Size> using tVector = typename tBase::template tVector<_Size>;
+   		template<typename... Args> using tView = typename tBase::template tView<Args...>;
    		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
    		using tBase::MinSize;
    		using tBase::Size;
@@ -175,8 +175,8 @@ class VariableGroupStatic : public VariableStatic<_tVariableMember::template tVe
 	public:
 		using tBase = VariableStatic<_tVariableMember::template tVector, _tVariableMember::template tView, _tVariableMeta::Size + _tVariableMember::Size * _GroupSize>;
 	public:
-   		template<int _Size> using tVector = typename tBase::tVector<_Size>;
-   		template<typename... Args> using tView = typename tBase::tView<Args...>;
+   		template<int _Size> using tVector = typename tBase::template tVector<_Size>;
+   		template<typename... Args> using tView = typename tBase::template tView<Args...>;
    		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
    		using tBase::MinSize;
    		using tBase::Size;
@@ -222,8 +222,8 @@ class VariableGroupDynamic : public Variable<_tVariableMember::template tVector,
 	public:
 		using tBase = Variable<_tVariableMember::template tVector, _tVariableMember::template tView>;
 	public:
-   		template<int _Size> using tVector = typename tBase::tVector<_Size>;
-   		template<typename... Args> using tView = typename tBase::tView<Args...>;
+   		template<int _Size> using tVector = typename tBase::template tVector<_Size>;
+   		template<typename... Args> using tView = typename tBase::template tView<Args...>;
    		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
    		using tBase::MinSize;
 	public:

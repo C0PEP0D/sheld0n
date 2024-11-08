@@ -8,7 +8,7 @@ The code is still in active developpement, feel free to ask for features.
 
 This code enables to compute active particle trajectories inside flows. It enables the user to specify a complex behaviour of particles. It can be used with external flow data, thus enabling to use data from flow simulations or experiments. Moreover, provided an internet connection, the software enables to use flows of the [Johns Hopkins Turbulence Database](http://turbulence.pha.jhu.edu/).
 Please keep in mind that this is a work in progress, all may not work out of the box yet.
-This software should be usable on any operating system but only have been tested on recent Linux distributions (Ubuntu 20, Archlinux).
+This software should be usable on any operating system but only have been tested on recent Linux distributions (Ubuntu, Archlinux...).
 
 This repository contains:
 
@@ -36,7 +36,7 @@ If not, you should be able to install these dependencies with your package manag
 
 * [**Python**](https://www.python.org/) must be installed
 * [**CMake** `v?`](https://cmake.org/download/) or higher must be installed
-* a c++20 compliant compiler, such as [**gcc** `v10`](https://askubuntu.com/questions/1192955/how-to-install-g-10-on-ubuntu-18-04) or higher must be installed
+* a c++20 compliant compiler, such as **gcc** `v10` or higher must be installed (`sudo apt install gcc-10`)
 * the [**Threading Building Block Library** `v2018`](https://github.com/ibaned/tbb) or higher must be installed ([this version](https://github.com/wjakob/tbb) that enables is installing it using CMake is advised)
 
 ### Installing

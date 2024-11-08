@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(c0p LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -43,7 +43,7 @@ target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/fl0p/include)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/v0l/include)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib)
 ## Compile features
-target_compile_features(run PUBLIC cxx_std_20)
+target_compile_features(run PUBLIC cxx_std_23)
 ## Link options
 if(NOT DEFINED TBB_DIR)
     target_link_options(run PRIVATE -ltbb) # TBB used for the standard execution library (parallel execution)
@@ -69,4 +69,4 @@ target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/fl0p/include)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/v0l/include)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib)
 ## Compile features
-target_compile_features(post PUBLIC cxx_std_20)
+target_compile_features(post PUBLIC cxx_std_23)

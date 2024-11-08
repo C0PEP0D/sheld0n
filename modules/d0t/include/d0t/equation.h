@@ -10,8 +10,8 @@ template<typename _tVariable>
 class Equation {
 	public:
 		using tVariable = _tVariable;
-		template<int _Size> using tVector = typename tVariable::tVector<_Size>;
-		template<typename... Args> using tView = typename tVariable::tView<Args...>;
+		template<int _Size> using tVector = typename tVariable::template tVector<_Size>;
+		template<typename... Args> using tView = typename tVariable::template tView<Args...>;
 		using tStateVectorDynamic = typename tVariable::tStateVectorDynamic;
 	public:
 		Equation() {
@@ -35,8 +35,8 @@ class EquationComposed : public Equation<VariableComposed<typename tEquations::t
 		using tBase = Equation<VariableComposed<typename tEquations::tVariable...>>;
 	public:
 		   using tVariable = typename tBase::tVariable;
-		template<int _Size> using tVector = typename tBase::tVector<_Size>;
-		template<typename... Args> using tView = typename tBase::tView<Args...>;
+		template<int _Size> using tVector = typename tBase::template tVector<_Size>;
+		template<typename... Args> using tView = typename tBase::template tView<Args...>;
 		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
 		static const unsigned int Number = sizeof...(tEquations);
 	public:
@@ -65,8 +65,8 @@ class EquationGroupDynamic : public Equation<_tVariableGroup> {
 		using tBase = Equation<_tVariableGroup>;
 	public:
 		using tVariable = typename tBase::tVariable;
-		template<int _Size> using tVector = typename tBase::tVector<_Size>;
-		template<typename... Args> using tView = typename tBase::tView<Args...>;
+		template<int _Size> using tVector = typename tBase::template tVector<_Size>;
+		template<typename... Args> using tView = typename tBase::template tView<Args...>;
 		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
 	public:
 		using tVariableGroup = tVariable;
@@ -91,8 +91,8 @@ class EquationGroupStatic : public Equation<_tVariableGroup> {
 		using tBase = Equation<_tVariableGroup>;
 	public:
 		using tVariable = typename tBase::tVariable;
-		template<int _Size> using tVector = typename tBase::tVector<_Size>;
-		template<typename... Args> using tView = typename tBase::tView<Args...>;
+		template<int _Size> using tVector = typename tBase::template tVector<_Size>;
+		template<typename... Args> using tView = typename tBase::template tView<Args...>;
 		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
 	public:
 		using tVariableGroup = tVariable;

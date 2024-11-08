@@ -14,15 +14,15 @@ class VariableVector : public VariableStatic<_tVector, _tView, _Dim> {
 	public:
 		using tBase = VariableStatic<_tVector, _tView, _Dim>;
     public:
-    	template<int _Size> using tVector = typename tBase::tVector<_Size>;
-   		template<typename... Args> using tView = typename tBase::tView<Args...>;
+    	template<int _Size> using tVector = typename tBase::template tVector<_Size>;
+   		template<typename... Args> using tView = typename tBase::template tView<Args...>;
    		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
    		using tBase::MinSize;
    		using tBase::Size;
    		using tStateVectorStatic = typename tBase::tStateVectorStatic;
     public:
     	static const unsigned int Dim = _Dim;
-        using tSpaceVector = typename tBase::tVector<Dim>;
+        using tSpaceVector = typename tBase::template tVector<Dim>;
     public:
     	static tView<tSpaceVector> get(double* pState) {
             return tView<tSpaceVector>(pState);
