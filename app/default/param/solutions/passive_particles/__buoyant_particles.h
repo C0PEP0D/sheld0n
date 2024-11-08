@@ -23,7 +23,8 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = DIM; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	static constexpr std::array<double, DIM> BuoyantVelocity = {0.0, 0.5}; // defined for 2D simulations, use {0.0, 0.5, 0.0} for 3D
+	static constexpr float BuoyantVelocity = 0.5;
+	static constexpr std::array<double, DIM> BuoyancyDirection = {0.0, 1.0}; // defined for 2D simulations, use {0.0, 0.0, 1.0} for 3D
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// definition of the member data
@@ -34,14 +35,14 @@ struct _PassiveParticlesParameters {
 
 			// ---------------- CUSTOM EQUATION START
 			// parameters
-			const tView<const tSpaceVector> v(BuoyantVelocity.data());
+			const tView<const tSpaceVector> z(BuoyancyDirection.data());
 			// input
 			const tView<const tSpaceVector> x(pState);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
 			// output
 			tView<tSpaceVector> dX(dState.data());
-			dX = u + v;
+			dX = u + BuoyantVelocity * z;
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
