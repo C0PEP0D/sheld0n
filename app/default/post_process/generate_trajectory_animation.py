@@ -14,7 +14,7 @@ import matplotlib.animation as animation
 
 def parse():
     parser = argparse.ArgumentParser(description='Plots 2D trajectories of all solutions over time, assuming pos_0 as x and pos_1 as y.')
-    parser.add_argument('--equation-list', '-e', nargs='*', default=[], help='equations for which to plot trajectorys')
+    parser.add_argument('--equation-list', '-e', nargs='*', default=[], help='equations for which to plot trajectories')
     parser.add_argument('--color-list', '-c', nargs='*', default=[], help='color for each equation')
     parser.add_argument('--step', '-s', type=int, default=1, help='animation frame step')
     return parser.parse_args()

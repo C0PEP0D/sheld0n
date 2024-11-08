@@ -16,6 +16,7 @@
 // FLAG: INCLUDE EQUATION BEGIN
 // #include "param/solutions/source_of_points/parameters.h"
 // #include "param/solutions/reactive_front/parameters.h"
+ #include "param/solutions/passive_particles/parameters.h"
 // FLAG: INCLUDE EQUATION END
 
 namespace c0p {
@@ -27,6 +28,7 @@ struct SolutionsParameters {
 	using tSolutionStatic = d0t::SolutionStatic<tSolver, 
 		d0t::EquationComposed<
 			// FLAG: DECLARE STATIC EQUATION BEGIN
+			_PassiveParticles
 			// FLAG: DECLARE STATIC EQUATION END
 		>
 	>;
