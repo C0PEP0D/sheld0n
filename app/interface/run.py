@@ -13,7 +13,6 @@ def parse():
     parser.add_argument('-d', '--debug', action='store_true', help='activates debug')
     parser.add_argument('-c', '--compiler', default='', help='specify the compiler used')
     parser.add_argument('-m', '--cmake-cmd', default='cmake', help='specify the cmake command')
-    parser.add_argument('-t', '--tbb-dir', default='', help='specify the path to the TBB directory')
     parser.add_argument('-j', '--jobs', type=int, default=1, help='specify the number a compiling jobs')
     return parser.parse_args()
 
@@ -28,8 +27,6 @@ def main():
         flags = "-DCMAKE_BUILD_TYPE=Debug"
     if args.compiler:
         flags += " -DCMAKE_CXX_COMPILER={compiler}".format(compiler=args.compiler)
-    if args.tbb_dir:
-        flags += " -DTBB_DIR={tbb_dir}".format(tbb_dir=args.tbb_dir)
     # configure
     subprocess.run("{cmake_cmd} .. {flags}; exit 0".format(cmake_cmd=args.cmake_cmd, flags=flags), cwd="build", shell=True)
     # build

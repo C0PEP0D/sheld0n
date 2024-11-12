@@ -13,20 +13,16 @@ message(INFO " C0P_PROJECT_DIR " ${C0P_PROJECT_DIR})
 
 ## PACKAGES
 ### tbb
-if(DEFINED TBB_DIR)
-    add_library(tbb SHARED IMPORTED)
-    set_target_properties(tbb PROPERTIES
-        IMPORTED_LOCATION "${TBB_DIR}/lib/libtbb.so"
-        INTERFACE_INCLUDE_DIRECTORIES "${TBB_DIR}/include"
-    )
-endif()
+list(APPEND CMAKE_MODULE_PATH ${C0P_PROJECT_DIR}/cmake/modules) # maybe unecessary ?
+find_package(TBB REQUIRED)
+
 ### turblib (JHTDB)
 list(APPEND TURB_LIB_SRC_FILES "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/soapC.c" "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/soapClient.c" "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/stdsoap2.c" "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/turblib.c")
 
 # Build run
 add_executable(run ${C0P_PROJECT_DIR}/app/core/run/main.cpp ${TURB_LIB_SRC_FILES})
 ## Link Libraries
-target_link_libraries(run tbb)
+target_link_libraries(run TBB::tbb)
 ## Include
 target_include_directories(run PRIVATE .)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/app)
@@ -52,7 +48,7 @@ endif()
 # Build post
 add_executable(post ${C0P_PROJECT_DIR}/app/core/post/main.cpp ${TURB_LIB_SRC_FILES})
 ## Libraries
-target_link_libraries(post tbb)
+target_link_libraries(post TBB::tbb)
 ## Include
 target_include_directories(post PRIVATE .)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/app)
