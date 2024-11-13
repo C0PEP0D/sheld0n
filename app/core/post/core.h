@@ -20,8 +20,6 @@ namespace c0p {
 template<typename tParameters>
 class Post {
 	public:
-		// base
-		Env<EnvParameters> env;
 		std::vector<std::string> time;
 	public:
 		Post() {
@@ -34,9 +32,9 @@ class Post {
 				if(not std::filesystem::exists(folder)) {
 					std::filesystem::create_directory(folder);
 					// // load
-					load(env, t);
+					load(t);
 					// // solutions
-					env.solutions.post(std::stod(t));
+					Env::solutions.post(std::stod(t));
 					// // msg
 					std::cout << "INFO : Processed " << t << "/" << time.back() << std::endl;
 				}
@@ -88,23 +86,23 @@ class Post {
 			}
 		}
 
-		void load(Env<EnvParameters>& env, const std::string& t) {
+		void load(const std::string& t) {
 			// Get directory
 			std::string folder = "time/" + t;
    			// Load
    			// Static
    			if (tParameters::IsStaticMerged) {
-   				if(not env.solutions.solutionsStatic.state.empty()) {
-   					l0ad::ascii::loadDouble(folder + "/static.txt", env.solutions.solutionsStatic.state.data(), env.solutions.solutionsStatic.state.size());
+   				if(not Env::solutions.solutionsStatic.state.empty()) {
+   					l0ad::ascii::loadDouble(folder + "/static.txt", Env::solutions.solutionsStatic.state.data(), Env::solutions.solutionsStatic.state.size());
    				}
    			} else {
-   				_loadStatic(env.solutions.solutionsStatic, folder);
+   				_loadStatic(Env::solutions.solutionsStatic, folder);
    			}
-   			_loadStatic(env.solutions.solutionsStatic, folder);
+   			_loadStatic(Env::solutions.solutionsStatic, folder);
    			SolutionsParameters::loadDynamic(folder);
 			SolutionsParameters::loadGroups(folder);
 			// Set time
-			env.solutions.solutionsStatic.t = std::stod(t);
+			Env::solutions.solutionsStatic.t = std::stod(t);
 		}
 
 		template<unsigned int Index = 0>

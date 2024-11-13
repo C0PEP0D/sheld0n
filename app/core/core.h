@@ -12,26 +12,23 @@
 
 namespace c0p {
 
-template<typename tParameters>
-class Env {
-	public:
-		Solutions<SolutionsParameters> solutions;
-	public:
-		Env() {
-		}
+	// template<typename tParameters>
+	struct Env {
 
-		void init() {
+		inline static Solutions<SolutionsParameters> solutions;
+
+		static void init() {
 			std::cout << "INFO : Init case start" << std::endl;
 			solutions.init();
 			std::cout << "INFO : Init case end" << std::endl;
 		}
 
-		void post(const double t) {
+		static void post(const double t) {
 			std::cout << "INFO : Post case start" << std::endl;
 			solutions.post(t);
 			std::cout << "INFO : Post case end" << std::endl;
 		}
-};
+	};
 
 }
 

@@ -19,8 +19,6 @@ namespace c0p {
 template<typename tParameters>
 class Run {
 	public:
-		Env<EnvParameters> env;
-	public:
 		std::size_t startIndex;
 	public:
 		Run() {
@@ -60,13 +58,13 @@ class Run {
 				} else {
 					// Init
 					startIndex = 1;
-					env.init();
+					Env::init();
 					save(0.0);
 				}
 			} else {
 				// Init
 				startIndex = 1;
-				env.init();
+				Env::init();
 				// Create time directory
 				std::filesystem::create_directory("time");
 				save(0.0);
@@ -74,7 +72,7 @@ class Run {
 		}
 
 		void step(const tScalar& t) {
-			env.solutions.step(tParameters::Dt);
+			Env::solutions.step(tParameters::Dt);
 		}
 		
 		void save(const tScalar& t) {
@@ -84,11 +82,11 @@ class Run {
 			// Save
 			// // Static
 			if (tParameters::IsMergingStatic) {
-				if(not env.solutions.solutionsStatic.state.empty()) {
-					s0ve::saveDouble(folder + "/static.txt", env.solutions.solutionsStatic.state.data(), env.solutions.solutionsStatic.state.size());
+				if(not Env::solutions.solutionsStatic.state.empty()) {
+					s0ve::saveDouble(folder + "/static.txt", Env::solutions.solutionsStatic.state.data(), Env::solutions.solutionsStatic.state.size());
 				}
 			} else {
-				_saveStatic(env.solutions.solutionsStatic, folder);
+				_saveStatic(Env::solutions.solutionsStatic, folder);
 			}
 			SolutionsParameters::saveDynamic(folder);
 			SolutionsParameters::saveGroups(folder);
@@ -111,16 +109,16 @@ class Run {
 			// Load
 			// // Static
 			if (tParameters::IsMergingStatic) {
-				if(not env.solutions.solutionsStatic.state.empty()) {
-					l0ad::ascii::loadDouble(folder + "/static.txt", env.solutions.solutionsStatic.state.data(), env.solutions.solutionsStatic.state.size());
+				if(not Env::solutions.solutionsStatic.state.empty()) {
+					l0ad::ascii::loadDouble(folder + "/static.txt", Env::solutions.solutionsStatic.state.data(), Env::solutions.solutionsStatic.state.size());
 				}
 			} else {
-				_loadStatic(env.solutions.solutionsStatic, folder);
+				_loadStatic(Env::solutions.solutionsStatic, folder);
 			}
 			SolutionsParameters::loadDynamic(folder);
 			SolutionsParameters::loadGroups(folder);
 			// set time
-			env.solutions.solutionsStatic.t = t;
+			Env::solutions.solutionsStatic.t = t;
 		}
 
 		template<unsigned int Index = 0>
