@@ -12,7 +12,7 @@
 // app includes
 #include "core/solutions/prop.h"
 #include "core/solutions/core.h"
-#include "param/flow/choice.h"
+#include "param/flow/parameters.h"
 
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"

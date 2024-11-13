@@ -4,7 +4,7 @@
 
 namespace c0p {
 
-struct FlowAnalytic {
+struct Flow {
 
 	static tSpaceVector getVelocity(const double* pX, const double t) {
 		return tSpaceVector({

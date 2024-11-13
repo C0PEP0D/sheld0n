@@ -48,7 +48,6 @@ def main():
     ### env
     #### flow
     os.symlink(os.path.relpath(code_dir + "/app/interface/flow/choose.py", args.name + "/param/flow"), args.name + "/param/flow/choose")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/flow/analytic/choose.py", args.name + "/param/flow/analytic"), args.name + "/param/flow/analytic/choose")
     #### solutions
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/copy_equation")
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/remove_equation")

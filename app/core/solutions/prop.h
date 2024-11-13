@@ -6,7 +6,7 @@
 // #include "sl0/object.h"
 // app include
 #include "core/prop.h"
-#include "param/flow/choice.h"
+#include "param/flow/parameters.h"
 
 namespace c0p {
 	class SolutionsParameters;

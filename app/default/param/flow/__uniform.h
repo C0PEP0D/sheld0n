@@ -7,7 +7,7 @@
 
 namespace c0p {
 
-struct FlowAnalytic {
+struct Flow {
 
 	static constexpr std::array<double, DIM> u = {1.0, 0.0}; // defined in 2D, use {1.0, 0.0, 0.0} in 3D
 

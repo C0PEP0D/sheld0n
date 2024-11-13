@@ -6,7 +6,7 @@
 #include <iostream>
 // app includes
 #include "core/prop.h"
-#include "param/flow/choice.h"
+#include "param/flow/parameters.h"
 #include "core/solutions/core.h"
 #include "param/solutions/parameters.h"
 

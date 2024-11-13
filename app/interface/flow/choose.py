@@ -13,4 +13,4 @@ if __name__ == '__main__':
         lib_code = compile(lib_source_file.read(), lib_filename, "exec")
     exec(lib_code)
     # run tests
-    choose_flow(choices_dir, choices_exceptions)
+    choose_file(choices_dir, choices_exceptions)

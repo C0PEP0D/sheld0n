@@ -4,8 +4,7 @@
 
 namespace c0p {
 
-struct FlowAnalytic {
-
+struct Flow {
 	static tSpaceVector getVelocity(const double* pX, const double t) {
 		return tSpaceVector({
 				std::cos(pX[0]) * std::sin(pX[1]),
