@@ -17,7 +17,6 @@ using tSpaceMatrix = tMatrix<DIM, DIM>;
 // the users can add whatever parameters they judge suitable,
 // these parameters are accessible from the other parameter files
 struct EnvParameters {
-	constexpr unsigned int DIM = 2; // 2D or 3D
     // optional characteristic group size. 
     // should be greater than zero.
     constexpr static const double cGroupSize = 16;
