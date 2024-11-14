@@ -40,11 +40,6 @@ target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/thirdpart
 ## Compile features
 target_compile_features(run PUBLIC cxx_std_23)
 
-# ## Link options
-# if(NOT DEFINED TBB_DIR)
-#     target_link_options(run PRIVATE -ltbb) # TBB used for the standard execution library (parallel execution)
-# endif()
-
 # Build post
 add_executable(post ${C0P_PROJECT_DIR}/app/core/post/main.cpp ${TURB_LIB_SRC_FILES})
 ## Libraries
