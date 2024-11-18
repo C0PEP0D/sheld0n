@@ -34,10 +34,11 @@ This software has been produced during my PhD thesis and as part as the European
 The dependencies are standard softwares that may already be installed on your system.
 If not, you should be able to install these dependencies with your package manager.
 
-* [**Python**](https://www.python.org/) must be installed
-* [**CMake** `v?`](https://cmake.org/download/) or higher must be installed
-* a c++20 compliant compiler, such as **gcc** `v10` or higher must be installed (`sudo apt install gcc-10`)
+* **Python** must be installed (`sudo apt install ffmpeg`)
+* **CMake** must be installed(`sudo apt install cmake`)
+* a c++20 compliant compiler, such as **gcc** `v14` or higher must be installed (`sudo apt install gcc-14`)
 * the **Threading Building Block Library** `v2018` or more recent must be installed (`sudo apt install tbb`)
+* **ffmpeg** must be installed (`sudo apt install ffmpeg`)
 
 ### Installing
 
