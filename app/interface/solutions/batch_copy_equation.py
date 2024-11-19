@@ -41,7 +41,7 @@ def file_replace(file_name, text, replacement):
         print(re.sub(text, replacement, line), end='')
 
 def set_parameter(dest, prop, value):
-    file_replace(dest + "/parameters.h", r"{prop} = [^\;]*;".format(prop=prop), "{prop} = {value};".format(prop=prop, value=float(value)))
+    file_replace(dest + "/parameters.h", r"{prop} = [^\;]*;".format(prop=prop), "{prop} = {value};".format(prop=prop, value=str(value)))
 
 def compute(sources, prop, values):
     for source in sources:
