@@ -20,6 +20,7 @@ This repository contains:
 - [Background](#background)
 - [Install](#install)
 - [Usage](#usage)
+- [Known Issue](#known-issue)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -34,11 +35,16 @@ This software has been produced during my PhD thesis and as part as the European
 The dependencies are standard softwares that may already be installed on your system.
 If not, you should be able to install these dependencies with your package manager.
 
-* **Python** must be installed (`sudo apt install ffmpeg`)
-* **CMake** must be installed(`sudo apt install cmake`)
-* a c++20 compliant compiler, such as **gcc** `v14` or higher must be installed (`sudo apt install gcc-14`)
-* the **Threading Building Block Library** `v2018` or more recent must be installed (`sudo apt install tbb`)
-* **ffmpeg** must be installed (`sudo apt install ffmpeg`)
+The following must be installed:
+* **Python** (`sudo apt install python`) with additional modules
+	* **numpy**, `python -m pip install numpy`
+	* **matplotlib**, `python -m pip install matplotlib`, used for plotting
+* **CMake**, `sudo apt install cmake`
+* **Threading Building Block Library**, `sudo apt install tbb`
+* a c++20 compliant compiler such as one of the following:
+	* **gcc** `v14`, `sudo apt install gcc-14`
+	* **clang** `v18`, `sudo apt install clang-18`
+* **ffmpeg**, `sudo apt install ffmpeg`, used to generate animations
 
 ### Installing
 
@@ -67,11 +73,11 @@ Most scripts provided by this software contain their description, explaining how
 One can access this description using the following:
 
 ```sh
-$ script -h
+$ ./script -h
 ```
 or
 ```sh
-$ script --help
+$ ./script --help
 ```
 
 ### Quick start
@@ -83,35 +89,75 @@ $ cd cases
 $ ./generate_new_case my_new_case
 ```
 
-Then navigate in the case you new case, and run the case.
+Then navigate in the case and run the case.
 
 ```sh
 $ cd my_new_case
 $ ./run
 ```
 
-Once the simulation has started or finished, one can run some post processing:
+[!NOTE]
+If it does not work, it might mean that your default compiler might not support all necessary C++ features.
+Try specifying another C++ compiler, `./run -c g++-14` or `./run -c clang++-18`.
+
+Once the simulation has finished, one can run some post processing:
 
 ```sh
 $ ./post
 ```
 
-Final data should be in the `post_process` directory. Further post processing can be done using various scripts in that directory.
-Feel free to run the `--help` option of these scripts to learn how to use them.
+[!NOTE]
+Similarly, one can specify another C++ compiler if necessary, `./post -c g++-14` or `./post -c clang++-18`.
+
+Final data should be in the `post_process` directory. 
+Further post processing is provided using python scripts in that directory.
+For instance, you can visualize your simulation using:
+
+```sh
+$ ./generate_trajectory_animation.py
+```
+
+Further post processing can be done using various scripts in that directory.
+Run the `--help` option of these scripts to learn how to use them.
+
+Feel free to edit this scripts at your convenience and create your own post processing.
 
 ### Editing simulation parameters
 
 All parameters are included in the `param` directory.
-One can edit any `parameters.h` file in this subtree as you see fit.
-Furthermore can choose between different default simulation parameters using the `choose` scripts.
-Again, feel free to use the `--help` option to learn how to use those scripts.
+* all files `parameters.h` contain parameters that can be edited.
+* `choose` scripts can be used to set `parameters.h` to a chosen default.
 
-### Known issue
+For instance use the `param/flow/choose` script to change the flow from a Taylor-Green Vortex to a uniform flow. 
+```sh
+$ cd param/flow
+$ ./choose uniform
+```
+Then open the `parameters.h` file in the same directory to see how it has changed.
+Use the `-h` or `--help` option to see all available choices.
 
-There is a memory leak somewhere. 
-I am pretty sure it comes from the turblib library but I have not got the time to investigate it more.
-You should be fine if you do not use the jhtdb flow.
-If you do, just kill the process when too much memory is used and rerun it.
+[!CAUTION]
+Using a `choice` script will override the `parameters.h` file in the same directory and all changes will be lost.
+
+* the python script `parameters.py` can be used to set any parameter in the simulation case.
+
+The `parameters.py` is intended to be edited by the user. 
+The script can search for any occurrences of a parameter in a directory tree and change it.
+
+[!CAUTION]
+Using `parameters.py` may edit directly all `parameters.h` files in the parameter tree. 
+If not used correctly, it might completely corrupt the simulation case.
+If you are not sure of its usage, make sure to save your simulation case before.
+
+### Advance usage
+
+The simulations can be further customized using the scripts located in `param/solutions`.
+A series of tutorials is provided in the [doc](doc) directory to learn how to properly use this code.
+
+## Known issue
+
+There is a memory leak when using the **JHTDB** flow.
+If you do use this flow in your simulations, just kill the process when too much memory is used and rerun it.
 
 ## Maintainers
 
