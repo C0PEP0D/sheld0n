@@ -41,10 +41,10 @@ def main():
     ### post scripts defaults
     #shutil.copy(code_dir + "/modules/pyp0st/post_default.py", args.name + "/post_process/post_default.py")
     ## interface
+    os.symlink(os.path.relpath(code_dir + "/app/interface/libset.py", args.name), args.name + "/libset.py")
     os.symlink(os.path.relpath(code_dir + "/app/interface/run.py", args.name), args.name + "/run")
     os.symlink(os.path.relpath(code_dir + "/app/interface/post.py", args.name), args.name + "/post")
     os.symlink(os.path.relpath(code_dir + "/app/interface/clean.py", args.name), args.name + "/clean")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/print_param.py", args.name), args.name + "/print_param")
     ### env
     #### flow
     os.symlink(os.path.relpath(code_dir + "/app/interface/flow/choose.py", args.name + "/param/flow"), args.name + "/param/flow/choose")
