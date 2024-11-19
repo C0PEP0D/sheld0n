@@ -96,9 +96,9 @@ $ cd my_new_case
 $ ./run
 ```
 
-[!NOTE]
-If it does not work, it might mean that your default compiler might not support all necessary C++ features.
-Try specifying another C++ compiler, `./run -c g++-14` or `./run -c clang++-18`.
+> [!NOTE]
+> If it does not work, it might mean that your default compiler might not support all necessary C++ features.
+> Try specifying another C++ compiler, `./run -c g++-14` or `./run -c clang++-18`.
 
 Once the simulation has finished, one can run some post processing:
 
@@ -106,8 +106,8 @@ Once the simulation has finished, one can run some post processing:
 $ ./post
 ```
 
-[!NOTE]
-Similarly, one can specify another C++ compiler if necessary, `./post -c g++-14` or `./post -c clang++-18`.
+> [!NOTE]
+> Similarly, one can specify another C++ compiler if necessary, `./post -c g++-14` or `./post -c clang++-18`.
 
 Final data should be in the `post_process` directory. 
 Further post processing is provided using python scripts in that directory.
@@ -136,18 +136,18 @@ $ ./choose uniform
 Then open the `parameters.h` file in the same directory to see how it has changed.
 Use the `-h` or `--help` option to see all available choices.
 
-[!CAUTION]
-Using a `choice` script will override the `parameters.h` file in the same directory and all changes will be lost.
+> [!CAUTION]
+> Using a `choice` script will override the `parameters.h` file in the same directory and all changes will be lost.
 
 * the python script `parameters.py` can be used to set any parameter in the simulation case.
 
 The `parameters.py` is intended to be edited by the user. 
 The script can search for any occurrences of a parameter in a directory tree and change it.
 
-[!CAUTION]
-Using `parameters.py` may edit directly all `parameters.h` files in the parameter tree. 
-If not used correctly, it might completely corrupt the simulation case.
-If you are not sure of its usage, make sure to save your simulation case before.
+> [!CAUTION]
+> Using `parameters.py` may edit directly all `parameters.h` files in the parameter tree. 
+> If not used correctly, it might completely corrupt the simulation case.
+> If you are not sure of its usage, make sure to save your simulation case before.
 
 ### Advance usage
 
