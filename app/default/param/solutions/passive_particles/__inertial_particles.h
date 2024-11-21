@@ -69,8 +69,10 @@ struct _PassiveParticlesParameters {
 			double* pSubState = tVariable::state(pState, subIndex);
 			// interpret subState as a tSpaceVector
 			tView<tSpaceVector> x(pSubState);
+			tView<tSpaceVector> v(pSubState + DIM);
 			// set the initial position of this member
 			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
+			v = tSpaceVector::Zero();
 		}
 		// ---------------- CUSTOM INIT END
 	}
@@ -85,8 +87,11 @@ struct _PassiveParticlesParameters {
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
 			const double* pSubState = tVariable::cState(pState, subIndex);
 			const tView<const tSpaceVector> x(pSubState);
+			const tView<const tSpaceVector> v(pSubState + DIM);
 			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_0"] = x[0];
 			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_1"] = x[1];
+			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__vel_0"] = v[0];
+			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__vel_1"] = v[1];
 			xAverage += x;
 		}
 		xAverage /= Number;
