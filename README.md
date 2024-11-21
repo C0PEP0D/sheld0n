@@ -139,13 +139,13 @@ Use the `-h` or `--help` option to see all available choices.
 > [!CAUTION]
 > Using a `choice` script will override the `parameters.h` file in the same directory and all changes will be lost.
 
-* optionally the python script `parameters.py` can be used to set any parameter in the simulation case.
+* optionally the python script `set.py` can be used to set any parameter in the simulation case.
 
-The `parameters.py`script is intended to be edited by the user. 
+The `set.py`script is intended to be edited by the user. 
 The script can search for any occurrences of a parameter in a directory tree and change it.
 
 > [!CAUTION]
-> Using `parameters.py` may edit directly all `parameters.h` files in the parameter tree. 
+> Using `set.py` may edit directly all `parameters.h` files in the parameter tree. 
 > If not used correctly, it might completely corrupt the simulation case.
 > If you are not sure of its usage, make sure to copy and save your simulation case before running it.
 
