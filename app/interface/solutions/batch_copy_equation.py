@@ -12,7 +12,7 @@ def parse():
     parser = argparse.ArgumentParser(description='Copies an equation into several others by varying their parameters.')
     parser.add_argument('sources', nargs='+', help='specify the name of the source equations')
     parser.add_argument('-p', '--prop', help='specify the property', required=True)
-    parser.add_argument('-v', '--values', type=str, nargs='+', help='specify the values', required=True)
+    parser.add_argument('-v', '--values', type=float, nargs='+', help='specify the values', required=True)
     return parser.parse_args()
 
 def get_property_from_dir_name(name, prop):
@@ -22,15 +22,15 @@ def get_property_from_dir_name(name, prop):
             return float(prop_name[len(prop)+1:].replace("o", ".").replace("m", "-"))
     return np.nan
 
-def set_property_from_dir_name(name, prop, value):
+def set_property_from_dir_name(name, prop, value, fwidth, fprecision):
     is_property_set = False
     all_properties = name.split("__")
     for i in range(len(all_properties)):
         if all_properties[i].startswith(prop):
-            all_properties[i] = prop + "_" + str(value).replace(".", "o").replace("-", "m")
+            all_properties[i] = prop + "_" + "{value:0>{fwidth}.{fprecision}f}".format(value=value, fwidth=fwidth, fprecision=fprecision).replace(".", "o").replace("-", "m")
             is_property_set = True
     if not is_property_set:
-        all_properties.append(prop + "_" + str(value).replace(".", "o").replace("-", "m"))
+        all_properties.append(prop + "_" + "{value:0>{fwidth}.{fprecision}f}".format(value=value, fwidth=fwidth, fprecision=fprecision).replace(".", "o").replace("-", "m"))
     name = ""
     for prop_name in all_properties:
         name += prop_name + "__"
@@ -59,9 +59,21 @@ def set_parameter(dest, prop, value):
     file_replace(dest + "/parameters.h", r"{prop} = [^\;]*;".format(prop=prop), "{prop} = {value};".format(prop=prop, value=str(value)))
 
 def compute(sources, prop, values):
+    finteger = 0
+    fprecision = 0
+    for value in values:
+        str_value = str(value)
+        str_value_array = str_value.split(".")
+        if len(str_value_array) == 2:
+            if len(str_value_array[0]) > finteger:
+                finteger = len(str_value_array[0])
+            if len(str_value_array[1]) > fprecision:
+                fprecision = len(str_value_array[1])
+    fwidth = finteger + fprecision + 1
+    print(finteger, fwidth, fprecision)
     for source in sources:
         for value in values:
-            dest = set_property_from_dir_name(source, prop, value)
+            dest = set_property_from_dir_name(source, prop, value, fwidth, fprecision)
             # execute command
             cmd = "./copy_equation {source} {dest}".format(source=source, dest=dest)
             print("INFO: running " + cmd)
