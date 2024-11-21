@@ -4,6 +4,7 @@
 import argparse
 # directory operations
 import os
+import glob
 # file edit
 import fileinput
 import fnmatch
@@ -14,31 +15,30 @@ def parse():
     parser = argparse.ArgumentParser(description='Parameter library that contains functions to set the parameters of the simulation.')
     return parser.parse_args()
 
-def find_replace(folder, file_pattern, text, replacement):
-    for dirpath, dirs, files in os.walk(folder, topdown=True):
-        files = [os.path.join(dirpath, filename) for filename in fnmatch.filter(files, file_pattern)]
-        if files:
-            for file in files:
-                lineno = 1
-                data_array = []
-                for line in fileinput.FileInput(file, inplace=True):
-                    text_match = re.search(text, line)
-                    if text_match:
-                        print(re.sub(text, replacement, line), end='')
-                        data_array.append({
-                            "text":text_match[0], 
-                            "replacement":replacement,
-                            "lineno":lineno
-                        })
-                    else:
-                        print(line, end='')
-                    lineno += 1
-                if data_array:
-                    for data in data_array:
-                        print("INFO: {file}:{lineno}: {text} ---> {replacement}".format(file=file, **data))
+def find_replace(file_pattern, text, replacement):
+    files = glob.glob(file_pattern, recursive=True)
+    if files:
+        for file in files:
+            lineno = 1
+            data_array = []
+            for line in fileinput.FileInput(file, inplace=True):
+                text_match = re.search(text, line)
+                if text_match:
+                    print(re.sub(text, replacement, line), end='')
+                    data_array.append({
+                        "text":text_match[0], 
+                        "replacement":replacement,
+                        "lineno":lineno
+                    })
+                else:
+                    print(line, end='')
+                lineno += 1
+            if data_array:
+                for data in data_array:
+                    print("INFO: {file}:{lineno}: {text} ---> {replacement}".format(file=file, **data))
 
 def set_parameter(dest, param, value):
-    find_replace(dest, "parameters.h", r" {param} = [^\;]*;".format(param=param), " {param} = {value};".format(param=param, value=str(value)))
+    find_replace(dest + "/parameters.h", r" {param} = [^\;]*;".format(param=param), " {param} = {value};".format(param=param, value=str(value)))
 
 if __name__ == '__main__':
     parse()

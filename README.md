@@ -142,12 +142,12 @@ Use the `-h` or `--help` option to see all available choices.
 * optionally the python script `set.py` can be used to set any parameter in the simulation case.
 
 The `set.py`script is intended to be edited by the user. 
-The script can search for any occurrences of a parameter in a directory tree and change it.
+The script can search for any occurrences of a parameter edit it.
 
 > [!CAUTION]
-> Using `set.py` may edit directly all `parameters.h` files in the parameter tree. 
-> If not used correctly, it might completely corrupt the simulation case.
-> If you are not sure of its usage, make sure to copy and save your simulation case before running it.
+> Using `set.py` edits directly the `parameters.h` files in the parameter tree. 
+> If not used correctly, in case of name collision, it can completely corrupt the simulation case.
+> If you are not sure of its usage, make sure to copy and save your simulation case before executing the script.
 
 ### Advance usage
 

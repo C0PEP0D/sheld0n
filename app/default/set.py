@@ -20,11 +20,11 @@ def main():
     ntime = int(round(16.0 * math.pi / dt)) # number of time steps
     number = 128 # number of particles
     npost = 64 # number of post processed steps
-    ## set
+    ## set, the path to directories must be given following the glob syntax.
     libset.set_parameter("param/run", "Dt", dt)
     libset.set_parameter("param/run", "NTime", ntime)
     libset.set_parameter("param/post", "Number", npost)
-    libset.set_parameter("param/solutions", "Number", number) # will edit all "parameters.h" files found in that directory and its subdirectories (potentially all equations)
+    libset.set_parameter("param/solutions/*", "Number", number) # will edit all "parameters.h" files found in that directory (all equations)
 
 if __name__ == '__main__':
     main()
