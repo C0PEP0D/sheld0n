@@ -312,6 +312,7 @@ $ ./post
 > This choice of compiling again each time you change parameters has been made to increase
 > convenience and performance. In real use cases with a lot of particles, the compilation
 > time becomes negligible compared to the simulation time. 
+>
 > To speed things up, you can use the `-j` option to run the compilation in parallel.
 
 Finally one can visualize its simulation by generating an animation of the particle trajectories.
