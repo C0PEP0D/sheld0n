@@ -281,7 +281,7 @@ First of all, the motion of inertial particles is described by the following equ
 ```
 with a $\vec{v}$ the velocity of the particle and $\tau$ a constant reaction time.
 
-This time, this particle is described by two state variables, its position and its velocity, both of dimension `DIM = 2`.
+This time, this particle is described by two state variables, its position and its velocity, both of dimension `DIM`.
 Therefore you can see that the parameter `StateSize` is set accordingly.
 ```sh
 23	static const unsigned StateSize = 2 * DIM; // dimension of the state variable 
