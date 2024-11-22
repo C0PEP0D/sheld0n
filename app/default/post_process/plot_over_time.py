@@ -6,8 +6,6 @@ import argparse
 import copy
 # numpy
 import numpy as np
-# internal modules
-import libpost
 # plotting
 import matplotlib.pyplot as plt
 
@@ -28,7 +26,7 @@ def main(input_equation_list, input_color_list):
     if input_color_list:
         color_list = input_color_list
     else:
-        cmap = plt.cm.get_cmap("plasma", len(equation_name_list))
+        cmap = plt.get_cmap("plasma", len(equation_name_list))
         color_list = [cmap(index) for index in range(len(equation_name_list))]
     print("INFO: Reading time...", flush=True)
     time_dir_array, time_array = libpost.get_time()

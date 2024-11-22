@@ -2,8 +2,6 @@
 
 # command line program
 import argparse
-# deepcopy
-import copy
 # numpy
 import numpy as np
 # internal modules
