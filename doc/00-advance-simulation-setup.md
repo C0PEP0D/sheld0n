@@ -195,9 +195,9 @@ In the line **40**, the first 2 elements of the array `dState` are interpreted a
 The variable `dX` now represent the temporal derivative of `x` aka the particle velocity.
 
 As stated above, the default behavior of a new equation added in the solver is that of a passive particle in a flow.
-The motion of such a particle is described by the following equation,
+The motion of such a particle is described by the following equation
 ```math
-\frac{d \vec{x}}{dt} = \vec{u} \left ( \vec{x}, t \right )
+\frac{d \vec{x}}{dt} = \vec{u} \left ( \vec{x}, t \right ) \, \mathrm{,}
 ```
 with $\vec{x}$ the position of the particle, $\vec{u}$ the flow velocity field and $t$ the time.
 This is exactly what the line **41** states and this is the line that should be edited to change the behavior of the particle.
@@ -256,13 +256,13 @@ You may note two new parameters,
 27	static constexpr std::array<double, DIM> BuoyancyDirection = {0.0, 1.0}; // defined for 2D simulations, use {0.0, 0.0, 1.0} for 3D
 ```
 and a different definition of the temporal derivative corresponding to the following equation
-This code corresponds to the definition of the following equation
 ```math
 \frac{d \vec{x}}{dt} = \vec{u} \left ( \vec{x}, t \right ) + V_{\mathrm{buoyancy}} \vec{z} \, \mathrm{,}
 ```
 with $V_{\mathrm{buoyancy}}$ the buoyancy induced velocity of the particle and $\vec{z}$ the vertical.
 
-OK, now our buoyant particles are setup. Now that we know how to do, let's just add inertial particles to the simulation just for fun.
+Now our buoyant particles are setup. 
+Now that we know how to do, let's just add inertial particles to the simulation just for fun.
 
 ```sh
 $ cd ..
@@ -301,18 +301,21 @@ To control further the simulation, three other directories exists with parameter
 * The `param/post` directory where you can control the post processing.
 
 Once that is done, we can run the simulation and the post processing.
-
 ```sh
 $ cd ../../..
 $ ./run
 ```
-
 ```sh
 $ ./post
 ```
+> [!NOTE]
+> You may note that compilation takes a long time compared to the time of the simulation.
+> This choice of compiling again each time you change parameters has been made to increase
+> convenience and performance. In real use cases with a lot of particles, the compilation
+> time becomes negligible compared to the simulation time. 
+> To speed things up, you can use the `-j` option to run the compilation in parallel.
 
 Finally one can visualize its simulation by generating an animation of the particle trajectories.
-
 ```sh
 $ cd post_process
 $ ls
@@ -333,7 +336,7 @@ In certain cases, if the simulation or the post_processing was stopped while wri
 In that case, just delete the last step to continue from the previous step.
 
 Because the `run` and the `post` are separated, you may change any post-processing function after the simulation has been executed without having to run again the whole simulation.
-However, in that case, make sure you delete the directory `post_process/time`, if it exists, before running again the `post` script (otherwise the post processing script might think that their is no need to run again).
+However, in that case, make sure you delete the directory `post_process/time` before running again the `post` script (otherwise the post processing script might think that their is no need to execute again).
 
 Finally the script `clean` completely cleans the simulation (without changing the parameters) if you want to completely start over the compilation configuration, the simulation and the post processing. It may be necessary if the directory of the case moved or changed name.
 
