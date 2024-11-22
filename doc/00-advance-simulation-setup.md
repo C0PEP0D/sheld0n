@@ -274,7 +274,10 @@ $ ./choose inertial_particles
 Before moving on, let's just analyse the `parameters.h` file of our inertial particles.
 First of all, the motion of inertial particles is described by
 ```math
-\frac{d \vec{x}}{dt} = \vec{v}
+\sysdelim..\systeme{
+	\frac{d \vec{x}}{dt} = \vec{v}
+	\frac{d \vec{v}}{dt} = \frac{ u \left ( \vec{x}, t \right ) - \vec{v} }{\tau} \, \mathrm{,}
+}
 ```
 and
 ```math
