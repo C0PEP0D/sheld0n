@@ -81,7 +81,9 @@ batch_copy_equation  copy_equation  create_new_equation  parameters.h  passive_p
 ```
 
 The `parameters.h` file lists the equations to be solved in your simulation.
-Contrary to most of the other `parameters.h` files in the `param/` directory, this file is solely meant to be modified using the scripts `batch_copy_equation`, `copy_equation`, `create_new_equation`, `remove_equation`, `rename_equation`.
+Contrary to most of the other `parameters.h` files in the `param/` directory, 
+this file is solely meant to be modified using the scripts 
+`batch_copy_equation`, `copy_equation`, `create_new_equation`, `remove_equation`, `rename_equation`.
 
 Each execution of a script will change the directories content while editing the `parameters.h` file.
 
@@ -100,7 +102,8 @@ batch_copy_equation  buoyant_particles  copy_equation  create_new_equation  para
 ```
 
 The `buoyant_particles` directory appeared. 
-However when creating a new equation, regardless of its name, the default behavior is the behavior of passive particles so we will have to change that.
+However when creating a new equation, regardless of its name, 
+the default behavior is the behavior of passive particles so we will have to change that.
 
 Move into that directory and checkout its content.
 
@@ -152,7 +155,8 @@ Furthermore, when defining parameters, simple mathematical operations can be per
 > [!NOTE]
 > You can also add your own parameters in between these flags if you need.
 
-Let's move on to the next editable part: the definition of the equation and more specifically, the definition of the temporal derivative of your state variables.
+Let's move on to the next editable part: the definition of the equation and more specifically, 
+the definition of the temporal derivative of your state variables.
 
 ```cpp
 31		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
@@ -216,10 +220,12 @@ Before changing the behavior from a passive particle to a buoyant particle, let'
 
 ```
 
-Contrary to the `stateTemporalDerivative` function, these functions affect all the particles of this type in the simulation (their number defined by the parameter `Number`).
+Contrary to the `stateTemporalDerivative` function, 
+these functions affect all the particles of this type in the simulation (their number defined by the parameter `Number`).
 Therefore, one must iterate over the number of particles to initialize or post process each particle.
 
-Currently the function `init` sets the particle position randomly within a box of center `BoxCenter` and size `BoxSize` and the `post` function extracts the position of each particle and computes the average position of all particles.
+Currently the function `init` sets the particle position randomly within a box of center `BoxCenter` and size `BoxSize`.
+The `post` function extracts the position of each particle and computes the average position of all particles.
 
 ## Choosing the type of particle
 
@@ -333,14 +339,23 @@ However, you'll need to remove the directory `time` to rerun the simulation from
 Similarly, the directory `post_process/time` is created when running the post processing and can be continued if the post processing ended prematurely.
 
 In certain cases, if the simulation or the post_processing was stopped while writing a file, the last time step may be corrupted.
-In that case, just delete the last step to continue from the previous step.
+In that case, just delete the last step (the last directory in `time` directory) to continue from the previous step.
 
-Because the `run` and the `post` are separated, you may change any post-processing function after the simulation has been executed without having to run again the whole simulation.
-However, in that case, make sure you delete the directory `post_process/time` before running again the `post` script (otherwise the post processing script might think that their is no need to execute again).
+Because the `run` and the `post` are separated,
+you may change any post-processing function after the simulation has been executed without having to run again the whole simulation.
+However, in that case, make sure you delete the directory `post_process/time` before running again the `post` script 
+(otherwise the post processing script might think that their is no need to execute again).
 
-Finally the script `clean` completely cleans the simulation (without changing the parameters) if you want to completely start over the compilation configuration, the simulation and the post processing. It may be necessary if the directory of the case moved or changed name.
+Finally if you change the name of your case (or copy and paste your case into a new name), you will have to reconfigure the compilation.
+To do that, just delete the directory `build` in your case.
+
+Finally the script `clean` completely cleans the simulation (without changing the parameters).
+It deletes the compilation configuration (the `build` directory), 
+the simulation results (the `time` directory) and 
+the post processing results (the `post_process/time` directory). 
 
 ## Next tutorial
 
 That's the end of this first tutorial. 
-In the next, you'll learn how to create customize your flows and particles.
+In the next tutorial [01-custom-equations.md](01-custom-equations.md), 
+you'll learn how to customize particles and flows to encode your own equations into the code.

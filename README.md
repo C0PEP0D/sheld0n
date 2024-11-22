@@ -4,16 +4,20 @@
 [![DOI](https://zenodo.org/badge/421041396.svg)](https://zenodo.org/badge/latestdoi/421041396)
 
 A code that enables complex active particle advection in flows. 
-The code is still in active developpement, feel free to ask for features.
+The code is still in active development, feel free to ask for features.
 
-This code enables to compute active particle trajectories inside flows. It enables the user to specify a complex behaviour of particles. It can be used with external flow data, thus enabling to use data from flow simulations or experiments. Moreover, provided an internet connection, the software enables to use flows of the [Johns Hopkins Turbulence Database](http://turbulence.pha.jhu.edu/).
-Please keep in mind that this is a work in progress, all may not work out of the box yet.
-This software should be usable on any operating system but only have been tested on recent Linux distributions (Ubuntu, Archlinux...).
+This parallel code enables to compute active particle trajectories inside flows. 
+It enables the user to specify a complex behaviour of particles. 
+It can be used with external flow data, thus enabling to use data from flow simulations or experiments. 
+Moreover, provided an internet connection, the software enables to use flows of the [Johns Hopkins Turbulence Database](http://turbulence.pha.jhu.edu/).
+This software should be usable on any operating system.
+It have been tested on recent Linux distributions (Ubuntu, Archlinux...) and OSX.
+On Windows I would advise to use **Windows Subsystem for Linux (WSL)** to avoid any surprises.
 
 This repository contains:
 
-1. [Lagrangian active particles advection software](./app) that binds low-level c++ modules into a high-level command line tool.
-2. A few low-level c++ [modules](./modules) that can be used independently.
+* [Lagrangian active particles advection software](./app) that binds low-level C++ modules into a high-level command line tool.
+* A few low-level c++ [modules](./modules) that can be used independently.
 
 ## Table of Contents
 
@@ -49,13 +53,10 @@ The following must be installed:
 ### Installing
 
 Start by cloning this repository with its submodules.
-
 ```sh
 $ git clone --recurse-submodules https://github.com/C0PEP0D/sheld0n.git
 ```
-
 And that's it!
-The executables are in the [cases](./cases) directory.
 
 ### Updating
 
@@ -66,6 +67,19 @@ $ git pull --recurse-submodules
 ```
 
 ## Usage
+
+### Prerequisites
+
+The solver is written in **C++** and the command line interface is written in **Python**.
+**You do not need to know** how to write in C++ nor in Python prior to the use the code (even though it can help).
+
+Even for a more advance usage of the code, you'll be able to edit the **C++** and **Python** files 
+by imitating the examples provided in the code, in particular if you follow the provided tutorial series.
+
+However as the solver is provided as a series a command line tools, you will need to be familiar with the use of
+a terminal emulator.
+
+### General usage
 
 The following covers basic usage of the code, while the documentation is improving, feel free to contact me if you have any questions regarding using this software.
 
@@ -152,7 +166,8 @@ The script can search for any occurrences of a parameter edit it.
 ### Advance usage
 
 The simulations can be further customized using the scripts located in `param/solutions`.
-A series of tutorials is provided in the [doc](doc) directory to learn how to properly use this code. **WIP**
+A series of tutorials is provided in the [doc](doc) directory to learn how to properly use this code, 
+starting with the first tutorial [doc/00-advance-simulation-setup.md](doc/00-advance-simulation-setup.md).
 
 ## Known issue
 
