@@ -152,7 +152,7 @@ Furthermore, when defining parameters, simple mathematical operations can be per
 > [!NOTE]
 > You can also add your own parameters in between these flags if you need.
 
-Let's move on to the next editable part: the definition of the equation and more specifically, the definition temporal derivative of your state variables.
+Let's move on to the next editable part: the definition of the equation and more specifically, the definition of the temporal derivative of your state variables.
 
 ```cpp
 31		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
@@ -196,9 +196,9 @@ The variable `dX` now represent the temporal derivative of `x` aka the particle 
 
 As stated above, the default behavior of a new equation added in the solver is that of a passive particle in a flow.
 The motion of such a particle is described by the following equation,
-$$
+```math
 \frac{d \vec{x}}{dt} = \vec{u} \left ( \vec{x}, t \right )
-$$
+```
 with $\vec{x}$ the position of the particle, $\vec{u}$ the flow velocity field and $t$ the time.
 This is exactly what the line **41** states and this is the line that should be edited to change the behavior of the particle.
 
@@ -250,7 +250,6 @@ $ ./choose buoyant_particles
 > Using a `choice` script will override the `parameters.h` file in the same directory and all changes will be lost.
 
 If you open again the `parameters.h` file, you'll see it has changed.
-
 You may note two new parameters,
 ```cpp
 26	static constexpr float BuoyantVelocity = 0.5;
@@ -258,9 +257,9 @@ You may note two new parameters,
 ```
 and a different definition of the temporal derivative corresponding to the following equation
 This code corresponds to the definition of the following equation
-$$
+```math
 \frac{d \vec{x}}{dt} = \vec{u} \left ( \vec{x}, t \right ) + V_{\mathrm{buoyancy}} \vec{z} \, \mathrm{,}
-$$
+```
 with $V_{\mathrm{buoyancy}}$ the buoyancy induced velocity of the particle and $\vec{z}$ the vertical.
 
 OK, now our buoyant particles are setup. Now that we know how to do, let's just add inertial particles to the simulation just for fun.
@@ -274,13 +273,13 @@ $ ./choose inertial_particles
 
 Before moving on, let's just analyse the `parameters.h` file of our inertial particles.
 First of all, the motion of inertial particles is described by
-$$
+```math
 \frac{d \vec{x}}{dt} = \vec{v}
-$$
+```
 and
-$$
+```math
 \frac{d \vec{v}}{dt} = \frac{1}{\tau} \left [ u \left ( \vec{x}, t \right ) - \vec{v} \right ] \, \mathrm{,}
-$$
+```
 with a $\vec{v}$ the velocity of the particle and $\tau$ a constant reaction time.
 
 This time, this particle is described by two state variables, its position and its velocity, both of dimension `DIM = 2`.
@@ -295,6 +294,11 @@ You can read further the file to understand how having two state variable change
 * how to add several state variables in the post processing.
 
 ## Running the simulation
+
+To control further the simulation, three other directories exists with parameters you can set.
+* The `param/flow` directory where you can choose and customize the flow.
+* The `param/run` directory where you can set the parameters of the solver (such as the time step, the total time of the simulation, etc...).
+* The `param/post` directory where you can control the post processing.
 
 Once that is done, we can run the simulation and the post processing.
 
@@ -318,11 +322,6 @@ $ ls
 generate_trajectory_animation.py  libpost.py  plot_over_time.py  time  trajectory_animation.mp4
 ```
 
-To control further the simulation, three other directories exists with parameters you can set.
-* The `param/flow` directory where you can choose and customize the flow.
-* The `param/run` directory where you can set the parameters of the solver (such as the time step, the total time of the simulation, etc...)
-* The `param/post` directory where you can control the post processing.
-
 The `time` directory at the root of the case contains the saved state of all particles for each time step saved once the simulation has been run.
 If the simulation stops before it ends for any kind of reason, when running again the simulation, the last saved simulation step in `time` will be used to continue the simulation.
 This also means that you can increase the total number of time steps after a simulation without having to run again the beginning of the simulation.
@@ -336,7 +335,7 @@ In that case, just delete the last step to continue from the previous step.
 Because the `run` and the `post` are separated, you may change any post-processing function after the simulation has been executed without having to run again the whole simulation.
 However, in that case, make sure you delete the directory `post_process/time`, if it exists, before running again the `post` script (otherwise the post processing script might think that their is no need to run again).
 
-Finally the script `clean` completely cleans the simulation (without changing the parameters) if you want to completely start over the compilation configuration, the simulation and the post processing. It may be necessary if the directory moved or changed name.
+Finally the script `clean` completely cleans the simulation (without changing the parameters) if you want to completely start over the compilation configuration, the simulation and the post processing. It may be necessary if the directory of the case moved or changed name.
 
 ## Next tutorial
 
