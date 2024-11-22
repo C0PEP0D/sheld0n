@@ -278,7 +278,7 @@ First of all, the motion of inertial particles is described by
 ```
 and
 ```math
-\frac{d \vec{v}}{dt} = \frac{1}{\tau} \left [ u \left ( \vec{x}, t \right ) - \vec{v} \right ] \, \mathrm{,}
+\frac{d \vec{v}}{dt} = \frac{ u \left ( \vec{x}, t \right ) - \vec{v} }{\tau} \, \mathrm{,}
 ```
 with a $\vec{v}$ the velocity of the particle and $\tau$ a constant reaction time.
 
