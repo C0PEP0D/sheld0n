@@ -44,7 +44,9 @@ def main():
     os.symlink(os.path.relpath(code_dir + "/app/interface/libset.py", args.name), args.name + "/libset.py")
     os.symlink(os.path.relpath(code_dir + "/app/interface/run.py", args.name), args.name + "/run")
     os.symlink(os.path.relpath(code_dir + "/app/interface/post.py", args.name), args.name + "/post")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/clean.py", args.name), args.name + "/clean")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/clean_build.py", args.name), args.name + "/clean_build")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/clean_time.py", args.name), args.name + "/clean_time")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/clean_post_process.py", args.name + "/post_process"), args.name + "/post_process/clean")
     ### env
     #### flow
     os.symlink(os.path.relpath(code_dir + "/app/interface/flow/choose.py", args.name + "/param/flow"), args.name + "/param/flow/choose")
