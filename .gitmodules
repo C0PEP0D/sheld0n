@@ -41,3 +41,7 @@
 	path = modules/fl0p
 	url = https://github.com/C0PEP0D/fl0p.git
 	branch = master
+[submodule "thirdparty/pybind11"]
+	path = thirdparty/pybind11
+	url = ../../pybind/pybind11
+	branch = stable

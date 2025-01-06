@@ -2,63 +2,13 @@
 #define SP0CE_GEOMETRY_H
 #pragma once
 
-#include <cmath> // sqrt, NAN, isnan
-#include <numeric> // inner_product
+// include std
+#include <cmath> // NAN, isnan
 #include <vector>
+// include lib
+#include "sp0ce/operators.h"
 
 namespace sp0ce {
-
-// vector operations
-
-template<unsigned int Dim>
-double dot(const double* pA, const double* pB) {
-    return std::inner_product(pA, pA + Dim, pB, 0.0);
-}
-
-// template<typename tSpaceVector>
-// tSpaceVector dot(const tSpaceVector* pBasis, const double* pA) {
-    // tSpaceVector b;
-    // for (unsigned int index = 0; index < tSpaceVector::SizeAtCompileTime; index++) {
-        // b[index] = dot<tSpaceVector::SizeAtCompileTime>(pBasis[index].data(), pA);
-    // }
-    // return b;
-// }
-
-double cross2d(const double* pA, const double* pB) {
-    return pA[0] * pB[1] - pA[1] * pB[0];
-}
-
-template<typename tSpaceVector>
-tSpaceVector cross2d(const double w, const double* pB) {
-    return tSpaceVector({
-        -w*pB[1],
-        w*pB[0]
-    });
-}
-
-template<typename tSpaceVector>
-tSpaceVector cross2d(const double* pA, const double w) {
-    return tSpaceVector({
-        pA[1]*w,
-        -pA[0]*w
-    });
-}
-
-template<typename tSpaceVector>
-tSpaceVector cross3d(const double* pA, const double* pB) {
-    return tSpaceVector({
-        pA[1] * pB[2] - pA[2] * pB[1],
-        pA[2] * pB[0] - pA[0] * pB[2],
-        pA[0] * pB[1] - pA[1] * pB[0]
-    });
-}
-
-template<unsigned int Dim>
-double norm2(const double* pA) {
-    return std::sqrt(dot<Dim>(pA, pA));
-}
-
-// intersections
 
 template<typename tSpaceVector, template<typename...> typename tView>
 tSpaceVector lineLine2DIntersection(const double* pA0, const double* pA1, const double* pB0, const double* pB1) {

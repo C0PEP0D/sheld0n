@@ -1,18 +1,19 @@
 # TODO
 
 * Current:
+	- Python custom behaviour
+
+* Current:
 	- Remove border curves that are too small
 	- Optimise and clean properly the border validity check
-    - Setup a debug output
+	- Setup a debug output
 * App:
-	- Setup again the surf case properly
-    - Python custom behaviour
-    - Setup GUI
-    - Memory
+	- Setup GUI
+	- Memory
 * Lib:
-    - s0ve
-    - StepPoint -> PointStep, same for all others
-    - use only Generic TypeAlgebra, along with DIM and other global parameters
+	- s0ve
+	- StepPoint -> PointStep, same for all others
+	- use only Generic TypeAlgebra, along with DIM and other global parameters
 * Misc:
-    - template argument number reduction (C-like interface)
-    - setup testing pipeline
+	- template argument number reduction (C-like interface)
+	- setup testing pipeline

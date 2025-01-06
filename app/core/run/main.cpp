@@ -5,7 +5,13 @@
 // // run
 #include "param/run/parameters.h"
 #include "core/run/core.h"
+// python
+#include "pybind11/embed.h"
+namespace py = pybind11;
 
 int main () {
-    c0p::Run<c0p::RunParameters> run;
+	py::scoped_interpreter python;
+	py::gil_scoped_release release;
+	
+	c0p::Run<c0p::RunParameters> run;
 }

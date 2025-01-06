@@ -12,8 +12,11 @@ endif()
 message(INFO " C0P_PROJECT_DIR " ${C0P_PROJECT_DIR})
 
 ## PACKAGES
+### TBB
 list(APPEND CMAKE_MODULE_PATH ${C0P_PROJECT_DIR}/cmake/modules) # maybe unecessary ?
 find_package(TBB REQUIRED)
+### PYBIND11
+# add_subdirectory(${C0P_PROJECT_DIR}/thirdparty/pybind11)
 
 ### turblib (JHTDB)
 list(APPEND TURB_LIB_SRC_FILES "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/soapC.c" "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/soapClient.c" "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/stdsoap2.c" "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/turblib.c")
@@ -22,10 +25,12 @@ list(APPEND TURB_LIB_SRC_FILES "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turbl
 add_executable(run ${C0P_PROJECT_DIR}/app/core/run/main.cpp ${TURB_LIB_SRC_FILES})
 ## Link Libraries
 target_link_libraries(run TBB::tbb)
+# target_link_libraries(run PRIVATE pybind11::embed)
 ## Include
 target_include_directories(run PRIVATE .)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/app)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/thirdparty/eigen)
+target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/thirdparty/pybind11/include)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/s0s/include)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/sp0ce/include)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/d0t/include)
@@ -44,10 +49,12 @@ target_compile_features(run PUBLIC cxx_std_23)
 add_executable(post ${C0P_PROJECT_DIR}/app/core/post/main.cpp ${TURB_LIB_SRC_FILES})
 ## Libraries
 target_link_libraries(post TBB::tbb)
+# target_link_libraries(post PRIVATE pybind11::embed)
 ## Include
 target_include_directories(post PRIVATE .)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/app)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/thirdparty/eigen)
+target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/thirdparty/pybind11/include)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/s0s/include)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/sp0ce/include)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/d0t/include)
