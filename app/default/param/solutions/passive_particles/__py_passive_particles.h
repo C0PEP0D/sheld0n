@@ -78,18 +78,18 @@ struct _PassiveParticlesParameters {
 
 	static void init(double* pState) {
 		// ---------------- CUSTOM INIT START
-		// interpret BoxCenter and BoxSize as vectors
-		const tSpaceVector boxCenter = tView<const tSpaceVector>(BoxCenter.data());
-		const tSpaceVector boxSize = tView<const tSpaceVector>(BoxSize.data());
-		// loop over each member of the variable group
-		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
-			// get the state variable of the subIndex member of the group
-			double* pSubState = tVariable::state(pState, subIndex);
-			// interpret subState as a tSpaceVector
-			tView<tSpaceVector> x(pSubState);
-			// set the initial position of this member
-			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
-		}
+		py::gil_scoped_acquire acquire;
+		auto locals = py::dict(
+			"state"_a = py::array_t<double>(Number * StateSize, pState, py::capsule(pState, [](void* ptr) {})),
+			"particle_state_size"_a = StateSize,
+			"particle_number"_a = Number
+		);
+		py::exec(R"(
+			sys.path.append('param/solutions/passive_particles')
+			import parameters
+			
+			state[:] = parameters.init(particle_state_size, particle_number)
+		)", py::globals(), locals);
 		// ---------------- CUSTOM INIT END
 	}
 
