@@ -272,3 +272,7 @@ def edit_file(choice, default_obj, obj, size = 1):
     find_replace(".", "parameters.h", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
     find_replace(".", "parameters.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
     find_replace(".", "parameters.h", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))
+    find_replace(".", "parameters.py", '"' + "".join(default_obj), '"' + "".join(obj))
+    find_replace(".", "parameters.py", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
+    find_replace(".", "parameters.py", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
+    find_replace(".", "parameters.py", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))
