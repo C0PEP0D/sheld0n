@@ -37,8 +37,8 @@ struct _PassiveParticlesParameters {
 		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
 
-			// ---------------- CUSTOM EQUATION START
-			
+			/// ---------------- CUSTOM EQUATION START
+						
 			// input
 			const tView<const tSpaceVector> x(pState);
 			// flow
@@ -52,10 +52,13 @@ struct _PassiveParticlesParameters {
 			auto locals = py::dict(
 				"x"_a = py::array_t<double>(DIM, x.data(), py::capsule(x.data(), [](void* ptr) {})),
 				"u"_a = py::array_t<double>(DIM, u.data(), py::capsule(u.data(), [](void* ptr) {})),
-				"dX"_a = py::array_t<double>(DIM, dX.data(), py::capsule(dX.data(), [](void* ptr) {}))
+				"dx"_a = py::array_t<double>(DIM, dX.data(), py::capsule(dX.data(), [](void* ptr) {}))
 			);
 			py::exec(R"(
-				dX[:] = u[:] # avoiding copy
+				sys.path.append('param/solutions/passive_particles')
+				import parameters
+				
+				dx[:] = parameters.position_temporal_derivative(x, u)
 			)", py::globals(), locals);
 			
 			// ---------------- CUSTOM EQUATION END
