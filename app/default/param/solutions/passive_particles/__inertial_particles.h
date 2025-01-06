@@ -82,22 +82,22 @@ struct _PassiveParticlesParameters {
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;
-		// ---------------- CUSTOM INIT START
+		// ---------------- CUSTOM POST START
 		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
 			const double* pSubState = tVariable::cState(pState, subIndex);
 			const tView<const tSpaceVector> x(pSubState);
 			const tView<const tSpaceVector> v(pSubState + DIM);
-			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_0"] = x[0];
-			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_1"] = x[1];
-			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__vel_0"] = v[0];
-			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__vel_1"] = v[1];
+			output["passive_particles__index_" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_0"] = x[0];
+			output["passive_particles__index_" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_1"] = x[1];
+			output["passive_particles__index_" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__vel_0"] = v[0];
+			output["passive_particles__index_" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__vel_1"] = v[1];
 			xAverage += x;
 		}
 		xAverage /= Number;
 		output["passive_particles__average_pos_0"] = xAverage[0];
 		output["passive_particles__average_pos_1"] = xAverage[1];
-		// ---------------- CUSTOM INIT END
+		// ---------------- CUSTOM POST END
 		return output;
 	}
 };

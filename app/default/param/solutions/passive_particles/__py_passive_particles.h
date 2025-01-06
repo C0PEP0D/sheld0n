@@ -17,6 +17,7 @@
 // include thirdparty
 #include "pybind11/embed.h"
 #include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 namespace py = pybind11;
 using namespace pybind11::literals;
 
@@ -97,21 +98,22 @@ struct _PassiveParticlesParameters {
 	static constexpr unsigned FormatNumber = Number/10 + 1;
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
-		std::map<std::string, double> output;
-		// ---------------- CUSTOM INIT START
-		tSpaceVector xAverage = tSpaceVector::Zero();
-		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
-			const double* pSubState = tVariable::cState(pState, subIndex);
-			const tView<const tSpaceVector> x(pSubState);
-			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_0"] = x[0];
-			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_1"] = x[1];
-			xAverage += x;
-		}
-		xAverage /= Number;
-		output["passive_particles__average_pos_0"] = xAverage[0];
-		output["passive_particles__average_pos_1"] = xAverage[1];
-		// ---------------- CUSTOM INIT END
-		return output;
+		// ---------------- CUSTOM POST START
+		py::gil_scoped_acquire acquire;
+		auto locals = py::dict(
+			"state"_a = py::array_t<double>(Number * StateSize, pState, py::capsule(pState, [](void* ptr) {})),
+			"particle_state_size"_a = StateSize,
+			"particle_number"_a = Number,
+			"output"_a = py::dict()
+		);
+		py::exec(R"(
+			sys.path.append('param/solutions/passive_particles')
+			import parameters
+			
+			output = parameters.post(state, particle_state_size, particle_number)
+		)", py::globals(), locals);
+		// ---------------- CUSTOM POST END
+		return locals["output"].cast<std::map<std::string, tScalar>>();
 	}
 };
 
