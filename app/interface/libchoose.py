@@ -259,6 +259,11 @@ def choose_file(choices_dir, choices_exceptions):
     args = parse_file(choices_dir, choices_exceptions)
     choices = get_choices_file(choices_dir, choices_exceptions)
     shutil.copyfile(get_abs_choices_dir(choices_dir) + "/" + choices[args.choice], "parameters.h")
+    if args.choice.startswith("py_"):
+        shutil.copyfile(get_abs_choices_dir(choices_dir) + "/" + choices[args.choice].replace(".h", ".py"), "parameters.py")
+    else:
+        if os.path.exists("parameters.py"):
+            os.remove("parameters.py")
 
 def edit_file(choice, default_obj, obj, size = 1):
     obj = obj[0:len(obj) - len(default_obj) + size]
