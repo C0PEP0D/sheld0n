@@ -335,6 +335,7 @@ The `time` directory at the root of the case contains the saved state of all par
 If the simulation stops before it ends for any kind of reason, when running again the simulation, the last saved simulation step in `time` will be used to continue the simulation.
 This also means that you can increase the total number of time steps after a simulation without having to run again the beginning of the simulation.
 However, you'll need to remove the directory `time` to rerun the simulation from the beginning.
+To do so, one can use the `clean_time` script.
 
 Similarly, the directory `post_process/time` is created when running the post processing and can be continued if the post processing ended prematurely.
 
@@ -343,16 +344,12 @@ In that case, just delete the last step (the last directory in `time` directory)
 
 Because the `run` and the `post` are separated,
 you may change any post-processing function after the simulation has been executed without having to run again the whole simulation.
-However, in that case, make sure you delete the directory `post_process/time` before running again the `post` script 
-(otherwise the post processing script might think that their is no need to execute again).
+However, in that case, make sure you delete the directory `post_process/time` before running again the `post` script.
+To do so, one can use the `post_process/clean` script.
 
-Finally if you change the name of your case (or copy and paste your case into a new name), you will have to reconfigure the compilation.
+Finally if you change the name of your case (or copy and paste your case into a new name), the code will have to reconfigure the compilation.
 To do that, just delete the directory `build` in your case.
-
-Finally the script `clean` completely cleans the simulation (without changing the parameters).
-It deletes the compilation configuration (the `build` directory), 
-the simulation results (the `time` directory) and 
-the post processing results (the `post_process/time` directory). 
+To do so, one can use the `clean_build` script.
 
 ## Next tutorial
 
