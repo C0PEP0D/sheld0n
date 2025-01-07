@@ -7,8 +7,9 @@ This tutorial series assumes you already learnt the basic usage of the code in t
 
 - [Setting up the case](#setting-up-the-case)
 - [Global parameters](#global-parameters)
-- [Adding a new type of particle](#adding-a-new-type-of-particle)
-- [Choosing the type of particle](#choosing-the-type-of-particle)
+- [Adding new particles](#adding-new-particles)
+- [Choosing the particles behavior](#choosing-particles-behavior)
+- [Choosing the flow](#choosing-the-flow)
 - [Running the simulation](#running-the-simulation)
 - [Next tutorial](#next-tutorial)
 
@@ -61,7 +62,7 @@ In this file, you can:
 
 Let's move on for now, we'll come back to these parameters later.
 
-## Adding a new type of particle
+## Adding a new particles
 
 The default simulation case created using the `./generate_new_case` script is a 2D simulation of passive particles in a Taylor-Green flow.
 
@@ -227,7 +228,7 @@ Therefore, one must iterate over the number of particles to initialize or post p
 Currently the function `init` sets the particle position randomly within a box of center `BoxCenter` and size `BoxSize`.
 The `post` function extracts the position of each particle and computes the average position of all particles.
 
-## Choosing the type of particle
+## Choosing the particles behavior
 
 Now that we analysed the `parameters.h` file of a passive particle, we want to change that file to match the behavior of a **buoyant** particle.
 We could manually edit the `parameters.h`, but we can also use the `choose` script in the same directory to choose another default behavior.
@@ -298,10 +299,17 @@ You can read further the file to understand how having two state variable change
 * how to initialize the state of your particles.
 * how to add several state variables in the post processing.
 
+## Choosing the flow
+
+Similarly the flow can be chosen and its parameters edited in the `param/flow` directory.
+
+> [!CAUTION]
+> If you need a 3D flow, you will also have to change the `DIM` parameter in the `param/parameters.h` file.
+> You also may also have to change particle parameters where you define explicitly 2D vectors and change them to 3D vectors.
+
 ## Running the simulation
 
 To control further the simulation, three other directories exists with parameters you can set.
-* The `param/flow` directory where you can choose and customize the flow.
 * The `param/run` directory where you can set the parameters of the solver (such as the time step, the total time of the simulation, etc...).
 * The `param/post` directory where you can control the post processing.
 
@@ -354,5 +362,5 @@ To do so, one can use the `clean_build` script.
 ## Next tutorial
 
 That's the end of this first tutorial. 
-In the next tutorial [01-custom-equations.md](01-custom-equations.md), 
-you'll learn how to customize particles and flows to encode your own equations into the code.
+In the next tutorial [01-custom-py-equations.md](01-custom-py-equations.md), 
+you'll learn how to customize particles and flows to encode your own equations into the code using a python interface.
