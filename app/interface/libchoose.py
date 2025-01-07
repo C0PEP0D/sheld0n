@@ -247,9 +247,12 @@ def get_choices_file(choices_dir, choices_exceptions = []):
     return choices
 
 def parse_file(choices_dir, choices_exceptions):
+    # get choices
+    choices = list(get_choices_file(choices_dir, choices_exceptions).keys())
+    choices.sort()
     # parser
     parser = argparse.ArgumentParser(description='Script to choose parameters among default ones.')
-    parser.add_argument('choice', choices=get_choices_file(choices_dir, choices_exceptions).keys(), help='specify your choice')
+    parser.add_argument('choice', choices=choices, help='specify your choice')
     # autocompletion
     argcomplete.autocomplete(parser)
     # parse
@@ -259,7 +262,7 @@ def choose_file(choices_dir, choices_exceptions):
     args = parse_file(choices_dir, choices_exceptions)
     choices = get_choices_file(choices_dir, choices_exceptions)
     shutil.copyfile(get_abs_choices_dir(choices_dir) + "/" + choices[args.choice], "parameters.h")
-    if args.choice.startswith("py_"):
+    if args.choice.endswith("_py"):
         shutil.copyfile(get_abs_choices_dir(choices_dir) + "/" + choices[args.choice].replace(".h", ".py"), "parameters.py")
     else:
         if os.path.exists("parameters.py"):
