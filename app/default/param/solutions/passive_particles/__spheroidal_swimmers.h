@@ -25,6 +25,7 @@ struct _PassiveParticlesParameters {
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
 	static constexpr double AspectRatio = 1.0; // aspect ratio of the spheroidal particles
 	static constexpr double Factor = (AspectRatio*AspectRatio - 1.0) / (AspectRatio*AspectRatio + 1.0); // factor used in the equation
+	static constexpr float SwimmingVelocity = 0.5;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// definition of the member data
@@ -45,7 +46,7 @@ struct _PassiveParticlesParameters {
 			// output
 			tView<tSpaceVector> dX(dState.data());
 			tView<tSpaceVector> dP(dState.data() + DIM);
-			dX = u;
+			dX = u + SwimmingVelocity * p.normalized();
 			dP = skewGrad * p + Factor * (symGrad * p - (p.dot(symGrad * p)) * p);
 			// ---------------- CUSTOM EQUATION END
 

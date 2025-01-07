@@ -39,29 +39,29 @@ struct _PassiveParticlesParameters {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
 
 			/// ---------------- CUSTOM EQUATION START
-						
+			
 			// input
 			const tView<const tSpaceVector> x(pState);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
-			// output
-			tView<tSpaceVector> dX(dState.data());
+			const tSpaceMatrix grad = Flow::getVelocityGradients(x.data(), t);
 
 			// python
 			
 			py::gil_scoped_acquire acquire;
 			auto locals = py::dict(
-				"x"_a = py::array_t<double>(DIM, x.data(), py::capsule(x.data(), [](void* ptr) {})),
+				"state"_a = py::array_t<double>(tVariable::Size, pState, py::capsule(pState, [](void* ptr) {})),
 				"u"_a = py::array_t<double>(DIM, u.data(), py::capsule(u.data(), [](void* ptr) {})),
-				"dx"_a = py::array_t<double>(DIM, dX.data(), py::capsule(dX.data(), [](void* ptr) {}))
+				"grad_u"_a = py::array_t<double>(DIM * DIM, grad.data(), py::capsule(grad.data(), [](void* ptr) {})),
+				"dstate"_a = py::array_t<double>(tVariable::Size, dState.data(), py::capsule(dState.data(), [](void* ptr) {}))
 			);
 			py::exec(R"(
 				sys.path.append('param/solutions/passive_particles')
 				import parameters
 				
-				dx[:] = parameters.position_temporal_derivative(x, u)
+				dstate[:] = parameters.state_temporal_derivative(state, u, grad_u)
 			)", py::globals(), locals);
-			
+	
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
