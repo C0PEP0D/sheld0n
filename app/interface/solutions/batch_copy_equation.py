@@ -57,6 +57,7 @@ def file_replace(file_name, text, replacement):
 
 def set_parameter(dest, prop, value):
     file_replace(dest + "/parameters.h", r"{prop} = [^\;]*;".format(prop=prop), "{prop} = {value};".format(prop=prop, value=str(value)))
+    file_replace(dest + "/parameters.py", r"{prop} = .*$".format(prop=prop), "{prop} = {value}".format(prop=prop, value=str(value)))
 
 def compute(sources, prop, values):
     finteger = 0
