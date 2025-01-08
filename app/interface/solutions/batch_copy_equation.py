@@ -70,7 +70,6 @@ def compute(sources, prop, values):
             if len(str_value_array[1]) > fprecision:
                 fprecision = len(str_value_array[1])
     fwidth = finteger + fprecision + 1
-    print(finteger, fwidth, fprecision)
     for source in sources:
         for value in values:
             dest = set_property_from_dir_name(source, prop, value, fwidth, fprecision)
