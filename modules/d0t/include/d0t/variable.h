@@ -15,15 +15,15 @@ namespace d0t {
 template<template<int> typename _tVector, template<typename...> class _tView, unsigned int _MinSize = 0>
 class Variable {
 	public:
-    	template<int _Size> using tVector = _tVector<_Size>;
-    	template<typename... Args> using tView = _tView<Args...>;
-        using tStateVectorDynamic = tVector<-1>;
-        static const unsigned int MinSize = _MinSize;
+		template<int _Size> using tVector = _tVector<_Size>;
+		template<typename... Args> using tView = _tView<Args...>;
+		using tStateVectorDynamic = tVector<-1>;
+		static const unsigned int MinSize = _MinSize;
 	public:
-        // // apply variable constraints
+		// // apply variable constraints
 		// virtual static void constrain(std::vector<double>& state) {
 			// T::_constrain(state);
-        // }
+		// }
 };
 
 template<template<int> typename _tVector, template<typename...> class _tView, unsigned int _Size>
@@ -35,42 +35,42 @@ class VariableStatic : public Variable<_tVector, _tView, _Size> {
    		template<typename... Args> using tView = typename tBase::template tView<Args...>;
    		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
    		using tBase::MinSize;
-    public:
+	public:
 		static const unsigned int Size = _Size;
 		using tStateVectorStatic = typename tBase::template tVector<Size>;
-    public:
-    	// // apply variable constraints
+	public:
+		// // apply variable constraints
 		// static void constrain(std::vector<double>& state) override {
 			// constrain(state.data());
-        // }
-        // virtual static void constrain(double* pState) {
-        // }
+		// }
+		// virtual static void constrain(double* pState) {
+		// }
 };
 
 template<template<int> typename _tVector, template<typename...> class _tView>
 class VariableNone : public VariableStatic<_tVector, _tView, 0> {
 	public:
 		using tBase = VariableStatic<_tVector, _tView, 0>;
-    public:
-    	template<int _Size> using tVector = typename tBase::template tVector<_Size>;
+	public:
+		template<int _Size> using tVector = typename tBase::template tVector<_Size>;
    		template<typename... Args> using tView = typename tBase::template tView<Args...>;
    		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
    		using tBase::MinSize;
    		using tBase::Size;
    		using tStateVectorStatic = typename tBase::tStateVectorStatic;
-    // public:
-    	// static double* get(double* pState) {
-            // return pState;
-        // }
-        // static const double* cGet(const double* pState) {
-            // return pState;
-        // }
-    public:
-    	static void constrain(double* pState) {
-    	}
-    	static void constrain(std::vector<double>& state) {
-    		constrain(state.data());
-    	}
+	// public:
+		// static double* get(double* pState) {
+			// return pState;
+		// }
+		// static const double* cGet(const double* pState) {
+			// return pState;
+		// }
+	public:
+		static void constrain(double* pState) {
+		}
+		static void constrain(std::vector<double>& state) {
+			constrain(state.data());
+		}
 };
 
 // composed variable
@@ -102,6 +102,24 @@ const double* cVariableComponentState(const double* pState) {
 	}
 }
 
+template<typename tVariableA, typename tVariableB, typename... tVariables>
+double* variableComponentState(double* pState) {
+	if constexpr (std::is_same<tVariableA, tVariableB>::value) {
+		return pState;
+	} else {
+		return variableComponentState<tVariableA, tVariables...>(pState + tVariableB::Size);
+	}
+}
+
+template<typename tVariableA, typename tVariableB, typename... tVariables>
+double* cVariableComponentState(const double* pState) {
+	if constexpr (std::is_same<tVariableA, tVariableB>::value) {
+		return pState;
+	} else {
+		return cVariableComponentState<tVariableA, tVariables...>(pState + tVariableB::Size);
+	}
+}
+
 template<typename... tVariables>
 class VariableComposed;
 
@@ -119,21 +137,29 @@ class VariableComposed<tVariable> : public VariableStatic<tVariable::template tV
 	public:
 		template<unsigned int Index> using tVariableComponent = VariableComponent<Index, tVariable>;
 	public:
-    	template<unsigned int Index>
-    	static double* state(double* pState) {
-    		return variableComponentState<Index, tVariable>(pState);
-        }
-        template<unsigned int Index>
-    	static const double* cState(const double* pState) {
-    		return cVariableComponentState<Index, tVariable>(pState);
-        }
-    public:
-        static void constrain(double* pState) {
+		template<unsigned int Index>
+		static double* state(double* pState) {
+			return variableComponentState<Index, tVariable>(pState);
+		}
+		template<unsigned int Index>
+		static const double* cState(const double* pState) {
+			return cVariableComponentState<Index, tVariable>(pState);
+		}
+		template<typename _tVariable>
+		static double* state(double* pState) {
+			return variableComponentState<_tVariable, tVariable>(pState);
+		}
+		template<typename _tVariable>
+		static const double* cState(const double* pState) {
+			return cVariableComponentState<_tVariable, tVariable>(pState);
+		}
+	public:
+		static void constrain(double* pState) {
 			tVariable::constrain(pState);
-        }
-        static void constrain(std::vector<double>& state) {
+		}
+		static void constrain(std::vector<double>& state) {
 			constrain(state.data());
-        }
+		}
 };
 
 template<typename tVariable, typename... tVariables>
@@ -149,23 +175,31 @@ class VariableComposed<tVariable, tVariables...> : public VariableStatic<tVariab
    		using tStateVectorStatic = typename tBase::tStateVectorStatic;
 	public:
 		template<unsigned int Index> using tVariableComponent = VariableComponent<Index, tVariable, tVariables...>;
-    public:
-    	template<unsigned int Index>
-    	static double* state(double* pState) {
-    		return variableComponentState<Index, tVariable, tVariables...>(pState);
-        }
-        template<unsigned int Index>
-    	static const double* cState(const double* pState) {
-    		return cVariableComponentState<Index, tVariable, tVariables...>(pState);
-        }
-    public:
-        static void constrain(double* pState) {
+	public:
+		template<unsigned int Index>
+		static double* state(double* pState) {
+			return variableComponentState<Index, tVariable, tVariables...>(pState);
+		}
+		template<unsigned int Index>
+		static const double* cState(const double* pState) {
+			return cVariableComponentState<Index, tVariable, tVariables...>(pState);
+		}
+		template<typename _tVariable>
+		static double* state(double* pState) {
+			return variableComponentState<_tVariable, tVariable, tVariables...>(pState);
+		}
+		template<typename _tVariable>
+		static const double* cState(const double* pState) {
+			return cVariableComponentState<_tVariable, tVariable, tVariables...>(pState);
+		}
+	public:
+		static void constrain(double* pState) {
 			tVariable::constrain(pState);
 			VariableComposed<tVariables...>::constrain(pState + tVariable::Size);
-        }
-        static void constrain(std::vector<double>& state) {
+		}
+		static void constrain(std::vector<double>& state) {
 			constrain(state.data());
-        }
+		}
 };
 
 // group variables
@@ -187,20 +221,20 @@ class VariableGroupStatic : public VariableStatic<_tVariableMember::template tVe
 		using tVariableMeta = _tVariableMeta;
 	public:
 		static double* stateMeta(double* pState) {
-	       	return pState;
-	    }
+		   	return pState;
+		}
   		static const double* cStateMeta(const double* pState) {
-          	return pState;
-  	    }
+		  	return pState;
+  		}
 	public:
 		static double* state(double* pState, const unsigned int index) {
-        	return pState + tVariableMeta::Size + index * tVariableMember::Size;
-	    }
+			return pState + tVariableMeta::Size + index * tVariableMember::Size;
+		}
    		static const double* cState(const double* pState, const unsigned int index) {
-           	return pState + tVariableMeta::Size + index * tVariableMember::Size;
-   	    }
+		   	return pState + tVariableMeta::Size + index * tVariableMember::Size;
+   		}
    	public:
-        // apply variable constraints
+		// apply variable constraints
 		static void constrain(double* pState) {
 			// constrain meta
 			tVariableMeta::constrain(pState);
@@ -209,12 +243,12 @@ class VariableGroupStatic : public VariableStatic<_tVariableMember::template tVe
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
 			// constrain everything
 			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [pState](const unsigned int memberIndex){
-                tVariableMember::constrain(state(pState, memberIndex));
-            });
-	    }
-	    static void constrain(std::vector<double>& state) {
+				tVariableMember::constrain(state(pState, memberIndex));
+			});
+		}
+		static void constrain(std::vector<double>& state) {
 			constrain(state.data());
-        }
+		}
 };
 
 template<typename _tVariableMember, typename _tVariableMeta = VariableNone<_tVariableMember::template tVector, _tVariableMember::template tView>>
@@ -231,23 +265,23 @@ class VariableGroupDynamic : public Variable<_tVariableMember::template tVector,
 		using tVariableMeta = _tVariableMeta;
 	public:
 		static double* stateMeta(double* pState) {
-        	return pState;
-	    }
+			return pState;
+		}
    		static const double* cStateMeta(const double* pState) {
-           	return pState;
-   	    }
+		   	return pState;
+   		}
    	public:
 		static double* state(double* pState, const unsigned int index) {
-        	return pState + tVariableMeta::Size + index * tVariableMember::Size;
-	    }
+			return pState + tVariableMeta::Size + index * tVariableMember::Size;
+		}
    		static const double* cState(const double* pState, const unsigned int index) {
-           	return pState + tVariableMeta::Size + index * tVariableMember::Size;
-   	    }
-   	    static const unsigned int groupSize(const unsigned int stateSize) {
-   	    	return (stateSize - tVariableMeta::Size) / tVariableMember::Size;
-   	    }
+		   	return pState + tVariableMeta::Size + index * tVariableMember::Size;
+   		}
+   		static const unsigned int groupSize(const unsigned int stateSize) {
+   			return (stateSize - tVariableMeta::Size) / tVariableMember::Size;
+   		}
    	public:
-        // apply variable constraints
+		// apply variable constraints
 		static void _constrain(std::vector<double>& p_state) {
 			// constrain meta
 			tVariableMeta::constrain(p_state.data());
@@ -256,10 +290,10 @@ class VariableGroupDynamic : public Variable<_tVariableMember::template tVector,
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
 			// constrain everything
 			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&p_state](const unsigned int memberIndex){
-                tVariableMember::constrain(state(p_state.data(), memberIndex));
-            });
-	    }
-	    // member management
+				tVariableMember::constrain(state(p_state.data(), memberIndex));
+			});
+		}
+		// member management
    		static void pushBackMember(std::vector<double>& p_state) {
    			p_state.resize(p_state.size() + tVariableMember::Size);
    		}
@@ -280,23 +314,23 @@ class VariableGroups {
 		using tVariableMeta = _tVariableMeta;
 	public:
 		static std::vector<double>& stateMeta(std::vector<std::vector<double>>& states) {
-        	return states.front();
-	    }
+			return states.front();
+		}
    		static const std::vector<double>& cStateMeta(const std::vector<std::vector<double>>& states) {
-           	return states.front();
-   	    }
+		   	return states.front();
+   		}
    	public:
 		static std::vector<double>& state(std::vector<std::vector<double>>& states, const unsigned int index) {
-        	return states[1 + index];
-	    }
+			return states[1 + index];
+		}
    		static const std::vector<double>& cState(const std::vector<std::vector<double>>& states, const unsigned int index) {
-           	return states[1 + index];
-   	    }
-   	    static const unsigned int groupNumber(const unsigned int statesSize) {
-   	    	return statesSize - 1;
-   	    }
+		   	return states[1 + index];
+   		}
+   		static const unsigned int groupNumber(const unsigned int statesSize) {
+   			return statesSize - 1;
+   		}
 	public:
-        // apply variable constraints
+		// apply variable constraints
 		static void _constrain(std::vector<std::vector<double>>& states) {
 			// constrain meta
 			tVariableMeta::constrain(states.front());
