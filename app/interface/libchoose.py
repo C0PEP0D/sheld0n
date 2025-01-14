@@ -2,7 +2,6 @@
 
 # Command line program
 import argparse
-import argcomplete
 # Name check
 import re
 # Directory operations
@@ -253,8 +252,6 @@ def parse_file(choices_dir, choices_exceptions):
     # parser
     parser = argparse.ArgumentParser(description='Script to choose parameters among default ones.')
     parser.add_argument('choice', choices=choices, help='specify your choice')
-    # autocompletion
-    argcomplete.autocomplete(parser)
     # parse
     return parser.parse_args()
 

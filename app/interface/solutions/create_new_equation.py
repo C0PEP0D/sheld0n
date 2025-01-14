@@ -2,7 +2,6 @@
 
 # Command line program
 import argparse
-import argcomplete
 # Name check
 import re
 # Directory operations
@@ -21,8 +20,6 @@ def parse():
     # parser
     parser = argparse.ArgumentParser(description='create a new equation based on the default one')
     parser.add_argument('name', help='specify the name of the new equation')
-    # autocompletion
-    argcomplete.autocomplete(parser)
     # parse
     return parser.parse_args()
 

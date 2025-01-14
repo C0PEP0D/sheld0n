@@ -2,7 +2,6 @@
 
 # Command line program
 import argparse
-import argcomplete
 # Name check
 import re
 # Directory operations
@@ -22,8 +21,6 @@ def parse():
     parser = argparse.ArgumentParser(description='copy an equation')
     parser.add_argument('source', help='specify the name of source equation')
     parser.add_argument('name', help='specify the name of the copy')
-    # autocompletion
-    argcomplete.autocomplete(parser)
     # parse
     return parser.parse_args()
 
