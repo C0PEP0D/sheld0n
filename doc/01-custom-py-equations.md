@@ -8,6 +8,7 @@ using the **Python** interface.
 - [Writing in Python](#writing-in-python)
 - [Custom particle equation](#custom-particle-equation)
 - [Custom post processing](#custom-post-processing)
+- [Custom flow equation](#custom-flow-equation)
 - [Next tutorial](#next-tutorial)
 
 ## Writing in Python
@@ -304,6 +305,18 @@ $ ./plot_custom.py -e custom_particles
 
 You may note that the histogram is not converged, to obtain converged statistics, you may need to
 run longer simulation with a higher number of particles.
+
+## Custom flow equation
+
+Similarly a python flow can be chosen in the `param/flow` directory and the `parameters.py` file edited to modify its behavior.
+If you do so, the flow can be directly accessed in **Python** parameter files as follows:
+
+ ```python
+sys.path.append('param')
+import flow.parameters as flow
+
+u = flow.get_velocity(x, t) # get flow velocity
+ ```
 
 ## Next tutorial
 
