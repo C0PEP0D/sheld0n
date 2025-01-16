@@ -14,7 +14,7 @@ struct Flow {
 		0.0
 	};
 	static constexpr std::array<double, DIM * DIM> Gradient = {
-		1.0, 1.0,
+		1.0,  1.0,
 		1.0, -1.0
 	};
 	static constexpr std::array<double, DIM> Acceleration = {
