@@ -52,10 +52,18 @@ The following must be installed:
 
 ### Installing
 
-Start by cloning this repository with its submodules.
+Start by cloning this repository on some of its submodules.
+
 ```sh
-$ git clone --recurse-submodules https://github.com/C0PEP0D/sheld0n.git
+$ git clone --recursive --no-checkout thirdparty/rl-tools
 ```
+Make sure to add the `--no-checkout thirdparty/rl-tools` option even if you'd like to use reinforcement learning tools.
+If you'd like to have this tools, just execute the following afterwards.
+
+```sh
+$ git submodule update --init thirdparty/rl-tools
+```
+
 And that's it!
 
 ### Updating
