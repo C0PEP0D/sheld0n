@@ -45,3 +45,6 @@
 	path = thirdparty/pybind11
 	url = ../../pybind/pybind11
 	branch = stable
+[submodule "thirdparty/rl-tools"]
+	path = thirdparty/rl-tools
+	url = git@github.com:rl-tools/rl-tools.git
