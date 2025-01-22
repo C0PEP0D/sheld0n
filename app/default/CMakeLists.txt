@@ -73,3 +73,30 @@ target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/thirdparty/pybind11)
 target_include_directories(post PRIVATE ${PYTHON_INCLUDE_DIRS})
 ## Compile features
 target_compile_features(post PUBLIC cxx_std_23)
+
+# Build learn
+add_executable(learn ${C0P_PROJECT_DIR}/app/core/learn/main.cpp ${TURB_LIB_SRC_FILES})
+## Link Libraries
+target_link_libraries(learn TBB::tbb)
+target_link_libraries(learn Python::Python Python::NumPy)
+## Include
+target_include_directories(learn PRIVATE .)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/app)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/thirdparty/eigen)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/thirdparty/pybind11/include)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/s0s/include)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/sp0ce/include)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/d0t/include)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/p0l/include)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/m0sh/include)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/l0ad/include)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/s0ve/include)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/include)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/fl0p/include)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/v0l/include)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/thirdparty/pybind11)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/thirdparty/rl-tools/include)
+target_include_directories(learn PRIVATE ${PYTHON_INCLUDE_DIRS})
+## Compile features
+target_compile_features(learn PUBLIC cxx_std_23)

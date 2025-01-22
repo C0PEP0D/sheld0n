@@ -24,6 +24,24 @@ class Solutions {
 		}
 	public:
 
+		// output
+
+		template<unsigned int Index>
+		double* stateStatic() {
+			using tStaticVariable = typename tSolutionStatic::tEquation::tVariable;
+			return tStaticVariable::template state<Index>(
+				solutionsStatic.state.data()
+			);
+		}
+
+		template<typename tType>
+		double* stateStatic() {
+			using tStaticVariable = typename tSolutionStatic::tEquation::tVariable;
+			return tStaticVariable::template state<tType>(
+				solutionsStatic.state.data()
+			);
+		}
+
 		// step
 		
 		void step(const double dt) {
@@ -39,11 +57,7 @@ class Solutions {
 			using tStaticEquation = typename tSolutionStatic::tEquation;
 			using tStaticVariable = typename tSolutionStatic::tEquation::tVariable;
 			if constexpr(Index < tStaticEquation::Number) {
-				tStaticEquation::template tEquationComponent<Index>::type::tParameters::init(
-					tStaticVariable::template state<Index>(
-						solutionsStatic.state.data()
-					)
-				);
+				tStaticEquation::template tEquationComponent<Index>::type::tParameters::init(stateStatic<Index>());
 				// recursion
 				initStatic<Index+1>();
 			}
@@ -63,12 +77,7 @@ class Solutions {
 			if constexpr(Index < tStaticEquation::Number) {
 				s0ve::saveMapToCsvDouble(
 					"post_process/time/" + std::format("{:0>10f}", t) + "/" + tStaticEquation::template tEquationComponent<Index>::type::tParameters::name + ".csv",
-					tStaticEquation::template tEquationComponent<Index>::type::tParameters::post(
-						tStaticVariable::template state<Index>(
-							solutionsStatic.state.data()
-						),
-						t
-					),
+					tStaticEquation::template tEquationComponent<Index>::type::tParameters::post(stateStatic<Index>(), t),
 					",", 
 					"#"
 				);
