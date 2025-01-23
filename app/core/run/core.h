@@ -78,7 +78,7 @@ class Run {
 		void save(const tScalar& t) {
 			// Build directory name
 			std::ostringstream oss;
-			oss << "time/" << std::fixed << std::setprecision(10) << std::setw(10) << std::setfill('0') << t;
+			oss << "time/" << std::fixed << std::setprecision(7) << std::setw(10) << std::setfill('0') << t;
 			std::string folder = oss.str();
 			// Create directory
 			std::filesystem::create_directory(folder);

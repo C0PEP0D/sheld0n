@@ -77,7 +77,7 @@ class Solutions {
 			if constexpr(Index < tStaticEquation::Number) {
 				// build name
 				std::ostringstream oss;
-				oss << "post_process/time/" << std::fixed << std::setprecision(10) << std::setw(10) << std::setfill('0') << t << "/" << tStaticEquation::template tEquationComponent<Index>::type::tParameters::name << ".csv";
+				oss << "post_process/time/" << std::fixed << std::setprecision(7) << std::setw(10) << std::setfill('0') << t << "/" << tStaticEquation::template tEquationComponent<Index>::type::tParameters::name << ".csv";
 				// save data
 				s0ve::saveMapToCsvDouble(
 					oss.str(),
