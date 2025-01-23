@@ -13,9 +13,9 @@ int main () {
 	py::scoped_interpreter python;
 	py::gil_scoped_release release;
 	// declare
-	typename c0p::LearnParameters::RLParameters::tDevice device;
-	typename c0p::LearnParameters::RLParameters::tIndex seed = 0;
-	typename c0p::LearnParameters::RLParameters::tLoopState ls;
+	typename c0p::LearnParameters::tDevice device;
+	typename c0p::LearnParameters::tIndex seed = 0;
+	typename c0p::LearnParameters::tLoopState ls;
 	// init
 	rlt::malloc(device, ls);
 	rlt::init(device, ls, seed);

@@ -4,7 +4,6 @@
 
 // std includes
 #include <map>
-#include <format>
 
 // app includes
 #include "core/solutions/prop.h"

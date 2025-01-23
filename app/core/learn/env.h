@@ -2,8 +2,6 @@
 #define C0P_CORE_LEARN_ENV_H
 #pragma once
 
-// std includes
-// lib includes
 // rl includes
 #include <rl_tools/rl/environments/environments.h>
 
@@ -18,15 +16,13 @@ namespace c0p {
 
 	template <typename tSpec>
 	struct RLEnvState{
-		static constexpr tSpec::TI DIM = tSpec::PARAMETERS::tAgentEquation::tVariable::Size;
-		typename tSpec::T x;
-		typename tSpec::T y;
-		// tVector<DIM> state;
+		static constexpr typename tSpec::TI DIM = tSpec::PARAMETERS::tAgentEquation::tVariable::Size;
+		tVector<DIM> state;
 	};
 
 	template <typename tSpec>
 	struct RLEnvObservation{
-		static constexpr tSpec::TI DIM = tSpec::PARAMETERS::ObservationDim;
+		static constexpr typename tSpec::TI DIM = tSpec::PARAMETERS::ObservationDim;
 	};
 
 	template <typename tSpec>

@@ -4,7 +4,7 @@
 
 // std includes
 #include <map>
-#include <format>
+#include <iomanip>
 
 // app includes
 #include "core/solutions/prop.h"
@@ -80,9 +80,15 @@ struct _PassiveParticlesParameters {
 		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
 			const double* pSubState = tVariable::cState(pState, subIndex);
+			// input
 			const tView<const tSpaceVector> x(pSubState);
-			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_0"] = x[0];
-			output["passive_particles__index" + std::format("{:0>{}d}", subIndex, FormatNumber) + "__pos_1"] = x[1];
+			// generate formated index
+			std::ostringstream ossIndex;
+			ossIndex << "passive_particles__index_" << std::setw(FormatNumber) << std::setfill('0') << subIndex;
+			// output
+			output[ossIndex.str() + "__pos_0"] = x[0];
+			output[ossIndex.str() + "__pos_1"] = x[1];
+			// compute average
 			xAverage += x;
 		}
 		xAverage /= Number;
