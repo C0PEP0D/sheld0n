@@ -1,9 +1,6 @@
 # TODO
 
 * Current:
-	- Python custom behaviour
-
-* Current:
 	- Remove border curves that are too small
 	- Optimise and clean properly the border validity check
 	- Setup a debug output

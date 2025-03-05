@@ -34,6 +34,7 @@ add_executable(run ${C0P_PROJECT_DIR}/app/core/run/main.cpp ${TURB_LIB_SRC_FILES
 ## Link Libraries
 target_link_libraries(run TBB::tbb)
 target_link_libraries(run Python::Python Python::NumPy)
+target_link_libraries(run RLtools::RLtools)
 ## Include
 target_include_directories(run PRIVATE .)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/app)
@@ -60,6 +61,7 @@ add_executable(post ${C0P_PROJECT_DIR}/app/core/post/main.cpp ${TURB_LIB_SRC_FIL
 ## Libraries
 target_link_libraries(post TBB::tbb)
 target_link_libraries(post Python::Python Python::NumPy)
+target_link_libraries(post RLtools::RLtools)
 ## Include
 target_include_directories(post PRIVATE .)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/app)

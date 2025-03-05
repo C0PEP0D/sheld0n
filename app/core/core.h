@@ -12,7 +12,6 @@
 
 namespace c0p {
 
-	// template<typename tParameters>
 	struct Env {
 
 		inline static Solutions<SolutionsParameters> solutions;

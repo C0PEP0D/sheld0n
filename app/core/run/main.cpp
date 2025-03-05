@@ -10,8 +10,9 @@
 namespace py = pybind11;
 
 int main () {
+	// python support
 	py::scoped_interpreter python;
 	py::gil_scoped_release release;
-
+	// run
 	c0p::Run<c0p::RunParameters> run;
 }

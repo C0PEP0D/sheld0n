@@ -34,9 +34,9 @@ namespace c0p {
 		using State = RLEnvState<SPEC>;
 		using Observation = RLEnvObservation<SPEC>;
 		using ObservationPrivileged = Observation;
-		static constexpr TI OBSERVATION_DIM = SPEC::PARAMETERS::ObservationDim;
-		static constexpr TI ACTION_DIM = SPEC::PARAMETERS::ActionDim;
-		static constexpr TI EPISODE_STEP_LIMIT = 200;
+		static constexpr TI OBSERVATION_DIM = Parameters::ObservationDim;
+		static constexpr TI ACTION_DIM = Parameters::ActionDim;
+		static constexpr TI EPISODE_STEP_LIMIT = Parameters::EpisodeStepLimit;
 	};
 
 }
