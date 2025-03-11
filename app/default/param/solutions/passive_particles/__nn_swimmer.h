@@ -11,10 +11,12 @@
 #include "param/flow/parameters.h"
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
-
-// #include "core/learn/core.h" // TODO : find a way to make this includable or at least part of it
+// nn
+#include "core/learn/neural_network/core.h"
 
 namespace c0p {
+
+// TODO : adapt that to be run in parallel !
 
 struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
@@ -24,7 +26,6 @@ struct _PassiveParticlesParameters {
 	// feel free to add parameters if you need
 	static constexpr double SwimmingVelocity = 0.5;
 	static constexpr std::array<double, DIM> TargetDirection = {0.0, 1.0}; // defined for 2D simulations, use {0.0, 1.0, 0.0} for 3D
-	using tNn = rlt::rl::algorithms::ppo::loop::core::ConfigApproximatorsSequential::ACTOR_TYPE;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// definition of the member data
@@ -33,19 +34,22 @@ struct _PassiveParticlesParameters {
 		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
 
-			// ---------------- CUSTOM EQUATION START
-
-			// evaluate neural network
-
-			// rlt::Tensor<rlt::tensor::Specification<double, unsigned int, typename tNn::INPUT_SHAPE, false>> input;
-			// rlt::Tensor<rlt::tensor::Specification<double, unsigned int, typename tNn::OUTPUT_SHAPE, false>> output;
-			// rlt::evaluate(Learn::device, Learn::ls.ppo.actor, input, output, buffer, Learn::rng);
-			
+			// ---------------- CUSTOM EQUATION START			
 			// input
-			const tView<const tSpaceVector> n(pState);//output._data);
 			const tView<const tSpaceVector> x(pState);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
+			const tSpaceMatrix grad = Flow::getVelocityGradients(x.data(), t);
+			// compute
+			// // observation
+			set(NeuralNetwork::input, 0, 0, TargetDirection[0]);
+			set(NeuralNetwork::input, 0, 1, TargetDirection[1]);
+			set(NeuralNetwork::input, 0, 2, grad(0, 0));
+			set(NeuralNetwork::input, 0, 3, grad(0, 1));
+			set(NeuralNetwork::input, 0, 4, grad(1, 0));
+			set(NeuralNetwork::input, 0, 5, grad(1, 1));
+			// // evaluation
+			const tView<const tSpaceVector> n(NeuralNetwork::evaluate());
 			// output
 			tView<tSpaceVector> dX(dState.data());
 			dX = u + n.normalized() * SwimmingVelocity;

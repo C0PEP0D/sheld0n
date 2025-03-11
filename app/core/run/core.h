@@ -10,6 +10,8 @@
 #include <string> // stod, to_string
 #include <filesystem>
 #include <iomanip>
+// app includes
+#include "core/learn/neural_network/core.h"
 // lib includes
 #include "s0ve/double.h"
 #include "l0ad/ascii/double.h"
@@ -69,6 +71,8 @@ class Run {
 				std::filesystem::create_directory("time");
 				save(0.0);
 			}
+			// Neural Network
+			NeuralNetwork::init();
 		}
 
 		void step(const tScalar& t) {

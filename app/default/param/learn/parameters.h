@@ -10,7 +10,6 @@
 #include <rl_tools/rl/algorithms/ppo/loop/core/config.h>
 #include <rl_tools/rl/algorithms/ppo/loop/core/operations_generic.h>
 // output setup
-#include <rl_tools/rl/loop/steps/extrack/operations_cpu.h>
 #include <rl_tools/rl/loop/steps/evaluation/operations_generic.h>
 
 namespace rlt = rl_tools;
@@ -19,6 +18,8 @@ namespace c0p {
 
 // Run simulation parameters
 struct LearnParameters {
+
+	// Environnement
 	
 	struct RLEnvParameters {
 		// Run Parameters
@@ -26,6 +27,7 @@ struct LearnParameters {
 		// // Should be greater than zero.
 		static constexpr double Dt = 1.0/128.0;
 		static constexpr unsigned int EpisodeStepLimit = std::round(8*M_PI/Dt); // number of step befor simulation ends (equivalent to Nt)
+		
 		// Init Parameters
 		static constexpr double INITIAL_STATE_MIN_X = -M_PI;
 		static constexpr double INITIAL_STATE_MAX_X = M_PI;
@@ -37,15 +39,16 @@ struct LearnParameters {
 			state.state[0] = rlt::random::uniform_real_distribution(typename DEVICE::SPEC::RANDOM(), INITIAL_STATE_MIN_X, INITIAL_STATE_MAX_X, rng);
 			state.state[1] = rlt::random::uniform_real_distribution(typename DEVICE::SPEC::RANDOM(), INITIAL_STATE_MIN_Y, INITIAL_STATE_MAX_Y, rng);
 		}
+		
 		// Agent Parameters
 		using tAgentEquation = _RlAgent;
 		static constexpr unsigned int ObservationDim = DIM + DIM * DIM; // target direction + flow velocity gradients
 		static constexpr unsigned int ActionDim = DIM; // swimming direction
 		// // TODO: SwimmingVelocity and TargetDirection for random setup ?
-		// Setup observation
+		
+		// Observation
 		template<typename DEVICE, typename SPEC, typename OBS_TYPE_SPEC, typename OBS_SPEC, typename RNG>
 		static void observe(DEVICE& device, const RLEnv<SPEC>& env, const typename RLEnv<SPEC>::Parameters& parameters, const typename RLEnv<SPEC>::State& state, const RLEnvObservation<OBS_TYPE_SPEC>&, rlt::Matrix<OBS_SPEC>& observation, RNG& rng) {
-			// rl_tools::math::cos(device.math, state.theta)
 			const c0p::tView<const c0p::tSpaceVector> x(state.state.data());
 			const c0p::tSpaceMatrix grad = c0p::Flow::getVelocityGradients(x.data(), 0.0); // TODO: replace 0.0 by t
 	
@@ -57,7 +60,8 @@ struct LearnParameters {
 			set(observation, 0, 4, grad(1, 0));
 			set(observation, 0, 5, grad(1, 1));
 		}
-		// Setup step
+		
+		// Step (Action)
 		template<typename DEVICE, typename SPEC, typename ACTION_SPEC, typename RNG>
 		static typename SPEC::T step(DEVICE& device, const RLEnv<SPEC>& env, const typename RLEnv<SPEC>::Parameters& parameters, const typename RLEnv<SPEC>::State& state, const rlt::Matrix<ACTION_SPEC>& action, typename RLEnv<SPEC>::State& nextState, RNG& rng) {
 			// send state to simulation
@@ -73,7 +77,8 @@ struct LearnParameters {
 			nextState.state = agentState;
 			return SPEC::PARAMETERS::Dt;
 		}
-		// Setup reward
+		
+		// Reward
 		template<typename DEVICE, typename SPEC, typename ACTION_SPEC, typename RNG>
 		static typename SPEC::T reward(DEVICE& device, const RLEnv<SPEC>& env, const typename RLEnv<SPEC>::Parameters& parameters, const typename RLEnv<SPEC>::State& state, const rlt::Matrix<ACTION_SPEC>& action, const typename RLEnv<SPEC>::State& next_state, RNG& rng) {
 			// get target direction
@@ -90,21 +95,27 @@ struct LearnParameters {
 	using tEnv = RLEnv<RLEnvSpec<tScalar, tIndex, RLEnvParameters>>;
 
 	struct LoopCoreParameters: rlt::rl::algorithms::ppo::loop::core::DefaultParameters<tScalar, tIndex, tEnv>{
+
 		static constexpr tIndex N_ENVIRONMENTS = 8;
 		static constexpr tIndex ON_POLICY_RUNNER_STEPS_PER_ENV = 128;
 		static constexpr tIndex BATCH_SIZE = 128;
 		static constexpr tIndex TOTAL_STEP_LIMIT = std::pow(2, 22);
+
 		static constexpr tIndex ACTOR_HIDDEN_DIM = 32;
 		static constexpr tIndex CRITIC_HIDDEN_DIM = 32;
+
 		static constexpr auto ACTOR_ACTIVATION_FUNCTION = rlt::nn::activation_functions::ActivationFunction::FAST_TANH;
 		static constexpr auto CRITIC_ACTIVATION_FUNCTION = rlt::nn::activation_functions::ActivationFunction::FAST_TANH;
+
 		static constexpr tIndex STEP_LIMIT = TOTAL_STEP_LIMIT/(ON_POLICY_RUNNER_STEPS_PER_ENV * N_ENVIRONMENTS) + 1;
 		static constexpr tIndex EPISODE_STEP_LIMIT = tEnv::EPISODE_STEP_LIMIT;
-		struct OPTIMIZER_PARAMETERS: rlt::nn::optimizers::adam::DEFAULT_PARAMETERS_TENSORFLOW<tScalar>{
+
+		struct OPTIMIZER_PARAMETERS: rlt::nn::optimizers::adam::DEFAULT_PARAMETERS_TENSORFLOW<tScalar> {
 			static constexpr tScalar ALPHA = 0.001;
 		};
+		
 		static constexpr bool NORMALIZE_OBSERVATIONS = true;
-		struct PPO_PARAMETERS: rlt::rl::algorithms::ppo::DefaultParameters<tScalar, tIndex, BATCH_SIZE>{
+		struct PPO_PARAMETERS: rlt::rl::algorithms::ppo::DefaultParameters<tScalar, tIndex, BATCH_SIZE> {
 			static constexpr tScalar ACTION_ENTROPY_COEFFICIENT = 0.0;
 			static constexpr tIndex N_EPOCHS = 1;
 			static constexpr tScalar GAMMA = 0.9;
@@ -113,14 +124,13 @@ struct LearnParameters {
 	};
 	using tLoopCoreConfig = rlt::rl::algorithms::ppo::loop::core::Config<tScalar, tIndex, tRng, tEnv, LoopCoreParameters>;
 	// output setup
-	using tLoopExtrackConfig = rlt::rl::loop::steps::extrack::Config<tLoopCoreConfig>; // Sets up the experiment tracking structure (https://docs.rl.tools/10-Experiment%20Tracking.html)
 	template <typename tNext>
 	struct tLoopEvalParameters: rlt::rl::loop::steps::evaluation::Parameters<tScalar, tIndex, tNext>{
 	    static constexpr tIndex EVALUATION_INTERVAL = tLoopCoreConfig::CORE_PARAMETERS::STEP_LIMIT / 10;
 	    static constexpr tIndex NUM_EVALUATION_EPISODES = 10;
 	    static constexpr tIndex N_EVALUATIONS = tNext::CORE_PARAMETERS::STEP_LIMIT / EVALUATION_INTERVAL;
 	};
-	using tLoopEvaluationConfig = rlt::rl::loop::steps::evaluation::Config<tLoopExtrackConfig, tLoopEvalParameters<tLoopExtrackConfig>>; // Evaluates the policy in a fixed interval and logs the return
+	using tLoopEvaluationConfig = rlt::rl::loop::steps::evaluation::Config<tLoopCoreConfig, tLoopEvalParameters<tLoopCoreConfig>>; // Evaluates the policy in a fixed interval and logs the return
 	using tLoopTimingConfig = rlt::rl::loop::steps::timing::Config<tLoopEvaluationConfig>;
 	// core
 	using tLoopConfig = tLoopTimingConfig;

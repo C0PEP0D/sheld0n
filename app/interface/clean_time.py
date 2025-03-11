@@ -15,6 +15,8 @@ def main():
     args = parse()
     if os.path.exists('time'):
         shutil.rmtree('time')
+    if os.path.exists('post_process/time'):
+        shutil.rmtree('post_process/time')
 
 if __name__ == '__main__':
     main()
