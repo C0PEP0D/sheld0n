@@ -26,11 +26,13 @@ struct _PassiveParticlesParameters {
 	// feel free to add parameters if you need
 	static constexpr double SwimmingVelocity = 0.5;
 	static constexpr std::array<double, DIM> TargetDirection = {0.0, 1.0}; // defined for 2D simulations, use {0.0, 1.0, 0.0} for 3D
+	// number
+	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// definition of the member data
-	using tVariable = d0t::VariableVector<tVector, tView, StateSize>;
-	struct tEquation : public d0t::Equation<tVariable> {
+	using tSubVariable = d0t::VariableComposed<d0t::VariableVector<tVector, tView, StateSize>>;
+	struct tSubEquation : public d0t::Equation<tSubVariable> {
 		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
 
@@ -42,14 +44,16 @@ struct _PassiveParticlesParameters {
 			const tSpaceMatrix grad = Flow::getVelocityGradients(x.data(), t);
 			// compute
 			// // observation
-			set(NeuralNetwork::input, 0, 0, TargetDirection[0]);
-			set(NeuralNetwork::input, 0, 1, TargetDirection[1]);
-			set(NeuralNetwork::input, 0, 2, grad(0, 0));
-			set(NeuralNetwork::input, 0, 3, grad(0, 1));
-			set(NeuralNetwork::input, 0, 4, grad(1, 0));
-			set(NeuralNetwork::input, 0, 5, grad(1, 1));
+			NeuralNetwork::tInput input;
+			set(input, 0, 0, TargetDirection[0]);
+			set(input, 0, 1, TargetDirection[1]);
+			set(input, 0, 2, grad(0, 0));
+			set(input, 0, 3, grad(0, 1));
+			set(input, 0, 4, grad(1, 0));
+			set(input, 0, 5, grad(1, 1));
 			// // evaluation
-			const tView<const tSpaceVector> n(NeuralNetwork::evaluate());
+			NeuralNetwork::tOutput output = NeuralNetwork::evaluate(input);
+			const tView<const tSpaceVector> n(output._data);
 			// output
 			tView<tSpaceVector> dX(dState.data());
 			dX = u + n.normalized() * SwimmingVelocity;
@@ -59,6 +63,9 @@ struct _PassiveParticlesParameters {
 			return dState;
 		}
 	};
+	// creating tVariable and tEquation
+	using tVariable = d0t::VariableGroupStatic<tSubVariable, Number>;
+	using tEquation = d0t::EquationGroupStatic<tVariable, tSubEquation>;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
 	static constexpr std::array<double, DIM> BoxCenter = {0.0, 0.0}; // defined for 2D simulation, use {0.0, 0.0, 0.0} for 3D
@@ -70,19 +77,40 @@ struct _PassiveParticlesParameters {
 		// interpret BoxCenter and BoxSize as vectors
 		const tSpaceVector boxCenter = tView<const tSpaceVector>(BoxCenter.data());
 		const tSpaceVector boxSize = tView<const tSpaceVector>(BoxSize.data());
-		// interpret state as a tSpaceVector
-		tView<tSpaceVector> x(pState);
-		// set the initial position of this member
-		x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
+		// loop over each member of the variable group
+		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
+			// get the state variable of the subIndex member of the group
+			double* pSubState = tVariable::state(pState, subIndex);
+			// interpret subState as a tSpaceVector
+			tView<tSpaceVector> x(pSubState);
+			// set the initial position of this member
+			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
+		}
 		// ---------------- CUSTOM INIT END
 	}
+
+	static constexpr unsigned FormatNumber = Number/10 + 1;
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;
 		// ---------------- CUSTOM POST START
-		const tView<const tSpaceVector> x(pState);
-		output["passive_particles__pos_0"] = x[0];
-		output["passive_particles__pos_1"] = x[1];
+		tSpaceVector xAverage = tSpaceVector::Zero();
+		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
+			const double* pSubState = tVariable::cState(pState, subIndex);
+			// input
+			const tView<const tSpaceVector> x(pSubState);
+			// generate formated index
+			std::ostringstream ossIndex;
+			ossIndex << "passive_particles__index_" << std::setw(FormatNumber) << std::setfill('0') << subIndex;
+			// output
+			output[ossIndex.str() + "__pos_0"] = x[0];
+			output[ossIndex.str() + "__pos_1"] = x[1];
+			// compute average
+			xAverage += x;
+		}
+		xAverage /= Number;
+		output["passive_particles__average_pos_0"] = xAverage[0];
+		output["passive_particles__average_pos_1"] = xAverage[1];
 		// ---------------- CUSTOM POST END
 		return output;
 	}

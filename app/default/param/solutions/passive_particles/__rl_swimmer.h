@@ -14,18 +14,24 @@
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
 
+// rl include
+#include <rl_tools/operations/cpu_mux.h>
+
+namespace rlt = rl_tools;
+
 namespace c0p {
 
 struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
-	static const unsigned StateSize = DIM; // dimension of the state variable 
+	static const unsigned StateSize = DIM + DIM; // position + swimming direction
 	// feel free to add parameters if you need
 	static constexpr double SwimmingVelocity = 0.5;
 	static constexpr std::array<double, DIM> TargetDirection = {0.0, 1.0}; // defined for 2D simulations, use {0.0, 1.0, 0.0} for 3D
-	// rl input
-	inline static std::array<double, DIM> SwimmingDirection = {0.0, 0.0};
+	// rl
+	static constexpr unsigned int ObservationDim = DIM + DIM * DIM; // target direction + flow velocity gradients
+	static constexpr unsigned int ActionDim = DIM; // swimming direction
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// definition of the member data
@@ -36,8 +42,8 @@ struct _PassiveParticlesParameters {
 
 			// ---------------- CUSTOM EQUATION START
 			// input
-			const tView<const tSpaceVector> n(SwimmingDirection.data());
 			const tView<const tSpaceVector> x(pState);
+			const tView<const tSpaceVector> n(pState + DIM);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
 			// output
@@ -75,6 +81,41 @@ struct _PassiveParticlesParameters {
 		output["passive_particles__pos_1"] = x[1];
 		// ---------------- CUSTOM POST END
 		return output;
+	}
+
+	// reinforcement learning
+
+	template<typename tObsSpec>
+	static void observe(const double* pState, const double t, rlt::Matrix<tObsSpec>& observation) {
+		// ---------------- CUSTOM OBSERVE START
+		// input
+		const tView<const tSpaceVector> x(pState);
+		const tSpaceMatrix grad = Flow::getVelocityGradients(x.data(), t);
+		// target direction
+		set(observation, 0, 0, TargetDirection[0]);
+		set(observation, 0, 1, TargetDirection[1]);
+		// flow velocity gradients
+		set(observation, 0, 2, grad(0, 0));
+		set(observation, 0, 3, grad(0, 1));
+		set(observation, 0, 4, grad(1, 0));
+		set(observation, 0, 5, grad(1, 1));
+		// ---------------- CUSTOM OBSERVE END
+	}
+
+	template<typename tActionSpec>
+	static void act(const rlt::Matrix<tActionSpec>& action, double* pState) {
+		// ---------------- CUSTOM ACT START
+		std::copy(action._data, action._data + DIM, pState + DIM);
+		// ---------------- CUSTOM ACT END
+	}
+
+	static double reward(const double* pState, const double* pNextState) {
+		// ---------------- CUSTOM REWARD START
+		const tView<const tSpaceVector> z(TargetDirection.data());
+		const tView<const tSpaceVector> x(pState);
+		const tView<const tSpaceVector> nextX(pNextState);
+		return (nextX - x).dot(z);
+		// ---------------- CUSTOM REWARD END
 	}
 };
 

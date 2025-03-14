@@ -143,7 +143,7 @@ class SolutionDynamic {
 
 template<typename _tSolver, typename _tEquation>
 class SolutionStatic : public SolutionDynamic<_tSolver, _tEquation> {
-	   public:
+	public:
 		using tBase = SolutionDynamic<_tSolver, _tEquation>;
 	public:
 		using tSolver = typename tBase::tSolver;

@@ -34,10 +34,26 @@ class Solutions {
 			);
 		}
 
+		template<unsigned int Index>
+		const double* cStateStatic() const {
+			using tStaticVariable = typename tSolutionStatic::tEquation::tVariable;
+			return tStaticVariable::template cState<Index>(
+				solutionsStatic.state.data()
+			);
+		}
+
 		template<typename tType>
 		double* stateStatic() {
 			using tStaticVariable = typename tSolutionStatic::tEquation::tVariable;
 			return tStaticVariable::template state<tType>(
+				solutionsStatic.state.data()
+			);
+		}
+
+		template<typename tType>
+		const double* cStateStatic() const {
+			using tStaticVariable = typename tSolutionStatic::tEquation::tVariable;
+			return tStaticVariable::template cState<tType>(
 				solutionsStatic.state.data()
 			);
 		}
@@ -56,6 +72,9 @@ class Solutions {
 		void initStatic() {
 			using tStaticEquation = typename tSolutionStatic::tEquation;
 			using tStaticVariable = typename tSolutionStatic::tEquation::tVariable;
+			// make sure state is correctly allocated
+			solutionsStatic.state.resize(tStaticVariable::MinSize);
+			// then run init
 			if constexpr(Index < tStaticEquation::Number) {
 				tStaticEquation::template tEquationComponent<Index>::type::tParameters::init(stateStatic<Index>());
 				// recursion
@@ -71,7 +90,7 @@ class Solutions {
 		// post
 
 		template<unsigned int Index = 0>
-		void postStatic(const double t) {
+		void postStatic(const double t) const {
 			using tStaticEquation = typename tSolutionStatic::tEquation;
 			using tStaticVariable = typename tSolutionStatic::tEquation::tVariable;
 			if constexpr(Index < tStaticEquation::Number) {
@@ -81,7 +100,7 @@ class Solutions {
 				// save data
 				s0ve::saveMapToCsvDouble(
 					oss.str(),
-					tStaticEquation::template tEquationComponent<Index>::type::tParameters::post(stateStatic<Index>(), t),
+					tStaticEquation::template tEquationComponent<Index>::type::tParameters::post(cStateStatic<Index>(), t),
 					",",
 					"#"
 				);
@@ -90,7 +109,7 @@ class Solutions {
 			}
 		}
 		
-		void post(const double t) {
+		void post(const double t) const {
 			postStatic(t);
 			tParameters::postGroups(t);
 		}

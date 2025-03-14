@@ -112,7 +112,7 @@ double* variableComponentState(double* pState) {
 }
 
 template<typename tVariableA, typename tVariableB, typename... tVariables>
-double* cVariableComponentState(const double* pState) {
+const double* cVariableComponentState(const double* pState) {
 	if constexpr (std::is_same<tVariableA, tVariableB>::value) {
 		return pState;
 	} else {

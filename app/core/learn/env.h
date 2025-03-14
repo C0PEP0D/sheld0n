@@ -4,6 +4,9 @@
 
 // rl includes
 #include <rl_tools/rl/environments/environments.h>
+// app includes
+#include "core/solutions/core.h"
+#include "param/solutions/parameters.h"
 
 namespace c0p {
 
@@ -16,8 +19,9 @@ namespace c0p {
 
 	template <typename tSpec>
 	struct RLEnvState{
-		static constexpr typename tSpec::TI DIM = tSpec::PARAMETERS::tAgentEquation::tVariable::Size;
-		tVector<DIM> state;
+		// static constexpr typename tSpec::TI DIM = SolutionsParameters::tSolutionStatic::tVariable::Size + 1; // TODO : is it mandatory ?
+		Solutions<SolutionsParameters> solutions;
+		typename tSpec::T t;
 	};
 
 	template <typename tSpec>
