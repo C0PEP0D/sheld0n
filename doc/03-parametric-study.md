@@ -182,7 +182,7 @@ To do so, you may just increase the value of the `cGroupSize` parameter in he `p
 You can then run again the simulation and seen how the results changed.
 
 > [!NOTE]
-> Make sure to clean the simulation before running it again using the `clean_time` and the `post_process/clean` scripts.
+> Make sure to clean the simulation before running it again using the `clean_time` script.
 
 ## Next tutorial
 
