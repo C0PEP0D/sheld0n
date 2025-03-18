@@ -2,6 +2,7 @@
 
 # Core
 import os
+import math
 # Command line program
 import argparse
 # Directory operations
@@ -14,6 +15,10 @@ import fileinput
 def parse():
     parser = argparse.ArgumentParser(description='create a new simulation case based on the default one')
     parser.add_argument('name', help='specify the name of the new simulation case')
+    parser.add_argument('-c', '--case', default='default', choices=[
+        'default',
+        'surf_tgv'
+    ], help='match the new case to an example case')
     return parser.parse_args()
 
 def main():
@@ -23,26 +28,12 @@ def main():
     code_dir = script_dir + "/.."
     # copy directory
     shutil.copytree(code_dir + "/app/default", args.name, ignore=shutil.ignore_patterns('__*'))
-    # change C0P_DIR
-    #for line in fileinput.FileInput(args.name + "/CMakeLists.txt", inplace=True):
-    #    if line == '    set(C0P_PROJECT_DIR ../..)\n':
-    #        print('    set(C0P_PROJECT_DIR ' + code_dir + ')\n', end='')
-    #    else:
-    #        print(line, end='')
-    # copy symlinks
-    ### csv scripts
-    #for script in glob.glob(code_dir + "/modules/py0csv/csv_*.py"):
-    #    os.symlink(script, args.name + "/post_process/" + os.path.basename(script).split(".")[0])
-    ### post scripts
-    # for script in glob.glob(code_dir + "/modules/pyp0st/plot_*.py"):
-    #     dest = args.name + "/post_process/"
-    #     os.symlink(os.path.relpath(script, dest), dest + os.path.basename(script))
+    # link post
     os.symlink(os.path.relpath(code_dir + "/modules/pyp0st/libpost.py", args.name + "/post_process/"), args.name + "/post_process/libpost.py")
-    ### post scripts defaults
-    #shutil.copy(code_dir + "/modules/pyp0st/post_default.py", args.name + "/post_process/post_default.py")
     ## interface
     os.symlink(os.path.relpath(code_dir + "/app/interface/libset.py", args.name), args.name + "/libset.py")
     os.symlink(os.path.relpath(code_dir + "/app/interface/run.py", args.name), args.name + "/run")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/set-parameter.py", args.name), args.name + "/set-parameter")
     os.symlink(os.path.relpath(code_dir + "/app/interface/post.py", args.name), args.name + "/post")
     os.symlink(os.path.relpath(code_dir + "/app/interface/learn.py", args.name), args.name + "/learn")
     os.symlink(os.path.relpath(code_dir + "/app/interface/clean_build.py", args.name), args.name + "/clean_build")
@@ -59,11 +50,76 @@ def main():
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/rename_equation")
     #### equation
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/choose")
-    ### init
-    #### solutions
-    ##### equation
-    # os.symlink(os.path.relpath(code_dir + "/app/interface/init/solutions/equation/choose.py", args.name + "/param/init/solutions/group_of_points"), args.name + "/param/init/solutions/group_of_points/choose")
-    ### post
+    ### set default case
+    os.chdir(args.name)
+    
+    match args.case:
+        case 'default':
+            set_case_default()
+        case 'surf_tgv':
+            set_case_surf_tgv()
+        case _:
+            print('WARNING: Example case "' + args.case + '" not recognised. Using default one.')
+            set_case_default()
+            
+    os.chdir('..')
+
+def set_case_default():
+    # input
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    code_dir = script_dir + "/.."
+    # copy
+    shutil.copy(code_dir + "/app/post/plot_vertical_displacement_over_time.py", "post_process/plot_vertical_displacement_over_time.py")
+
+def set_case_surf_tgv():
+    set_flow_tgv()
+    set_solutions_surf(math.pi, math.pi)
+    # param
+    os.system('./set-parameter param cGroupSize 128')
+    # run
+    os.system('./set-parameter param/run Dt "1.0/128.0"')
+    os.system('./set-parameter param/run NTime "8.0 * M_PI / Dt"')
+    os.system('./set-parameter param/run NSave 16')
+    # post
+    os.system('./set-parameter param/run Number 0')
+    # post processing
+    ## input
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    code_dir = script_dir + "/.."
+    ## copy
+    shutil.copy(code_dir + "/app/post/plot_vertical_migration_performance_over_time_horizon.py", "post_process/plot_vertical_migration_performance_over_time_horizon.py")
+
+# TODO: other cases (teach nn)
+# TODO: other cases (evaluate nn)
+
+# flow
+
+def set_flow_tgv():
+    os.chdir('param/flow')
+    os.system('./choose tgv')
+    os.chdir('../..')
+    os.system('./set-parameter param cLength M_PI')
+    os.system('./set-parameter param cTime M_PI')
+
+# solutions
+
+def set_solutions_surf(c_time, c_length):
+    os.chdir('param/solutions')
+    os.system('./create_new_equation surfers')
+    os.chdir('surfers')
+    os.system('./choose ' + 'surfers')
+    os.chdir('..')
+    # time horizon
+    os.system('./batch_copy_equation surfers -p TimeHorizon -v ' + " ".join([str(v * c_time) for v in [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]]))
+    os.system('./remove_equation surfers')
+    # swimming velocity
+    surfers = " ".join(glob.glob("surfers__*"))
+    c_velocity = c_length / c_time
+    os.system('./batch_copy_equation ' + surfers + ' -p SwimmingVelocity -v ' + " ".join([str(v * c_velocity) for v in [0.25, 0.5, 1.0, 2.0, 4.0]]))
+    os.system('./remove_equation ' + surfers)
+    os.chdir('../..')
+
+# rl
 
 if __name__ == '__main__':
     main()

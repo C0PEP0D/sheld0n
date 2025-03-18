@@ -7,6 +7,7 @@ import subprocess
 import glob
 import fileinput
 import re
+import os
 
 def parse():
     parser = argparse.ArgumentParser(description='Copies an equation into several others by varying their parameters.')
@@ -39,18 +40,19 @@ def set_property_from_dir_name(name, prop, value, fwidth, fprecision):
 def file_replace(file_name, text, replacement):
     lineno = 1
     data_array = []
-    for line in fileinput.FileInput(file_name, inplace=True):
-        text_match = re.search(text, line)
-        if text_match:
-            print(re.sub(text, replacement, line), end='')
-            data_array.append({
-                "text":text_match[0], 
-                "replacement":replacement,
-                "lineno":lineno
-            })
-        else:
-            print(line, end='')
-        lineno += 1
+    if os.path.exists(file_name):
+        for line in fileinput.FileInput(file_name, inplace=True):
+            text_match = re.search(text, line)
+            if text_match:
+                print(re.sub(text, replacement, line), end='')
+                data_array.append({
+                    "text":text_match[0], 
+                    "replacement":replacement,
+                    "lineno":lineno
+                })
+            else:
+                print(line, end='')
+            lineno += 1
     if data_array:
         for data in data_array:
             print("INFO: {file}:{lineno}: {text} ---> {replacement}".format(file=file_name, **data))

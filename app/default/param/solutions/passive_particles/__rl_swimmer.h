@@ -121,7 +121,7 @@ struct _PassiveParticlesParameters {
 		const tView<const tSpaceVector> z(pState + DIM);
 		const tView<const tSpaceVector> n(pState + 2 * DIM);
 		const tView<const tSpaceVector> nextX(pNextState);
-		return (nextX - x).dot(z) + 0.01 * -std::abs(n.norm() - 1.0);
+		return (nextX - x).dot(z) + 0.001 * -std::abs(n.norm() - 1.0);
 		// ---------------- CUSTOM REWARD END
 	}
 };

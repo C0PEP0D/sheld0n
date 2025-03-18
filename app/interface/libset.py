@@ -36,9 +36,14 @@ def find_replace(file_pattern, text, replacement):
             if data_array:
                 for data in data_array:
                     print("INFO: {file}:{lineno}: {text} ---> {replacement}".format(file=file, **data))
+            else:
+                print("WARNING: " + text + " not found in " + file)
+    else:
+        print("WARNING: " + file_pattern + " not found")
 
 def set_parameter(dest, param, value):
     find_replace(dest + "/parameters.h", r" {param} = [^\;]*;".format(param=param), " {param} = {value};".format(param=param, value=str(value)))
+    find_replace(dest + "/parameters.py", r" {param} = [^\\n]*\n".format(param=param), " {param} = {value}\n".format(param=param, value=str(value)))
 
 if __name__ == '__main__':
     parse()
