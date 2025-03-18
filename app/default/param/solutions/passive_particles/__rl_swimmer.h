@@ -25,10 +25,9 @@ struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
-	static const unsigned StateSize = DIM + DIM; // position + swimming direction
+	static const unsigned StateSize = DIM + DIM + DIM; // position + target direction + swimming direction
 	// feel free to add parameters if you need
 	static constexpr double SwimmingVelocity = 0.5;
-	static constexpr std::array<double, DIM> TargetDirection = {0.0, 1.0}; // defined for 2D simulations, use {0.0, 1.0, 0.0} for 3D
 	// rl
 	static constexpr unsigned int ObservationDim = DIM + DIM * DIM; // target direction + flow velocity gradients
 	static constexpr unsigned int ActionDim = DIM; // swimming direction
@@ -43,7 +42,8 @@ struct _PassiveParticlesParameters {
 			// ---------------- CUSTOM EQUATION START
 			// input
 			const tView<const tSpaceVector> x(pState);
-			const tView<const tSpaceVector> n(pState + DIM);
+			const tView<const tSpaceVector> z(pState + DIM);
+			const tView<const tSpaceVector> n(pState + 2 * DIM);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
 			// output
@@ -68,8 +68,12 @@ struct _PassiveParticlesParameters {
 		const tSpaceVector boxSize = tView<const tSpaceVector>(BoxSize.data());
 		// interpret state as a tSpaceVector
 		tView<tSpaceVector> x(pState);
+		tView<tSpaceVector> z(pState + DIM);
+		tView<tSpaceVector> n(pState + 2 * DIM);
 		// set the initial position of this member
 		x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
+		z = tSpaceVector::Random().normalized();
+		n = z;
 		// ---------------- CUSTOM INIT END
 	}
 
@@ -90,10 +94,11 @@ struct _PassiveParticlesParameters {
 		// ---------------- CUSTOM OBSERVE START
 		// input
 		const tView<const tSpaceVector> x(pState);
+		const tView<const tSpaceVector> z(pState + DIM);
 		const tSpaceMatrix grad = Flow::getVelocityGradients(x.data(), t);
 		// target direction
-		set(observation, 0, 0, TargetDirection[0]);
-		set(observation, 0, 1, TargetDirection[1]);
+		set(observation, 0, 0, z[0]);
+		set(observation, 0, 1, z[1]);
 		// flow velocity gradients
 		set(observation, 0, 2, grad(0, 0));
 		set(observation, 0, 3, grad(0, 1));
@@ -105,16 +110,18 @@ struct _PassiveParticlesParameters {
 	template<typename tActionSpec>
 	static void act(const rlt::Matrix<tActionSpec>& action, double* pState) {
 		// ---------------- CUSTOM ACT START
-		std::copy(action._data, action._data + DIM, pState + DIM);
+		tView<tSpaceVector> n(pState + 2 * DIM);
+		std::copy(action._data, action._data + DIM, n.data());
 		// ---------------- CUSTOM ACT END
 	}
 
 	static double reward(const double* pState, const double* pNextState) {
 		// ---------------- CUSTOM REWARD START
-		const tView<const tSpaceVector> z(TargetDirection.data());
 		const tView<const tSpaceVector> x(pState);
+		const tView<const tSpaceVector> z(pState + DIM);
+		const tView<const tSpaceVector> n(pState + 2 * DIM);
 		const tView<const tSpaceVector> nextX(pNextState);
-		return (nextX - x).dot(z);
+		return (nextX - x).dot(z) + 0.01 * -std::abs(n.norm() - 1.0);
 		// ---------------- CUSTOM REWARD END
 	}
 };

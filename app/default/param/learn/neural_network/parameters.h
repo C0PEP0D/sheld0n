@@ -22,10 +22,10 @@ struct NeuralNetworkParameters {
 	constexpr static unsigned int HiddenDim = 32;
 	constexpr static unsigned int NumLayers = 3; // total number of layers (including input and output)
 	
-	constexpr static auto activationFunction = rlt::nn::activation_functions::RELU;
-	constexpr static auto outputActivationFunction = rlt::nn::activation_functions::RELU;
+	constexpr static auto ActivationFunction = rlt::nn::activation_functions::RELU;
+	constexpr static auto OutputActivationFunction = rlt::nn::activation_functions::RELU;
 	
-	using tNnConfig = rlt::nn_models::mlp::Configuration<double, unsigned int, OutputDim, NumLayers, HiddenDim, activationFunction, outputActivationFunction>;
+	using tNnConfig = rlt::nn_models::mlp::Configuration<double, unsigned int, OutputDim, NumLayers, HiddenDim, ActivationFunction, OutputActivationFunction>;
 	
 	using tCapability = rlt::nn::capability::Forward<>;
 	using tInputShape = rlt::tensor::Shape<unsigned int, BatchSize, InputDim>;
