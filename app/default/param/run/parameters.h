@@ -19,7 +19,7 @@ struct RunParameters {
     // Currently, post processing will only be
     // possible to be performed on saved time steps.
     // Should be greater than zero.
-    static const unsigned int NSave = NTime;
+    static const unsigned int NSave = 16;
     // If enbaled all static objects are saved
     // in the same file. May lead to slightly
     // faster simulations.

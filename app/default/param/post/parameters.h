@@ -14,7 +14,7 @@ namespace c0p {
 struct PostParameters {
 	// Number of time steps that are to be post processed.
 	// 0 means all saved time steps are to be post processed.
-	static const unsigned int Number = 32;
+	static const unsigned int Number = 0;
 	// Index of the first time step that are to be post processed.
 	static const unsigned int IndexStart = 0;
 	// Iteration step. 0 means this step computed automatically

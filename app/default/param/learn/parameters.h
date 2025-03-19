@@ -57,22 +57,22 @@ struct LearnParameters {
 		// env parameters
 		static constexpr tIndex N_ENVIRONMENTS = 128;
 		static constexpr tIndex ON_POLICY_RUNNER_STEPS_PER_ENV = 128;
-		static constexpr tIndex BATCH_SIZE = 128;
-		static constexpr tIndex TOTAL_STEP_LIMIT = std::pow(2, 22);
+		static constexpr tIndex BATCH_SIZE = 256;
+		static constexpr tIndex TOTAL_STEP_LIMIT = std::pow(2, 26);
 
 		static constexpr tIndex STEP_LIMIT = TOTAL_STEP_LIMIT/(ON_POLICY_RUNNER_STEPS_PER_ENV * N_ENVIRONMENTS) + 1;
 		static constexpr tIndex EPISODE_STEP_LIMIT = tEnv::EPISODE_STEP_LIMIT;
 
 		// rl orgorithms
 		struct OPTIMIZER_PARAMETERS: rlt::nn::optimizers::adam::DEFAULT_PARAMETERS_TENSORFLOW<tScalar> {
-			static constexpr tScalar ALPHA = 0.001;
+			static constexpr tScalar ALPHA = 0.1;
 		};
 		
 		static constexpr bool NORMALIZE_OBSERVATIONS = true;
 		struct PPO_PARAMETERS: rlt::rl::algorithms::ppo::DefaultParameters<tScalar, tIndex, BATCH_SIZE> {
 			static constexpr tScalar ACTION_ENTROPY_COEFFICIENT = 0.1;
 			static constexpr tIndex N_EPOCHS = 1;
-			static constexpr tScalar GAMMA = 0.99;
+			static constexpr tScalar GAMMA = 0.999;
 			static constexpr tScalar INITIAL_ACTION_STD = 2.0;
 		};
 	};

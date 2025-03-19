@@ -19,7 +19,7 @@ using tSpaceMatrix = tMatrix<DIM, DIM>;
 struct EnvParameters {
     // optional characteristic group size. 
     // should be greater than zero.
-    constexpr static const double cGroupSize = 16;
+    constexpr static const double cGroupSize = 128;
     // optional characteristic scales used to parameterize equations.
     constexpr static const double cLength = M_PI;
     constexpr static const double cTime = M_PI;
