@@ -30,29 +30,25 @@ def main(input_equation_list, input_color_list):
     else:
         cmap = plt.get_cmap("plasma", len(equation_name_list))
         color_list = [cmap(index) for index in range(len(equation_name_list))]
+    # markers
+    marker_list = ["o", "^", "s", "P", "*"]
     print("INFO: Reading time...", flush=True)
     time_dir_array, time_array = libpost.get_time()
     print("INFO: Reading equation property over time...", flush=True)
     pos_1_over_time = {}
     for equation_name in equation_name_list:
         pos_1_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__pos_1", time_dir_array))
-    print("INFO: Plotting raw property over time...", flush=True)
+    print("INFO: Plotting average vertical velocity over time ...", flush=True)
     for equation_index, equation_name in enumerate(equation_name_list):
-        plt.plot(time_array, pos_1_over_time[equation_name], color=color_list[equation_index])
+        plt.plot(
+            time_array, 
+            (pos_1_over_time[equation_name] - pos_1_over_time[equation_name][0]).mean(1) / time_array, 
+            color=color_list[equation_index], 
+            marker=marker_list[equation_index % len(marker_list)],
+            label=equation_name,
+        )
     plt.xlabel('$t$')
-    plt.ylabel('$y$')
-    plt.show()
-    print("INFO: Plotting property difference to initial time ...", flush=True)
-    for equation_index, equation_name in enumerate(equation_name_list):
-        plt.plot(time_array, pos_1_over_time[equation_name] - pos_1_over_time[equation_name][0], color=color_list[equation_index])
-    plt.xlabel('$t$')
-    plt.ylabel('$y$')
-    plt.show()
-    print("INFO: Plotting property difference to initial time average ...", flush=True)
-    for equation_index, equation_name in enumerate(equation_name_list):
-        plt.plot(time_array, (pos_1_over_time[equation_name] - pos_1_over_time[equation_name][0]).mean(1), color=color_list[equation_index], label=equation_name)
-    plt.xlabel('$t$')
-    plt.ylabel(r'$\langle y \rangle$')
+    plt.ylabel(r'$\langle V_{\mathrm{eff.}} \rangle$')
     plt.legend()
     plt.show()
 
