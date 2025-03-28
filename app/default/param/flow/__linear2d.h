@@ -26,6 +26,8 @@ struct Flow {
 		// nothing to do
 	}
 
+	// get
+
 	static tSpaceVector getVelocity(const double* pX, const double t) {
 		// parameters
 		const tView<const tSpaceVector> u0(Velocity0.data());
@@ -41,9 +43,16 @@ struct Flow {
 		return tView<const tSpaceMatrix>(Gradient.data());
 	};
 	
-	static tSpaceVector getAcceleration(const double* pX, const double t) {
-		return tView<const tSpaceVector>(Acceleration.data());
-	};
+
+	// prepare
+		
+	static void prepareVelocity(const double* pX, const double t) {
+		// nothing to do
+	}
+	
+	static void prepareVelocityGradients(const double* pX, const double t) {
+		// nothing to do
+	}
 };
 
 }

@@ -77,7 +77,10 @@ class EquationGroupDynamic : public Equation<_tVariableGroup> {
 			std::vector<unsigned int> memberIndexs(tVariableGroup::groupSize(stateSize));
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
 
-			// TODO: add global operations (prepare flow for example)
+			// prepare each equation if necessary
+			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [pState, stateSize, t](const unsigned int memberIndex){
+				tMemberEquation::prepare(tVariableGroup::cState(pState, memberIndex), tVariableGroup::tVariableMember::Size, t);
+			});
 			
 			// apply sub equation to each member of the group
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(stateSize);
@@ -106,7 +109,10 @@ class EquationGroupStatic : public Equation<_tVariableGroup> {
 			std::vector<unsigned int> memberIndexs(tVariableGroup::GroupSize);
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
 
-			// TODO: add global operations (prepare flow for example)
+			// prepare each equation if necessary
+			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [pState, stateSize, t](const unsigned int memberIndex){
+				tMemberEquation::prepare(tVariableGroup::cState(pState, memberIndex), tVariableGroup::tVariableMember::Size, t);
+			});
 
 			// apply sub equation to each member of the group
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariableGroup::Size);

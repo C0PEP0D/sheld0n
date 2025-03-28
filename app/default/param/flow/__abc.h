@@ -10,9 +10,13 @@ struct Flow {
 	static constexpr double B = 1.0;
 	static constexpr double C = 1.0;
 
+	// init
+
 	static void init() {
 		// nothing to do
 	}
+
+	// get
 
 	static tSpaceVector getVelocity(const double* pX, const double t) {
 		return tSpaceVector({
@@ -30,9 +34,15 @@ struct Flow {
 		return velocityGradients;
 	};
 	
-	static tSpaceVector getAcceleration(const double* pX, const double t) {
-		return tSpaceVector::Zero();
-	};
+	// prepare
+
+	static void prepareVelocity(const double* pX, const double t) {
+		// nothing to do
+	}
+
+	static void prepareVelocityGradients(const double* pX, const double t) {
+		// nothing to do
+	}
 };
 
 }

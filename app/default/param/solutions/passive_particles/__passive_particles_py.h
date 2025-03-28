@@ -34,6 +34,12 @@ struct _PassiveParticlesParameters {
 	// definition of the member data
 	using tSubVariable = d0t::VariableComposed<d0t::VariableVector<tVector, tView, StateSize>>;
 	struct tSubEquation : public d0t::Equation<tSubVariable> {
+
+		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+			const tView<const tSpaceVector> x(pState);
+			Flow::prepareVelocity(x.data(), t);
+		}
+	
 		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
 

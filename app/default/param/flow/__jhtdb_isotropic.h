@@ -14,6 +14,8 @@ struct Flow {
 		// nothing to do
 	}
 
+	// get
+
 	static tSpaceVector getVelocity(const double* pX, const double t) {
 		return FlowJhtdb::Isotropic::getVelocity(pX, t);
 	};
@@ -21,10 +23,16 @@ struct Flow {
 	static tSpaceMatrix getVelocityGradients(const double* pX, const double t) {
 		return FlowJhtdb::Isotropic::getVelocityGradients(pX, t);
 	};
+
+	// prepare
 	
-	static tSpaceVector getAcceleration(const double* pX, const double t) {
-		return FlowJhtdb::Isotropic::getAcceleration(pX, t);
-	};
+	static void prepareVelocity(const double* pX, const double t) {
+		FlowJhtdb::Isotropic::prepareVelocity(pX, t);
+	}
+	
+	static void prepareVelocityGradients(const double* pX, const double t) {
+		FlowJhtdb::Isotropic::prepareVelocityGradients(pX, t);
+	}
 
 };
 

@@ -17,6 +17,8 @@ struct Flow {
 		// nothing to do
 	}
 
+	// get
+
 	static tSpaceVector getVelocity(const double* pX, const double t) {
 		tSpaceVector u = tSpaceVector::Zero();
 		// python
@@ -54,25 +56,16 @@ struct Flow {
 		// output
 		return j;
 	};
+
+	// prepare
 	
-	static tSpaceVector getAcceleration(const double* pX, const double t) {
-		tSpaceVector a = tSpaceVector::Zero();
-		// python
-		py::gil_scoped_acquire acquire;
-		auto locals = py::dict(
-			"x"_a = py::array_t<double>(DIM, pX, py::capsule(pX, [](void* ptr) {})),
-			"t"_a = t,
-			"a"_a = py::array_t<double>(DIM, a.data(), py::capsule(a.data(), [](void* ptr) {}))
-		);
-		py::exec(R"(
-			sys.path.append('flow')
-			import parameters
-			
-			a[:] = parameters.get_acceleration(x, t)
-		)", py::globals(), locals);
-		// output
-		return a;
-	};
+	static void prepareVelocity(const double* pX, const double t) {
+		// nothing to do
+	}
+
+	static void prepareVelocityGradients(const double* pX, const double t) {
+		// nothing to do
+	}
 };
 
 }

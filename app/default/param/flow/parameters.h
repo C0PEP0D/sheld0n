@@ -9,6 +9,8 @@ struct Flow {
 	static void init() {
 		// nothing to do
 	}
+
+	// get
 	
 	static tSpaceVector getVelocity(const double* pX, const double t) {
 		return tSpaceVector({
@@ -23,10 +25,16 @@ struct Flow {
 		velocityGradients(1,0) = -std::cos(pX[0]) * std::cos(pX[1]); velocityGradients(1,1) = std::sin(pX[0]) * std::sin(pX[1]);
 		return velocityGradients;
 	};
+
+	// prepare
 	
-	static tSpaceVector getAcceleration(const double* pX, const double t) {
-		return tSpaceVector::Zero();
-	};
+	static void prepareVelocity(const double* pX, const double t) {
+		// nothing to do
+	}
+
+	static void prepareVelocityGradients(const double* pX, const double t) {
+		// nothing to do
+	}
 };
 
 }
