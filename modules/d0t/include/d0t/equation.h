@@ -78,7 +78,7 @@ class EquationGroupDynamic : public Equation<_tVariableGroup> {
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
 
 			// prepare each equation if necessary
-			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [pState, stateSize, t](const unsigned int memberIndex){
+			std::for_each(std::execution::seq, memberIndexs.cbegin(), memberIndexs.cend(), [pState, stateSize, t](const unsigned int memberIndex){
 				tMemberEquation::prepare(tVariableGroup::cState(pState, memberIndex), tVariableGroup::tVariableMember::Size, t);
 			});
 			
@@ -110,7 +110,7 @@ class EquationGroupStatic : public Equation<_tVariableGroup> {
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
 
 			// prepare each equation if necessary
-			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [pState, stateSize, t](const unsigned int memberIndex){
+			std::for_each(std::execution::seq, memberIndexs.cbegin(), memberIndexs.cend(), [pState, stateSize, t](const unsigned int memberIndex){
 				tMemberEquation::prepare(tVariableGroup::cState(pState, memberIndex), tVariableGroup::tVariableMember::Size, t);
 			});
 
