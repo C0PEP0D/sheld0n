@@ -10,6 +10,10 @@ struct Flow {
 	static constexpr double B = 1.0;
 	static constexpr double C = 1.0;
 
+	static void init() {
+		// nothing to do
+	}
+
 	static tSpaceVector getVelocity(const double* pX, const double t) {
 		return tSpaceVector({
 				A * std::sin(pX[2]) + C * std::cos(pX[1]),

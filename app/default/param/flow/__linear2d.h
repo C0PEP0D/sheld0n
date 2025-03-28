@@ -22,6 +22,10 @@ struct Flow {
 		0.0
 	};
 
+	static void init() {
+		// nothing to do
+	}
+
 	static tSpaceVector getVelocity(const double* pX, const double t) {
 		// parameters
 		const tView<const tSpaceVector> u0(Velocity0.data());

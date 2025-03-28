@@ -18,6 +18,11 @@ add_subdirectory(
 	${C0P_PROJECT_DIR}/thirdparty/rl-tools
 	${CMAKE_BINARY_DIR}/rl-tools
 )
+### JHTDB
+add_subdirectory(
+	${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/getjhtdb
+	${CMAKE_BINARY_DIR}/getjhtdb
+)
 ## PACKAGES
 ### TBB
 list(APPEND CMAKE_MODULE_PATH ${C0P_PROJECT_DIR}/cmake/modules) # maybe unecessary ?
@@ -26,15 +31,13 @@ find_package(TBB REQUIRED)
 ### Python
 find_package(Python COMPONENTS Interpreter Development NumPy REQUIRED)
 
-### turblib (JHTDB)
-list(APPEND TURB_LIB_SRC_FILES "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/soapC.c" "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/soapClient.c" "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/stdsoap2.c" "${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib/turblib.c")
-
 # Build run
-add_executable(run ${C0P_PROJECT_DIR}/app/core/run/main.cpp ${TURB_LIB_SRC_FILES})
+add_executable(run ${C0P_PROJECT_DIR}/app/core/run/main.cpp)
 ## Link Libraries
 target_link_libraries(run TBB::tbb)
 target_link_libraries(run Python::Python Python::NumPy)
 target_link_libraries(run RLtools::RLtools)
+target_link_libraries(run getjhtdb)
 ## Include
 target_include_directories(run PRIVATE .)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/app)
@@ -50,18 +53,19 @@ target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/s0ve/include)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/include)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/fl0p/include)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/v0l/include)
-target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib)
+target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/thirdparty)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/thirdparty/pybind11)
 target_include_directories(run PRIVATE ${PYTHON_INCLUDE_DIRS})
 ## Compile features
 target_compile_features(run PUBLIC cxx_std_17)
 
 # Build post
-add_executable(post ${C0P_PROJECT_DIR}/app/core/post/main.cpp ${TURB_LIB_SRC_FILES})
+add_executable(post ${C0P_PROJECT_DIR}/app/core/post/main.cpp)
 ## Libraries
 target_link_libraries(post TBB::tbb)
 target_link_libraries(post Python::Python Python::NumPy)
 target_link_libraries(post RLtools::RLtools)
+target_link_libraries(post getjhtdb)
 ## Include
 target_include_directories(post PRIVATE .)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/app)
@@ -77,18 +81,19 @@ target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/s0ve/include)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/include)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/fl0p/include)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/v0l/include)
-target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib)
+target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/thirdparty)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/thirdparty/pybind11)
 target_include_directories(post PRIVATE ${PYTHON_INCLUDE_DIRS})
 ## Compile features
 target_compile_features(post PUBLIC cxx_std_17)
 
 # Build learn
-add_executable(learn ${C0P_PROJECT_DIR}/app/core/learn/main.cpp ${TURB_LIB_SRC_FILES})
+add_executable(learn ${C0P_PROJECT_DIR}/app/core/learn/main.cpp)
 ## Link Libraries
 target_link_libraries(learn TBB::tbb)
 target_link_libraries(learn Python::Python Python::NumPy)
 target_link_libraries(learn RLtools::RLtools)
+target_link_libraries(learn getjhtdb)
 ## Include
 target_include_directories(learn PRIVATE .)
 target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/app)
@@ -104,7 +109,7 @@ target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/s0ve/include
 target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/include)
 target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/fl0p/include)
 target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/v0l/include)
-target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/thirdparty/turblib)
+target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/fl0w/thirdparty)
 target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/thirdparty/pybind11)
 target_include_directories(learn PRIVATE ${PYTHON_INCLUDE_DIRS})
 ## Compile features

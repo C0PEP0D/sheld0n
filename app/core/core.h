@@ -17,6 +17,11 @@ namespace c0p {
 		inline static Solutions<SolutionsParameters> solutions;
 
 		static void init() {
+			// init random
+			rand0m::seed(EnvParameters::randomSeed);
+			// init flow
+			Flow::init();
+			// init solutions
 			std::cout << "INFO : Init case start" << std::endl;
 			solutions.init();
 			std::cout << "INFO : Init case end" << std::endl;

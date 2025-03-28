@@ -26,9 +26,6 @@ struct EnvParameters {
     constexpr static const double cVelocity = cLength / cTime;
     // seed used for random generation
     constexpr static const unsigned int randomSeed = 0;
-    EnvParameters() {
-        rand0m::seed(randomSeed); // comment this line to set a random seed
-    }
 };
 
 }

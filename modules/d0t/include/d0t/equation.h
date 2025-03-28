@@ -76,6 +76,9 @@ class EquationGroupDynamic : public Equation<_tVariableGroup> {
 			// create member indexs
 			std::vector<unsigned int> memberIndexs(tVariableGroup::groupSize(stateSize));
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
+
+			// TODO: add global operations (prepare flow for example)
+			
 			// apply sub equation to each member of the group
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(stateSize);
 			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&dState, pState, stateSize, t](const unsigned int memberIndex){
@@ -102,6 +105,9 @@ class EquationGroupStatic : public Equation<_tVariableGroup> {
 			// create member indexs
 			std::vector<unsigned int> memberIndexs(tVariableGroup::GroupSize);
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
+
+			// TODO: add global operations (prepare flow for example)
+
 			// apply sub equation to each member of the group
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariableGroup::Size);
 			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&dState, pState, stateSize, t](const unsigned int memberIndex){
@@ -127,7 +133,9 @@ class SolutionDynamic {
 	public:
 		virtual void step(const double dt) {
 			tSolver::step(
-				[](const double* pState, const unsigned int stateSize, const double t) { return tEquation::stateTemporalDerivative(pState, stateSize, t); }, 
+				[](const double* pState, const unsigned int stateSize, const double t) { 
+					return tEquation::stateTemporalDerivative(pState, stateSize, t); 
+				}, 
 				state.data(), 
 				state.size(), 
 				t, 
@@ -155,7 +163,9 @@ class SolutionStatic : public SolutionDynamic<_tSolver, _tEquation> {
 	   public:
 		void step(const double dt) override {
 			tSolver::step(
-				[](const double* pState, const unsigned int stateSize, const double t) { return tEquation::stateTemporalDerivative(pState, stateSize, t); }, 
+				[](const double* pState, const unsigned int stateSize, const double t) { 
+					return tEquation::stateTemporalDerivative(pState, stateSize, t); 
+				}, 
 				tBase::state.data(), 
 				tBase::state.size(), 
 				tBase::t,

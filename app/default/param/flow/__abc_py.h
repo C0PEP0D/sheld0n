@@ -13,6 +13,10 @@ namespace c0p {
 
 struct Flow {
 
+	static void init() {
+		// nothing to do
+	}
+
 	static tSpaceVector getVelocity(const double* pX, const double t) {
 		tSpaceVector u = tSpaceVector::Zero();
 		// python
