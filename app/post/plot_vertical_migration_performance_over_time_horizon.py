@@ -87,7 +87,7 @@ def main(input_equation_list, input_color_list):
             marker=marker_list[plot_index % len(marker_list)]
         )
         plot_index += 1
-    plt.xlabel(r'$\tau$')
+    plt.xlabel(r'$\tau / \pi$')
     plt.ylabel(r'$\langle V_{\mathrm{eff.}} \rangle / V_{\mathrm{swim}}$')
     plt.legend()
     plt.show()

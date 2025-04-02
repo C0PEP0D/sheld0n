@@ -14,6 +14,7 @@ def parse():
     parser.add_argument('sources', nargs='+', help='specify the name of the source equations')
     parser.add_argument('-p', '--prop', help='specify the property', required=True)
     parser.add_argument('-v', '--values', type=float, nargs='+', help='specify the values', required=True)
+    parser.add_argument('-f', '--factor', help='specify a factor', default=None)
     return parser.parse_args()
 
 def get_property_from_dir_name(name, prop):
@@ -57,11 +58,15 @@ def file_replace(file_name, text, replacement):
         for data in data_array:
             print("INFO: {file}:{lineno}: {text} ---> {replacement}".format(file=file_name, **data))
 
-def set_parameter(dest, prop, value):
-    file_replace(dest + "/parameters.h", r"{prop} = [^\;]*;".format(prop=prop), "{prop} = {value};".format(prop=prop, value=str(value)))
-    file_replace(dest + "/parameters.py", r"{prop} = .*$".format(prop=prop), "{prop} = {value}".format(prop=prop, value=str(value)))
+def set_parameter(dest, prop, value, factor):
+    if factor:
+        file_replace(dest + "/parameters.h", r"{prop} = [^\;]*;".format(prop=prop), "{prop} = {value} * {factor};".format(prop=prop, value=str(value), factor=factor))
+        file_replace(dest + "/parameters.py", r"{prop} = .*$".format(prop=prop), "{prop} = {value} * {factor}".format(prop=prop, value=str(value), factor=factor))
+    else:
+        file_replace(dest + "/parameters.h", r"{prop} = [^\;]*;".format(prop=prop), "{prop} = {value};".format(prop=prop, value=str(value)))
+        file_replace(dest + "/parameters.py", r"{prop} = .*$".format(prop=prop), "{prop} = {value}".format(prop=prop, value=str(value)))
 
-def compute(sources, prop, values):
+def compute(sources, prop, values, factor):
     finteger = 0
     fprecision = 0
     for value in values:
@@ -81,13 +86,13 @@ def compute(sources, prop, values):
             print("INFO: running " + cmd)
             subprocess.call(shlex.split(cmd))
             # set parameter
-            set_parameter(dest, prop, value)
+            set_parameter(dest, prop, value, factor)
 
-def main(source, prop, values):
-    compute(source, prop, values)
+def main(source, prop, values, factor):
+    compute(source, prop, values, factor)
 
 if __name__ == '__main__':
     # parse arguments
     args = parse()
     # call
-    main(args.sources, args.prop, args.values)
+    main(args.sources, args.prop, args.values, args.factor)

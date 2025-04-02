@@ -149,12 +149,12 @@ def set_solutions_surfers(c_time, c_length):
     os.system('./choose ' + 'surfers')
     os.chdir('..')
     # time horizon
-    os.system('./batch_copy_equation surfers -p TimeHorizon -v ' + " ".join([str(v * c_time) for v in np.arange(0.0, 1.0 + 0.125, 0.125)]))
+    os.system('./batch_copy_equation surfers -p TimeHorizon -f EnvParameters::cTime -v ' + " ".join([str(v) for v in np.arange(0.0, 1.0 + 0.125, 0.125)]))
     os.system('./remove_equation surfers')
     # swimming velocity
     surfers = " ".join(glob.glob("surfers__*"))
     c_velocity = c_length / c_time
-    os.system('./batch_copy_equation ' + surfers + ' -p SwimmingVelocity -v ' + " ".join([str(v * c_velocity) for v in [0.25, 0.5, 1.0, 2.0, 4.0]]))
+    os.system('./batch_copy_equation ' + surfers + ' -p SwimmingVelocity -f EnvParameters::cVelocity -v ' + ' '.join([str(v) for v in [0.25, 0.5, 1.0, 2.0, 4.0]]))
     os.system('./remove_equation ' + surfers)
     os.chdir('../..')
 
@@ -179,8 +179,15 @@ def set_solutions_nn_swimmers():
     os.chdir('naive_swimmers')
     os.system('./choose ' + 'buoyant_particles')
     os.chdir('..')
+    # surfers
+    os.system('./create_new_equation surfers')
+    os.chdir('surfers')
+    os.system('./choose ' + 'surfers')
+    os.chdir('..')
     # back
     os.chdir('../..')
+    # set surfing parameters
+    os.system('./set-parameter param/solutions/surfers TimeHorizon "0.25*EnvParameters::cTime"')
 
 # rl
 
