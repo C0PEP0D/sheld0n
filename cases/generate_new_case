@@ -21,7 +21,8 @@ def parse():
         'default',
         'surf_tgv',
         'rl_tgv',
-        'nn_tgv'
+        'nn_tgv',
+        'passive_jhtdb'
     ], help='match the new case to an example case')
     return parser.parse_args()
 
@@ -66,6 +67,8 @@ def main():
             set_case_rl_tgv()
         case 'nn_tgv':
             set_case_nn_tgv()
+        case 'passive_jhtdb':
+            set_case_passive_jhtdb()
         case _:
             print('WARNING: Example case "' + args.case + '" not recognised. Using default one.')
             set_case_default()
@@ -131,6 +134,16 @@ def set_case_nn_tgv():
     # print
     print('WARNING: This case is designed for the evaluation of a neural network learn using the rl_tgv case.\n         To do so, copy the files in "param/learn/neural_network/data" from the rl_tgv case to this one after the reinforcement learning process ended.\n         Make sure the environment parameters from the rl_tgv case are the same (in particular the agent\'s swimming velocity) as this one before running the evaluation.')
 
+def set_case_passive_jhtdb():
+    set_flow_jhtdb()
+    # post processing
+    ## input
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    code_dir = script_dir + "/.."
+    # remove symbolic link
+    os.unlink("learn")
+    # shutil.rmtree("param/learn")
+
 # flow
 
 def set_flow_tgv():
@@ -139,6 +152,17 @@ def set_flow_tgv():
     os.chdir('../..')
     os.system('./set-parameter param cLength M_PI')
     os.system('./set-parameter param cTime M_PI')
+
+def set_flow_jhtdb():
+    os.chdir('param/flow')
+    os.system('./choose jhtdb_isotropic')
+    os.chdir('../..')
+    os.system('./set-parameter param DIM 3')
+    os.system('./set-parameter param cLength 0.00280')
+    os.system('./set-parameter param cTime 0.0424')
+    os.system('./set-parameter param/run Dt 0.002')
+    os.system('./set-parameter param/run NTime "int(10.056/Dt)"')
+    os.system('./set-parameter param/run NSave NTime')
 
 # solutions
 
