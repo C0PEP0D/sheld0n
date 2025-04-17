@@ -41,8 +41,8 @@ def main(input_equation_list, input_color_list):
     print("INFO: Plotting average vertical velocity over time ...", flush=True)
     for equation_index, equation_name in enumerate(equation_name_list):
         plt.plot(
-            time_array, 
-            (pos_1_over_time[equation_name] - pos_1_over_time[equation_name][0]).mean(1) / time_array, 
+            time_array[1:], 
+            (pos_1_over_time[equation_name] - pos_1_over_time[equation_name][0]).mean(1)[1:] / time_array[1:], 
             color=color_list[equation_index], 
             marker=marker_list[equation_index % len(marker_list)],
             label=equation_name,

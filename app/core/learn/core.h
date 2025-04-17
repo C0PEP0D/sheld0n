@@ -27,6 +27,7 @@ namespace c0p {
 		static void run() {
 			std::cout << "INFO : Running Learning Process..." << std::endl;
 			while(!rlt::step(device, ls)) {
+				save();
 			}
 			std::cout << "INFO : Done." << std::endl;
 		}

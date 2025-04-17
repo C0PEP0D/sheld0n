@@ -65,7 +65,7 @@ struct LearnParameters {
 
 		// rl orgorithms
 		struct OPTIMIZER_PARAMETERS: rlt::nn::optimizers::adam::DEFAULT_PARAMETERS_TENSORFLOW<tScalar> {
-			static constexpr tScalar ALPHA = 0.01;
+			static constexpr tScalar ALPHA = 0.001;
 		};
 		
 		static constexpr bool NORMALIZE_OBSERVATIONS = true;

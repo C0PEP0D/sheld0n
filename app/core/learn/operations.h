@@ -48,11 +48,14 @@ namespace rl_tools {
 		// next agent
 		using tAgentEquation = typename SPEC::PARAMETERS::tAgentEquation;
 		c0p::tView<c0p::tStateVectorDynamic> nextAgentState(nextState.solutions.template stateStatic<typename tAgentEquation::tVariable>(), tAgentEquation::tVariable::Size);
+
 		// act
 		tAgentEquation::tParameters::act(action, nextAgentState.data());
+
 		// simulation step
-		nextState.solutions.step(SPEC::PARAMETERS::Dt);
+		nextState.solutions.step(SPEC::PARAMETERS::Dt / 128.0);
 		nextState.t += SPEC::PARAMETERS::Dt;
+
 		// return
 		return SPEC::PARAMETERS::Dt;
 	}
