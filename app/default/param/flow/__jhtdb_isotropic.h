@@ -25,6 +25,10 @@ struct Flow {
 	};
 
 	// prepare
+
+	static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+		FlowJhtdb::Isotropic::prepare(t);
+	}
 	
 	static void prepareVelocity(const double* pX, const double t) {
 		FlowJhtdb::Isotropic::prepareVelocity(pX, t);

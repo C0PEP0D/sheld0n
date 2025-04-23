@@ -9,7 +9,7 @@
 #include "param/flow/parameters.h"
 
 namespace c0p {
-	class SolutionsParameters;
+	class SolutionsParameters; // useless
 }
 
 #endif

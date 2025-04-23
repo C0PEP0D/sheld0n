@@ -26,7 +26,8 @@ struct PointVortexFlow {
 		PointVortexFlow(const double p_step) : step(p_step), sigma(p_step), binTree(p_step) {
 			
 		}
-	
+
+	public:
 		void prepare(const double* pPosition, const double* pVorticity, const unsigned int n) {
 			binTree.clear();
 			for(unsigned int index = 0; index < n; ++index) {
@@ -116,7 +117,7 @@ struct PointVortexFlow {
 			return output;
 		};
 
-		tMatrix getVelocityGradients(const double* pX, const double t) const {
+		tMatrix getVelocityGradients(const double* pX) const {
 			return tMatrix::Zero;
 		};
 };

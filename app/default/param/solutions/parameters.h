@@ -8,10 +8,12 @@
 
 // std include
 #include <filesystem>
-//lib
+// lib
 #include "d0t/equation.h"
 #include "s0ve/double.h"
 #include "l0ad/ascii/double.h"
+// param
+#include "param/flow/parameters.h"
 
 // FLAG: INCLUDE EQUATION BEGIN
 // #include "param/solutions/source_of_points/parameters.h"
@@ -21,16 +23,24 @@
 
 namespace c0p {
 
+struct PrepareStatic {
+	static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+		Flow::prepare(pState, stateSize, t);
+	}
+};
+
 struct SolutionsParameters {
 
 	// ---------------- STATIC
 
-	using tSolutionStatic = d0t::SolutionStatic<tSolver, 
+	using tSolutionStatic = d0t::SolutionStatic<
+		tSolver, 
 		d0t::EquationComposed<
 			// FLAG: DECLARE STATIC EQUATION BEGIN
 			_PassiveParticles
 			// FLAG: DECLARE STATIC EQUATION END
-		>
+		>,
+		PrepareStatic
 	>;
 
 	// ---------------- DYNAMIC

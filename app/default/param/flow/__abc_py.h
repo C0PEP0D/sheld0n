@@ -58,10 +58,13 @@ struct Flow {
 	};
 
 	// prepare
+	static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+		// nothing to do
+	}
 
 	static void prepareVelocity(const double* pX, const double t) {
-			// nothing to do
-		}
+		// nothing to do
+	}
 	
 	static void prepareVelocityGradients(const double* pX, const double t) {
 		// nothing to do
