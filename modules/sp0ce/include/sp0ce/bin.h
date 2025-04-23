@@ -17,6 +17,16 @@ class Bin {
 	public:
 		static const unsigned int Dim = _Dim;
 	public:
+		const double step;
+		std::map<
+			std::array<int, Dim>, 
+			std::vector<unsigned int>
+		> ijkToIndexes;
+		std::unordered_map<
+			unsigned int,
+			std::array<int, Dim>
+		> indexToIjk;
+	public:
 		Bin(const double p_step) : step(p_step) {
 			
 		}
@@ -85,8 +95,13 @@ class Bin {
 			std::array<int, Dim> ijkStart;
 			std::array<int, Dim> ijkEnd;
 			for(unsigned int j = 0; j < Dim; ++j) {
-				ijkStart[j] = (pIjk[j]/2) * 2;
-				ijkEnd[j] = (pIjk[j]/2 + 1) * 2;
+				if(pIjk[j] < 0) {
+					ijkStart[j] = ((pIjk[j] - 1)/2) * 2;
+					ijkEnd[j] = ((pIjk[j] - 1)/2 + 1) * 2;
+				} else {
+					ijkStart[j] = (pIjk[j]/2) * 2;
+					ijkEnd[j] = (pIjk[j]/2 + 1) * 2;
+				}
 			}
 			return getIjkInBetween(ijkStart.data(), ijkEnd.data());
 		}
@@ -112,17 +127,6 @@ class Bin {
 				}
 			}
 		}
-
-	public:
-		const double step;
-		std::map<
-			std::array<int, Dim>, 
-			std::vector<unsigned int>
-		> ijkToIndexes;
-		std::map<
-			unsigned int,
-			std::array<int, Dim>
-		> indexToIjk;
 };
 
 template<unsigned int _Dim> // Object type, Position type
@@ -130,10 +134,17 @@ class BinTree {
 	public:
 		static const unsigned int Dim = _Dim;
 	public:
+		const double step;
+		std::vector<Bin<Dim>> data;
+	public:
 		BinTree(const double p_step) : step(p_step) {
 			data.emplace_back(step);
 		}
 	public:
+		void clear() {
+			data.clear();
+			data.emplace_back(step);
+		}
 		void addIndex(const unsigned int index, const double* pPosition) {
 			// add in data
 			for(unsigned int i = 0; i < data.size(); ++i) {
@@ -145,7 +156,11 @@ class BinTree {
 				for (auto const& [ijk, indexes] : (*(data.end() - 2)).ijkToIndexes) {
 					std::array<int, Dim> newIjk = ijk;
 					for(unsigned int i = 0; i < ijk.size(); ++i) {
-						newIjk[i] /= 2;
+						if(newIjk[i] < 0) {
+							newIjk[i] = (newIjk[i] - 1) / 2;
+						} else {
+							newIjk[i] = newIjk[i] / 2;
+						}
 					}
 					auto itIjkToIndexes = data.back().ijkToIndexes.find(newIjk);
 					if(itIjkToIndexes != data.back().ijkToIndexes.end()) {
@@ -159,9 +174,6 @@ class BinTree {
 				}
 			}
 		}
-	public:
-		const double step;
-		std::vector<Bin<Dim>> data;
 };
 
 };
