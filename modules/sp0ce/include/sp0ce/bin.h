@@ -21,7 +21,7 @@ class Bin {
 			
 		}
 	public:
-		virtual void addIndex(const double* pPosition, const unsigned int index) {
+		void addIndex(const unsigned int index, const double* pPosition) {
 			// compute ijk
 			std::array<int, Dim> ijk = positionToIjk(pPosition);
 			// update data
@@ -29,28 +29,23 @@ class Bin {
 			if(itIjkToIndexes != ijkToIndexes.end()) {
 				itIjkToIndexes->second.push_back(index);
 			} else {
-				ijkToIndexes.emplace(ijk, { index });
+				ijkToIndexes.emplace(ijk, std::vector<unsigned int>({ index }));
 			}
 			indexToIjk.emplace(index, ijk);
 		}
 
-		virtual void addIndexes(const double* pPosition, const unsigned int* pIndexes, const unsigned int number) {
-			// compute ijk
-			std::array<int, Dim> ijk = positionToIjk(pPosition);
-			// update data
-			auto itIjkToIndexes = ijkToIndexes.find(ijk);
-			if(itIjkToIndexes != ijkToIndexes.end()) {
-				itIjkToIndexes->second.push_back(index); // TODO: replace by indexes
-			} else {
-				ijkToIndexes.emplace(ijk, { index }); // TODO: replace by indexes
-			}
-			indexToIjk.emplace(index, ijk);
+		void clear() {
+			ijkToIndexes.clear();
+			indexToIjk.clear();
 		}
-
+	public:
 		std::array<int, Dim> positionToIjk(const double* pPosition) const {
 			std::array<int, Dim> ijk;
 			for(std::size_t i = 0; i < Dim; ++i) {
-				ijk[i] = int(std::round(pPosition[i]/step));
+				ijk[i] = int(pPosition[i]/step);
+				if(pPosition[i] < 0.0) {
+					ijk[i] -= 1;
+				}
 			}
 			return ijk;
 		}
@@ -68,14 +63,8 @@ class Bin {
 			ijkToNeighborIjkAuxiliary(pIjk, 0, output);
 			return output;
 		}
-
-		void clear() {
-			ijkToIndexes.clear();
-			indexToIjk.clear();
-		}
-
-	public:
-		virtual void ijkToNeighborIjkAuxiliary(const int* pIjk, const unsigned int i, std::vector<std::array<int, Dim>>& output) const {
+		
+		void ijkToNeighborIjkAuxiliary(const int* pIjk, const unsigned int i, std::vector<std::array<int, Dim>>& output) const {
 			for(int j = -1; j < 1; ++j) {
 				// newIjk
 				std::array<int, Dim> newIjk;
@@ -92,6 +81,38 @@ class Bin {
 			}
 		}
 
+		std::vector<std::array<int, Dim>> ijkToSiblingIjk(const int* pIjk) const {
+			std::array<int, Dim> ijkStart;
+			std::array<int, Dim> ijkEnd;
+			for(unsigned int j = 0; j < Dim; ++j) {
+				ijkStart[j] = (pIjk[j]/2) * 2;
+				ijkEnd[j] = (pIjk[j]/2 + 1) * 2;
+			}
+			return getIjkInBetween(ijkStart.data(), ijkEnd.data());
+		}
+
+		std::vector<std::array<int, Dim>> getIjkInBetween(const int* pIjkStart, const int* pIjkEnd) const {
+			std::vector<std::array<int, Dim>> output;
+			getIjkInBetweenAuxiliary(pIjkStart, pIjkEnd, 0, output);
+			return output;
+		}
+
+		void getIjkInBetweenAuxiliary(const int* pIjkStart, const int* pIjkEnd, const unsigned int i, std::vector<std::array<int, Dim>>& output) const {
+			std::array<int, Dim> newIjk;
+			for(unsigned int j = 0; j < Dim; ++j) {
+				newIjk[j] = pIjkStart[j];
+			}
+			output.push_back(newIjk);
+			// progress into graph
+			for(unsigned int j = i; j < Dim; ++j) {
+				std::array<int, Dim> newIjkStart = newIjk;
+				newIjkStart[j] += 1;
+				if(newIjkStart[j] < pIjkEnd[j]) {
+					getIjkInBetweenAuxiliary(newIjkStart.data(), pIjkEnd, j, output);
+				}
+			}
+		}
+
 	public:
 		const double step;
 		std::map<
@@ -104,96 +125,45 @@ class Bin {
 		> indexToIjk;
 };
 
-template<unsigned int _Dim, double _Step> // Object type, Position type
+template<unsigned int _Dim> // Object type, Position type
 class BinTree {
 	public:
 		static const unsigned int Dim = _Dim;
-		static constexpr double Step = _Step;
 	public:
-		BinTree() {
-			data.emplace_back(Step);
+		BinTree(const double p_step) : step(p_step) {
+			data.emplace_back(step);
 		}
 	public:
-		void addIndex(const double* pPosition, const unsigned int index) {
+		void addIndex(const unsigned int index, const double* pPosition) {
 			// add in data
 			for(unsigned int i = 0; i < data.size(); ++i) {
-				data[i].addIndex(pPosition, index);
+				data[i].addIndex(index, pPosition);
 			}
 			// push_back data
-			while(data.back().ijkToIndexes.size() > 1) {
+			while(data.back().ijkToIndexes.size() > std::pow(2, Dim)) {
 				data.emplace_back(2 * data.back().step);
-				for() { // TODO: iterate over map (data.end() - 2).ijkToIndexes
-					// TODO: add indexes to position
+				for (auto const& [ijk, indexes] : (*(data.end() - 2)).ijkToIndexes) {
+					std::array<int, Dim> newIjk = ijk;
+					for(unsigned int i = 0; i < ijk.size(); ++i) {
+						newIjk[i] /= 2;
+					}
+					auto itIjkToIndexes = data.back().ijkToIndexes.find(newIjk);
+					if(itIjkToIndexes != data.back().ijkToIndexes.end()) {
+				    	itIjkToIndexes->second.insert(itIjkToIndexes->second.begin(), indexes.begin(), indexes.end());
+				    } else {
+				    	data.back().ijkToIndexes.emplace(newIjk, indexes);
+				    }
+				    for (auto const& _index : indexes) {
+				    	data.back().indexToIjk.emplace(_index, newIjk);
+				    }
 				}
 			}
 		}
 	public:
+		const double step;
 		std::vector<Bin<Dim>> data;
 };
 
-
-// 	template<class O, class V> // Object type, Position type
-// 	class BinPeriodic : public Bin<O, V> {
-// 		public:
-// 			BinPeriodic();
-// 			BinPeriodic(const V& d, const V& l);
-// 			void add(const O& object, const V& x) override;
-// 			std::vector<std::vector<int>> getIjkNeighbours(const std::vector<int>& ijk) const override;
-// 		public:
-// 			V l;
-// 			using Bin<O, V>::d;
-// 			using Bin<O, V>::data;
-// 			using Bin<O, V>::index;
-// 	};
-// 
-// 	template<class O, class V>
-// 	BinPeriodic<O, V>::BinPeriodic() { // TODO should be a default argument more than a defualt constructor
-// 	}
-// 	
-// 	template<class O, class V>
-// 	BinPeriodic<O, V>::BinPeriodic(const V& p_d, const V& p_l) : Bin<O, V>(p_d), l(p_l) {
-// 	
-// 	}
-// 
-// 	template<class O, class V>
-// 	void BinPeriodic<O, V>::add(const O& object, const V& x) {
-// 		V xPeriodic = x;
-// 		for(std::size_t i = 0; i < d.size(); i++) {
-// 			xPeriodic[i] = std::fmod(0.5 * l[i] + xPeriodic[i], l[i]);
-// 			if (xPeriodic[i] < 0.0)
-// 			   xPeriodic[i] += l[i];
-// 			xPeriodic[i] -= 0.5 * l[i];
-// 		}
-// 		Bin<O, V>::add(object, xPeriodic);
-// 	}
-// 	
-// 	template<class O, class V>
-// 	std::vector<std::vector<int>> BinPeriodic<O, V>::getIjkNeighbours(const std::vector<int>& ijk) const {
-// 		const int n = l[l.size() - ijk.size()]/d[d.size() - ijk.size()];
-// 		if(ijk.size() == 1) {
-// 			std::vector<std::vector<int>> abc(3, std::vector<int>(1));
-// 			for(int i = -1; i <= 1; i++) {
-// 				abc[i+1][0] = (n/2 + ijk.front()+i) % n;
-// 				if(abc[i+1][0] < 0)
-// 					abc[i+1][0] += n;
-// 				abc[i+1][0] -= n/2;
-// 			}
-// 			return abc;
-// 		} else {
-// 			std::vector<std::vector<int>> abc;
-// 			std::vector<std::vector<int>> recAbc = getIjkNeighbours(std::vector<int>(ijk.begin() + 1, ijk.end()));
-// 			for(int i = -1; i <= 1; i++) {
-// 				for(std::size_t j = 0; j < recAbc.size(); j++) {
-// 					abc.push_back(recAbc[j]);
-// 					abc[abc.size()-1].insert(abc[abc.size()-1].begin(), (n/2 + ijk.front()+i) % n);
-// 					if(abc[abc.size()-1][0] < 0)
-// 						abc[abc.size()-1][0] += n;
-// 					abc[abc.size()-1][0] -= n/2;
-// 				}
-// 			}
-// 			return abc;
-// 		}
-// 	}
 };
 
 #endif
