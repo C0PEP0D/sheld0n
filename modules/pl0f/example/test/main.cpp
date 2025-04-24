@@ -27,17 +27,19 @@ const tScalar w0 = 1.0;
 
 int main () {
 	// build data at random
-	std::vector<tScalar> positionArray(n * Dim);
-	std::vector<tScalar> vorticityArray(n);
+	std::vector<tScalar> vortexStateArray(n * (Dim + 1), 0.0);
 	for(unsigned int index = 0; index < n; ++index) {
-		tView<tSpaceVector> x(&(positionArray[index * Dim]));
+
+		tView<tSpaceVector> x(&(vortexStateArray[index * (Dim + 1)]));
 		x = tSpaceVector::Random() * r0;
-		vorticityArray[index] = tSpaceVector::Random()[0] * w0;
+		
+		tScalar& w = vortexStateArray[index * (Dim + 1) + Dim];
+		w = tVector<1>::Random()[0] * w0;
 	}
 
 	// flow
 	tFlow flow(Step);
-	flow.prepare(positionArray.data(), vorticityArray.data(), n);
+	flow.prepare(vortexStateArray.data(), n);
 
 	// query
 	// // init

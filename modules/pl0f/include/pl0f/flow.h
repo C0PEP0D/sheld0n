@@ -8,8 +8,16 @@
 
 namespace pl0f {
 
-template<unsigned int Dim, typename tVector, typename tMatrix, template<typename...> typename tView>
+template<unsigned int _Dim, typename _tVector, typename _tMatrix, template<typename...> typename _tView>
 struct PointVortexFlow {
+	public:
+		static const unsigned int Dim = _Dim;
+		static const unsigned int VortexStateSize = Dim + 1;
+	
+		using tVector = _tVector;
+		using tMatrix = _tMatrix;
+		template<typename ...Args>
+		using tView = _tView<Args...>;
 
 	public:
 		const double step;
@@ -19,8 +27,7 @@ struct PointVortexFlow {
 
 		// super
 		std::vector<std::map<std::array<int, Dim>, unsigned int>> ijkToSuperIndex;
-		std::vector<std::vector<double>> superPositionArray;
-		std::vector<std::vector<double>> superVorticityArray;
+		std::vector<std::vector<double>> superVortexStateArray;
 
 	public:
 		PointVortexFlow(const double p_step) : step(p_step), sigma(p_step), binTree(p_step) {
@@ -28,46 +35,48 @@ struct PointVortexFlow {
 		}
 
 	public:
-		void prepare(const double* pPosition, const double* pVorticity, const unsigned int n) {
+		void prepare(const double* pState, const unsigned int n) {
 			binTree.clear();
 			for(unsigned int index = 0; index < n; ++index) {
-				binTree.addIndex(index, &(pPosition[index * Dim]));
+				const tView<const tVector> x(pState + index * VortexStateSize);
+				const double& w = pState[index * VortexStateSize + Dim];
+				binTree.addIndex(index, x.data());
 			}
 			// super
 			ijkToSuperIndex.clear();
-			superPositionArray.clear();
-			superVorticityArray.clear();
+			superVortexStateArray.clear();
 			// 0
 			ijkToSuperIndex.emplace_back();
-			superPositionArray.emplace_back();
-			superVorticityArray.emplace_back();
+			superVortexStateArray.emplace_back();
 			for (auto const& [ijk, indexes] : binTree.data[0].ijkToIndexes) {
 				// init
-				ijkToSuperIndex[0][ijk] = superVorticityArray[0].size();
-				superVorticityArray[0].push_back(0.0);
-				superPositionArray[0].resize(superVorticityArray[0].size() * Dim, 0.0);
+				ijkToSuperIndex[0][ijk] = ijkToSuperIndex[0].size();
+				superVortexStateArray[0].resize(ijkToSuperIndex[0].size() * VortexStateSize, 0.0);
 				// process
-				tView<tVector> superPosition(&(superPositionArray[0][superPositionArray[0].size() - Dim]));
+				tView<tVector> superX(&(superVortexStateArray[0][superVortexStateArray[0].size() - VortexStateSize]));
+				double& superW = superVortexStateArray[0].back();
 				for (auto const& index : indexes) {
-					superVorticityArray[0].back() += pVorticity[index];
-					superPosition += pVorticity[index] * tView<const tVector>(&(pPosition[index]));
+					const tView<const tVector> x(pState + index * VortexStateSize);
+					const double w = pState[index * VortexStateSize + Dim];
+					superW += w;
+					superX += w * x;
 				}
-				if(superVorticityArray[0].back() != 0.0) {
-					superPosition /= superVorticityArray[0].back();
+				if(superW != 0.0) {
+					superX /= superW;
 				}
 			}
 			// others
 			for(unsigned int i = 1; i < binTree.data.size(); ++i) {
 				ijkToSuperIndex.emplace_back();
-				superPositionArray.emplace_back();
-				superVorticityArray.emplace_back();
+				superVortexStateArray.emplace_back();
 				for (auto const& [ijk, indexes] : binTree.data[i].ijkToIndexes) {
 					// init
-					ijkToSuperIndex[i][ijk] = superVorticityArray[i].size();
-					superVorticityArray[i].push_back(0.0);
-					superPositionArray[i].resize(superVorticityArray[i].size() * Dim, 0.0);
+					ijkToSuperIndex[i][ijk] = ijkToSuperIndex[i].size();
+					superVortexStateArray[i].resize(ijkToSuperIndex[i].size() * VortexStateSize, 0.0);
+					
 					// process
-					tView<tVector> superPosition(&(superPositionArray[i][superPositionArray[i].size() - Dim]));
+					tView<tVector> superX(&(superVortexStateArray[i][superVortexStateArray[i].size() - VortexStateSize]));
+					double& superW = superVortexStateArray[i].back();
 					// sub
 					std::array<int, Dim> subIjkStart;
 					std::array<int, Dim> subIjkEnd;
@@ -79,12 +88,12 @@ struct PointVortexFlow {
 						auto iterator = ijkToSuperIndex[i-1].find(subIjk);
 						if(iterator != ijkToSuperIndex[i-1].end()) {
 							const unsigned int subSuperIndex = iterator->second;
-							superVorticityArray[i].back() += superVorticityArray[i-1][subSuperIndex];
-							superPosition += superVorticityArray[i-1][subSuperIndex] * tView<const tVector>(&(superPositionArray[i-1][subSuperIndex * Dim]));
+							superW += superVortexStateArray[i-1][subSuperIndex * VortexStateSize + Dim];
+							superX += superVortexStateArray[i-1][subSuperIndex * VortexStateSize + Dim] * tView<const tVector>(&(superVortexStateArray[i-1][subSuperIndex * VortexStateSize]));
 						}
 					}
-					if(superVorticityArray[i].back() != 0.0) {
-						superPosition /= superVorticityArray[i].back();
+					if(superW != 0.0) {
+						superX /= superW;
 					}
 				}
 			}
@@ -101,12 +110,12 @@ struct PointVortexFlow {
 						auto iterator = ijkToSuperIndex[i].find(siblingIjk);
 						if(iterator != ijkToSuperIndex[i].end()) {
 							const unsigned int siblingIndex = iterator->second;
-							const tVector r = x - tView<const tVector>(&(superPositionArray[i][siblingIndex * Dim]));
+							const tVector r = x - tView<const tVector>(&(superVortexStateArray[i][siblingIndex * VortexStateSize]));
 							const double rNorm = r.norm();
 							if(rNorm > sigma) {
-								output += sp0ce::cross2d<tVector>(superVorticityArray[i][siblingIndex], r.data()) * std::pow(sigma/rNorm, 2); // 2D
+								output += sp0ce::cross2d<tVector>(superVortexStateArray[i][siblingIndex * VortexStateSize + Dim], r.data()) * std::pow(sigma/rNorm, 2); // 2D
 							} else {
-								output += sp0ce::cross2d<tVector>(superVorticityArray[i][siblingIndex], r.data());
+								output += sp0ce::cross2d<tVector>(superVortexStateArray[i][siblingIndex * VortexStateSize + Dim], r.data());
 							}
 						}
 					}
