@@ -10,8 +10,6 @@
 // lib includes
 #include "d0t/equation.h"
 #include "s0ve/double.h"
-// app includes
-#include "core/solutions/prop.h"
 
 namespace c0p {
 

@@ -23,25 +23,23 @@
 
 namespace c0p {
 
-struct PrepareStatic {
-	static void prepare(const double* pState, const unsigned int stateSize, const double t) {
-		Flow::prepare(pState, stateSize, t);
-	}
-};
-
 struct SolutionsParameters {
 
 	// ---------------- STATIC
 
-	using tSolutionStatic = d0t::SolutionStatic<
-		tSolver, 
-		d0t::EquationComposed<
-			// FLAG: DECLARE STATIC EQUATION BEGIN
-			_PassiveParticles
-			// FLAG: DECLARE STATIC EQUATION END
-		>,
-		PrepareStatic
+	using tEquationStatic = d0t::EquationComposed<
+		// FLAG: DECLARE STATIC EQUATION BEGIN
+		_PassiveParticles
+		// FLAG: DECLARE STATIC EQUATION END
 	>;
+
+	struct PrepareStatic {
+		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+			Flow::prepare<tEquationStatic, _PassiveParticles>(pState, stateSize, t); // FIXME: enough to solve circular dependency but not satisfactory
+		}
+	};
+	
+	using tSolutionStatic = d0t::SolutionStatic<tSolver, tEquationStatic, PrepareStatic>;
 
 	// ---------------- DYNAMIC
 

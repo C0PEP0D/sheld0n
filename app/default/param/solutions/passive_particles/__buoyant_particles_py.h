@@ -6,7 +6,6 @@
 #include <map>
 
 // app includes
-#include "core/solutions/prop.h"
 #include "core/solutions/core.h"
 #include "param/flow/parameters.h"
 

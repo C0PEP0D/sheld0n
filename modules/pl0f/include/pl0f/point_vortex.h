@@ -1,5 +1,5 @@
-#ifndef D0T_VARIABLE_H
-#define D0T_VARIABLE_H
+#ifndef PL0F_POINT_VORTEX_H
+#define PL0F_POINT_VORTEX_H
 #pragma once
 
 // std includes
@@ -24,7 +24,6 @@ struct PointVortexFlow {
 		const double sigma;
 		
 		sp0ce::BinTree<Dim> binTree;
-
 		// super
 		std::vector<std::map<std::array<int, Dim>, unsigned int>> ijkToSuperIndex;
 		std::vector<std::vector<double>> superVortexStateArray;
@@ -36,6 +35,7 @@ struct PointVortexFlow {
 
 	public:
 		void prepare(const double* pState, const unsigned int n) {
+			// binTree
 			binTree.clear();
 			for(unsigned int index = 0; index < n; ++index) {
 				const tView<const tVector> x(pState + index * VortexStateSize);
@@ -109,13 +109,16 @@ struct PointVortexFlow {
 					if(siblingIjk != ijk) {
 						auto iterator = ijkToSuperIndex[i].find(siblingIjk);
 						if(iterator != ijkToSuperIndex[i].end()) {
-							const unsigned int siblingIndex = iterator->second;
-							const tVector r = x - tView<const tVector>(&(superVortexStateArray[i][siblingIndex * VortexStateSize]));
+							const unsigned int superIndex = iterator->second;
+							const tView<const tVector> superX(&(superVortexStateArray[i][superIndex * VortexStateSize]));
+							const double superW = superVortexStateArray[i][superIndex * VortexStateSize + Dim];
+
+							const tVector r = x - superX;
 							const double rNorm = r.norm();
 							if(rNorm > sigma) {
-								output += sp0ce::cross2d<tVector>(superVortexStateArray[i][siblingIndex * VortexStateSize + Dim], r.data()) * std::pow(sigma/rNorm, 2); // 2D
+								output += sp0ce::cross2d<tVector>(superW, r.data()) * std::pow(sigma/rNorm, 2); // 2D
 							} else {
-								output += sp0ce::cross2d<tVector>(superVortexStateArray[i][siblingIndex * VortexStateSize + Dim], r.data());
+								output += sp0ce::cross2d<tVector>(superW, r.data());
 							}
 						}
 					}
@@ -127,7 +130,37 @@ struct PointVortexFlow {
 		};
 
 		tMatrix getVelocityGradients(const double* pX) const {
-			return tMatrix::Zero;
+			tMatrix output = tMatrix::Zero();
+			const tView<const tVector> x(pX);
+			for(int i = binTree.data.size() - 1; i > -1; --i) {
+				const std::array<int, Dim> ijk = binTree.data[i].positionToIjk(pX);
+				const std::vector<std::array<int, Dim>> siblingIjkArray = binTree.data[i].ijkToSiblingIjk(ijk.data());
+				for(auto const& siblingIjk : siblingIjkArray) {
+					if(siblingIjk != ijk) {
+						auto iterator = ijkToSuperIndex[i].find(siblingIjk);
+						if(iterator != ijkToSuperIndex[i].end()) {
+							const unsigned int superIndex = iterator->second;
+							const tView<const tVector> superX(&(superVortexStateArray[i][superIndex * VortexStateSize]));
+							const double superW = superVortexStateArray[i][superIndex * VortexStateSize + Dim];
+
+							tMatrix skewSuperW;
+							skewSuperW << 0.0, superW,
+							              -superW,  0.0;
+							
+							const tVector r = x - superX;
+							const double rNorm = r.norm();
+							if(rNorm > sigma) {
+								output += std::pow(sigma/rNorm, 4) * (sp0ce::cross2d<tVector>(superW, r.data()) * r.transpose()); // 2D
+							} else {
+								output += sp0ce::cross2d<tVector>(superW, r.data()) * r.transpose();
+							}
+						}
+					}
+					
+				}
+			}
+			output *= 0.5; // 2D
+			return output;
 		};
 };
 

@@ -27,10 +27,10 @@ def edit(name):
     for line in fileinput.FileInput("parameters.h", inplace=True):
         if (line == '#include "param/solutions/{}/parameters.h"\n'.format(name)):
             pass
-        elif (line == '\t\t\t_{Name}\n'.format(Name=upper_camel_name)):
+        elif (line == '\t\t_{Name}\n'.format(Name=upper_camel_name)):
             has_removed_first = True
             pass
-        elif (line == '\t\t\t,_{Name}\n'.format(Name=upper_camel_name)):
+        elif (line == '\t\t,_{Name}\n'.format(Name=upper_camel_name)):
             pass
         else:
             if has_removed_first:

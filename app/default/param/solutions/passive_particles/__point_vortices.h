@@ -4,6 +4,7 @@
 
 // std includes
 #include <map>
+#include <iomanip>
 
 // app includes
 #include "core/solutions/core.h"
@@ -12,20 +13,13 @@
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
 
-// include thirdparty
-#include "pybind11/embed.h"
-#include "pybind11/numpy.h"
-#include "pybind11/stl.h"
-namespace py = pybind11;
-using namespace pybind11::literals;
-
 namespace c0p {
 
 struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
-	static const unsigned StateSize = DIM; // dimension of the state variable 
+	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
 	// ---------------- CUSTOM EQUATION PARAMETERS END
@@ -42,28 +36,15 @@ struct _PassiveParticlesParameters {
 		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
 
-			/// ---------------- CUSTOM EQUATION START
-			
+			// ---------------- CUSTOM EQUATION START
 			// input
 			const tView<const tSpaceVector> x(pState);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
-
-			// python
-			
-			py::gil_scoped_acquire acquire;
-			auto locals = py::dict(
-				"state"_a = py::array_t<double>(tVariable::Size, pState, py::capsule(pState, [](void* ptr) {})),
-				"u"_a = py::array_t<double>(DIM, u.data(), py::capsule(u.data(), [](void* ptr) {})),
-				"dstate"_a = py::array_t<double>(tVariable::Size, dState.data(), py::capsule(dState.data(), [](void* ptr) {}))
-			);
-			py::exec(R"(
-				sys.path.append('param/solutions/passive_particles')
-				import parameters
-				
-				dstate[:] = parameters.state_temporal_derivative(state, u)
-			)", py::globals(), locals);
-	
+			const double w = pState[DIM];
+			// output
+			tView<tSpaceVector> dX(dState.data());
+			dX = u;
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
@@ -77,22 +58,25 @@ struct _PassiveParticlesParameters {
 	// ---------------- CUSTOM INIT PARAMETERS START
 	static constexpr std::array<double, DIM> BoxCenter = {0.0, 0.0}; // defined for 2D simulation, use {0.0, 0.0, 0.0} for 3D
 	static constexpr std::array<double, DIM> BoxSize = {2.0 * M_PI, 2.0 * M_PI}; // defined for 2D simulation, use {2.0 * M_PI, 2.0 * M_PI,  2.0 * M_PI} for 3D
+	static constexpr double Vorticity = 1.0;
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {
 		// ---------------- CUSTOM INIT START
-		py::gil_scoped_acquire acquire;
-		auto locals = py::dict(
-			"state"_a = py::array_t<double>(Number * StateSize, pState, py::capsule(pState, [](void* ptr) {})),
-			"particle_state_size"_a = StateSize,
-			"particle_number"_a = Number
-		);
-		py::exec(R"(
-			sys.path.append('param/solutions/passive_particles')
-			import parameters
-			
-			state[:] = parameters.init(particle_state_size, particle_number)
-		)", py::globals(), locals);
+		// interpret BoxCenter and BoxSize as vectors
+		const tSpaceVector boxCenter = tView<const tSpaceVector>(BoxCenter.data());
+		const tSpaceVector boxSize = tView<const tSpaceVector>(BoxSize.data());
+		// loop over each member of the variable group
+		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
+			// get the state variable of the subIndex member of the group
+			double* pSubState = tVariable::state(pState, subIndex);
+			// interpret subState as a tSpaceVector
+			tView<tSpaceVector> x(pSubState);
+			double& w = pSubState[DIM];
+			// set the initial position of this member
+			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
+			w = Vorticity * tVector<1>::Random()[0];
+		}
 		// ---------------- CUSTOM INIT END
 	}
 
@@ -100,22 +84,33 @@ struct _PassiveParticlesParameters {
 	static constexpr unsigned FormatNumber = Number/10 + 1;
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
+		std::map<std::string, double> output;
 		// ---------------- CUSTOM POST START
-		py::gil_scoped_acquire acquire;
-		auto locals = py::dict(
-			"state"_a = py::array_t<double>(Number * StateSize, pState, py::capsule(pState, [](void* ptr) {})),
-			"particle_state_size"_a = StateSize,
-			"particle_number"_a = Number,
-			"output"_a = py::dict()
-		);
-		py::exec(R"(
-			sys.path.append('param/solutions/passive_particles')
-			import parameters
-			
-			output = parameters.post(state, particle_state_size, particle_number)
-		)", py::globals(), locals);
+		tSpaceVector xAverage = tSpaceVector::Zero();
+		double wAverage = 0.0;
+		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
+			const double* pSubState = tVariable::cState(pState, subIndex);
+			// input
+			const tView<const tSpaceVector> x(pSubState);
+			const double w = pSubState[DIM];
+			// generate formated index
+			std::ostringstream ossIndex;
+			ossIndex << "passive_particles__index_" << std::setw(FormatNumber) << std::setfill('0') << subIndex;
+			// output
+			output[ossIndex.str() + "__pos_0"] = x[0];
+			output[ossIndex.str() + "__pos_1"] = x[1];
+			output[ossIndex.str() + "__vorticity"] = w;
+			// compute average
+			xAverage += x;
+			wAverage += w;
+		}
+		xAverage /= Number;
+		wAverage /= Number;
+		output["passive_particles__average_pos_0"] = xAverage[0];
+		output["passive_particles__average_pos_1"] = xAverage[1];
+		output["passive_particles__average_vorticity"] = wAverage;
 		// ---------------- CUSTOM POST END
-		return locals["output"].cast<std::map<std::string, tScalar>>();
+		return output;
 	}
 };
 

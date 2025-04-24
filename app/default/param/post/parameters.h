@@ -2,12 +2,6 @@
 #define C0P_PARAM_POST_PARAMETERS_H
 #pragma once
 
-// std include
-#include <map>
-#include <string>
-// app include
-#include "core/post/prop.h"
-
 namespace c0p {
 
 // Post processing parameters

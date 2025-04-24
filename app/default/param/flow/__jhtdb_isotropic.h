@@ -26,6 +26,7 @@ struct Flow {
 
 	// prepare
 
+	template<typename tEquationStatic, typename tEquationFlow>
 	static void prepare(const double* pState, const unsigned int stateSize, const double t) {
 		FlowJhtdb::Isotropic::prepare(t);
 	}

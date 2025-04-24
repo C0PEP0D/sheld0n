@@ -4,7 +4,7 @@
 // thirdparties includes
 #include <Eigen/Dense>
 // lib includes
-#include "pl0f/flow.h"
+#include "pl0f/point_vortex.h"
 
 using tScalar = double;
 // linear Algebra
@@ -45,60 +45,29 @@ int main () {
 	// // init
 	tSpaceVector x;
 	tSpaceVector u;
+	tSpaceMatrix j;
 	// // process
 	x = tSpaceVector::Random() * r0;
 	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
-	// // process
-	x = tSpaceVector::Random();
-	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
+	j = flow.getVelocityGradients(x.data());
+	std::cout << "u(" << x.transpose() << ") = " << "\n" << u <<std::endl;
+	std::cout << "j(" << x.transpose() << ") = " << "\n" << j <<std::endl;
 	// // process
 	x = tSpaceVector::Random() * r0;
 	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
+	j = flow.getVelocityGradients(x.data());
+	std::cout << "u(" << x.transpose() << ") = " << "\n" << u <<std::endl;
+	std::cout << "j(" << x.transpose() << ") = " << "\n" << j <<std::endl;
 	// // process
 	x = tSpaceVector::Random() * r0;
 	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
+	j = flow.getVelocityGradients(x.data());
+	std::cout << "u(" << x.transpose() << ") = " << "\n" << u <<std::endl;
+	std::cout << "j(" << x.transpose() << ") = " << "\n" << j <<std::endl;
 	// // process
 	x = tSpaceVector::Random() * r0;
 	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
-	// // process
-	x = tSpaceVector::Random() * r0;
-	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
-	// // process
-	x = tSpaceVector::Random() * r0;
-	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
-	// // process
-	x = tSpaceVector::Random() * r0;
-	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
-	// // process
-	x = tSpaceVector::Random() * r0;
-	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
-	// // process
-	x = tSpaceVector::Random() * r0;
-	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
-	// // process
-	x = tSpaceVector::Random() * r0;
-	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
-	// // process
-	x = tSpaceVector::Random() * r0;
-	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
-	// // process
-	x = tSpaceVector::Random() * r0;
-	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
-	// // process
-	x = tSpaceVector::Random() * r0;
-	u = flow.getVelocity(x.data());
-	std::cout << "u(" << x.transpose() << ") = " << u.transpose() <<std::endl;
+	j = flow.getVelocityGradients(x.data());
+	std::cout << "u(" << x.transpose() << ") = " << "\n" << u <<std::endl;
+	std::cout << "j(" << x.transpose() << ") = " << "\n" << j <<std::endl;
 }

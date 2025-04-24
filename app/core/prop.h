@@ -8,6 +8,7 @@
 #include <random>
 // lib includes
 #include "s0s/runge_kutta_fehlberg.h"
+#include "d0t/variables/vector.h"
 // app includes
 #include "param/parameters.h"
 

@@ -2,16 +2,19 @@
 #define C0P_PARAM_FLOW_PARAMETERS_H
 #pragma once
 
-#include "pl0f/flow.h"
+#include "pl0f/point_vortex.h"
+// #include "core/solutions/core.h"
+// #include "param/solutions/parameters.h"
 
 namespace c0p {
 
 struct Flow {
 
-	using PointVortexFlow = pl0f::PointVortexFlow<Dim, tSpaceVector, tSpaceMatrix, tView>
-	using tVorticesEquation = _Vortices; // name of the objects
+	using PointVortexFlow = pl0f::PointVortexFlow<DIM, tSpaceVector, tSpaceMatrix, tView>;
+	inline static const double step = 1.0; 
+	inline static PointVortexFlow flow = PointVortexFlow(step);
 
-	inline static PointVortexFlow flow;
+	// using tVorticesEquation = _PassiveParticles; // name of the vortices
 
 	static void init() {
 		// nothing to do
@@ -29,15 +32,17 @@ struct Flow {
 
 	// prepare
 
+	template<typename tEquationStatic, typename tEquationFlow>
 	static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+		// get state
 		const tView<const tStateVectorDynamic> state(
-			Solutions::tSolutionStatic::tEquation::tVariable::template cState<typename tVorticesEquation::tVariable>(
+			tEquationStatic::tVariable::template cState<typename tEquationFlow::tVariable>(
 				pState
 			),
-			tVorticesEquation::tVariable::Size
+			tEquationFlow::tVariable::Size
 		);
-		// TODO: give in state -> with both position and vorticity (to match current structure)
-		flow.prepare(const double* pPosition, const double* pVorticity, tVorticesEquation::tVariable::GroupSize);
+		// prepare flow
+		flow.prepare(state.data(), tEquationFlow::tVariable::GroupSize);
 	}
 	
 	static void prepareVelocity(const double* pX, const double t) {

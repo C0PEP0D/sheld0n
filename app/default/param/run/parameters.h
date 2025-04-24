@@ -2,8 +2,6 @@
 #define C0P_PARAM_RUN_PARAMETERS_H
 #pragma once
 
-#include "core/run/prop.h"
-
 namespace c0p {
 
 // Run simulation parameters

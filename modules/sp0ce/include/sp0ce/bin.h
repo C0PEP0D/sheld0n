@@ -1,5 +1,5 @@
-#ifndef SPACE_H
-#define SPACE_H
+#ifndef SPACE_BIN_H
+#define SPACE_BIN_H
 #pragma once
 
 #include <iostream>

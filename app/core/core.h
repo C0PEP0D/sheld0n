@@ -14,7 +14,8 @@ namespace c0p {
 
 	struct Env {
 
-		inline static Solutions<SolutionsParameters> solutions;
+		using tSolutions = Solutions<SolutionsParameters>;
+		inline static tSolutions solutions;
 
 		static void init() {
 			// init random

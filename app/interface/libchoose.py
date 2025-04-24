@@ -190,11 +190,11 @@ def edit_add_equation(name):
     for line in fileinput.FileInput("parameters.h", inplace=True):
         if line == '// FLAG: INCLUDE EQUATION END\n':
             print('#include "param/solutions/{}/parameters.h"\n'.format(name), end='')
-        if line == '\t\t\t// FLAG: DECLARE STATIC EQUATION END\n':
-            if previous_line == '\t\t\t// FLAG: DECLARE STATIC EQUATION BEGIN\n':
-                 print('\t\t\t_{Name}\n'.format(Name=upper_camel_name), end='')
+        if line == '\t\t// FLAG: DECLARE STATIC EQUATION END\n':
+            if previous_line == '\t\t// FLAG: DECLARE STATIC EQUATION BEGIN\n':
+                 print('\t\t_{Name}\n'.format(Name=upper_camel_name), end='')
             else:
-                print('\t\t\t,_{Name}\n'.format(Name=upper_camel_name), end='')
+                print('\t\t,_{Name}\n'.format(Name=upper_camel_name), end='')
         previous_line = line
         print(line, end='')
 

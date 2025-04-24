@@ -10,7 +10,7 @@
 #include <string> // stod, to_string
 #include <filesystem>
 // app include
-#include "core/post/prop.h"
+#include "core/prop.h"
 // lib include
 #include "l0ad/ascii/double.h"
 #include "s0ve/double.h"
