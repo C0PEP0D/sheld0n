@@ -52,7 +52,7 @@ struct PointVortexFlow {
 			// binTree
 			binTree.clear();
 			for(unsigned int index = 0; index < n; ++index) {
-				const tView<const tVector> x(pState + index * VortexStateSize);
+				const tVector x = sp0ce::xPeriodic<tVector>(pState + index * VortexStateSize, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 				const double& w = pState[index * VortexStateSize + Dim];
 				binTree.addIndex(index, x.data());
 			}
@@ -70,7 +70,7 @@ struct PointVortexFlow {
 				tView<tVector> superX(&(superVortexStateArray[0][superVortexStateArray[0].size() - VortexStateSize]));
 				double& superW = superVortexStateArray[0].back();
 				for (auto const& index : indexes) {
-					const tView<const tVector> x(pState + index * VortexStateSize);
+					const tVector x = sp0ce::xPeriodic<tVector>(pState + index * VortexStateSize, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 					const double w = pState[index * VortexStateSize + Dim];
 					superW += w;
 					superX += w * x;
