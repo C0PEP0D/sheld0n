@@ -101,32 +101,6 @@ double getTetrahedreVolume(const std::vector<T>& positions) {
     return getTetrahedreVolume(positions[0], positions[1], positions[2], positions[3]);
 }
 
-// Periodic utils
-
-template<class T>
-T abPeriodic(const T& a, const T& b, const T& l) {
-    T bPeriodic = b;
-    for(std::size_t i = 0; i < l.size(); i++) {
-        bPeriodic[i] = std::fmod(0.5 * l[i] + bPeriodic[i], l[i]);
-        if (bPeriodic[i] < 0.0)
-           bPeriodic[i] += l[i];
-        bPeriodic[i] -= 0.5 * l[i];
-    }
-    
-    std::vector<T> imB(std::pow(2, 3), bPeriodic);
-    imB[0] = bPeriodic;
-    for(std::size_t i = 0; i < l.size(); i++) {
-        const int s = std::pow(2, i);
-        for(std::size_t j = 0; j < s; j++) {
-            imB[s+j] = imB[j] - l[i];
-        }
-    }
-    auto closestImB = std::min_element(imB.begin(), imB.end(), [a](const T& b1, const T& b2) {
-            return norm<T>(b1-a) < norm<T>(b2-a);
-        });
-    return *closestImB - a;
-}
-
 }
 
 #endif
