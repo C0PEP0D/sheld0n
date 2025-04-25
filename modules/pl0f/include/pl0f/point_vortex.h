@@ -115,9 +115,9 @@ struct PointVortexFlow {
 
 		tVector getVelocity(const double* pX) const {
 			tVector output = tVector::Zero();
-			const tView<const tVector> x(pX);
+			const tVector x = sp0ce::xPeriodic<tVector>(pX, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 			for(int i = binTree.data.size() - 1; i > -1; --i) {
-				const std::array<int, Dim> ijk = binTree.data[i].positionToIjk(pX);
+				const std::array<int, Dim> ijk = binTree.data[i].positionToIjk(x.data());
 				const std::vector<std::array<int, Dim>> siblingIjkArray = binTree.data[i].ijkToSiblingIjk(ijk.data());
 				for(auto const& siblingIjk : siblingIjkArray) {
 					if(siblingIjk != ijk) {
@@ -145,9 +145,9 @@ struct PointVortexFlow {
 
 		tMatrix getVelocityGradients(const double* pX) const {
 			tMatrix output = tMatrix::Zero();
-			const tView<const tVector> x(pX);
+			const tVector x = sp0ce::xPeriodic<tVector>(pX, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 			for(int i = binTree.data.size() - 1; i > -1; --i) {
-				const std::array<int, Dim> ijk = binTree.data[i].positionToIjk(pX);
+				const std::array<int, Dim> ijk = binTree.data[i].positionToIjk(x.data());
 				const std::vector<std::array<int, Dim>> siblingIjkArray = binTree.data[i].ijkToSiblingIjk(ijk.data());
 				for(auto const& siblingIjk : siblingIjkArray) {
 					if(siblingIjk != ijk) {
