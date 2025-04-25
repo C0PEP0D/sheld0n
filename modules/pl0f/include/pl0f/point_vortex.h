@@ -22,6 +22,9 @@ struct PointVortexFlow {
 	public:
 		const double step;
 		const double sigma;
+		const tVector periodCenter;
+		const tVector periodSize;
+		std::array<bool, Dim> isAxisPeriodic;
 		
 		sp0ce::BinTree<Dim> binTree;
 		// super
@@ -29,7 +32,18 @@ struct PointVortexFlow {
 		std::vector<std::vector<double>> superVortexStateArray;
 
 	public:
-		PointVortexFlow(const double p_step) : step(p_step), sigma(p_step), binTree(p_step) {
+		PointVortexFlow(
+			const double p_step, 
+			const tVector p_periodCenter,
+			const tVector p_periodSize,
+			const std::array<bool, Dim> p_isAxisPeriodic
+		) : step(p_step), sigma(p_step), binTree(p_step), periodCenter(p_periodCenter), periodSize(p_periodSize), isAxisPeriodic(p_isAxisPeriodic) {
+			
+		}
+
+		PointVortexFlow(
+			const double p_step
+		) : step(p_step), sigma(p_step), binTree(p_step), periodCenter(tVector::Zero()), periodSize(tVector::Zero()), isAxisPeriodic({false}) {
 			
 		}
 
@@ -113,7 +127,7 @@ struct PointVortexFlow {
 							const tView<const tVector> superX(&(superVortexStateArray[i][superIndex * VortexStateSize]));
 							const double superW = superVortexStateArray[i][superIndex * VortexStateSize + Dim];
 
-							const tVector r = x - superX;
+							const tVector r = sp0ce::abPeriodic<tVector, tView>(superX.data(), x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 							const double rNorm = r.norm();
 							if(rNorm > sigma) {
 								output += sp0ce::cross2d<tVector>(superW, r.data()) * std::pow(sigma/rNorm, 2); // 2D
@@ -147,7 +161,7 @@ struct PointVortexFlow {
 							skewSuperW << 0.0, superW,
 							              -superW,  0.0;
 							
-							const tVector r = x - superX;
+							const tVector r = sp0ce::abPeriodic<tVector, tView>(superX.data(), x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 							const double rNorm = r.norm();
 							if(rNorm > sigma) {
 								output += std::pow(sigma/rNorm, 4) * (sp0ce::cross2d<tVector>(superW, r.data()) * r.transpose()); // 2D

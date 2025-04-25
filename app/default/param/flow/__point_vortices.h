@@ -10,8 +10,9 @@ namespace c0p {
 
 struct Flow {
 
+	inline static const double step = 1.0/128.0; // basically the spatial resolution of the flow, should be the inverse of the density of points
+
 	using PointVortexFlow = pl0f::PointVortexFlow<DIM, tSpaceVector, tSpaceMatrix, tView>;
-	inline static const double step = 1.0; 
 	inline static PointVortexFlow flow = PointVortexFlow(step);
 
 	// using tVorticesEquation = _PassiveParticles; // name of the vortices

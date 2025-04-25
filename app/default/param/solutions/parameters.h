@@ -33,9 +33,12 @@ struct SolutionsParameters {
 		// FLAG: DECLARE STATIC EQUATION END
 	>;
 
+	struct VoidFlowEquation {};
+	using FlowEquation = VoidFlowEquation;
+
 	struct PrepareStatic {
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
-			Flow::prepare<tEquationStatic, _PassiveParticles>(pState, stateSize, t); // FIXME: enough to solve circular dependency but not satisfactory
+			Flow::prepare<tEquationStatic, FlowEquation>(pState, stateSize, t); // FIXME: enough to solve circular dependency but not satisfactory
 		}
 	};
 	

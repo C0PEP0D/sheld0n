@@ -22,7 +22,9 @@ def parse():
         'surf_tgv',
         'rl_tgv',
         'nn_tgv',
-        'passive_jhtdb'
+        'jhtdb',
+        'point_vortices',
+        'point_vortices_periodic'
     ], help='match the new case to an example case')
     return parser.parse_args()
 
@@ -67,8 +69,12 @@ def main():
             set_case_rl_tgv()
         case 'nn_tgv':
             set_case_nn_tgv()
-        case 'passive_jhtdb':
-            set_case_passive_jhtdb()
+        case 'jhtdb':
+            set_case_jhtdb()
+        case 'point_vortices':
+            set_case_point_vortices()
+        case 'point_vortices_periodic':
+            set_case_point_vortices_periodic()
         case _:
             print('WARNING: Example case "' + args.case + '" not recognised. Using default one.')
             set_case_default()
@@ -134,8 +140,28 @@ def set_case_nn_tgv():
     # print
     print('WARNING: This case is designed for the evaluation of a neural network learn using the rl_tgv case.\n         To do so, copy the files in "param/learn/neural_network/data" from the rl_tgv case to this one after the reinforcement learning process ended.\n         Make sure the environment parameters from the rl_tgv case are the same (in particular the agent\'s swimming velocity) as this one before running the evaluation.')
 
-def set_case_passive_jhtdb():
+def set_case_jhtdb():
     set_flow_jhtdb()
+    # post processing
+    ## input
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    code_dir = script_dir + "/.."
+    # remove symbolic link
+    os.unlink("learn")
+    # shutil.rmtree("param/learn")
+
+def set_case_point_vortices():
+    set_flow_point_vortices()
+    # post processing
+    ## input
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    code_dir = script_dir + "/.."
+    # remove symbolic link
+    os.unlink("learn")
+    # shutil.rmtree("param/learn")
+
+def set_case_point_vortices_periodic():
+    set_flow_point_vortices_periodic()
     # post processing
     ## input
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -163,6 +189,52 @@ def set_flow_jhtdb():
     os.system('./set-parameter param/run Dt 0.002')
     os.system('./set-parameter param/run NTime "int(10.056/Dt)"')
     os.system('./set-parameter param/run NSave NTime')
+
+def set_flow_point_vortices():
+    os.chdir('param/flow')
+    os.system('./choose point_vortices')
+    os.chdir('../..')
+    # solutions
+    os.chdir('param/solutions')
+    os.system('./create_new_equation point_vortices')
+    os.chdir('point_vortices')
+    os.system('./choose ' + 'point_vortices')
+    os.chdir('..')
+    os.chdir('../..')
+    # parameters
+    ## solutions
+    os.system('./set-parameter param/solutions FlowEquation _PointVortices')
+    ## param
+    os.system('./set-parameter param cLength 1.0')
+    os.system('./set-parameter param cTime 1.0')
+    os.system('./set-parameter param cDomainSize "{1.0, 1.0}"')
+    ## run
+    os.system('./set-parameter param/run Dt 1.0/128.0')
+    os.system('./set-parameter param/run NTime "int(16.0/Dt)"')
+    os.system('./set-parameter param/run NSave "NTime/16"')
+
+def set_flow_point_vortices_periodic():
+    os.chdir('param/flow')
+    os.system('./choose point_vortices_periodic')
+    os.chdir('../..')
+    # solutions
+    os.chdir('param/solutions')
+    os.system('./create_new_equation point_vortices_periodic')
+    os.chdir('point_vortices_periodic')
+    os.system('./choose ' + 'point_vortices_periodic')
+    os.chdir('..')
+    os.chdir('../..')
+    # parameters
+    ## solutions
+    os.system('./set-parameter param/solutions FlowEquation _PointVorticesPeriodic')
+    ## param
+    os.system('./set-parameter param cLength 1.0')
+    os.system('./set-parameter param cTime 1.0')
+    os.system('./set-parameter param cDomainSize "{1.0, 1.0}"')
+    ## run
+    os.system('./set-parameter param/run Dt 1.0/128.0')
+    os.system('./set-parameter param/run NTime "int(16.0/Dt)"')
+    os.system('./set-parameter param/run NSave "NTime/16"')
 
 # solutions
 

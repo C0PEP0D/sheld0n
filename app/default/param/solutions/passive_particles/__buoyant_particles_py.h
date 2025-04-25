@@ -35,8 +35,10 @@ struct _PassiveParticlesParameters {
 	struct tSubEquation : public d0t::Equation<tSubVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
-			const tView<const tSpaceVector> x(pState);
-			Flow::prepareVelocity(x.data(), t);
+			// ---------------- CUSTOM PREPARATION START
+			const tView<const tSpaceVector> cX(pState);
+			Flow::prepareVelocity(cX.data(), t);
+			// ---------------- CUSTOM PREPARATION END
 		}
 		
 		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
@@ -75,8 +77,8 @@ struct _PassiveParticlesParameters {
 	using tEquation = d0t::EquationGroupStatic<tVariable, tSubEquation>;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
-	static constexpr std::array<double, DIM> BoxCenter = {0.0, 0.0}; // defined for 2D simulation, use {0.0, 0.0, 0.0} for 3D
-	static constexpr std::array<double, DIM> BoxSize = {2.0 * M_PI, 2.0 * M_PI}; // defined for 2D simulation, use {2.0 * M_PI, 2.0 * M_PI,  2.0 * M_PI} for 3D
+	inline static const tSpaceVector BoxCenter = EnvParameters::cDomainCenter;
+	inline static const tSpaceVector BoxSize = EnvParameters::cDomainSize;
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {

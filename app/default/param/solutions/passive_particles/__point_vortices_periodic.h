@@ -22,7 +22,12 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
+	// vorticity
 	static constexpr double InitVorticityMax = 64.0;
+	// periodicity
+	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
+	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
+	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// definition of the member data
@@ -31,8 +36,12 @@ struct _PassiveParticlesParameters {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
 			// ---------------- CUSTOM PREPARATION START
+			// prepare velocity just in case
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
+			// // clamp x into periodic domain
+			// tView<tSpaceVector> x(pState);
+			// x = sp0ce::xPeriodic<tSpaceVector>(x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
