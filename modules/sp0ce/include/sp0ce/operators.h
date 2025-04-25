@@ -47,12 +47,12 @@ double norm2(const double* pA) {
 }
 
 template<typename tVector>
-tVector xToPeriodic(const double* pX, const double* pCenter, const double* pSize) {
+tVector xPeriodic(const double* pX, const double* pCenter, const double* pSize) {
 	const unsigned int Dim = tVector::RowsAtCompileTime;
 	// compute periodic x
 	tVector x;
 	for(std::size_t i = 0; i < Dim; ++i) {
-		x[i] = std::fmod(pX[i] - pCenter[i] - 0.5 * size[i], pSize[i]);
+		x[i] = std::fmod(pX[i] - pCenter[i] - 0.5 * pSize[i], pSize[i]);
 		if (x[i] < 0.0) {
 			x[i] += pSize[i];
 		}
@@ -63,8 +63,8 @@ tVector xToPeriodic(const double* pX, const double* pCenter, const double* pSize
 
 template<typename tVector, template<typename ...> typename tView>
 tVector abPeriodic(const double* pA, const double* pB, const double* pCenter, const double* pSize) {
-	const tVector a = xToPeriodic(pA, pCenter, pSize);
-	const tVector b = xToPeriodic(pB, pCenter, pSize);
+	const tVector a = xPeriodic<tVector>(pA, pCenter, pSize);
+	const tVector b = xPeriodic<tVector>(pB, pCenter, pSize);
 	const tVector ab = b - a;
 	//  minimum image distance
 	const unsigned int Dim = tVector::RowsAtCompileTime;
