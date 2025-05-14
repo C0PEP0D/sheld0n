@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# # gui
+# from cli2gui import Cli2Gui # TODO: add support to nargs='+' into cli2gui
+# command line program
 import argparse
 import numpy as np
 import shlex
@@ -8,14 +11,6 @@ import glob
 import fileinput
 import re
 import os
-
-def parse():
-    parser = argparse.ArgumentParser(description='Copies an equation into several others by varying their parameters.')
-    parser.add_argument('sources', nargs='+', help='specify the name of the source equations')
-    parser.add_argument('-p', '--prop', help='specify the property', required=True)
-    parser.add_argument('-v', '--values', type=float, nargs='+', help='specify the values', required=True)
-    parser.add_argument('-f', '--factor', help='specify a factor', default=None)
-    return parser.parse_args()
 
 def get_property_from_dir_name(name, prop):
     all_properties = name.split("__")
@@ -66,10 +61,10 @@ def set_parameter(dest, prop, value, factor):
         file_replace(dest + "/parameters.h", r"{prop} = [^\;]*;".format(prop=prop), "{prop} = {value};".format(prop=prop, value=str(value)))
         file_replace(dest + "/parameters.py", r"{prop} = .*$".format(prop=prop), "{prop} = {value}".format(prop=prop, value=str(value)))
 
-def compute(sources, prop, values, factor):
+def run(args):
     finteger = 0
     fprecision = 0
-    for value in values:
+    for value in args.values:
         str_value = str(value)
         str_value_array = str_value.split(".")
         if len(str_value_array) == 2:
@@ -78,21 +73,26 @@ def compute(sources, prop, values, factor):
             if len(str_value_array[1]) > fprecision:
                 fprecision = len(str_value_array[1])
     fwidth = finteger + fprecision + 1
-    for source in sources:
-        for value in values:
-            dest = set_property_from_dir_name(source, prop, value, fwidth, fprecision)
+    for source in args.sources:
+        for value in args.values:
+            dest = set_property_from_dir_name(source, args.prop, value, fwidth, fprecision)
             # execute command
             cmd = "./copy_equation {source} {dest}".format(source=source, dest=dest)
             print("INFO: running " + cmd)
             subprocess.call(shlex.split(cmd))
             # set parameter
-            set_parameter(dest, prop, value, factor)
+            set_parameter(dest, args.prop, value, args.factor)
 
-def main(source, prop, values, factor):
-    compute(source, prop, values, factor)
+# @Cli2Gui(run_function=run)
+def main():
+    parser = argparse.ArgumentParser(description='Copies an equation into several others by varying their parameters.')
+    parser.add_argument('sources', nargs='+', choices=[equation for equation in os.listdir(".") if os.path.isdir(equation)], help='specify the name of the source equations')
+    parser.add_argument('-p', '--prop', help='specify the property', required=True)
+    parser.add_argument('-v', '--values', type=float, nargs='+', help='specify the values', required=True)
+    parser.add_argument('-f', '--factor', help='specify a factor', default=None)
+    args = parser.parse_args()
+    # run
+    run(args)
 
 if __name__ == '__main__':
-    # parse arguments
-    args = parse()
-    # call
-    main(args.sources, args.prop, args.values, args.factor)
+    main()

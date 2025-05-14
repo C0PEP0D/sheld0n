@@ -56,15 +56,21 @@ def main(input_equation_list, input_color_list, input_step):
         if time_index % input_step == 0:
             artists.append([])
             for equation_index, equation_name in enumerate(equation_name_list):
-                arts = art_ax.plot(pos_0_over_time[equation_name][0:time_index+1:input_step], pos_1_over_time[equation_name][0:time_index+1:input_step], color=color_list[equation_index % len(color_list)], alpha=0.5)
-                artists[-1] += arts
+                # arts = art_ax.plot(pos_0_over_time[equation_name][0:time_index+1:input_step], pos_1_over_time[equation_name][0:time_index+1:input_step], color=color_list[equation_index % len(color_list)], alpha=0.5)
+                # artists[-1] += arts
+                art = art_ax.scatter(pos_0_over_time[equation_name][0:time_index+1:input_step], pos_1_over_time[equation_name][0:time_index+1:input_step], s=2, color=color_list[equation_index % len(color_list)], alpha=0.25)
+                artists[-1].append(art)
                 art = art_ax.scatter(pos_0_over_time[equation_name][time_index], pos_1_over_time[equation_name][time_index], s=12, color=color_list[equation_index % len(color_list)])
                 artists[-1].append(art)
     # legend
+    min_0 = min([pos_0_over_time[equation_name].min() for equation in equation_name_list])
+    max_0 = max([pos_0_over_time[equation_name].max() for equation in equation_name_list])
+    min_1 = min([pos_1_over_time[equation_name].min() for equation in equation_name_list])
+    max_1 = max([pos_1_over_time[equation_name].max() for equation in equation_name_list])
     for equation_index, equation_name in enumerate(equation_name_list):
         art_ax.text(
-            pos_0_over_time[equation_name].max(), 
-            pos_1_over_time[equation_name].max(),
+            max_0,
+            max_1 - equation_index * (max_1 - min_1) / (len(equation_name_list) - 1),
             equation_name, 
             fontsize=8,
             #color=color_list[equation_index % len(color_list)],

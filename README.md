@@ -49,6 +49,7 @@ The following must be installed:
 	* **gcc** `v14`, `sudo apt install gcc-14`
 	* **clang** `v18`, `sudo apt install clang-18`
 * **ffmpeg**, `sudo apt install ffmpeg`, used to generate animations
+* **cli2gui**, `python -m pip install cli2gui`, used for the graphical interface
 
 ### Installing
 

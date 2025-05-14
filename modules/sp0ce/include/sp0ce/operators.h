@@ -53,11 +53,11 @@ tVector xPeriodic(const double* pX, const double* pCenter, const double* pSize, 
 	tVector x;
 	for(std::size_t i = 0; i < Dim; ++i) {
 		if(pIsAxisPeriodic[i]) {
-			x[i] = std::fmod(pX[i] - pCenter[i] - 0.5 * pSize[i], pSize[i]);
+			x[i] = std::fmod(pX[i] - pCenter[i] + 0.5 * pSize[i], pSize[i]);
 			if (x[i] < 0.0) {
 				x[i] += pSize[i];
 			}
-			x[i] += pCenter[i] + 0.5 * pSize[i];
+			x[i] += pCenter[i] - 0.5 * pSize[i];
 		} else {
 			x[i] = pX[i];
 		}

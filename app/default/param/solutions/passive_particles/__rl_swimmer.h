@@ -32,8 +32,15 @@ struct _PassiveParticlesParameters {
 	static constexpr unsigned int ActionDim = DIM; // swimming direction
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
-	// definition of the member data
-	using tVariable = d0t::VariableVector<tVector, tView, StateSize>;
+	struct tVariable : public d0t::VariableVector<tVector, tView, StateSize> {
+	
+		static void constrain(double* pState) {
+			// ---------------- CUSTOM CONSTRAIN START
+			// ---------------- CUSTOM CONSTRAIN END
+		}
+
+	};
+
 	struct tEquation : public d0t::Equation<tVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {

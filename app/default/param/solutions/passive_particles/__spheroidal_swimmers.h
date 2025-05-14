@@ -27,8 +27,16 @@ struct _PassiveParticlesParameters {
 	static constexpr float SwimmingVelocity = 0.5;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
+	struct tSubVariable : public d0t::VariableVector<tVector, tView, StateSize> {
+		
+		static void constrain(double* pState) {
+			// ---------------- CUSTOM CONSTRAIN START
+			// ---------------- CUSTOM CONSTRAIN END
+		}
+
+	};
+
 	// definition of the member data
-	using tSubVariable = d0t::VariableComposed<d0t::VariableVector<tVector, tView, StateSize>>;
 	struct tSubEquation : public d0t::Equation<tSubVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
@@ -63,7 +71,7 @@ struct _PassiveParticlesParameters {
 		}
 	};
 	// creating tVariable and tEquation
-	using tVariable = d0t::VariableGroupStatic<tSubVariable, Number>;
+	using tVariable = d0t::VariableGroupStatic<d0t::VariableComposed<tSubVariable>, Number>;
 	using tEquation = d0t::EquationGroupStatic<tVariable, tSubEquation>;
 
 	// ---------------- CUSTOM INIT PARAMETERS START

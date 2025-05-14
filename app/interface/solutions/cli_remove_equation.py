@@ -1,25 +1,22 @@
 #!/usr/bin/env python3
 
-# Command line program
+# gui
+from cli2gui import Cli2Gui
+# command line program
 import argparse
-# Directory operations
+# directory operations
 import shutil
 import os
-# Replace operations
+# replace operations
 import fnmatch
 import fileinput
-# Custom Libraries
+# custom Libraries
 import sys
 script_dir = os.path.dirname(os.path.realpath(__file__))
 lib_directory = script_dir[:script_dir.find("interface") + len("interface")]
 sys.path.append(lib_directory)
 import libchoose
-
-def parse():
-    parser = argparse.ArgumentParser(description='remove equations')
-    parser.add_argument('equations', nargs='+', help='specify the names of the equations to remove')
-    return parser.parse_args()
-
+    
 def edit(name):
     upper_camel_name = libchoose.object_to_upper_camel_case([name])
     # solutions
@@ -38,15 +35,29 @@ def edit(name):
                 has_removed_first = False
             print(line, end='')
 
-def main(name):
+def run_aux(name):
     # edit
     edit(name)
     # remove dir
     shutil.rmtree(name)
     # shutil.rmtree("../../../init/solutions/" + name)
 
+def run(args):
+    if "--cli2gui" in sys.argv:
+        run_aux(os.path.normpath(args.equations))
+    else:
+        for equation in args.equations:
+            run_aux(os.path.normpath(equation))
+
+@Cli2Gui(run_function=run)
+def main():
+    parser = argparse.ArgumentParser(description='remove equations')
+    parser.add_argument('equations', nargs='+', choices=[equation for equation in os.listdir(".") if os.path.isdir(equation)], help='select the equations to remove')
+    args = parser.parse_args()
+    # run
+    run(args)
+    
+
 if __name__ == '__main__':
-    # main
-    args = parse()
-    for obj in args.equations:
-        main(os.path.normpath(obj))
+    main()
+    

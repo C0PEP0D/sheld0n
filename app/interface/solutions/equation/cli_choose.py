@@ -14,6 +14,3 @@ if __name__ == '__main__':
     exec(lib_code)
     # choose
     choose_file(choices_dir, choices_exceptions)
-    # edit
-    name = os.path.basename(os.getcwd())
-    edit_file(name, ["passive_particles"], [name])
