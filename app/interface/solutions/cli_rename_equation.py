@@ -10,12 +10,13 @@ import subprocess
 import glob
 import fileinput
 import re
+import os
 
 def compute(source, name):
-    cmd = "./copy_equation {source} {name}".format(source=source, name=name)
+    cmd = "./cli_copy_equation {source} {name}".format(source=source, name=name)
     print("INFO: running " + cmd)
     subprocess.call(shlex.split(cmd))
-    cmd = "./remove_equation {source}".format(source=source)
+    cmd = "./cli_remove_equation {source}".format(source=source)
     print("INFO: running " + cmd)
     subprocess.call(shlex.split(cmd))
 
@@ -25,7 +26,7 @@ def run(args):
 @Cli2Gui(run_function=run)
 def main():
     parser = argparse.ArgumentParser(description='rename an equation')
-    parser.add_argument('source', help='specify the name of the equation')
+    parser.add_argument('source', choices=[equation for equation in os.listdir(".") if os.path.isdir(equation)], help='specify the name of the equation')
     parser.add_argument('name', help='specify the new name of the equation')
     args = parser.parse_args()
     # run

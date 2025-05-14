@@ -204,7 +204,7 @@ def set_flow_point_vortices():
     os.chdir('../..')
     # solutions
     os.chdir('param/solutions')
-    os.system('./create_new_equation point_vortices')
+    os.system('./cli_create_new_equation point_vortices')
     os.chdir('point_vortices')
     os.system('./cli_choose ' + 'point_vortices')
     os.chdir('..')
@@ -227,7 +227,7 @@ def set_flow_point_vortices_periodic():
     os.chdir('../..')
     # solutions
     os.chdir('param/solutions')
-    os.system('./create_new_equation point_vortices_periodic')
+    os.system('./cli_create_new_equation point_vortices_periodic')
     os.chdir('point_vortices_periodic')
     os.system('./cli_choose ' + 'point_vortices_periodic')
     os.chdir('..')
@@ -248,43 +248,43 @@ def set_flow_point_vortices_periodic():
 
 def set_solutions_surfers(c_time, c_length):
     os.chdir('param/solutions')
-    os.system('./create_new_equation surfers')
+    os.system('./cli_create_new_equation surfers')
     os.chdir('surfers')
     os.system('./cli_choose ' + 'surfers')
     os.chdir('..')
     # time horizon
-    os.system('./batch_copy_equation surfers -p TimeHorizon -f EnvParameters::cTime -v ' + " ".join([str(v) for v in np.arange(0.0, 1.0 + 0.125, 0.125)]))
-    os.system('./remove_equation surfers')
+    os.system('./cli_batch_copy_equation surfers -p TimeHorizon -f EnvParameters::cTime -v ' + " ".join([str(v) for v in np.arange(0.0, 1.0 + 0.125, 0.125)]))
+    os.system('./cli_remove_equation surfers')
     # swimming velocity
     surfers = " ".join(glob.glob("surfers__*"))
     c_velocity = c_length / c_time
-    os.system('./batch_copy_equation ' + surfers + ' -p SwimmingVelocity -f EnvParameters::cVelocity -v ' + ' '.join([str(v) for v in [0.25, 0.5, 1.0, 2.0, 4.0]]))
-    os.system('./remove_equation ' + surfers)
+    os.system('./cli_batch_copy_equation ' + surfers + ' -p SwimmingVelocity -f EnvParameters::cVelocity -v ' + ' '.join([str(v) for v in [0.25, 0.5, 1.0, 2.0, 4.0]]))
+    os.system('./cli_remove_equation ' + surfers)
     os.chdir('../..')
 
 def set_solutions_rl_swimmer():
     os.chdir('param/solutions')
-    os.system('./create_new_equation rl_swimmer')
+    os.system('./cli_create_new_equation rl_swimmer')
     os.chdir('rl_swimmer')
     os.system('./cli_choose ' + 'rl_swimmer')
-    os.system('./remove_equation passive_particles')
+    os.system('./cli_remove_equation passive_particles')
     os.chdir('..')
     os.chdir('../..')
 
 def set_solutions_nn_swimmers():
     os.chdir('param/solutions')
     # nn swimmers
-    os.system('./create_new_equation nn_swimmers')
+    os.system('./cli_create_new_equation nn_swimmers')
     os.chdir('nn_swimmers')
     os.system('./cli_choose ' + 'nn_swimmers')
     os.chdir('..')
     # naive swimmers
-    os.system('./create_new_equation naive_swimmers')
+    os.system('./cli_create_new_equation naive_swimmers')
     os.chdir('naive_swimmers')
     os.system('./cli_choose ' + 'buoyant_particles')
     os.chdir('..')
     # surfers
-    os.system('./create_new_equation surfers')
+    os.system('./cli_create_new_equation surfers')
     os.chdir('surfers')
     os.system('./cli_choose ' + 'surfers')
     os.chdir('..')
