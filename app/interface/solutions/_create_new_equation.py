@@ -19,6 +19,8 @@ sys.path.append(lib_directory)
 import libchoose
 
 def run(args):
+    is_gui = "--cli2gui" in sys.argv
+    # compute
     name_check = re.compile(r'[][@!#$%^&*()<>?/\|}{~:+.\'"]')
     if(name_check.search(args.name) == None):
         # copy
@@ -26,14 +28,19 @@ def run(args):
         param_dir = ".."
         code_dir = script_dir + "/../../.."
         shutil.copytree(code_dir + "/app/default/param/solutions/passive_particles", args.name, ignore=shutil.ignore_patterns('__*'))
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/cli_choose.py", args.name), args.name + "/cli_choose")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name), args.name + "/gui_choose")
+        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/_choose.py", args.name), args.name + "/._choose")
+        if is_gui:
+            os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/_choose.py", args.name), args.name + "/.cli_choose")
+            os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name), args.name + "/gui_choose")
+        else:
+            os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/_choose.py", args.name), args.name + "/cli_choose")
+            os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name), args.name + "/.gui_choose")
         # edit
         libchoose.edit_choice(args.name, ["passive_particles"], [args.name])
         libchoose.edit_add_equation(args.name)
         # choose parameters
         os.chdir(args.name)
-        os.system('./cli_choose ' + args.parameters)
+        os.system('./._choose ' + args.parameters)
         os.chdir('..')
     else:
         print("ERROR: name shouldn't contain special characters")

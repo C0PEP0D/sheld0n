@@ -2,7 +2,7 @@
 import os
 
 def main():
-    os.system("./cli_remove_equation --cli2gui")
+    os.system("./._remove_equation --cli2gui")
 
 if __name__ == '__main__':
     main()

@@ -2,7 +2,7 @@
 import os
 
 def main():
-    os.system("./cli_set_parameter --cli2gui")
+    os.system("./._set_parameter --cli2gui")
 
 if __name__ == '__main__':
     main()

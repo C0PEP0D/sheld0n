@@ -2,7 +2,7 @@
 import os
 
 def main():
-    os.system("./cli_post --cli2gui")
+    os.system("./._post --cli2gui")
 
 if __name__ == '__main__':
     main()

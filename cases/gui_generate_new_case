@@ -2,7 +2,7 @@
 import os
 
 def main():
-    os.system("./cli_generate_new_case --cli2gui")
+    os.system("./.cli_generate_new_case --cli2gui")
 
 if __name__ == '__main__':
     main()
