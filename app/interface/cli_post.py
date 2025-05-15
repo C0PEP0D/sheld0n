@@ -1,23 +1,15 @@
 #!/usr/bin/env python3
 
-# Command line program
+# gui
+from cli2gui import Cli2Gui
+# command line program
 import argparse
-# Directory operations
+# directory operations
 import os
-# File edit
+# file edit
 import subprocess
 
-
-def parse():
-    parser = argparse.ArgumentParser(description='Run the simulation')
-    parser.add_argument('-d', '--debug', action='store_true', help='activates debug')
-    parser.add_argument('-c', '--compiler', default='', help='specify the compiler used')
-    parser.add_argument('-m', '--cmake-cmd', default='cmake', help='specify the cmake command')
-    parser.add_argument('-j', '--jobs', type=int, default=1, help='specify the number a compiling jobs')
-    return parser.parse_args()
-
-def main():
-    args = parse()
+def run(args):
     # create build dir
     if not os.path.exists('build'):
         os.makedirs('build')
@@ -33,6 +25,17 @@ def main():
     subprocess.run("{cmake_cmd} --build . -j {jobs} --target post".format(cmake_cmd=args.cmake_cmd, jobs=args.jobs), cwd="build", shell=True)
     # run
     subprocess.run("./build/post", shell=True)
+
+@Cli2Gui(run_function=run)
+def main():
+    parser = argparse.ArgumentParser(description='Run the simulation')
+    parser.add_argument('-d', '--debug', action='store_true', help='activates debug')
+    parser.add_argument('-c', '--compiler', default='', help='specify the compiler used')
+    parser.add_argument('-m', '--cmake-cmd', default='cmake', help='specify the cmake command')
+    parser.add_argument('-j', '--jobs', type=int, default=1, help='specify the number a compiling jobs')
+    args = parser.parse_args()
+    # run
+    run(args)
 
 if __name__ == '__main__':
     main()
