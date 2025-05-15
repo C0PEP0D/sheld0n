@@ -36,7 +36,7 @@ class Post {
 					// // solutions
 					Env::solutions.post(std::stod(t));
 					// // msg
-					std::cout << "INFO : Processed " << t << "/" << time.back() << std::endl;
+					std::cout << "INFO : Post Processed " << t << "/" << time.back() << std::endl;
 				}
 				// // // mesh
 				// if(tParameters::IsPostProcessingMesh) {

@@ -27,23 +27,37 @@ class Run {
 			// init saving system
 			init();
 			// run case
+			const tScalar tEnd = tParameters::NTime * tParameters::Dt;
 			for(std::size_t index = startIndex; index < tParameters::NTime; index++) {
-				const tScalar t = index * tParameters::Dt;
 				// step
-				step(t);
-				// save
+				Env::solutions.step(tParameters::Dt);
+				// post process
 				if(index % (tParameters::NTime / tParameters::NSave) == 0) {
-					std::cout << "INFO : Saving step " << index << "/" << tParameters::NTime << "." << std::endl;
-					save(t);
+					// save
+					const tScalar t = index * tParameters::Dt;
+					std::cout << "INFO : Saving and Post Processing step " << t << "/" << tEnd << "." << std::endl;
+					saveAndPostProcess(t);
 				}
 			}
 			if (startIndex < tParameters::NTime) {
-				std::cout << "INFO : Saving step " << tParameters::NTime << "/" << tParameters::NTime << "." << std::endl;
-				save(tParameters::NTime * tParameters::Dt);
+				// save
+				std::cout << "INFO : Saving last step " << tEnd << "/" << tEnd << "." << std::endl;
+				saveAndPostProcess(tEnd);
+				// post process
+				std::cout << "INFO : Post Processing step " << tEnd << "/" << tEnd << std::endl;
+				Env::solutions.post(tEnd);
 			}
 		}
 
 		void init() {
+			// post processing
+			if(not std::filesystem::exists("post_process")) {
+				std::filesystem::create_directory("post_process");
+				std::filesystem::create_directory("post_process/time");
+			} else if(not std::filesystem::exists("post_process/time")) {
+				std::filesystem::create_directory("post_process/time");
+			}
+			// saved data
 			if(std::filesystem::exists("time")) {
 				std::vector<double> time;
 				for (const auto & entry : std::filesystem::directory_iterator("time")) {
@@ -61,7 +75,7 @@ class Run {
 					// Init
 					startIndex = 1;
 					Env::init();
-					save(0.0);
+					saveAndPostProcess(0.0);
 				}
 			} else {
 				// Init
@@ -69,25 +83,23 @@ class Run {
 				Env::init();
 				// Create time directory
 				std::filesystem::create_directory("time");
-				save(0.0);
+				saveAndPostProcess(0.0);
 			}
-			// Neural Network
+			// neural network
 			NeuralNetwork::init();
 		}
 
-		void step(const tScalar& t) {
-			Env::solutions.step(tParameters::Dt);
-		}
+		// void step(const tScalar& t) {
+		// 	Env::solutions.step(tParameters::Dt);
+		// }
 		
-		void save(const tScalar& t) {
-			// Build directory name
+		void saveAndPostProcess(const tScalar& t) {
+			// directory
 			std::ostringstream oss;
 			oss << "time/" << std::fixed << std::setprecision(7) << std::setw(10) << std::setfill('0') << t;
 			std::string folder = oss.str();
-			// Create directory
 			std::filesystem::create_directory(folder);
-			// Save
-			// // Static
+			// save
 			if (tParameters::IsMergingStatic) {
 				if(not Env::solutions.solutionsStatic.state.empty()) {
 					s0ve::saveDouble(folder + "/static.txt", Env::solutions.solutionsStatic.state.data(), Env::solutions.solutionsStatic.state.size());
@@ -97,6 +109,11 @@ class Run {
 			}
 			SolutionsParameters::saveDynamic(folder);
 			SolutionsParameters::saveGroups(folder);
+			// post directory
+			std::string postFolder = "post_process/" + folder;
+			std::filesystem::create_directory(postFolder);
+			// post
+			Env::solutions.post(t);
 		}
 
 		template<unsigned int Index = 0>
@@ -112,7 +129,9 @@ class Run {
 		
 		void load(const tScalar& t) {
 			// Get directory
-			std::string folder = "time/" + std::to_string(t);
+			std::ostringstream oss;
+			oss << "time/" << std::fixed << std::setprecision(7) << std::setw(10) << std::setfill('0') << t;
+			std::string folder = oss.str();
 			// Load
 			// // Static
 			if (tParameters::IsMergingStatic) {
