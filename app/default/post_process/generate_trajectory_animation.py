@@ -16,10 +16,14 @@ def parse():
     parser = argparse.ArgumentParser(description='Plots 2D trajectories of all solutions over time, assuming pos_0 as x and pos_1 as y.')
     parser.add_argument('--equation-list', '-e', nargs='*', default=[], help='equations for which to plot trajectories')
     parser.add_argument('--color-list', '-c', nargs='*', default=[], help='color for each equation')
+    parser.add_argument('--begin', '-b', type=int, default=0, help='begin step')
+    parser.add_argument('--end', '-d', type=int, default=-1, help='end step')
     parser.add_argument('--step', '-s', type=int, default=1, help='animation frame step')
+    parser.add_argument('--xlim', '-x', type=float, nargs=2, default=[], help='axis x lim')
+    parser.add_argument('--ylim', '-y', type=float, nargs=2, default=[], help='axis y lim')
     return parser.parse_args()
 
-def main(input_equation_list, input_color_list, input_step):
+def main(input_equation_list, input_color_list, input_step, input_begin, input_end, input_xlim, input_ylim):
     # equations
     if input_equation_list:
         equation_name_list = input_equation_list
@@ -35,6 +39,7 @@ def main(input_equation_list, input_color_list, input_step):
     # process
     print("INFO: Reading time...", flush=True)
     time_dir_array, time_array = libpost.get_time()
+    time_dir_array, time_array = time_dir_array[input_begin:input_end:input_step], time_array[input_begin:input_end:input_step]
     print("INFO: Reading equation property over time...", flush=True)
     pos_0_over_time = {}
     pos_1_over_time = {}
@@ -46,22 +51,35 @@ def main(input_equation_list, input_color_list, input_step):
     print("INFO: Animating...", flush=True)
     art_fig, art_ax = plt.subplots()
     art_ax.set_aspect('equal', 'box')
-    art_ax.grid(False)
-    art_ax.axis('off')
+    # art_ax.grid(False)
+    # art_ax.axis('off')
     art_ax.set_facecolor("black")
     art_fig.set_facecolor("black")
+    art_ax.spines["bottom"].set_color("white")
+    art_ax.spines["top"].set_color("white")
+    art_ax.spines["left"].set_color("white")
+    art_ax.spines["right"].set_color("white")
+    art_ax.xaxis.label.set_color('white')
+    art_ax.yaxis.label.set_color('white')
+    art_ax.tick_params(axis='x', colors='white')
+    art_ax.tick_params(axis='y', colors='white')
+    art_ax.grid(which='major', color='gray')
+    art_ax.grid(which='minor', color='gray')
+    if input_xlim:
+        art_ax.set_xlim(input_xlim[0], input_xlim[1])
+    if input_ylim:
+        art_ax.set_ylim(input_ylim[0], input_ylim[1])
     trajectories = {}
     artists = []
     for time_index, time in enumerate(time_array):
-        if time_index % input_step == 0:
-            artists.append([])
-            for equation_index, equation_name in enumerate(equation_name_list):
-                # arts = art_ax.plot(pos_0_over_time[equation_name][0:time_index+1:input_step], pos_1_over_time[equation_name][0:time_index+1:input_step], color=color_list[equation_index % len(color_list)], alpha=0.5)
-                # artists[-1] += arts
-                art = art_ax.scatter(pos_0_over_time[equation_name][0:time_index+1:input_step], pos_1_over_time[equation_name][0:time_index+1:input_step], s=2, color=color_list[equation_index % len(color_list)], alpha=0.25)
-                artists[-1].append(art)
-                art = art_ax.scatter(pos_0_over_time[equation_name][time_index], pos_1_over_time[equation_name][time_index], s=12, color=color_list[equation_index % len(color_list)])
-                artists[-1].append(art)
+        artists.append([])
+        for equation_index, equation_name in enumerate(equation_name_list):
+            # arts = art_ax.plot(pos_0_over_time[equation_name][0:time_index+1], pos_1_over_time[equation_name][0:time_index+1], color=color_list[equation_index % len(color_list)], alpha=0.5)
+            # artists[-1] += arts
+            art = art_ax.scatter(pos_0_over_time[equation_name][0:time_index+1], pos_1_over_time[equation_name][0:time_index+1], s=2, color=color_list[equation_index % len(color_list)], alpha=0.25)
+            artists[-1].append(art)
+            art = art_ax.scatter(pos_0_over_time[equation_name][time_index], pos_1_over_time[equation_name][time_index], s=12, color=color_list[equation_index % len(color_list)])
+            artists[-1].append(art)
     # legend
     min_0 = min([pos_0_over_time[equation_name].min() for equation in equation_name_list])
     max_0 = max([pos_0_over_time[equation_name].max() for equation in equation_name_list])
@@ -82,4 +100,4 @@ def main(input_equation_list, input_color_list, input_step):
 
 if __name__ == '__main__':
     args = parse()
-    main(args.equation_list, args.color_list, args.step)
+    main(args.equation_list, args.color_list, args.step, args.begin, args.end, args.xlim, args.ylim)

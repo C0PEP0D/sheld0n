@@ -10,7 +10,7 @@ namespace c0p {
 
 struct Flow {
 
-	inline static const double step = 1.0/128.0; // basically the spatial resolution of the flow, should be the inverse of the density of points
+	inline static const double step = std::pow(2, -10); // basically the spatial resolution of the flow, should be the inverse of the density of points
 
 	using PointVortexFlow = pl0f::PointVortexFlow<DIM, tSpaceVector, tSpaceMatrix, tView>;
 	inline static PointVortexFlow flow = PointVortexFlow(step);
@@ -33,17 +33,8 @@ struct Flow {
 
 	// prepare
 
-	template<typename tEquationStatic, typename tEquationFlow>
-	static void prepare(const double* pState, const unsigned int stateSize, const double t) {
-		// get state
-		const tView<const tStateVectorDynamic> state(
-			tEquationStatic::tVariable::template cState<typename tEquationFlow::tVariable>(
-				pState
-			),
-			tEquationFlow::tVariable::Size
-		);
-		// prepare flow
-		flow.prepare(state.data(), tEquationFlow::tVariable::GroupSize);
+	static void prepare(const double* pState, const unsigned int vortexNumber) { // called by point vortices
+		flow.prepare(pState, vortexNumber);
 	}
 	
 	static void prepareVelocity(const double* pX, const double t) {

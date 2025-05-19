@@ -16,13 +16,14 @@
 namespace c0p {
 
 struct _PassiveParticlesParameters {
+	inline static unsigned int StateIndex = 0; // USED INTERNALLY, DO NOT EDIT
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
 	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	static constexpr double InitVorticityMax = 64.0;
+	static constexpr double InitVorticityMax = 1.0/Number;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tSubVariable : public d0t::VariableVector<tVector, tView, StateSize> {
@@ -63,7 +64,16 @@ struct _PassiveParticlesParameters {
 	};
 	// creating tVariable and tEquation
 	using tVariable = d0t::VariableGroupStatic<d0t::VariableComposed<tSubVariable>, Number>;
-	using tEquation = d0t::EquationGroupStatic<tVariable, tSubEquation>;
+	struct tEquation : public d0t::EquationGroupStatic<tVariable, tSubEquation> {
+
+		using tBase = d0t::EquationGroupStatic<tVariable, tSubEquation>;
+	
+		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+			tBase::prepare(pState, stateSize, t);
+			// prepare flow
+			Flow::prepare(pState, stateSize/StateSize);
+		}
+	};
 
 	// ---------------- CUSTOM INIT PARAMETERS START
 	inline static const tSpaceVector BoxCenter = EnvParameters::cDomainCenter;

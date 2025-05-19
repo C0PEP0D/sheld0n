@@ -87,34 +87,13 @@ class Post {
 		}
 
 		void load(const std::string& t) {
-			// Get directory
+			// directory
 			std::string folder = "time/" + t;
-   			// Load
-   			// Static
-   			if (tParameters::IsStaticMerged) {
-   				if(not Env::solutions.solutionsStatic.state.empty()) {
-   					l0ad::ascii::loadDouble(folder + "/static.txt", Env::solutions.solutionsStatic.state.data(), Env::solutions.solutionsStatic.state.size());
-   				}
-   			} else {
-   				_loadStatic(Env::solutions.solutionsStatic, folder);
-   			}
-   			_loadStatic(Env::solutions.solutionsStatic, folder);
-   			SolutionsParameters::loadDynamic(folder);
-			SolutionsParameters::loadGroups(folder);
-			// Set time
+   			// load
+			Solutions::load(folder);
+			// set time
 			Env::solutions.solutionsStatic.t = std::stod(t);
 		}
-
-		template<unsigned int Index = 0>
-    	static void _loadStatic(Solutions<SolutionsParameters>::tSolutionStatic& solutionsStatic, const std::string& folder) {
-    		using tStaticEquation = typename Solutions<SolutionsParameters>::tSolutionStatic::tEquation;
-    		using tStaticVariable = typename Solutions<SolutionsParameters>::tSolutionStatic::tEquation::tVariable;
-    		if constexpr(Index < tStaticEquation::Number) {
-        		l0ad::ascii::loadDouble(folder + "/" + tStaticEquation::template tEquationComponent<Index>::type::tParameters::name + ".txt", tStaticVariable::template state<Index>(solutionsStatic.state.data()), tStaticVariable::template tVariableComponent<Index>::type::Size);
-        		// recursion
-        		_loadStatic<Index+1>(solutionsStatic, folder);
-        	}
-        }
 };
 
 }

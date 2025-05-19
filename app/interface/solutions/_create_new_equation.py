@@ -37,7 +37,7 @@ def run(args):
             os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name), args.name + "/.gui_choose")
         # edit
         libchoose.edit_choice(args.name, ["passive_particles"], [args.name])
-        libchoose.edit_add_equation(args.name)
+        libchoose.edit_add_equation_static(args.name)
         # choose parameters
         os.chdir(args.name)
         os.system('./._choose ' + args.parameters)

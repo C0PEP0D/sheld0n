@@ -41,11 +41,8 @@ class Run {
 			}
 			if (startIndex < tParameters::NTime) {
 				// save
-				std::cout << "INFO : Saving last step " << tEnd << "/" << tEnd << "." << std::endl;
+				std::cout << "INFO : Saving and Post Processing last step " << tEnd << "/" << tEnd << "." << std::endl;
 				saveAndPostProcess(tEnd);
-				// post process
-				std::cout << "INFO : Post Processing step " << tEnd << "/" << tEnd << std::endl;
-				Env::solutions.post(tEnd);
 			}
 		}
 
@@ -88,10 +85,6 @@ class Run {
 			// neural network
 			NeuralNetwork::init();
 		}
-
-		// void step(const tScalar& t) {
-		// 	Env::solutions.step(tParameters::Dt);
-		// }
 		
 		void saveAndPostProcess(const tScalar& t) {
 			// directory
@@ -100,63 +93,24 @@ class Run {
 			std::string folder = oss.str();
 			std::filesystem::create_directory(folder);
 			// save
-			if (tParameters::IsMergingStatic) {
-				if(not Env::solutions.solutionsStatic.state.empty()) {
-					s0ve::saveDouble(folder + "/static.txt", Env::solutions.solutionsStatic.state.data(), Env::solutions.solutionsStatic.state.size());
-				}
-			} else {
-				_saveStatic(Env::solutions.solutionsStatic, folder);
-			}
-			SolutionsParameters::saveDynamic(folder);
-			SolutionsParameters::saveGroups(folder);
+			Env::solutions.save(folder);
 			// post directory
 			std::string postFolder = "post_process/" + folder;
 			std::filesystem::create_directory(postFolder);
 			// post
-			Env::solutions.post(t);
+			Env::solutions.post(postFolder, t);
 		}
-
-		template<unsigned int Index = 0>
-    	static void _saveStatic(const Solutions<SolutionsParameters>::tSolutionStatic& solutionsStatic, const std::string& folder) {
-    		using tStaticEquation = typename Solutions<SolutionsParameters>::tSolutionStatic::tEquation;
-    		using tStaticVariable = typename Solutions<SolutionsParameters>::tSolutionStatic::tEquation::tVariable;
-    		if constexpr(Index < tStaticEquation::Number) {
-        		s0ve::saveDouble(folder + "/" + tStaticEquation::template tEquationComponent<Index>::type::tParameters::name + ".txt", tStaticVariable::template cState<Index>(solutionsStatic.state.data()), tStaticVariable::template tVariableComponent<Index>::type::Size);
-        		// recursion
-        		_saveStatic<Index+1>(solutionsStatic, folder);
-        	}
-        }
 		
 		void load(const tScalar& t) {
-			// Get directory
+			// directory
 			std::ostringstream oss;
 			oss << "time/" << std::fixed << std::setprecision(7) << std::setw(10) << std::setfill('0') << t;
 			std::string folder = oss.str();
-			// Load
-			// // Static
-			if (tParameters::IsMergingStatic) {
-				if(not Env::solutions.solutionsStatic.state.empty()) {
-					l0ad::ascii::loadDouble(folder + "/static.txt", Env::solutions.solutionsStatic.state.data(), Env::solutions.solutionsStatic.state.size());
-				}
-			} else {
-				_loadStatic(Env::solutions.solutionsStatic, folder);
-			}
-			SolutionsParameters::loadDynamic(folder);
-			SolutionsParameters::loadGroups(folder);
+			// load
+			Env::solutions.load(folder);
 			// set time
-			Env::solutions.solutionsStatic.t = t;
+			Env::solutions.t = t;
 		}
-
-		template<unsigned int Index = 0>
-    	static void _loadStatic(Solutions<SolutionsParameters>::tSolutionStatic& solutionsStatic, const std::string& folder) {
-    		using tStaticEquation = typename Solutions<SolutionsParameters>::tSolutionStatic::tEquation;
-    		using tStaticVariable = typename Solutions<SolutionsParameters>::tSolutionStatic::tEquation::tVariable;
-    		if constexpr(Index < tStaticEquation::Number) {
-        		l0ad::ascii::loadDouble(folder + "/" + tStaticEquation::template tEquationComponent<Index>::type::tParameters::name + ".txt", tStaticVariable::template state<Index>(solutionsStatic.state.data()), tStaticVariable::template tVariableComponent<Index>::type::Size);
-        		// recursion
-        		_loadStatic<Index+1>(solutionsStatic, folder);
-        	}
-        }
 };
 
 }

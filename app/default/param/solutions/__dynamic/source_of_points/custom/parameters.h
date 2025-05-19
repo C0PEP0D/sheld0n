@@ -17,6 +17,8 @@
 namespace c0p {
 
 struct _SourceOfPointsCustomParameters {
+	// index
+	static constexpr unsigned int StateIndex = 1; // USED INTERNALLY, DO NOT EDIT MANUALLY UNLESS YOU KNOW WHAT YOU ARE DOING
 	// name
 	inline static const std::string name = "source_of_points";
 	static constexpr double Lifetime = 1.0;

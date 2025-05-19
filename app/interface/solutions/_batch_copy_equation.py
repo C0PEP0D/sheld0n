@@ -77,7 +77,7 @@ def run(args):
         for value in args.values:
             dest = set_property_from_dir_name(source, args.prop, value, fwidth, fprecision)
             # execute command
-            cmd = "./cli_copy_equation {source} {dest}".format(source=source, dest=dest)
+            cmd = "./._copy_equation {source} {dest}".format(source=source, dest=dest)
             print("INFO: running " + cmd)
             subprocess.call(shlex.split(cmd))
             # set parameter

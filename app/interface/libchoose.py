@@ -136,6 +136,16 @@ def object_to_upper_snake_case(obj):
             o = o[1:]
         s += o.upper() + "_"
     return s[:-1]
+
+# def object_to_camel_case(obj):
+#     s = obj[0]
+#     for o in obj[1:]:
+#         if o.startswith("__"):
+#             o = o[2:]
+#         elif o.startswith("_"):
+#             o = o[1:]
+#         s += o.title().replace("_", "")
+#     return s
  
 def object_to_upper_camel_case(obj):
     s = ""
@@ -185,18 +195,30 @@ def find_replace(folder, file_pattern, text, replacement, condition = lambda lin
                 else:
                     print(line, end='')
 
-def edit_add_equation(name):
+def edit_add_equation_static(name):
     upper_camel_name = object_to_upper_camel_case([name])
     ## add equation to param/solutions/parameters.h
     previous_line = ''
     for line in fileinput.FileInput("parameters.h", inplace=True):
         if line == '// FLAG: INCLUDE EQUATION END\n':
             print('#include "param/solutions/{}/parameters.h"\n'.format(name), end='')
-        if line == '\t\t// FLAG: DECLARE STATIC EQUATION END\n':
-            if previous_line == '\t\t// FLAG: DECLARE STATIC EQUATION BEGIN\n':
-                 print('\t\t_{Name}\n'.format(Name=upper_camel_name), end='')
-            else:
-                print('\t\t,_{Name}\n'.format(Name=upper_camel_name), end='')
+        elif line == '\t\t// FLAG: STATE INDEX STATIC EQUATION END\n':
+            print('\t\t_{Name}::tParameters::StateIndex = stateIndex;\n'.format(Name=upper_camel_name), end='')
+            print('\t\tstateIndex += _{Name}::tVariable::Size;\n'.format(Name=upper_camel_name), end='')
+        elif line == '\t\t// FLAG: INIT STATIC EQUATION END\n':
+            print('\t\t_{Name}::tParameters::init(pStateArray[0] + _{Name}::tParameters::StateIndex);\n'.format(Name=upper_camel_name), end='')
+        elif line == '\t\t// FLAG: PREPARE STATIC EQUATION END\n':
+            print('\t\t_{Name}::prepare(pStateArray[0] + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size, t);\n'.format(Name=upper_camel_name), end='')
+        elif line == '\t\t// FLAG: STATE TEMPORAL DERIVATIVE STATIC EQUATION END\n':
+            print('\t\ttView<tStateVectorDynamic>(output[0].data() + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size) = _{Name}::stateTemporalDerivative(pStateArray[0] + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size, t);\n'.format(Name=upper_camel_name), end='')
+        elif line == '\t\t// FLAG: CONSTRAIN STATIC EQUATION END\n':
+            print('\t\t_{Name}::tVariable::constrain(stateArray[0].data() + _{Name}::tParameters::StateIndex);\n'.format(Name=upper_camel_name), end='')
+        elif line == '\t\t// FLAG: SAVE STATIC EQUATION END\n':
+            print('\t\ts0ve::saveDouble(folder + "/" + _{Name}::tParameters::name + ".txt", pStateArray[0] + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size);\n'.format(Name=upper_camel_name), end='')
+        elif line == '\t\t// FLAG: LOAD STATIC EQUATION END\n':
+            print('\t\tl0ad::ascii::loadDouble(folder + "/" + _{Name}::tParameters::name + ".txt", stateArray[0].data() + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size);\n'.format(Name=upper_camel_name), end='')
+        elif line == '\t\t// FLAG: POST STATIC EQUATION END\n':
+            print('\t\ts0ve::saveMapToCsvDouble(folder + "/" + _{Name}::tParameters::name + ".csv", _{Name}::tParameters::post(pStateArray[0] + _{Name}::tParameters::StateIndex, t), ",", "#");\n'.format(Name=upper_camel_name), end='')
         previous_line = line
         print(line, end='')
 

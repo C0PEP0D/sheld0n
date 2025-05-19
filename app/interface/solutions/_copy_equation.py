@@ -25,7 +25,7 @@ def run(args):
         shutil.copytree(args.source, args.name, symlinks=True)
         # edit
         libchoose.edit_choice(args.name, [args.source], [args.name])
-        libchoose.edit_add_equation(args.name)
+        libchoose.edit_add_equation_static(args.name)
     else:
         print("ERROR: name shouldn't contain special characters")
 

@@ -28,11 +28,6 @@ namespace c0p {
 			std::cout << "INFO : Init case end" << std::endl;
 		}
 
-		static void post(const double t) {
-			std::cout << "INFO : Post case start" << std::endl;
-			solutions.post(t);
-			std::cout << "INFO : Post case end" << std::endl;
-		}
 	};
 
 }

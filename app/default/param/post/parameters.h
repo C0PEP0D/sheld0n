@@ -14,9 +14,6 @@ struct PostParameters {
 	// Iteration step. 0 means this step computed automatically
 	// based on Number.
 	static const unsigned int IndexStep = 0;
-	
-	// Specify if all static objects are merge in one unique file.
-	static const bool IsStaticMerged = false;
 };
 
 }

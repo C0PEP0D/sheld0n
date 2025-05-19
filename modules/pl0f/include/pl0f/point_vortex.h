@@ -43,15 +43,15 @@ struct PointVortexFlow {
 
 		PointVortexFlow(
 			const double p_step
-		) : step(p_step), sigma(p_step), binTree(p_step), periodCenter(tVector::Zero()), periodSize(tVector::Zero()), isAxisPeriodic({false}) {
+		) : step(p_step), sigma(p_step), binTree(p_step), periodCenter(tVector::Zero()), periodSize(tVector::Zero()), isAxisPeriodic({false, false}) {
 			
 		}
 
 	public:
-		void prepare(const double* pState, const unsigned int n) {
+		void prepare(const double* pState, const unsigned int number) {
 			// binTree
 			binTree.clear();
-			for(unsigned int index = 0; index < n; ++index) {
+			for(unsigned int index = 0; index < number; ++index) {
 				const tVector x = sp0ce::xPeriodic<tVector>(pState + index * VortexStateSize, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 				const double& w = pState[index * VortexStateSize + Dim];
 				binTree.addIndex(index, x.data());
@@ -118,7 +118,16 @@ struct PointVortexFlow {
 			const tVector x = sp0ce::xPeriodic<tVector>(pX, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 			for(int i = binTree.data.size() - 1; i > -1; --i) {
 				const std::array<int, Dim> ijk = binTree.data[i].positionToIjk(x.data());
-				const std::vector<std::array<int, Dim>> siblingIjkArray = binTree.data[i].ijkToSiblingIjk(ijk.data());
+				// get siblingIjkArray (get all if at root)
+				std::vector<std::array<int, Dim>> siblingIjkArray;
+				if(i == binTree.data.size() - 1) {
+					for (auto [key, value] : binTree.data[i].ijkToIndexes) {
+					    siblingIjkArray.push_back(key);
+					}
+				} else {
+					siblingIjkArray = binTree.data[i].ijkToSiblingIjk(ijk.data());
+				}
+				// compute
 				for(auto const& siblingIjk : siblingIjkArray) {
 					if(siblingIjk != ijk) {
 						auto iterator = ijkToSuperIndex[i].find(siblingIjk);
@@ -130,9 +139,9 @@ struct PointVortexFlow {
 							const tVector r = sp0ce::abPeriodic<tVector, tView>(superX.data(), x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 							const double rNorm = r.norm();
 							if(rNorm > sigma) {
-								output += sp0ce::cross2d<tVector>(superW, r.data()) * std::pow(sigma/rNorm, 2); // 2D
+								output += sp0ce::cross2d<tVector>(superW, r.data()) * std::pow(1.0/rNorm, 2); // 2D
 							} else {
-								output += sp0ce::cross2d<tVector>(superW, r.data());
+								output += sp0ce::cross2d<tVector>(superW, r.data()) * std::pow(1.0/sigma, 2);
 							}
 						}
 					}
@@ -148,7 +157,16 @@ struct PointVortexFlow {
 			const tVector x = sp0ce::xPeriodic<tVector>(pX, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 			for(int i = binTree.data.size() - 1; i > -1; --i) {
 				const std::array<int, Dim> ijk = binTree.data[i].positionToIjk(x.data());
-				const std::vector<std::array<int, Dim>> siblingIjkArray = binTree.data[i].ijkToSiblingIjk(ijk.data());
+				// get siblingIjkArray (get all if at root)
+				std::vector<std::array<int, Dim>> siblingIjkArray;
+				if(i == binTree.data.size() - 1) {
+					for (auto [key, value] : binTree.data[i].ijkToIndexes) {
+					    siblingIjkArray.push_back(key);
+					}
+				} else {
+					siblingIjkArray = binTree.data[i].ijkToSiblingIjk(ijk.data());
+				}
+				// compute
 				for(auto const& siblingIjk : siblingIjkArray) {
 					if(siblingIjk != ijk) {
 						auto iterator = ijkToSuperIndex[i].find(siblingIjk);
@@ -164,9 +182,9 @@ struct PointVortexFlow {
 							const tVector r = sp0ce::abPeriodic<tVector, tView>(superX.data(), x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 							const double rNorm = r.norm();
 							if(rNorm > sigma) {
-								output += std::pow(sigma/rNorm, 4) * (sp0ce::cross2d<tVector>(superW, r.data()) * r.transpose()); // 2D
+								output += std::pow(1.0/rNorm, 4) * (sp0ce::cross2d<tVector>(superW, r.data()) * r.transpose()); // 2D
 							} else {
-								output += sp0ce::cross2d<tVector>(superW, r.data()) * r.transpose();
+								output += sp0ce::cross2d<tVector>(superW, r.data()) * r.transpose() * std::pow(1.0/sigma, 2);
 							}
 						}
 					}

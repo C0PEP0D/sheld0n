@@ -21,6 +21,7 @@ namespace rlt = rl_tools;
 namespace c0p {
 
 struct _PassiveParticlesParameters {
+	inline static unsigned int StateIndex = 0; // USED INTERNALLY, DO NOT EDIT
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START

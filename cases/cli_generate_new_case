@@ -62,14 +62,15 @@ def run(args):
         os.symlink(os.path.relpath(code_dir + "/app/interface/_learn.py", args.name), args.name + "/.cli_learn")
         ### env
         #### flow
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_choose.py", args.name + "/param/flow"), args.name + "/param/flow/.cli_choose")
+        os.symlink(os.path.relpath(code_dir + "/app/interface/flow/_choose.py", args.name + "/param/flow"), args.name + "/param/flow/.cli_choose")
         #### solutions
         os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_copy_equation")
         os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_remove_equation")
+        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_batch_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_batch_copy_equation")
         os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_create_new_equation")
         os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_rename_equation")
         #### equation
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/.cli_choose")
+        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/.cli_choose")
         ###################### gui
         ### basic
         os.symlink(os.path.relpath(code_dir + "/app/interface/gui_run.py", args.name), args.name + "/gui_run")
@@ -95,14 +96,15 @@ def run(args):
         os.symlink(os.path.relpath(code_dir + "/app/interface/_learn.py", args.name), args.name + "/cli_learn")
         ### env
         #### flow
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_choose.py", args.name + "/param/flow"), args.name + "/param/flow/cli_choose")
+        os.symlink(os.path.relpath(code_dir + "/app/interface/flow/_choose.py", args.name + "/param/flow"), args.name + "/param/flow/cli_choose")
         #### solutions
         os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/cli_copy_equation")
         os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/cli_remove_equation")
+        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_batch_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/cli_batch_copy_equation")
         os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/cli_create_new_equation")
         os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/cli_rename_equation")
         #### equation
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/cli_choose")
+        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/cli_choose")
         ###################### gui
         ### basic
         os.symlink(os.path.relpath(code_dir + "/app/interface/gui_run.py", args.name), args.name + "/.gui_run")
@@ -136,6 +138,8 @@ def run(args):
             set_case_point_vortices()
         case 'point_vortices_periodic':
             set_case_point_vortices_periodic()
+        case 'vortex_dipole':
+            set_case_vortex_dipole()
         case _:
             print('WARNING: Example case "' + args.case + '" not recognised. Using default one.')
             set_case_default()
@@ -153,7 +157,8 @@ def main():
         'nn_tgv',
         'jhtdb',
         'point_vortices',
-        'point_vortices_periodic'
+        'point_vortices_periodic',
+        'vortex_dipole'
     ], help='match the new case to an example case')
     args = parser.parse_args()
     # run
@@ -163,8 +168,6 @@ def set_case_default():
     # input
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/.."
-    # post processing
-    shutil.copy(code_dir + "/app/post/plot_average_vertical_velocity_over_time.py", "post_process/plot_average_vertical_velocity_over_time.py")
     # remove symbolic link
     if is_gui:
         os.unlink(".cli_learn")
@@ -286,6 +289,21 @@ def set_case_point_vortices_periodic():
         os.unlink(".gui_learn")
     # shutil.rmtree("param/learn")
 
+def set_case_vortex_dipole():
+    set_flow_vortex_dipole()
+    # post processing
+    ## input
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    code_dir = script_dir + "/.."
+    # remove symbolic link
+    if is_gui:
+        os.unlink(".cli_learn")
+        os.unlink("gui_learn")
+    else:
+        os.unlink("cli_learn")
+        os.unlink(".gui_learn")
+    # shutil.rmtree("param/learn")
+
 # flow
 
 def set_flow_tgv():
@@ -318,8 +336,6 @@ def set_flow_point_vortices():
     os.chdir('..')
     os.chdir('../..')
     # parameters
-    ## solutions
-    os.system('./._set_parameter param/solutions FlowEquation _PointVortices')
     ## param
     os.system('./._set_parameter param cLength 1.0')
     os.system('./._set_parameter param cTime 1.0')
@@ -341,8 +357,27 @@ def set_flow_point_vortices_periodic():
     os.chdir('..')
     os.chdir('../..')
     # parameters
-    ## solutions
-    os.system('./._set_parameter param/solutions FlowEquation _PointVorticesPeriodic')
+    ## param
+    os.system('./._set_parameter param cLength 1.0')
+    os.system('./._set_parameter param cTime 1.0')
+    os.system('./._set_parameter param cDomainSize "{1.0, 1.0}"')
+    ## run
+    os.system('./._set_parameter param/run Dt 1.0/128.0')
+    os.system('./._set_parameter param/run NTime "int(16.0/Dt)"')
+    os.system('./._set_parameter param/run NSave "NTime/16"')
+
+def set_flow_vortex_dipole():
+    os.chdir('param/flow')
+    os.system('./._choose point_vortices')
+    os.chdir('../..')
+    # solutions
+    os.chdir('param/solutions')
+    os.system('./._create_new_equation point_vortices')
+    os.chdir('point_vortices')
+    os.system('./._choose ' + 'vortex_dipole')
+    os.chdir('..')
+    os.chdir('../..')
+    # parameters
     ## param
     os.system('./._set_parameter param cLength 1.0')
     os.system('./._set_parameter param cTime 1.0')

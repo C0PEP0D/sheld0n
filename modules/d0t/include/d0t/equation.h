@@ -159,12 +159,6 @@ class EquationGroupStatic : public Equation<_tVariableGroup> {
 
 // solution
 
-// struct PrepareNothing {
-// 	static void prepare(const double* pState, const unsigned int stateSize, const double t) {
-// 	
-// 	}
-// };
-
 template<typename _tSolver, typename _tEquation, typename _tPrepare>
 class SolutionDynamic {
 	public:

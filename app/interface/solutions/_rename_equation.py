@@ -13,10 +13,10 @@ import re
 import os
 
 def compute(source, name):
-    cmd = "./_copy_equation {source} {name}".format(source=source, name=name)
+    cmd = "./._copy_equation {source} {name}".format(source=source, name=name)
     print("INFO: running " + cmd)
     subprocess.call(shlex.split(cmd))
-    cmd = "./_remove_equation {source}".format(source=source)
+    cmd = "./._remove_equation {source}".format(source=source)
     print("INFO: running " + cmd)
     subprocess.call(shlex.split(cmd))
 
