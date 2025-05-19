@@ -34,7 +34,7 @@ def main(input_equation_list, input_color_list, input_step, input_begin, input_e
     if input_color_list:
         color_list = input_color_list
     else:
-        cmap = plt.get_cmap("plasma", len(equation_name_list))
+        cmap = plt.get_cmap("rainbow", len(equation_name_list))
         color_list = [cmap(index) for index in range(len(equation_name_list))]
     # process
     print("INFO: Reading time...", flush=True)
