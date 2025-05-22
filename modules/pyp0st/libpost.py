@@ -42,6 +42,8 @@ def get_equation_property_over_time(equation_name, prop, time_dir_array):
         if info.size > 0:
             property_array = property_array["value"]
             property_array_over_time.append(property_array)
+        else:
+            property_array_over_time.append(np.array([]))
     return property_array_over_time
 
 def get_equation(time_dir, equation_name):

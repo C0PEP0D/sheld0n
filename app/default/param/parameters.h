@@ -26,7 +26,7 @@ struct EnvParameters {
 	constexpr static const double cVelocity = cLength / cTime;
 	// characteristic domain (mainly used to define bounds for random initialization)
 	inline static const tSpaceVector cDomainCenter = tSpaceVector::Zero();
-	inline static const tSpaceVector cDomainSize = {2 * M_PI, 2.0 * M_PI};
+	inline static const tSpaceVector cDomainSize = {2 * M_PI, 2 * M_PI};
 	inline static const std::array<bool, DIM> cDomainIsAxisPeriodic = {true, true};
 	// seed used for random generation
 	constexpr static const unsigned int randomSeed = 0;

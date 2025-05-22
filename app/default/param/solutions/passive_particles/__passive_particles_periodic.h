@@ -20,16 +20,21 @@ struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
-	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
+	static const unsigned StateSize = DIM; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	static constexpr double MaxCirculation = 1.0/Number;
+	// periodicity
+	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
+	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
+	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tSubVariable : public d0t::VariableVector<tVector, tView, StateSize> {
-		
+	
 		static void constrain(double* pState) {
 			// ---------------- CUSTOM CONSTRAIN START
+			tView<tSpaceVector> x(pState);
+			x = sp0ce::xPeriodic<tSpaceVector>(x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
@@ -52,7 +57,6 @@ struct _PassiveParticlesParameters {
 			const tView<const tSpaceVector> x(pState);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
-			const double w = pState[DIM];
 			// output
 			tView<tSpaceVector> dX(dState.data());
 			dX = u;
@@ -64,16 +68,7 @@ struct _PassiveParticlesParameters {
 	};
 	// creating tVariable and tEquation
 	using tVariable = d0t::VariableGroupStatic<d0t::VariableComposed<tSubVariable>, Number>;
-	struct tEquation : public d0t::EquationGroupStatic<tVariable, tSubEquation> {
-
-		using tBase = d0t::EquationGroupStatic<tVariable, tSubEquation>;
-	
-		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
-			tBase::prepare(pState, stateSize, t);
-			// prepare flow
-			Flow::prepare(pState, stateSize/StateSize);
-		}
-	};
+	using tEquation = d0t::EquationGroupStatic<tVariable, tSubEquation>;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
 	inline static const tSpaceVector BoxCenter = EnvParameters::cDomainCenter;
@@ -91,10 +86,8 @@ struct _PassiveParticlesParameters {
 			double* pSubState = tVariable::state(pState, subIndex);
 			// interpret subState as a tSpaceVector
 			tView<tSpaceVector> x(pSubState);
-			double& w = pSubState[DIM];
 			// set the initial position of this member
 			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
-			w = MaxCirculation * tVector<1>::Random()[0];
 		}
 		// ---------------- CUSTOM INIT END
 	}
@@ -106,28 +99,22 @@ struct _PassiveParticlesParameters {
 		std::map<std::string, double> output;
 		// ---------------- CUSTOM POST START
 		tSpaceVector xAverage = tSpaceVector::Zero();
-		double wAverage = 0.0;
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
 			const double* pSubState = tVariable::cState(pState, subIndex);
 			// input
 			const tView<const tSpaceVector> x(pSubState);
-			const double w = pSubState[DIM];
 			// generate formated index
 			std::ostringstream ossIndex;
 			ossIndex << "passive_particles__index_" << std::setw(FormatNumber) << std::setfill('0') << subIndex;
 			// output
 			output[ossIndex.str() + "__pos_0"] = x[0];
 			output[ossIndex.str() + "__pos_1"] = x[1];
-			output[ossIndex.str() + "__circulation"] = w;
 			// compute average
 			xAverage += x;
-			wAverage += w;
 		}
 		xAverage /= Number;
-		wAverage /= Number;
 		output["passive_particles__average_pos_0"] = xAverage[0];
 		output["passive_particles__average_pos_1"] = xAverage[1];
-		output["passive_particles__average_circulation"] = wAverage;
 		// ---------------- CUSTOM POST END
 		return output;
 	}

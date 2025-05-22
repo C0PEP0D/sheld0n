@@ -45,9 +45,8 @@ def main(input_equation_list, input_color_list, input_step, input_begin, input_e
     pos_1_over_time = {}
     vorticity_over_time = {}
     for equation_name in equation_name_list:
-        pos_0_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__pos_0", time_dir_array))
-        pos_1_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__pos_1", time_dir_array))
-        vorticity_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__vorticity", time_dir_array))
+        pos_0_over_time[equation_name] = libpost.get_equation_property_over_time(equation_name, ".*__pos_0", time_dir_array)
+        pos_1_over_time[equation_name] = libpost.get_equation_property_over_time(equation_name, ".*__pos_1", time_dir_array)
     print("INFO: Animating...", flush=True)
     art_fig, art_ax = plt.subplots()
     art_ax.set_aspect('equal', 'box')
@@ -76,15 +75,15 @@ def main(input_equation_list, input_color_list, input_step, input_begin, input_e
         for equation_index, equation_name in enumerate(equation_name_list):
             # arts = art_ax.plot(pos_0_over_time[equation_name][0:time_index+1], pos_1_over_time[equation_name][0:time_index+1], color=color_list[equation_index % len(color_list)], alpha=0.5)
             # artists[-1] += arts
-            art = art_ax.scatter(pos_0_over_time[equation_name][0:time_index+1], pos_1_over_time[equation_name][0:time_index+1], s=2, color=color_list[equation_index % len(color_list)], alpha=0.25)
+            art = art_ax.scatter(np.concatenate(pos_0_over_time[equation_name][max(0, time_index-16):time_index+1]), np.concatenate(pos_1_over_time[equation_name][max(0, time_index-16):time_index+1]), s=2, color=color_list[equation_index % len(color_list)], alpha=0.25)
             artists[-1].append(art)
             art = art_ax.scatter(pos_0_over_time[equation_name][time_index], pos_1_over_time[equation_name][time_index], s=12, color=color_list[equation_index % len(color_list)])
             artists[-1].append(art)
     # legend
-    min_0 = min([pos_0_over_time[equation_name].min() for equation in equation_name_list])
-    max_0 = max([pos_0_over_time[equation_name].max() for equation in equation_name_list])
-    min_1 = min([pos_1_over_time[equation_name].min() for equation in equation_name_list])
-    max_1 = max([pos_1_over_time[equation_name].max() for equation in equation_name_list])
+    min_0 = min([np.concatenate(pos_0_over_time[equation_name]).min() for equation in equation_name_list])
+    max_0 = max([np.concatenate(pos_0_over_time[equation_name]).max() for equation in equation_name_list])
+    min_1 = min([np.concatenate(pos_1_over_time[equation_name]).min() for equation in equation_name_list])
+    max_1 = max([np.concatenate(pos_1_over_time[equation_name]).max() for equation in equation_name_list])
     for equation_index, equation_name in enumerate(equation_name_list):
         art_ax.text(
             max_0,

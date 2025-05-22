@@ -140,6 +140,8 @@ def run(args):
             set_case_point_vortices_periodic()
         case 'vortex_dipole':
             set_case_vortex_dipole()
+        case 'point_vortex_jet':
+            set_case_point_vortex_jet()
         case _:
             print('WARNING: Example case "' + args.case + '" not recognised. Using default one.')
             set_case_default()
@@ -158,7 +160,8 @@ def main():
         'jhtdb',
         'point_vortices',
         'point_vortices_periodic',
-        'vortex_dipole'
+        'vortex_dipole',
+        'point_vortex_jet'
     ], help='match the new case to an example case')
     args = parser.parse_args()
     # run
@@ -276,6 +279,10 @@ def set_case_point_vortices():
 
 def set_case_point_vortices_periodic():
     set_flow_point_vortices_periodic()
+    # edit passive_particles
+    os.chdir('param/solutions/passive_particles')
+    os.system('./._choose passive_particles_periodic')
+    os.chdir('../../..')
     # post processing
     ## input
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -304,6 +311,25 @@ def set_case_vortex_dipole():
         os.unlink(".gui_learn")
     # shutil.rmtree("param/learn")
 
+def set_case_point_vortex_jet():
+    set_flow_point_vortex_jet()
+    # edit passive_particles
+    os.chdir('param/solutions/passive_particles')
+    os.system('./._choose source_of_passive_particles')
+    os.chdir('../../..')
+    # post processing
+    ## input
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    code_dir = script_dir + "/.."
+    # remove symbolic link
+    if is_gui:
+        os.unlink(".cli_learn")
+        os.unlink("gui_learn")
+    else:
+        os.unlink("cli_learn")
+        os.unlink(".gui_learn")
+    # shutil.rmtree("param/learn")
+
 # flow
 
 def set_flow_tgv():
@@ -312,14 +338,20 @@ def set_flow_tgv():
     os.chdir('../..')
     os.system('./._set_parameter param cLength M_PI')
     os.system('./._set_parameter param cTime M_PI')
+    os.system('./._set_parameter param cDomainSize "{2*M_PI, 2*M_PI}"')
+    os.system('./._set_parameter param cDomainIsAxisPeriodic "{true, true}"')
 
 def set_flow_jhtdb():
     os.chdir('param/flow')
     os.system('./._choose jhtdb_isotropic')
     os.chdir('../..')
+    ## param
     os.system('./._set_parameter param DIM 3')
     os.system('./._set_parameter param cLength 0.00280')
     os.system('./._set_parameter param cTime 0.0424')
+    os.system('./._set_parameter param cDomainSize "{1.0, 1.0, 1.0}"')
+    os.system('./._set_parameter param cDomainIsAxisPeriodic "{true, true, true}"')
+    ## run
     os.system('./._set_parameter param/run Dt 0.002')
     os.system('./._set_parameter param/run NTime "int(10.056/Dt)"')
     os.system('./._set_parameter param/run NSave NTime')
@@ -340,6 +372,7 @@ def set_flow_point_vortices():
     os.system('./._set_parameter param cLength 1.0')
     os.system('./._set_parameter param cTime 1.0')
     os.system('./._set_parameter param cDomainSize "{1.0, 1.0}"')
+    os.system('./._set_parameter param cDomainIsAxisPeriodic "{false, false}"')
     ## run
     os.system('./._set_parameter param/run Dt 1.0/128.0')
     os.system('./._set_parameter param/run NTime "int(16.0/Dt)"')
@@ -361,6 +394,7 @@ def set_flow_point_vortices_periodic():
     os.system('./._set_parameter param cLength 1.0')
     os.system('./._set_parameter param cTime 1.0')
     os.system('./._set_parameter param cDomainSize "{1.0, 1.0}"')
+    os.system('./._set_parameter param cDomainIsAxisPeriodic "{true, true}"')
     ## run
     os.system('./._set_parameter param/run Dt 1.0/128.0')
     os.system('./._set_parameter param/run NTime "int(16.0/Dt)"')
@@ -382,10 +416,30 @@ def set_flow_vortex_dipole():
     os.system('./._set_parameter param cLength 1.0')
     os.system('./._set_parameter param cTime 1.0')
     os.system('./._set_parameter param cDomainSize "{1.0, 1.0}"')
+    os.system('./._set_parameter param cDomainIsAxisPeriodic "{false, false}"')
     ## run
     os.system('./._set_parameter param/run Dt 1.0/128.0')
     os.system('./._set_parameter param/run NTime "int(16.0/Dt)"')
     os.system('./._set_parameter param/run NSave "NTime/16"')
+
+def set_flow_point_vortex_jet():
+    os.chdir('param/flow')
+    os.system('./._choose point_vortices')
+    os.chdir('../..')
+    # solutions
+    os.chdir('param/solutions')
+    os.system('./._create_new_equation point_vortices -p point_vortex_jet')
+    os.chdir('../..')
+    # parameters
+    ## param
+    os.system('./._set_parameter param cLength 1.0')
+    os.system('./._set_parameter param cTime 1.0')
+    os.system('./._set_parameter param cDomainSize "{2.0, 1.0}"')
+    os.system('./._set_parameter param cDomainIsAxisPeriodic "{false, false}"')
+    ## run
+    os.system('./._set_parameter param/run Dt 1.0/128.0')
+    os.system('./._set_parameter param/run NTime "int(8.0/Dt)"')
+    os.system('./._set_parameter param/run NSave NTime')
 
 # solutions
 

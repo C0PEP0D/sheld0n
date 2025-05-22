@@ -202,23 +202,69 @@ def edit_add_equation_static(name):
     for line in fileinput.FileInput("parameters.h", inplace=True):
         if line == '// FLAG: INCLUDE EQUATION END\n':
             print('#include "param/solutions/{}/parameters.h"\n'.format(name), end='')
+
         elif line == '\t\t// FLAG: STATE INDEX STATIC EQUATION END\n':
             print('\t\t_{Name}::tParameters::StateIndex = stateIndex;\n'.format(Name=upper_camel_name), end='')
             print('\t\tstateIndex += _{Name}::tVariable::Size;\n'.format(Name=upper_camel_name), end='')
+
         elif line == '\t\t// FLAG: INIT STATIC EQUATION END\n':
             print('\t\t_{Name}::tParameters::init(pStateArray[0] + _{Name}::tParameters::StateIndex);\n'.format(Name=upper_camel_name), end='')
+
         elif line == '\t\t// FLAG: PREPARE STATIC EQUATION END\n':
             print('\t\t_{Name}::prepare(pStateArray[0] + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size, t);\n'.format(Name=upper_camel_name), end='')
+
         elif line == '\t\t// FLAG: STATE TEMPORAL DERIVATIVE STATIC EQUATION END\n':
             print('\t\ttView<tStateVectorDynamic>(output[0].data() + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size) = _{Name}::stateTemporalDerivative(pStateArray[0] + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size, t);\n'.format(Name=upper_camel_name), end='')
+
         elif line == '\t\t// FLAG: CONSTRAIN STATIC EQUATION END\n':
             print('\t\t_{Name}::tVariable::constrain(stateArray[0].data() + _{Name}::tParameters::StateIndex);\n'.format(Name=upper_camel_name), end='')
+
         elif line == '\t\t// FLAG: SAVE STATIC EQUATION END\n':
             print('\t\ts0ve::saveDouble(folder + "/" + _{Name}::tParameters::name + ".txt", pStateArray[0] + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size);\n'.format(Name=upper_camel_name), end='')
+
         elif line == '\t\t// FLAG: LOAD STATIC EQUATION END\n':
             print('\t\tl0ad::ascii::loadDouble(folder + "/" + _{Name}::tParameters::name + ".txt", stateArray[0].data() + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size);\n'.format(Name=upper_camel_name), end='')
+
         elif line == '\t\t// FLAG: POST STATIC EQUATION END\n':
             print('\t\ts0ve::saveMapToCsvDouble(folder + "/" + _{Name}::tParameters::name + ".csv", _{Name}::tParameters::post(pStateArray[0] + _{Name}::tParameters::StateIndex, t), ",", "#");\n'.format(Name=upper_camel_name), end='')
+        previous_line = line
+        print(line, end='')
+
+def edit_add_equation_dynamic(name):
+    upper_camel_name = object_to_upper_camel_case([name])
+    ## add equation to param/solutions/parameters.h
+    previous_line = ''
+    for line in fileinput.FileInput("parameters.h", inplace=True):
+        if line == '// FLAG: INCLUDE EQUATION END\n':
+            print('#include "param/solutions/{}/parameters.h"\n'.format(name), end='')
+
+        elif line == '\t\t// FLAG: STATE INDEX DYNAMIC EQUATION END\n':
+            print('\t\t_{Name}::tParameters::StateIndex = stateIndex;\n'.format(Name=upper_camel_name), end='')
+            print('\t\tstateIndex = _{Name}::tParameters::StateIndex + 1;\n'.format(Name=upper_camel_name), end='')
+
+        elif line == '\t\t// FLAG: INIT DYNAMIC EQUATION END\n':
+            print('\t\tstateArray[_{Name}::tParameters::StateIndex].resize(_{Name}::tVariable::MinSize);\n'.format(Name=upper_camel_name), end='')
+            print('\t\t_{Name}::tParameters::init(stateArray[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
+
+        elif line == '\t\t// FLAG: PREPARE DYNAMIC EQUATION END\n':
+            print('\t\t_{Name}::prepare(pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex], t);\n'.format(Name=upper_camel_name), end='')
+        
+        elif line == '\t\t// FLAG: STATE TEMPORAL DERIVATIVE DYNAMIC EQUATION END\n':
+            print('\t\ttView<tStateVectorDynamic>(output[_{Name}::tParameters::StateIndex].data(), output[_{Name}::tParameters::StateIndex].size()) = _{Name}::stateTemporalDerivative(pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex], t);\n'.format(Name=upper_camel_name), end='')
+
+        elif line == '\t\t// FLAG: CONSTRAIN DYNAMIC EQUATION END\n':
+            print('\t\t_{Name}::tVariable::constrain(stateArray[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
+
+        elif line == '\t\t// FLAG: SAVE DYNAMIC EQUATION END\n':
+            print('\t\tif (pStateSize[_{Name}::tParameters::StateIndex] > 0) {{\n'.format(Name=upper_camel_name), end='')
+            print('\t\t\ts0ve::saveDouble(folder + "/" + _{Name}::tParameters::name + ".txt", pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
+            print('\t\t}} // _{Name}::Flag\n'.format(Name=upper_camel_name), end='')
+        elif line == '\t\t// FLAG: LOAD DYNAMIC EQUATION END\n':
+            print('\t\tif(std::filesystem::exists(folder + "/" + _{Name}::tParameters::name + ".txt")) {{\n'.format(Name=upper_camel_name), end='')
+            print('\t\t\tl0ad::ascii::loadVectorDouble(folder + "/" + _{Name}::tParameters::name + ".txt", stateArray[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
+            print('\t\t}} // _{Name}::Flag\n'.format(Name=upper_camel_name), end='')
+        elif line == '\t\t// FLAG: POST DYNAMIC EQUATION END\n':
+            print('\t\ts0ve::saveMapToCsvDouble(folder + "/" + _{Name}::tParameters::name + ".csv", _{Name}::tParameters::post(pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex], t), ",", "#");\n'.format(Name=upper_camel_name), end='')
         previous_line = line
         print(line, end='')
 
@@ -280,6 +326,36 @@ def apply_choice(args):
     name = os.path.basename(os.getcwd())
     if not name == "flow":
         edit_file(name, ["passive_particles"], [name])
+        # register
+        is_static = True
+        is_dynamic = False
+        with open("parameters.h", 'r') as file:
+            for line in file:
+                if line.startswith("// FLAG: DYNAMIC"):
+                    is_static = False
+                    is_dynamic = True
+                    break
+                elif line.startswith("namespace c0p {"):
+                    break
+        # move
+        os.chdir("..")
+        # remove
+        upper_camel_name = object_to_upper_camel_case([name])
+        for line in fileinput.FileInput("parameters.h", inplace=True):
+            if (line == '#include "param/solutions/{}/parameters.h"\n'.format(name)):
+                pass
+            elif ('_{Name}::'.format(Name=upper_camel_name) in line):
+                pass
+            else:
+                print(line, end='')
+        # add again
+        if is_static:
+            edit_add_equation_static(name)
+        elif is_dynamic:
+            edit_add_equation_dynamic(name)
+        # move back
+        os.chdir(name)
+    
 
 @Cli2Gui(run_function=apply_choice)
 def choose_file(choices_dir, choices_exceptions, edit=True):

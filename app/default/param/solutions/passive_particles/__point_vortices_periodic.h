@@ -23,8 +23,8 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	// vorticity
-	static constexpr double InitVorticityMax = 1.0/Number;
+	// circulation
+	static constexpr double MaxCirculation = 1.0/Number;
 	// periodicity
 	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
 	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
@@ -102,7 +102,7 @@ struct _PassiveParticlesParameters {
 			double& w = pSubState[DIM];
 			// set the initial position of this member
 			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
-			w = InitVorticityMax * tVector<1>::Random()[0];
+			w = MaxCirculation * tVector<1>::Random()[0];
 		}
 		// ---------------- CUSTOM INIT END
 	}
@@ -126,7 +126,7 @@ struct _PassiveParticlesParameters {
 			// output
 			output[ossIndex.str() + "__pos_0"] = x[0];
 			output[ossIndex.str() + "__pos_1"] = x[1];
-			output[ossIndex.str() + "__vorticity"] = w;
+			output[ossIndex.str() + "__circulation"] = w;
 			// compute average
 			xAverage += x;
 			wAverage += w;
@@ -135,7 +135,7 @@ struct _PassiveParticlesParameters {
 		wAverage /= Number;
 		output["passive_particles__average_pos_0"] = xAverage[0];
 		output["passive_particles__average_pos_1"] = xAverage[1];
-		output["passive_particles__average_vorticity"] = wAverage;
+		output["passive_particles__average_circulation"] = wAverage;
 		// ---------------- CUSTOM POST END
 		return output;
 	}

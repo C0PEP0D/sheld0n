@@ -28,7 +28,7 @@ struct SolutionsParameters {
 
 	// ---------------- INIT
 
-	static void init(std::vector<std::vector<double>>& stateArray) {
+	static void allocate(std::vector<std::vector<double>>& stateArray) {
 		// init static StateIndex
 		unsigned int stateIndex = 0;
 		// FLAG: STATE INDEX STATIC EQUATION BEGIN
@@ -39,11 +39,12 @@ struct SolutionsParameters {
 		stateArray[0].resize(stateIndex);
 		stateIndex = 1;
 		// FLAG: STATE INDEX DYNAMIC EQUATION BEGIN
-		// _SourceOfPoints::tParameters::StateIndex = stateIndex;
-		// stateIndex += 1;
 		// FLAG: STATE INDEX DYNAMIC EQUATION END
 		stateArray.resize(stateIndex);
+	}
 
+	static void init(std::vector<std::vector<double>>& stateArray) {
+		allocate(stateArray);
 		// get pointers
 		std::vector<double*> pStateArray(stateArray.size());
 		std::vector<unsigned int> stateSizeArray(stateArray.size());
@@ -51,12 +52,10 @@ struct SolutionsParameters {
 			pStateArray[index] = stateArray[index].data();
 			stateSizeArray[index] = stateArray[index].size();
 		}
-
 		// FLAG: INIT STATIC EQUATION BEGIN
 		_PassiveParticles::tParameters::init(pStateArray[0] + _PassiveParticles::tParameters::StateIndex);
 		// FLAG: INIT STATIC EQUATION END
 		// FLAG: INIT DYNAMIC EQUATION BEGIN
-		// _SourceOfPoints::tParameters::init(stateArray[_SourceOfPoints::tParameters::StateIndex]);
 		// FLAG: INIT DYNAMIC EQUATION END
 	}
 	
@@ -67,7 +66,6 @@ struct SolutionsParameters {
 		_PassiveParticles::prepare(pStateArray[0] + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size, t);
 		// FLAG: PREPARE STATIC EQUATION END
 		// FLAG: PREPARE DYNAMIC EQUATION BEGIN
-		// _SourceOfPoints::prepare(pStateArray[_SourceOfPoints::tParameters::StateIndex], pStateSize[_SourceOfPoints::tParameters::StateIndex], t);
 		// FLAG: PREPARE DYNAMIC EQUATION END
 	}
 
@@ -82,7 +80,6 @@ struct SolutionsParameters {
 		tView<tStateVectorDynamic>(output[0].data() + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size) = _PassiveParticles::stateTemporalDerivative(pStateArray[0] + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size, t);
 		// FLAG: STATE TEMPORAL DERIVATIVE STATIC EQUATION END
 		// FLAG: STATE TEMPORAL DERIVATIVE DYNAMIC EQUATION BEGIN
-		// output[_SourceOfPoints::tParameters::StateIndex] = _SourceOfPoints::stateTemporalDerivative(pStateArray[_SourceOfPoints::tParameters::StateIndex], pStateSize[_SourceOfPoints::tParameters::StateIndex], t);
 		// FLAG: STATE TEMPORAL DERIVATIVE DYNAMIC EQUATION END
 		return output;
 	}
@@ -94,7 +91,6 @@ struct SolutionsParameters {
 		_PassiveParticles::tVariable::constrain(stateArray[0].data() + _PassiveParticles::tParameters::StateIndex);
 		// FLAG: CONSTRAIN STATIC EQUATION END
 		// FLAG: CONSTRAIN DYNAMIC EQUATION BEGIN
-		// _SourceOfPoints::tVariable::constrain(stateArray[_SourceOfPoints::tParameters::StateIndex]);
 		// FLAG: CONSTRAIN DYNAMIC EQUATION END
 	}
 
@@ -105,20 +101,15 @@ struct SolutionsParameters {
 		s0ve::saveDouble(folder + "/" + _PassiveParticles::tParameters::name + ".txt", pStateArray[0] + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size);
 		// FLAG: SAVE STATIC EQUATION END
 		// FLAG: SAVE DYNAMIC EQUATION BEGIN
-		// if (not pStateSize[_SourceOfPoints::tParameters::StateIndex] > 0) {
-		//     s0ve::saveDouble(folder + "/" + _SourceOfPoints::tParameters::name + ".txt", pStateArray[_SourceOfPoints::tParameters::StateIndex], pStateSize[_SourceOfPoints::tParameters::StateIndex]);
-		// }
 		// FLAG: SAVE DYNAMIC EQUATION END
 	}
 
 	static void load(const std::string& folder, std::vector<std::vector<double>>& stateArray) {
+		allocate(stateArray);
 		// FLAG: LOAD STATIC EQUATION BEGIN
 		l0ad::ascii::loadDouble(folder + "/" + _PassiveParticles::tParameters::name + ".txt", stateArray[0].data() + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size);
 		// FLAG: LOAD STATIC EQUATION END
 		// FLAG: LOAD DYNAMIC EQUATION BEGIN
-		// if(std::filesystem::exists(folder + "/" + _SourceOfPoints::tParameters::name + ".txt")) {
-		//     l0ad::ascii::loadVectorDouble(folder + "/" + _SourceOfPoints::tParameters::name + ".txt", stateArray[_SourceOfPoints::tParameters::StateIndex]);
-		// }
 		// FLAG: LOAD DYNAMIC EQUATION END
 	}
 
@@ -129,7 +120,6 @@ struct SolutionsParameters {
 		s0ve::saveMapToCsvDouble(folder + "/" + _PassiveParticles::tParameters::name + ".csv", _PassiveParticles::tParameters::post(pStateArray[0] + _PassiveParticles::tParameters::StateIndex, t), ",", "#");
 		// FLAG: POST STATIC EQUATION END
 		// FLAG: POST DYNAMIC EQUATION BEGIN
-		// s0ve::saveMapToCsvDouble(folder, _SourceOfPoints::tParameters::post(pStateArray[_SourceOfPoints::tParameters::StateIndex], pStateSize[_SourceOfPoints::tParameters::StateIndex], t), ",", "#");
 		// FLAG: POST DYNAMIC EQUATION END
 	}
 

@@ -37,11 +37,25 @@ def run(args):
             os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name), args.name + "/.gui_choose")
         # edit
         libchoose.edit_choice(args.name, ["passive_particles"], [args.name])
-        libchoose.edit_add_equation_static(args.name)
         # choose parameters
         os.chdir(args.name)
         os.system('./._choose ' + args.parameters)
         os.chdir('..')
+        # register
+        is_static = True
+        is_dynamic = False
+        with open(args.name + '/parameters.h', 'r') as file:
+            for line in file:
+                if line.startswith("// FLAG: DYNAMIC"):
+                    is_static = False
+                    is_dynamic = True
+                    break
+                elif line.startswith("namespace c0p {"):
+                    break
+        if is_static:
+            libchoose.edit_add_equation_static(args.name)
+        elif is_dynamic:
+            libchoose.edit_add_equation_dynamic(args.name)
     else:
         print("ERROR: name shouldn't contain special characters")
 

@@ -23,7 +23,7 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	static constexpr double InitVorticity = 1.0/Number;
+	static constexpr double Circulation = 1.0/Number;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tSubVariable : public d0t::VariableVector<tVector, tView, StateSize> {
@@ -96,7 +96,7 @@ struct _PassiveParticlesParameters {
 				std::cos(index * 2 * M_PI / halfNumber), 
 				std::sin(index * 2 * M_PI / halfNumber)
 			});
-			w = InitVorticity;
+			w = Circulation;
 		}
 		for(unsigned int index = 0; index < (Number - halfNumber); ++index) {
 			// get the state variable of the index member of the group
@@ -109,7 +109,7 @@ struct _PassiveParticlesParameters {
 				std::cos(index * 2 * M_PI / (Number - halfNumber)), 
 				std::sin(index * 2 * M_PI / (Number - halfNumber))
 			});
-			w = -InitVorticity;
+			w = -Circulation;
 		}
 		// ---------------- CUSTOM INIT END
 	}
@@ -133,7 +133,7 @@ struct _PassiveParticlesParameters {
 			// output
 			output[ossIndex.str() + "__pos_0"] = x[0];
 			output[ossIndex.str() + "__pos_1"] = x[1];
-			output[ossIndex.str() + "__vorticity"] = w;
+			output[ossIndex.str() + "__circulation"] = w;
 			// compute average
 			xAverage += x;
 			wAverage += w;
@@ -142,7 +142,7 @@ struct _PassiveParticlesParameters {
 		wAverage /= Number;
 		output["passive_particles__average_pos_0"] = xAverage[0];
 		output["passive_particles__average_pos_1"] = xAverage[1];
-		output["passive_particles__average_vorticity"] = wAverage;
+		output["passive_particles__average_circulation"] = wAverage;
 		// ---------------- CUSTOM POST END
 		return output;
 	}

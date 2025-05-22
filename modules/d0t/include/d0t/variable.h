@@ -254,7 +254,7 @@ class VariableGroupStatic : public VariableStatic<_tVariableMember::template tVe
 template<typename _tVariableMember, typename _tVariableMeta = VariableNone<_tVariableMember::template tVector, _tVariableMember::template tView>>
 class VariableGroupDynamic : public Variable<_tVariableMember::template tVector, _tVariableMember::template tView, _tVariableMeta::Size> {
 	public:
-		using tBase = Variable<_tVariableMember::template tVector, _tVariableMember::template tView>;
+		using tBase = Variable<_tVariableMember::template tVector, _tVariableMember::template tView, _tVariableMeta::Size>;
 	public:
    		template<int _Size> using tVector = typename tBase::template tVector<_Size>;
    		template<typename... Args> using tView = typename tBase::template tView<Args...>;
