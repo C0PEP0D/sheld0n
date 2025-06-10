@@ -24,16 +24,18 @@ struct _PassiveParticlesParameters {
 	// ---------------- CUSTOM EQUATION PARAMETERS START
 	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
 	// physics parameters
+	inline static const double Position = EnvParameters::cDomainCenter + tSpaceVector({-0.5 * EnvParameters::cDomainSize[0], 0.0});
 	inline static const double FlowVelocity = 2.0;
+	inline static const double FlowDirection = tSpaceVector({1.0, 0.0});
 	inline static const double DipoleSeparation = std::pow(2, -4) * EnvParameters::cDomainSize[1];
-	inline static const tSpaceVector PositivePosition = EnvParameters::cDomainCenter + tSpaceVector({-0.5 * EnvParameters::cDomainSize[0], 0.5 * DipoleSeparation});
-	inline static const tSpaceVector NegativePosition = EnvParameters::cDomainCenter + tSpaceVector({-0.5 * EnvParameters::cDomainSize[0], -0.5 * DipoleSeparation});
 	// preprocessed quantities
+	inline static const double DipoleDirection = tSpaceVector({-FlowDirection[1], FlowDirection[0]});
+	inline static const tSpaceVector PositivePosition = Position + 0.5 * DipoleSeparation * DipoleDirection;
+	inline static const tSpaceVector NegativePosition = Position - 0.5 * DipoleSeparation * DipoleDirection;
 	inline static const double FlowRate = FlowVelocity * DipoleSeparation;
 	inline static const double CirculationRate = FlowVelocity * FlowVelocity;
 	// numeric parameters
-	inline static const double Circulation = FlowRate / 1.0; // increase the divider to increase the "resolution" of the jet
-	inline static const double VortexRate = CirculationRate / Circulation;
+	inline static const double VortexRate = CirculationRate / FlowRate * 1.0; // increase the factor to increase the "resolution" of the jet
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tSubVariable : public d0t::VariableVector<tVector, tView, StateSize> {
@@ -107,6 +109,7 @@ struct _PassiveParticlesParameters {
 		}
 		
 		static void _spawn(std::vector<double>& p_state, unsigned int number) {
+			const double dCirculation = 0.5 * M_PI * DipoleSeparation * (Flow::getVelocity(Position.data(), 0.0) - FlowVelocity * Direction); // constrain needs t
 			for (unsigned int index = 0; index < number; index++) {
 				{ // positive
 					tBase::pushBackMember(p_state);
@@ -116,7 +119,7 @@ struct _PassiveParticlesParameters {
 					double* pCirculation = pState + DIM;
 					// // set
 					x = PositivePosition;
-					*pCirculation = Circulation;
+					*pCirculation = dCirculation;
 				}
 				{ // negative
 					tBase::pushBackMember(p_state);
@@ -126,7 +129,7 @@ struct _PassiveParticlesParameters {
 					double* pCirculation = pState + DIM;
 					// // set
 					x = NegativePosition;
-					*pCirculation = -Circulation;
+					*pCirculation = -dCirculation;
 				}
 			}
 		}

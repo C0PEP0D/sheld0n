@@ -64,7 +64,9 @@ def main():
     # parser
     parser = argparse.ArgumentParser(description='create a new equation based on the default one')
     parser.add_argument('name', help='specify the name of the new equation')
-    parser.add_argument('-p', '--parameters', default='passive_particles', choices=libchoose.get_choices_file("solutions/passive_particles", []), help='match the new case to an example case')
+    choices = list(libchoose.get_choices_file("solutions/passive_particles", []).keys())
+    choices.sort()
+    parser.add_argument('-p', '--parameters', default='passive_particles', choices=choices, help='match the new case to an example case')
     # parse
     args = parser.parse_args()
     # run

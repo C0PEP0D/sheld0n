@@ -17,7 +17,7 @@
 
 namespace d0t {
 
-template<typename _tVariableMember, double _Density, bool _IsClosed, unsigned int _InterpolationOrder>
+template<typename _tVariableMember, unsigned int _Density, bool _IsClosed, unsigned int _InterpolationOrder>
 class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 	public:
 		using tBase = VariableGroupDynamic<_tVariableMember>;
@@ -26,8 +26,8 @@ class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 		template<typename... Args> using tView = typename tBase::tView<Args...>;
 		using tStateVectorDynamic = typename tBase::tStateVectorDynamic;
 		using tBase::MinSize;
-		using tVariableMember = tBase::tVariableMember;
-		using tVariableMeta = tBase::tVariableMeta;
+		using tVariableMember = typename tBase::tVariableMember;
+		using tVariableMeta = typename tBase::tVariableMeta;
 	public:
 		constexpr static unsigned int VariableMemberSize = tVariableMember::Size;
 		constexpr static unsigned int Dim = tVariableMember::Dim;
@@ -39,13 +39,16 @@ class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 	public:
 		using tScalar = tVector<1>;
 		using tMesh = m0sh::NonUniform<tScalar, tView, 1>;
+	
 	public:
 		static tView<tSpaceVector> position(const double* pState, const unsigned int index) {
-			return tVariableMember::position(tBase::state(pState, index));
+			return tView<tSpaceVector>(tBase::state(pState, index));
 		}
+
 		static const tSpaceVector cPosition(const double* pState, const unsigned int index) {
-			return tVariableMember::cPosition(tBase::cState(pState, index));
+			return tView<const tSpaceVector>(tBase::cState(pState, index));
 		}
+
 	public:
 		static std::vector<tStateVectorDynamic> cStateInterpolationPolynome(const double* pState, const unsigned int stateSize, const double s) { // TODO: minimize the stateScalars computation
 			// interpolation data
@@ -106,6 +109,7 @@ class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 			p0l::polynome::differentiate(interpolationPolynome);
 			return tVariableMember::cPosition(p0l::polynome::evaluation(interpolationPolynome.data(), interpolationPolynome.size(), s).data()) / positionDerivative.norm();
 		}
+
 	public:
 		static double cS(const double* pState, const unsigned int stateSize, const unsigned int memberIndex) { // TODO: compute length using integral
 			if (memberIndex > 0) {

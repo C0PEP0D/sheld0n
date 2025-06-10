@@ -142,6 +142,8 @@ def run(args):
             set_case_vortex_dipole()
         case 'point_vortex_jet':
             set_case_point_vortex_jet()
+        case 'passive_curve':
+            set_case_passive_curve()
         case _:
             print('WARNING: Example case "' + args.case + '" not recognised. Using default one.')
             set_case_default()
@@ -150,9 +152,7 @@ def run(args):
 
 @Cli2Gui(run_function=run)
 def main():
-    parser = argparse.ArgumentParser(description='create a new simulation case based on a default one')
-    parser.add_argument('name', help='specify the name of the new simulation case')
-    parser.add_argument('-c', '--case', default='default', choices=[
+    choices = [
         'default',
         'surf_tgv',
         'rl_tgv',
@@ -161,8 +161,14 @@ def main():
         'point_vortices',
         'point_vortices_periodic',
         'vortex_dipole',
-        'point_vortex_jet'
-    ], help='match the new case to an example case')
+        'point_vortex_jet',
+        'passive_curve'
+    ]
+    choices.sort()
+    # parse
+    parser = argparse.ArgumentParser(description='create a new simulation case based on a default one')
+    parser.add_argument('name', help='specify the name of the new simulation case')
+    parser.add_argument('-c', '--case', default='default', choices=choices, help='match the new case to an example case')
     args = parser.parse_args()
     # run
     run(args)
@@ -279,10 +285,6 @@ def set_case_point_vortices():
 
 def set_case_point_vortices_periodic():
     set_flow_point_vortices_periodic()
-    # edit passive_particles
-    os.chdir('param/solutions/passive_particles')
-    os.system('./._choose passive_particles_periodic')
-    os.chdir('../../..')
     # post processing
     ## input
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -317,6 +319,22 @@ def set_case_point_vortex_jet():
     os.chdir('param/solutions/passive_particles')
     os.system('./._choose source_of_passive_particles')
     os.chdir('../../..')
+    # post processing
+    ## input
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    code_dir = script_dir + "/.."
+    # remove symbolic link
+    if is_gui:
+        os.unlink(".cli_learn")
+        os.unlink("gui_learn")
+    else:
+        os.unlink("cli_learn")
+        os.unlink(".gui_learn")
+    # shutil.rmtree("param/learn")
+
+def set_case_passive_curve():
+    set_flow_point_vortices_periodic()
+    set_solutions_passive_curve()
     # post processing
     ## input
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -384,10 +402,16 @@ def set_flow_point_vortices_periodic():
     os.chdir('../..')
     # solutions
     os.chdir('param/solutions')
+    # passive particles
+    os.chdir('passive_particles')
+    os.system('./._choose passive_particles_periodic')
+    os.chdir('..')
+    # point vortices
     os.system('./._create_new_equation point_vortices_periodic')
     os.chdir('point_vortices_periodic')
     os.system('./._choose ' + 'point_vortices_periodic')
     os.chdir('..')
+    # end solutions
     os.chdir('../..')
     # parameters
     ## param
@@ -489,6 +513,20 @@ def set_solutions_nn_swimmers():
     os.chdir('../..')
     # set surfing parameters
     os.system('./._set_parameter param/solutions/surfers TimeHorizon "0.25*EnvParameters::cTime"')
+
+def set_solutions_passive_curve():
+    os.chdir('param/solutions')
+    # nn swimmers
+    os.system('./._create_new_equation passive_curve')
+    os.chdir('passive_curve')
+    os.system('./._choose ' + 'passive_curve')
+    os.chdir('..')
+    # back
+    os.chdir('../..')
+    ## run
+    os.system('./._set_parameter param/run Dt 1.0/128.0')
+    os.system('./._set_parameter param/run NTime "int(24.0/Dt)"')
+    os.system('./._set_parameter param/run NSave "NTime/4"')
 
 # rl
 

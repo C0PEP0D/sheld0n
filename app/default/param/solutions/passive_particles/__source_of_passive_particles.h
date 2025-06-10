@@ -6,8 +6,6 @@
 #include <map>
 #include <iomanip>
 
-// ioqsdjajzkhdal
-
 // app includes
 #include "core/solutions/core.h"
 #include "param/flow/parameters.h"
