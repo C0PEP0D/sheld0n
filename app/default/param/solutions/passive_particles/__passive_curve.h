@@ -32,16 +32,20 @@ struct _PassiveParticlesParameters {
 	static constexpr unsigned int InterpolationOrder = 2;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
-	struct tSubVariable : public d0t::VariableVector<tVector, tView, StateSize> {
+	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
 	
-		static void constrain(double* pState) {
+		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
+			// input
+			double* pState = stateArray[StateIndex].data() + memberStateIndex;
 			// ---------------- CUSTOM CONSTRAIN START
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
 	};
+	using tCurveVariable = d0t::VariableCurve<tMemberVariable, Density, IsClosed, InterpolationOrder>;
+	using tVariable = tCurveVariable;
 
-	struct tSubEquation : public d0t::Equation<tSubVariable> {
+	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
 			// ---------------- CUSTOM PREPARATION START
@@ -50,8 +54,12 @@ struct _PassiveParticlesParameters {
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
-		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
-			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
+		static tStateVectorDynamic stateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t, const unsigned int memberIndex) {
+			// static input
+			const unsigned int stateSize = tMemberVariable::Size;
+			const double* pState = tCurveVariable::cState(pStateArray[StateIndex], memberIndex);
+			// output
+			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START
 			// input
@@ -69,10 +77,8 @@ struct _PassiveParticlesParameters {
 		}
 
 	};
-	
-	// creating tVariable and tEquation
-	using tVariable = d0t::VariableCurve<tSubVariable, Density, IsClosed, InterpolationOrder>;
-	using tEquation = d0t::EquationGroupDynamic<tVariable, tSubEquation>;
+	using tCurveEquation = d0t::EquationGroupDynamic<tCurveVariable, tMemberEquation>;
+	using tEquation = tCurveEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
 	inline static const tSpaceVector InitPositionStart = EnvParameters::cDomainCenter - 0.25 * tSpaceVector({EnvParameters::cDomainSize[0], 0.0});
@@ -100,9 +106,9 @@ struct _PassiveParticlesParameters {
 		unsigned int formatNumber = number/10 + 1;
 		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < number; ++subIndex) {
-			const double* pSubState = tVariable::cState(pState, subIndex);
+			const double* pMemberState = tVariable::cState(pState, subIndex);
 			// input
-			const tView<const tSpaceVector> x(pSubState);
+			const tView<const tSpaceVector> x(pMemberState);
 			// generate formated index
 			std::ostringstream ossIndex;
 			ossIndex << "passive_particles__index_" << std::setw(formatNumber) << std::setfill('0') << subIndex;

@@ -10,10 +10,11 @@ namespace c0p {
 
 struct Flow {
 
-	inline static const double step = std::pow(2, -10); // basically the spatial resolution of the flow, should be the inverse of the density of points
+	inline static const double dx = std::pow(2, -4); // basically the spatial resolution of the flow, should be the inverse of the density of points
+	inline static const tSpaceVector meanVelocity = tSpaceVector::Zero();
 
 	using PointVortexFlow = pl0f::PointVortexFlow<DIM, tSpaceVector, tSpaceMatrix, tView>;
-	inline static PointVortexFlow flow = PointVortexFlow(step);
+	inline static PointVortexFlow flow = PointVortexFlow(dx, meanVelocity);
 
 	// using tVorticesEquation = _PassiveParticles; // name of the vortices
 

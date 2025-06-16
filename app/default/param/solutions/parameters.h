@@ -77,7 +77,8 @@ struct SolutionsParameters {
 			output[index].resize(pStateSize[index]);
 		}
 		// FLAG: STATE TEMPORAL DERIVATIVE STATIC EQUATION BEGIN
-		tView<tStateVectorDynamic>(output[0].data() + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size) = _PassiveParticles::stateTemporalDerivative(pStateArray[0] + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size, t);
+		// tView<tStateVectorDynamic>(output[0].data() + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size) = _PassiveParticles::stateTemporalDerivative(pStateArray[0] + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size, t);
+		tView<tStateVectorDynamic>(output[0].data() + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size) = _PassiveParticles::stateTemporalDerivative(pStateArray, pStateSize, arraySize, t);
 		// FLAG: STATE TEMPORAL DERIVATIVE STATIC EQUATION END
 		// FLAG: STATE TEMPORAL DERIVATIVE DYNAMIC EQUATION BEGIN
 		// FLAG: STATE TEMPORAL DERIVATIVE DYNAMIC EQUATION END
@@ -86,9 +87,9 @@ struct SolutionsParameters {
 
 	// ---------------- CONSTRAIN
 	
-	static void constrain(std::vector<std::vector<double>>& stateArray) {
+	static void constrain(std::vector<std::vector<double>>& stateArray, const double t) {
 		// FLAG: CONSTRAIN STATIC EQUATION BEGIN
-		_PassiveParticles::tVariable::constrain(stateArray[0].data() + _PassiveParticles::tParameters::StateIndex);
+		_PassiveParticles::tVariable::constrain(stateArray, t, _PassiveParticles::tParameters::StateIndex);
 		// FLAG: CONSTRAIN STATIC EQUATION END
 		// FLAG: CONSTRAIN DYNAMIC EQUATION BEGIN
 		// FLAG: CONSTRAIN DYNAMIC EQUATION END

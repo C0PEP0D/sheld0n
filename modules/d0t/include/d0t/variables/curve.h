@@ -185,28 +185,30 @@ class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 		}
 		
 	public:
-		static void constrain(std::vector<double>& p_state) {
-			tBase::_constrain(p_state);
+		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int stateIndex) {
+			tBase::_constrain(stateArray, t, stateIndex);
+			//input
+			std::vector<double>& _state = stateArray[stateIndex];
 			// interpolation data
-			std::vector<tStateVectorDynamic> states(tBase::groupSize(p_state.size()), tStateVectorDynamic(VariableMemberSize));
-			for(unsigned int index = 0; index < tBase::groupSize(p_state.size()); index++) {
-				states[index] = tView<const tStateVectorDynamic>(tBase::cState(p_state.data(), index), VariableMemberSize, 1);
+			std::vector<tStateVectorDynamic> states(tBase::groupSize(_state.size()), tStateVectorDynamic(VariableMemberSize));
+			for(unsigned int index = 0; index < tBase::groupSize(_state.size()); index++) {
+				states[index] = tView<const tStateVectorDynamic>(tBase::cState(_state.data(), index), VariableMemberSize, 1);
 			}
 			// axes
-			std::vector<std::vector<double>> axes(1, std::vector<double>(tBase::groupSize(p_state.size()) + int(IsClosed)));
+			std::vector<std::vector<double>> axes(1, std::vector<double>(tBase::groupSize(_state.size()) + int(IsClosed)));
 			double length = 0.0;
 			axes[0][0] = 0.0;
-			for(unsigned int index = 1; index < tBase::groupSize(p_state.size()); index++){
-				const tSpaceVector x1 = cPosition(p_state.data(), index);
-				const tSpaceVector x0 = cPosition(p_state.data(), index - 1);
+			for(unsigned int index = 1; index < tBase::groupSize(_state.size()); index++){
+				const tSpaceVector x1 = cPosition(_state.data(), index);
+				const tSpaceVector x0 = cPosition(_state.data(), index - 1);
 				length += (x1 - x0).norm();
 				axes[0][index] = length;
 			}
 			if(IsClosed) {
-				const tSpaceVector x1 = cPosition(p_state.data(), 0);
-				const tSpaceVector x0 = cPosition(p_state.data(), tBase::groupSize(p_state.size()) - 1);
+				const tSpaceVector x1 = cPosition(_state.data(), 0);
+				const tSpaceVector x0 = cPosition(_state.data(), tBase::groupSize(_state.size()) - 1);
 				length += (x1 - x0).norm();
-				axes[0][tBase::groupSize(p_state.size())] = length;
+				axes[0][tBase::groupSize(_state.size())] = length;
 			}
 			for(unsigned int index = 1; index < axes[0].size(); index++) {
 				axes[0][index] /= length;
@@ -215,23 +217,23 @@ class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 			const unsigned int newSize = std::max((unsigned int)(std::ceil(length * Density) + int(!IsClosed)), InterpolationOrder + 1);
 			const double newDs = 1.0 / (newSize - int(!IsClosed));
 			// manage data
-			const int difference = newSize - tBase::groupSize(p_state.size());
+			const int difference = newSize - tBase::groupSize(_state.size());
 			if(difference < 0) {
 				for(int i = -1; i >= difference; i--) {
-					tBase::popBackMember(p_state);
+					tBase::popBackMember(_state);
 				}
 			} else if(difference > 0) {
 				for(int i = 0; i < difference; i++) {
-					tBase::pushBackMember(p_state);
+					tBase::pushBackMember(_state);
 				}
 			}
 			// interpolation
 			std::vector<unsigned int> memberIndexs(newSize);
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
-			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&p_state, axes, states, newDs](const unsigned int& memberIndex){
+			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&_state, axes, states, newDs](const unsigned int& memberIndex){
 				const double s = memberIndex * newDs;
 				std::vector<tStateVectorDynamic> interpolationPolynome = p0l::lagrange::interpolationMeshPoint<tMesh, tStateVectorDynamic>(axes.data(), states.data(), tStateVectorDynamic::Zero(VariableMemberSize), &s, InterpolationOrder, IsClosed);
-				tView<tStateVectorDynamic>(tBase::state(p_state.data(), memberIndex), VariableMemberSize) = p0l::polynome::evaluation(interpolationPolynome.data(), interpolationPolynome.size(), s);
+				tView<tStateVectorDynamic>(tBase::state(_state.data(), memberIndex), VariableMemberSize) = p0l::polynome::evaluation(interpolationPolynome.data(), interpolationPolynome.size(), s);
 			});
 		}
 };

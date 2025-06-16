@@ -214,10 +214,9 @@ def edit_add_equation_static(name):
             print('\t\t_{Name}::prepare(pStateArray[0] + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size, t);\n'.format(Name=upper_camel_name), end='')
 
         elif line == '\t\t// FLAG: STATE TEMPORAL DERIVATIVE STATIC EQUATION END\n':
-            print('\t\ttView<tStateVectorDynamic>(output[0].data() + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size) = _{Name}::stateTemporalDerivative(pStateArray[0] + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size, t);\n'.format(Name=upper_camel_name), end='')
-
+            print('\t\ttView<tStateVectorDynamic>(output[0].data() + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size) = _{Name}::stateTemporalDerivative(pStateArray, pStateSize, arraySize, t);\n'.format(Name=upper_camel_name), end='')
         elif line == '\t\t// FLAG: CONSTRAIN STATIC EQUATION END\n':
-            print('\t\t_{Name}::tVariable::constrain(stateArray[0].data() + _{Name}::tParameters::StateIndex);\n'.format(Name=upper_camel_name), end='')
+            print('\t\t_{Name}::tVariable::constrain(stateArray, t, _{Name}::tParameters::StateIndex);\n'.format(Name=upper_camel_name), end='')
 
         elif line == '\t\t// FLAG: SAVE STATIC EQUATION END\n':
             print('\t\ts0ve::saveDouble(folder + "/" + _{Name}::tParameters::name + ".txt", pStateArray[0] + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size);\n'.format(Name=upper_camel_name), end='')
@@ -250,10 +249,9 @@ def edit_add_equation_dynamic(name):
             print('\t\t_{Name}::prepare(pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex], t);\n'.format(Name=upper_camel_name), end='')
         
         elif line == '\t\t// FLAG: STATE TEMPORAL DERIVATIVE DYNAMIC EQUATION END\n':
-            print('\t\ttView<tStateVectorDynamic>(output[_{Name}::tParameters::StateIndex].data(), output[_{Name}::tParameters::StateIndex].size()) = _{Name}::stateTemporalDerivative(pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex], t);\n'.format(Name=upper_camel_name), end='')
-
+            print('\t\ttView<tStateVectorDynamic>(output[_{Name}::tParameters::StateIndex].data(), output[_{Name}::tParameters::StateIndex].size()) = _{Name}::stateTemporalDerivative(pStateArray, pStateSize, arraySize, t, _{Name}::tParameters::StateIndex);\n'.format(Name=upper_camel_name), end='')
         elif line == '\t\t// FLAG: CONSTRAIN DYNAMIC EQUATION END\n':
-            print('\t\t_{Name}::tVariable::constrain(stateArray[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
+            print('\t\t_{Name}::tVariable::constrain(stateArray, t, _{Name}::tParameters::StateIndex);\n'.format(Name=upper_camel_name), end='')
 
         elif line == '\t\t// FLAG: SAVE DYNAMIC EQUATION END\n':
             print('\t\tif (pStateSize[_{Name}::tParameters::StateIndex] > 0) {{\n'.format(Name=upper_camel_name), end='')

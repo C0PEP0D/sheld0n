@@ -6,6 +6,9 @@
 #include <map>
 #include <iomanip>
 
+// lib includes
+#include "sp0ce/operators.h"
+
 // app includes
 #include "core/solutions/core.h"
 #include "param/flow/parameters.h"
@@ -29,9 +32,12 @@ struct _PassiveParticlesParameters {
 	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
-	struct tSubVariable : public d0t::VariableVector<tVector, tView, StateSize> {
+	// variable
+	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
 	
-		static void constrain(double* pState) {
+		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
+			// input
+			double* pState = stateArray[0].data() + memberStateIndex;
 			// ---------------- CUSTOM CONSTRAIN START
 			tView<tSpaceVector> x(pState);
 			x = sp0ce::xPeriodic<tSpaceVector>(x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
@@ -39,8 +45,11 @@ struct _PassiveParticlesParameters {
 		}
 
 	};
+	using tGroupVariable = d0t::VariableGroupStatic<d0t::VariableComposed<tMemberVariable>, Number>;
+	using tVariable = tGroupVariable;
 
-	struct tSubEquation : public d0t::Equation<tSubVariable> {
+	// equation
+	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
 			// ---------------- CUSTOM PREPARATION START
@@ -49,8 +58,12 @@ struct _PassiveParticlesParameters {
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
-		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
-			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
+		static tStateVectorDynamic stateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t, const unsigned int memberIndex) {
+			// static input
+			const unsigned int stateSize = tMemberVariable::Size;
+			const double* pState = tGroupVariable::cState(pStateArray[0] + StateIndex, memberIndex);
+			// output
+			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START
 			// input
@@ -66,9 +79,8 @@ struct _PassiveParticlesParameters {
 			return dState;
 		}
 	};
-	// creating tVariable and tEquation
-	using tVariable = d0t::VariableGroupStatic<d0t::VariableComposed<tSubVariable>, Number>;
-	using tEquation = d0t::EquationGroupStatic<tVariable, tSubEquation>;
+	using tGroupEquation = d0t::EquationGroupStatic<tGroupVariable, tMemberEquation>;
+	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
 	inline static const tSpaceVector BoxCenter = EnvParameters::cDomainCenter;

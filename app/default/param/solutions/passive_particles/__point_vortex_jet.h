@@ -13,6 +13,8 @@
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
 
+#include "param/run/parameters.h"
+
 // FLAG: DYNAMIC
 
 namespace c0p {
@@ -24,30 +26,99 @@ struct _PassiveParticlesParameters {
 	// ---------------- CUSTOM EQUATION PARAMETERS START
 	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
 	// physics parameters
-	inline static const double Position = EnvParameters::cDomainCenter + tSpaceVector({-0.5 * EnvParameters::cDomainSize[0], 0.0});
-	inline static const double FlowVelocity = 2.0;
-	inline static const double FlowDirection = tSpaceVector({1.0, 0.0});
-	inline static const double DipoleSeparation = std::pow(2, -4) * EnvParameters::cDomainSize[1];
-	// preprocessed quantities
-	inline static const double DipoleDirection = tSpaceVector({-FlowDirection[1], FlowDirection[0]});
-	inline static const tSpaceVector PositivePosition = Position + 0.5 * DipoleSeparation * DipoleDirection;
-	inline static const tSpaceVector NegativePosition = Position - 0.5 * DipoleSeparation * DipoleDirection;
-	inline static const double FlowRate = FlowVelocity * DipoleSeparation;
-	inline static const double CirculationRate = FlowVelocity * FlowVelocity;
+	inline static const tSpaceVector Position = EnvParameters::cDomainCenter + tSpaceVector({-0.25 * EnvParameters::cDomainSize[0], 0.0});
+	inline static const tSpaceVector FlowVelocity = tSpaceVector({std::pow(2, 1), 0.0});
+	inline static const double Separation = std::pow(2, -2) * EnvParameters::cDomainSize[1];
+	inline static const double ReactionTime = 1.0/2.0;
 	// numeric parameters
-	inline static const double VortexRate = CirculationRate / FlowRate * 1.0; // increase the factor to increase the "resolution" of the jet
+	inline static const double VortexInterval = std::max(ReactionTime/8.0, RunParameters::Dt);
+	inline static const double VortexRate = 1.0/VortexInterval;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
-	struct tSubVariable : public d0t::VariableVector<tVector, tView, StateSize> {
+	// variable
+
+	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
 	
-		static void constrain(double* pState) {
+		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
+			// input
+			double* pState = stateArray[StateIndex].data() + memberStateIndex;
 			// ---------------- CUSTOM CONSTRAIN START
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
 	};
+	using tMetaVariable = d0t::VariableVector<tVector, tView, 1>; // stores timer
+	struct tGroupVariable : public d0t::VariableGroupDynamic<tMemberVariable, tMetaVariable> {
+		using tBase = d0t::VariableGroupDynamic<tMemberVariable, tMetaVariable>;
 
-	struct tSubEquation : public d0t::Equation<tSubVariable> {
+		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int stateIndex) {
+			tBase::_constrain(stateArray, t, stateIndex);
+			// input
+			std::vector<double>& _state = stateArray[StateIndex];
+			// ---------------- CUSTOM CONSTRAIN START
+			// remove points that get out of domain
+			for(int index = tBase::groupSize(_state.size()) - 1; index > -1; index--) {
+				const double* pState = tBase::cState(_state.data(), index);
+				const tView<const tSpaceVector> x(pState);
+				if (
+					std::abs(x[0] - EnvParameters::cDomainCenter[0]) > 0.5 * EnvParameters::cDomainSize[0] || 
+					std::abs(x[1] - EnvParameters::cDomainCenter[1]) > 0.5 * EnvParameters::cDomainSize[1]
+				) {
+					tBase::eraseMember(_state, index);
+				}
+			}
+			// add points based on rate
+			double* pTime;
+			pTime = tBase::stateMeta(_state.data());
+			const unsigned int number = int((*pTime) * VortexRate);
+			if (number > 0) {
+				const tSpaceVector dVelocity = (FlowVelocity - Flow::getVelocity(Position.data(), t)) * VortexInterval/ReactionTime;
+				addVelocity(_state, Position.data(), dVelocity.data(), Separation);
+				// update pTime before set
+				pTime = tBase::stateMeta(_state.data());
+				*pTime = 0.0;
+			}
+			// ---------------- CUSTOM CONSTRAIN END
+		}
+		
+		static void addVelocity(std::vector<double>& _state, const double* pPosition, const double* pDVelocity, const double spacing) {
+			// input
+			const tView<const tSpaceVector> position(pPosition);
+			const tView<const tSpaceVector> dVelocity(pDVelocity);
+			const double dVelocityNorm = dVelocity.norm();
+			if(dVelocityNorm > 0.0) {
+				const tSpaceVector dVelocityDirection = dVelocity / dVelocityNorm;
+				const tSpaceVector dVelocityOrthogonal = tSpaceVector({-dVelocityDirection[1], dVelocityDirection[0]});
+				// circulation
+				const double dCirculation = 0.5 * M_PI * spacing * dVelocityNorm; // constrain needs t
+				{ // positive
+					tBase::pushBackMember(_state);
+					// set initial state
+					double* pState = tBase::state(_state.data(), tBase::groupSize(_state.size()) - 1);
+					tView<tSpaceVector> x(pState);
+					double* pCirculation = pState + DIM;
+					// // set
+					x = position + 0.5 * spacing * dVelocityOrthogonal;
+					*pCirculation = dCirculation;
+				}
+				{ // negative
+					tBase::pushBackMember(_state);
+					// set initial state
+					double* pState = tBase::state(_state.data(), tBase::groupSize(_state.size()) - 1);
+					tView<tSpaceVector> x(pState);
+					double* pCirculation = pState + DIM;
+					// // set
+					x = position - 0.5 * spacing * dVelocityOrthogonal;
+					*pCirculation = -dCirculation;
+				}
+			}
+		}
+	};
+	using tVariable = tGroupVariable;
+
+	// equation
+
+	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
 			// ---------------- CUSTOM PREPARATION START
@@ -56,8 +127,12 @@ struct _PassiveParticlesParameters {
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
-		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
-			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
+		static tStateVectorDynamic stateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t, const unsigned int memberIndex) {
+			// static input
+			const unsigned int stateSize = tMemberVariable::Size;
+			const double* pState = tGroupVariable::cState(pStateArray[StateIndex], memberIndex);
+			// output
+			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START
 			// input
@@ -75,68 +150,9 @@ struct _PassiveParticlesParameters {
 		}
 
 	};
+	struct tGroupEquation : public d0t::EquationGroupDynamic<tGroupVariable, tMemberEquation> {
 	
-	// creating tVariable and tEquation
-	using tMetaVariable = d0t::VariableVector<tVector, tView, 1>; // stores timer
-	struct tVariable : public d0t::VariableGroupDynamic<tSubVariable, tMetaVariable> {
-		using tBase = d0t::VariableGroupDynamic<tSubVariable, tMetaVariable>;
-
-		static void constrain(std::vector<double>& p_state) {
-			tBase::_constrain(p_state);
-			// ---------------- CUSTOM CONSTRAIN START
-			// remove points that get out of domain
-			for(int index = tBase::groupSize(p_state.size()) - 1; index > -1; index--) {
-				const double* pState = tBase::cState(p_state.data(), index);
-				const tView<const tSpaceVector> x(pState);
-				if (
-					std::abs(x[0] - EnvParameters::cDomainCenter[0]) > 0.5 * EnvParameters::cDomainSize[0] || 
-					std::abs(x[1] - EnvParameters::cDomainCenter[1]) > 0.5 * EnvParameters::cDomainSize[1]
-				) {
-					tBase::eraseMember(p_state, index);
-				}
-			}
-			// add points based on rate
-			double* pTime;
-			pTime = tBase::stateMeta(p_state.data());
-			const unsigned int number = int((*pTime) * VortexRate);
-			if (number > 0) {
-				_spawn(p_state, number);
-				// update pTime before set
-				pTime = tBase::stateMeta(p_state.data());
-				*pTime = 0.0;
-			}
-			// ---------------- CUSTOM CONSTRAIN END
-		}
-		
-		static void _spawn(std::vector<double>& p_state, unsigned int number) {
-			const double dCirculation = 0.5 * M_PI * DipoleSeparation * (Flow::getVelocity(Position.data(), 0.0) - FlowVelocity * Direction); // constrain needs t
-			for (unsigned int index = 0; index < number; index++) {
-				{ // positive
-					tBase::pushBackMember(p_state);
-					// set initial state
-					double* pState = tBase::state(p_state.data(), tBase::groupSize(p_state.size()) - 1);
-					tView<tSpaceVector> x(pState);
-					double* pCirculation = pState + DIM;
-					// // set
-					x = PositivePosition;
-					*pCirculation = dCirculation;
-				}
-				{ // negative
-					tBase::pushBackMember(p_state);
-					// set initial state
-					double* pState = tBase::state(p_state.data(), tBase::groupSize(p_state.size()) - 1);
-					tView<tSpaceVector> x(pState);
-					double* pCirculation = pState + DIM;
-					// // set
-					x = NegativePosition;
-					*pCirculation = -dCirculation;
-				}
-			}
-		}
-	};
-	struct tEquation : public d0t::EquationGroupDynamic<tVariable, tSubEquation> {
-	
-		using tBase = d0t::EquationGroupDynamic<tVariable, tSubEquation>;
+		using tBase = d0t::EquationGroupDynamic<tVariable, tMemberEquation>;
 	
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
 			tBase::prepare(pState, stateSize, t);
@@ -144,8 +160,8 @@ struct _PassiveParticlesParameters {
 			Flow::prepare(tVariable::cState(pState, 0), tVariable::groupSize(stateSize));
 		}
 
-		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
-			tStateVectorDynamic dState = tBase::stateTemporalDerivative(pState, stateSize, t);
+		static tStateVectorDynamic stateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t, const unsigned int stateIndex) {
+			tStateVectorDynamic dState = tBase::stateTemporalDerivative(pStateArray, pStateSize, arraySize, t, stateIndex);
 			// meta
 			double* pDTime = tVariable::stateMeta(dState.data());
 			*pDTime = 1.0;
@@ -153,6 +169,7 @@ struct _PassiveParticlesParameters {
 			return dState;
 		}
 	};
+	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
 	// ---------------- CUSTOM INIT PARAMETERS START
@@ -171,9 +188,9 @@ struct _PassiveParticlesParameters {
 		unsigned int formatNumber = number/10 + 1;
 		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < number; ++subIndex) {
-			const double* pSubState = tVariable::cState(pState, subIndex);
+			const double* pMemberState = tVariable::cState(pState, subIndex);
 			// input
-			const tView<const tSpaceVector> x(pSubState);
+			const tView<const tSpaceVector> x(pMemberState);
 			// generate formated index
 			std::ostringstream ossIndex;
 			ossIndex << "passive_particles__index_" << std::setw(formatNumber) << std::setfill('0') << subIndex;

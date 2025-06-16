@@ -20,8 +20,10 @@ struct PointVortexFlow {
 		using tView = _tView<Args...>;
 
 	public:
-		const double step;
+		const double dx;
 		const double sigma;
+		const tVector meanVelocity;
+		
 		const tVector periodCenter;
 		const tVector periodSize;
 		std::array<bool, Dim> isAxisPeriodic;
@@ -33,17 +35,25 @@ struct PointVortexFlow {
 
 	public:
 		PointVortexFlow(
-			const double p_step, 
+			const double p_dx,
+			const tVector p_meanVelocity,
 			const tVector p_periodCenter,
 			const tVector p_periodSize,
 			const std::array<bool, Dim> p_isAxisPeriodic
-		) : step(p_step), sigma(p_step), binTree(p_step), periodCenter(p_periodCenter), periodSize(p_periodSize), isAxisPeriodic(p_isAxisPeriodic) {
+		) : dx(p_dx), sigma(p_dx), meanVelocity(p_meanVelocity), binTree(p_dx), periodCenter(p_periodCenter), periodSize(p_periodSize), isAxisPeriodic(p_isAxisPeriodic) {
 			
 		}
 
 		PointVortexFlow(
-			const double p_step
-		) : step(p_step), sigma(p_step), binTree(p_step), periodCenter(tVector::Zero()), periodSize(tVector::Zero()), isAxisPeriodic({false, false}) {
+			const double p_dx,
+			const tVector p_meanVelocity
+		) : PointVortexFlow(p_dx, p_meanVelocity, tVector::Zero(), tVector::Zero(), std::array<bool, Dim>({false, false})) {
+			
+		}
+
+		PointVortexFlow(
+			const double p_dx
+		) : PointVortexFlow(p_dx, tVector::Zero()) {
 			
 		}
 
@@ -69,14 +79,17 @@ struct PointVortexFlow {
 				// process
 				tView<tVector> superX(&(superVortexStateArray[0][superVortexStateArray[0].size() - VortexStateSize]));
 				double& superW = superVortexStateArray[0].back();
+				double superWAbs = 0.0;
 				for (auto const& index : indexes) {
 					const tVector x = sp0ce::xPeriodic<tVector>(pState + index * VortexStateSize, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 					const double w = pState[index * VortexStateSize + Dim];
+					const double wAbs = std::abs(w);
 					superW += w;
-					superX += w * x;
+					superWAbs += wAbs;
+					superX += wAbs * x;
 				}
-				if(superW != 0.0) {
-					superX /= superW;
+				if(superWAbs != 0.0) {
+					superX /= superWAbs;
 				}
 			}
 			// others
@@ -91,6 +104,7 @@ struct PointVortexFlow {
 					// process
 					tView<tVector> superX(&(superVortexStateArray[i][superVortexStateArray[i].size() - VortexStateSize]));
 					double& superW = superVortexStateArray[i].back();
+					double superWAbs = 0.0;
 					// sub
 					std::array<int, Dim> subIjkStart;
 					std::array<int, Dim> subIjkEnd;
@@ -103,16 +117,18 @@ struct PointVortexFlow {
 						if(iterator != ijkToSuperIndex[i-1].end()) {
 							const unsigned int subSuperIndex = iterator->second;
 							superW += superVortexStateArray[i-1][subSuperIndex * VortexStateSize + Dim];
-							superX += superVortexStateArray[i-1][subSuperIndex * VortexStateSize + Dim] * tView<const tVector>(&(superVortexStateArray[i-1][subSuperIndex * VortexStateSize]));
+							superWAbs += std::abs(superVortexStateArray[i-1][subSuperIndex * VortexStateSize + Dim]);
+							superX += std::abs(superVortexStateArray[i-1][subSuperIndex * VortexStateSize + Dim]) * tView<const tVector>(&(superVortexStateArray[i-1][subSuperIndex * VortexStateSize]));
 						}
 					}
-					if(superW != 0.0) {
-						superX /= superW;
+					if(superWAbs != 0.0) {
+						superX /= superWAbs;
 					}
 				}
 			}
 		};
 
+	public:
 		tVector getVelocity(const double* pX) const {
 			tVector output = tVector::Zero();
 			const tVector x = sp0ce::xPeriodic<tVector>(pX, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
@@ -149,7 +165,7 @@ struct PointVortexFlow {
 				}
 			}
 			output *= 0.5; // 2D
-			return output;
+			return meanVelocity + output;
 		};
 
 		tMatrix getVelocityGradients(const double* pX) const {

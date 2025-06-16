@@ -9,14 +9,15 @@ namespace c0p {
 
 struct Flow {
 
-	inline static const double step = std::pow(2, -10); // basically the spatial resolution of the flow, should be the inverse of the density of points
+	inline static const double dx = std::pow(2, -4); // basically the spatial resolution of the flow, should be the inverse of the density of points
+	inline static const tSpaceVector meanVelocity = tSpaceVector::Zero();
 	// periodicity
 	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
 	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
 	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
 
 	using PointVortexFlow = pl0f::PointVortexFlow<DIM, tSpaceVector, tSpaceMatrix, tView>;
-	inline static PointVortexFlow flow = PointVortexFlow(step, periodCenter, periodSize, isAxisPeriodic);
+	inline static PointVortexFlow flow = PointVortexFlow(step, meanVelocity, periodCenter, periodSize, isAxisPeriodic);
 
 	// using tVorticesEquation = _PassiveParticles; // name of the vortices
 

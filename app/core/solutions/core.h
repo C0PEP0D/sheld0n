@@ -43,10 +43,11 @@ class Solutions {
 					return tParameters::stateTemporalDerivative(pStateArray, pStateSize, arraySize, t); // execute
 				}, pStateArray.data(), stateSizeArray.data(), pStateArray.size(), t, dt
 			);
-			// constrain variables
-			tParameters::constrain(stateArray);
 			// increment time
 			t += dt;
+			// constrain variables
+			tParameters::prepare(pStateArray.data(), stateSizeArray.data(), pStateArray.size(), t);
+			tParameters::constrain(stateArray, t);
 		}
 
 		// ---------------- SAVE & LOAD

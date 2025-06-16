@@ -13,6 +13,9 @@
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
 
+#include "param/solutions/interactive_particles/parameters.h"
+#include "param/run/parameters.h"
+
 // FLAG: DYNAMIC
 
 namespace c0p {
@@ -23,11 +26,6 @@ struct _PassiveParticlesParameters {
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
 	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
-	// feel free to add parameters if you need
-	static constexpr double Rate = 256.0;
-	static constexpr double Lifetime = 1.0;
-	inline static const tSpaceVector Center = EnvParameters::cDomainCenter;
-	inline static const tSpaceVector Length = EnvParameters::cDomainSize;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// variable
@@ -48,43 +46,80 @@ struct _PassiveParticlesParameters {
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int stateIndex) {
 			tBase::_constrain(stateArray, t, stateIndex);
 			// input
-			std::vector<double>& _state = stateArray[stateIndex];
+			std::vector<double>& _state = stateArray[StateIndex];
+
 			// ---------------- CUSTOM CONSTRAIN START
-			// remove dead points
-			for(int index = tBase::groupSize(_state.size()) - 1; index > -1; index--) {
-				const double* pState = tBase::cState(_state.data(), index);
-				const double tLife = *(pState + DIM);
-				if (tLife < 0.0) {
-					tBase::eraseMember(_state, index);
-				}
+
+			// // remove points that get out of domain
+			// for(int index = tBase::groupSize(_state.size()) - 1; index > -1; index--) {
+			// 	const double* pState = tBase::cState(_state.data(), index);
+			// 	const tView<const tSpaceVector> x(pState);
+			// 	if (
+			// 		std::abs(x[0] - EnvParameters::cDomainCenter[0]) > 0.5 * EnvParameters::cDomainSize[0] || 
+			// 		std::abs(x[1] - EnvParameters::cDomainCenter[1]) > 0.5 * EnvParameters::cDomainSize[1]
+			// 	) {
+			// 		tBase::eraseMember(_state, index);
+			// 	}
+			// }
+
+			// merge points that are too close to each other
+
+			_state = Flow::flow.superVortexStateArray[0];
+
+			// interactive particles
+
+			using InteractiveParticlesParameters = _InteractiveParticlesParameters;
+			const double* pInteractiveParticlesState = stateArray[0].data() + InteractiveParticlesParameters::StateIndex;
+			
+			for(unsigned int index = 0; index < InteractiveParticlesParameters::Number; ++index) {
+			
+				const double* pState = InteractiveParticlesParameters::tGroupVariable::cState(pInteractiveParticlesState, index);
+
+				// input
+				const tView<const tSpaceVector> x(pState);
+				const tView<const tSpaceVector> v(pState + DIM);
+				// flow
+				const tSpaceVector u = Flow::getVelocity(x.data(), t);
+	
+				// apply "force" on flow
+				const tSpaceVector dVelocity = -(u - v) * (u - v).norm() / InteractiveParticlesParameters::Width * RunParameters::Dt;
+				addVelocity(_state, x.data(), dVelocity.data(), InteractiveParticlesParameters::Width);
+				
 			}
-			// add points based on rate
-			if (_state.empty()) {
-				_spawn(_state, 1);
-			} else {
-				const double* pStateLast = tBase::cState(_state.data(), tBase::groupSize(_state.size()) - 1);
-				const double tLifeLast = *(pStateLast + DIM);
-				const unsigned int number = int((Lifetime - tLifeLast) * Rate);
-				if (number > 0) {
-					_spawn(_state, number);
-				}
-			}
+
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 		
-		static void _spawn(std::vector<double>& _state, unsigned int number) {
-			for (unsigned int index = 0; index < number; index++) {
-				tBase::pushBackMember(_state);
-				// set initial state
-				double* pState = tBase::state(_state.data(), tBase::groupSize(_state.size()) - 1);
-				tView<tSpaceVector> x(pState);
-				double* pTLife = pState + DIM;
-				// // set
-				x = tSpaceVector::Random();
-				for(unsigned int index = 0; index < DIM; ++index){
-					x[index] = x[index] * 0.5 * Length[index] + Center[index];
+		static void addVelocity(std::vector<double>& _state, const double* pPosition, const double* pDVelocity, const double spacing) {
+			// input
+			const tView<const tSpaceVector> position(pPosition);
+			const tView<const tSpaceVector> dVelocity(pDVelocity);
+			const double dVelocityNorm = dVelocity.norm();
+			if(dVelocityNorm > 0.0) {
+				const tSpaceVector dVelocityDirection = dVelocity / dVelocityNorm;
+				const tSpaceVector dVelocityOrthogonal = tSpaceVector({-dVelocityDirection[1], dVelocityDirection[0]});
+				// circulation
+				const double dCirculation = 0.5 * M_PI * spacing * dVelocityNorm; // constrain needs t
+				{ // positive
+					tBase::pushBackMember(_state);
+					// set initial state
+					double* pState = tBase::state(_state.data(), tBase::groupSize(_state.size()) - 1);
+					tView<tSpaceVector> x(pState);
+					double* pCirculation = pState + DIM;
+					// // set
+					x = position + 0.5 * spacing * dVelocityOrthogonal;
+					*pCirculation = dCirculation;
 				}
-				*pTLife = Lifetime;
+				{ // negative
+					tBase::pushBackMember(_state);
+					// set initial state
+					double* pState = tBase::state(_state.data(), tBase::groupSize(_state.size()) - 1);
+					tView<tSpaceVector> x(pState);
+					double* pCirculation = pState + DIM;
+					// // set
+					x = position - 0.5 * spacing * dVelocityOrthogonal;
+					*pCirculation = -dCirculation;
+				}
 			}
 		}
 	};
@@ -111,15 +146,12 @@ struct _PassiveParticlesParameters {
 			// ---------------- CUSTOM EQUATION START
 			// input
 			const tView<const tSpaceVector> x(pState);
-			const double tLife = *(pState + DIM);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
 			// output
 			tView<tSpaceVector> dX(dState.data());
-			double* pDtLife = dState.data() + DIM;
 			// equation
 			dX = u;
-			*pDtLife = -1.0;
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
@@ -127,7 +159,16 @@ struct _PassiveParticlesParameters {
 		}
 
 	};
-	using tGroupEquation = d0t::EquationGroupDynamic<tVariable, tMemberEquation>;
+	struct tGroupEquation : public d0t::EquationGroupDynamic<tGroupVariable, tMemberEquation> {
+	
+		using tBase = d0t::EquationGroupDynamic<tVariable, tMemberEquation>;
+	
+		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+			tBase::prepare(pState, stateSize, t);
+			// prepare flow
+			Flow::prepare(tVariable::cState(pState, 0), tVariable::groupSize(stateSize));
+		}
+	};
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
@@ -148,14 +189,12 @@ struct _PassiveParticlesParameters {
 			const double* pMemberState = tVariable::cState(pState, subIndex);
 			// input
 			const tView<const tSpaceVector> x(pMemberState);
-			const double tLife = *(pMemberState + DIM);
 			// generate formated index
 			std::ostringstream ossIndex;
 			ossIndex << "passive_particles__index_" << std::setw(formatNumber) << std::setfill('0') << subIndex;
 			// output
 			output[ossIndex.str() + "__pos_0"] = x[0];
 			output[ossIndex.str() + "__pos_1"] = x[1];
-			output[ossIndex.str() + "__tlife"] = tLife;
 			// compute average
 			xAverage += x;
 		}

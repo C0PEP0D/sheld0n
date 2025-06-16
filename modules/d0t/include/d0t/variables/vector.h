@@ -21,14 +21,11 @@ class VariableVector : public VariableStatic<_tVector, _tView, _Dim> {
    		using tBase::Size;
    		using tStateVectorStatic = typename tBase::tStateVectorStatic;
     public:
-    	static const unsigned int Dim = _Dim;
-        using tSpaceVector = typename tBase::template tVector<Dim>;
-    public:
-    	static tView<tSpaceVector> get(double* pState) {
-            return tView<tSpaceVector>(pState);
+    	static tView<tStateVectorStatic> get(double* pState) {
+            return tView<tStateVectorStatic>(pState);
         }
-        static tView<const tSpaceVector> cGet(const double* pState) {
-            return tView<const tSpaceVector>(pState);
+        static tView<const tStateVectorStatic> cGet(const double* pState) {
+            return tView<const tStateVectorStatic>(pState);
         }
     public:
     	static void constrain(double* pState) {

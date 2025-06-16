@@ -35,7 +35,9 @@ struct _PassiveParticlesParameters {
 
 	struct tVariable : public d0t::VariableVector<tVector, tView, StateSize> {
 	
-		static void constrain(double* pState) {
+		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int stateIndex) {
+			// input
+			double* pState = stateArray[0].data() + stateIndex;
 			// ---------------- CUSTOM CONSTRAIN START
 			// ---------------- CUSTOM CONSTRAIN END
 		}
@@ -51,7 +53,11 @@ struct _PassiveParticlesParameters {
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
-		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
+		static tStateVectorDynamic stateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t) {
+			// static input
+			const unsigned int stateSize = tVariable::Size;
+			const double* pState = pStateArray[0] + StateIndex;
+			// output
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START

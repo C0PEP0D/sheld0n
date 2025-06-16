@@ -66,10 +66,7 @@ class VariableNone : public VariableStatic<_tVector, _tView, 0> {
 			// return pState;
 		// }
 	public:
-		static void constrain(double* pState) {
-		}
-		static void constrain(std::vector<double>& state) {
-			constrain(state.data());
+		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int stateIndex) {
 		}
 };
 
@@ -154,11 +151,8 @@ class VariableComposed<tVariable> : public VariableStatic<tVariable::template tV
 			return cVariableComponentState<_tVariable, tVariable>(pState);
 		}
 	public:
-		static void constrain(double* pState) {
-			tVariable::constrain(pState);
-		}
-		static void constrain(std::vector<double>& state) {
-			constrain(state.data());
+		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int stateIndex) {
+			tVariable::constrain(stateArray, t, stateIndex);
 		}
 };
 
@@ -193,12 +187,9 @@ class VariableComposed<tVariable, tVariables...> : public VariableStatic<tVariab
 			return cVariableComponentState<_tVariable, tVariable, tVariables...>(pState);
 		}
 	public:
-		static void constrain(double* pState) {
-			tVariable::constrain(pState);
-			VariableComposed<tVariables...>::constrain(pState + tVariable::Size);
-		}
-		static void constrain(std::vector<double>& state) {
-			constrain(state.data());
+		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int stateIndex) {
+			tVariable::constrain(stateArray, t, stateIndex);
+			VariableComposed<tVariables...>::constrain(stateArray, t, stateIndex + tVariable::Size);
 		}
 };
 
@@ -235,19 +226,16 @@ class VariableGroupStatic : public VariableStatic<_tVariableMember::template tVe
    		}
    	public:
 		// apply variable constraints
-		static void constrain(double* pState) {
+		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int stateIndex) {
 			// constrain meta
-			tVariableMeta::constrain(pState);
+			tVariableMeta::constrain(stateArray, t, stateIndex);
 			// create member indexs
 			std::vector<unsigned int> memberIndexs(GroupSize);
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
 			// constrain everything
-			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [pState](const unsigned int memberIndex){
-				tVariableMember::constrain(state(pState, memberIndex));
+			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&stateArray, t, stateIndex](const unsigned int memberIndex){
+				tVariableMember::constrain(stateArray, t, stateIndex + tVariableMeta::Size + memberIndex * tVariableMember::Size);
 			});
-		}
-		static void constrain(std::vector<double>& state) {
-			constrain(state.data());
 		}
 };
 
@@ -282,15 +270,15 @@ class VariableGroupDynamic : public Variable<_tVariableMember::template tVector,
    		}
    	public:
 		// apply variable constraints
-		static void _constrain(std::vector<double>& p_state) {
+		static void _constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int stateIndex) {
 			// constrain meta
-			tVariableMeta::constrain(p_state.data());
+			tVariableMeta::constrain(stateArray, t, stateIndex);
 			// create member indexs
-			std::vector<unsigned int> memberIndexs(groupSize(p_state.size()));
+			std::vector<unsigned int> memberIndexs(groupSize(stateArray[stateIndex].size()));
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
 			// constrain everything
-			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&p_state](const unsigned int memberIndex){
-				tVariableMember::constrain(state(p_state.data(), memberIndex));
+			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&stateArray, t](const unsigned int memberIndex){
+				tVariableMember::constrain(stateArray, t, tVariableMeta::Size + memberIndex * tVariableMember::Size);
 			});
 		}
 		// member management
@@ -307,55 +295,55 @@ class VariableGroupDynamic : public Variable<_tVariableMember::template tVector,
    		}
 };
 
-template<typename _tVariableGroup, typename _tVariableMeta = VariableNone<_tVariableGroup::template tVector, _tVariableGroup::template tView>>
-class VariableGroups {
-	public:
-		using tVariableGroup = _tVariableGroup;
-		using tVariableMeta = _tVariableMeta;
-	public:
-		static std::vector<double>& stateMeta(std::vector<std::vector<double>>& states) {
-			return states.front();
-		}
-   		static const std::vector<double>& cStateMeta(const std::vector<std::vector<double>>& states) {
-		   	return states.front();
-   		}
-   	public:
-		static std::vector<double>& state(std::vector<std::vector<double>>& states, const unsigned int index) {
-			return states[1 + index];
-		}
-   		static const std::vector<double>& cState(const std::vector<std::vector<double>>& states, const unsigned int index) {
-		   	return states[1 + index];
-   		}
-   		static const unsigned int groupNumber(const unsigned int statesSize) {
-   			return statesSize - 1;
-   		}
-	public:
-		// apply variable constraints
-		static void _constrain(std::vector<std::vector<double>>& states) {
-			// constrain meta
-			tVariableMeta::constrain(states.front());
-			// create group indexs
-			std::vector<unsigned int> groupIndexs(states.size() - 1);
-			std::iota(groupIndexs.begin(), groupIndexs.end(), 0);
-			// constrain everything
-			std::for_each(std::execution::par_unseq, groupIndexs.cbegin(), groupIndexs.cend(), [&states](const unsigned int groupIndex){
-				tVariableGroup::constrain(states[1 + groupIndex]);
-			});
-		}
-		// member management
-		static void pushBackGroup(std::vector<std::vector<double>>& states) {
-			states.push_back(std::vector<double>(tVariableGroup::MinSize));
-		}
-		static void insertGroups(std::vector<std::vector<double>>& states, const std::vector<std::vector<double>>& otherStates) {
-			states.insert(states.end(), otherStates.begin(), otherStates.end());
-		}
-		static void popBackGroup(std::vector<std::vector<double>>& states) {
-			states.pop_back();
-		}
-		static void eraseGroup(std::vector<std::vector<double>>& states, const unsigned int& memberIndex) {
-			states.erase(states.begin() + 1 + memberIndex);
-		}
-};
+// template<typename _tVariableGroup, typename _tVariableMeta = VariableNone<_tVariableGroup::template tVector, _tVariableGroup::template tView>>
+// class VariableGroups {
+// 	public:
+// 		using tVariableGroup = _tVariableGroup;
+// 		using tVariableMeta = _tVariableMeta;
+// 	public:
+// 		static std::vector<double>& stateMeta(std::vector<std::vector<double>>& states) {
+// 			return states.front();
+// 		}
+//    		static const std::vector<double>& cStateMeta(const std::vector<std::vector<double>>& states) {
+// 		   	return states.front();
+//    		}
+//    	public:
+// 		static std::vector<double>& state(std::vector<std::vector<double>>& states, const unsigned int index) {
+// 			return states[1 + index];
+// 		}
+//    		static const std::vector<double>& cState(const std::vector<std::vector<double>>& states, const unsigned int index) {
+// 		   	return states[1 + index];
+//    		}
+//    		static const unsigned int groupNumber(const unsigned int statesSize) {
+//    			return statesSize - 1;
+//    		}
+// 	public:
+// 		// apply variable constraints
+// 		static void _constrain(std::vector<std::vector<double>>& states) {
+// 			// constrain meta
+// 			tVariableMeta::constrain(states.front());
+// 			// create group indexs
+// 			std::vector<unsigned int> groupIndexs(states.size() - 1);
+// 			std::iota(groupIndexs.begin(), groupIndexs.end(), 0);
+// 			// constrain everything
+// 			std::for_each(std::execution::par_unseq, groupIndexs.cbegin(), groupIndexs.cend(), [&states](const unsigned int groupIndex){
+// 				tVariableGroup::constrain(states[1 + groupIndex]);
+// 			});
+// 		}
+// 		// member management
+// 		static void pushBackGroup(std::vector<std::vector<double>>& states) {
+// 			states.push_back(std::vector<double>(tVariableGroup::MinSize));
+// 		}
+// 		static void insertGroups(std::vector<std::vector<double>>& states, const std::vector<std::vector<double>>& otherStates) {
+// 			states.insert(states.end(), otherStates.begin(), otherStates.end());
+// 		}
+// 		static void popBackGroup(std::vector<std::vector<double>>& states) {
+// 			states.pop_back();
+// 		}
+// 		static void eraseGroup(std::vector<std::vector<double>>& states, const unsigned int& memberIndex) {
+// 			states.erase(states.begin() + 1 + memberIndex);
+// 		}
+// };
 
 }
 

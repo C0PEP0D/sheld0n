@@ -60,18 +60,18 @@ class EquationComposed : public Equation<VariableComposed<typename tEquations::t
 		}
 
 	public:
-		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
-			tStateVectorDynamic dState = tStateVectorDynamic::Zero(stateSize);
-			loopStateTemporalDerivative(pState, t, dState.data());
+		static tStateVectorDynamic stateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t) {
+			tStateVectorDynamic dState = tStateVectorDynamic::Zero(pStateSize[0]);
+			loopStateTemporalDerivative(pStateArray, pStateSize, arraySize, t, dState.data());
 			return dState;
 		}
 		
 		template<unsigned int Index = 0>
-		static void loopStateTemporalDerivative(const double* pState, const double t, double* pDstate) {
+		static void loopStateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t, double* pDstate) {
 			if constexpr(Index < Number) {
-				tView<tStateVectorDynamic>(tVariable::template state<Index>(pDstate), tVariable::template tVariableComponent<Index>::type::Size, 1) = tEquationComponent<Index>::type::stateTemporalDerivative(tVariable::template cState<Index>(pState), tVariable::template tVariableComponent<Index>::type::Size, t);
+				tView<tStateVectorDynamic>(tVariable::template state<Index>(pDstate), tVariable::template tVariableComponent<Index>::type::Size, 1) = tEquationComponent<Index>::type::stateTemporalDerivative(pStateArray, pStateSize, arraySize, t);
 				// recursion
-				loopStateTemporalDerivative<Index+1>(pState, t, pDstate);
+				loopStateTemporalDerivative<Index+1>(pStateArray, pStateSize, arraySize, t);
 			}
 		}
 };
@@ -104,14 +104,15 @@ class EquationGroupDynamic : public Equation<_tVariableGroup> {
 			});
 		}
 	 public:
-		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
+		static tStateVectorDynamic stateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t, const unsigned int groupIndex) {
+			const unsigned int stateSize = pStateSize[groupIndex];
 			// create member indexs
 			std::vector<unsigned int> memberIndexs(tVariableGroup::groupSize(stateSize));
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
 			// apply sub equation to each member of the group
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(stateSize);
-			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&dState, pState, stateSize, t](const unsigned int memberIndex){
-				tView<typename tVariableGroup::tVariableMember::tStateVectorStatic>(tVariableGroup::state(dState.data(), memberIndex)) = tMemberEquation::stateTemporalDerivative(tVariableGroup::cState(pState, memberIndex), tVariableGroup::tVariableMember::Size, t);
+			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&dState, pStateArray, pStateSize, arraySize, t](const unsigned int memberIndex){
+				tView<typename tVariableGroup::tVariableMember::tStateVectorStatic>(tVariableGroup::state(dState.data(), memberIndex)) = tMemberEquation::stateTemporalDerivative(pStateArray, pStateSize, arraySize, t, memberIndex);
 			});
 			return dState;
 		}
@@ -144,122 +145,122 @@ class EquationGroupStatic : public Equation<_tVariableGroup> {
 		}
 
 	public:
-		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
+		static tStateVectorDynamic stateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t) {
 			// create member indexs
 			std::vector<unsigned int> memberIndexs(tVariableGroup::GroupSize);
 			std::iota(memberIndexs.begin(), memberIndexs.end(), 0);
 			// apply sub equation to each member of the group
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariableGroup::Size);
-			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&dState, pState, stateSize, t](const unsigned int memberIndex){
-				tView<typename tVariableGroup::tVariableMember::tStateVectorStatic>(tVariableGroup::state(dState.data(), memberIndex)) = tMemberEquation::stateTemporalDerivative(tVariableGroup::cState(pState, memberIndex), tVariableGroup::tVariableMember::Size, t);
+			std::for_each(std::execution::par_unseq, memberIndexs.cbegin(), memberIndexs.cend(), [&dState, pStateArray, pStateSize, arraySize, t](const unsigned int memberIndex){
+				tView<typename tVariableGroup::tVariableMember::tStateVectorStatic>(tVariableGroup::state(dState.data(), memberIndex)) = tMemberEquation::stateTemporalDerivative(pStateArray, pStateSize, arraySize, t, memberIndex);
 			});
 			return dState;
 		}
 };
 
-// solution
-
-template<typename _tSolver, typename _tEquation, typename _tPrepare>
-class SolutionDynamic {
-	public:
-		using tSolver = _tSolver;
-		using tEquation = _tEquation;
-		using tVariable = typename tEquation::tVariable;
-		using tPrepare = _tPrepare;
-
-	public:
-		SolutionDynamic(const double p_t = 0.0) : state(tVariable::MinSize), t(p_t) {
-		}
-
-	public:
-		virtual void step(const double dt) {
-			tSolver::step(
-				[](const double* pState, const unsigned int stateSize, const double t) { 
-					tEquation::prepare(pState, stateSize, t);
-					tPrepare::prepare(pState, stateSize, t);
-					return tEquation::stateTemporalDerivative(pState, stateSize, t); 
-				}, 
-				state.data(),
-				state.size(),
-				t, 
-				dt
-			);
-			tVariable::constrain(state);
-			t += dt;
-		}
-
-	public:
-		double t;
-		std::vector<double> state;
-};
-
-template<typename _tSolver, typename _tEquation, typename _tPrepare>
-class SolutionStatic : public SolutionDynamic<_tSolver, _tEquation, _tPrepare> {
-	public:
-		using tBase = SolutionDynamic<_tSolver, _tEquation, _tPrepare>;
-
-	public:
-		using tSolver = typename tBase::tSolver;
-		using tEquation = typename tBase::tEquation;
-		using tVariable = typename tBase::tVariable;
-		using tPrepare = typename tBase::tPrepare;
-
-	public:
-		SolutionStatic(const double p_t = 0.0) : tBase(p_t)  {
-		}
-
-	public:
-		void step(const double dt) override {
-			tSolver::step(
-				[](const double* pState, const unsigned int stateSize, const double t) {
-					tEquation::prepare(pState, stateSize, t);
-					tPrepare::prepare(pState, stateSize, t);
-					return tEquation::stateTemporalDerivative(pState, stateSize, t); 
-				},
-				tBase::state.data(), 
-				tBase::state.size(), 
-				tBase::t,
-				dt
-			);
-			tVariable::constrain(tBase::state.data());
-			tBase::t += dt;
-		}
-};
-
-// TODO: SolutionGroups should be a SolutionDynamic with meta. I need to think about it.
-
-template<typename _tSolver, typename _tEquation, typename _tPrepare, typename _tVariable>
-class SolutionGroups {
-	public:
-		using tSolver = _tSolver;
-		using tEquation = _tEquation;
-		using tVariable = _tVariable;
-		using tPrepare = _tPrepare;
-
-	public:
-		SolutionGroups(const double p_t = 0.0) : states(1, std::vector<double>(tVariable::tVariableMeta::MinSize)), t(p_t) {
-		}
-
-	public:
-		virtual void step(const double dt) {
-			tSolver::step(
-				[](const std::vector<std::vector<double>>& states, const double t) {
-					tEquation::prepare(states, t);
-					tPrepare::prepare(states, t);
-					return tEquation::stateTemporalDerivative(states, t); 
-				},
-				states,
-				t,
-				dt
-			);
-			tVariable::constrain(states);
-			t += dt;
-		}
-
-	public:
-		double t;
-		std::vector<std::vector<double>> states;
-};
+// // solution
+// 
+// template<typename _tSolver, typename _tEquation, typename _tPrepare>
+// class SolutionDynamic {
+// 	public:
+// 		using tSolver = _tSolver;
+// 		using tEquation = _tEquation;
+// 		using tVariable = typename tEquation::tVariable;
+// 		using tPrepare = _tPrepare;
+// 
+// 	public:
+// 		SolutionDynamic(const double p_t = 0.0) : state(tVariable::MinSize), t(p_t) {
+// 		}
+// 
+// 	public:
+// 		virtual void step(const double dt) {
+// 			tSolver::step(
+// 				[](const double* pState, const unsigned int stateSize, const double t) { 
+// 					tEquation::prepare(pState, stateSize, t);
+// 					tPrepare::prepare(pState, stateSize, t);
+// 					return tEquation::stateTemporalDerivative(pState, stateSize, t); 
+// 				}, 
+// 				state.data(),
+// 				state.size(),
+// 				t, 
+// 				dt
+// 			);
+// 			tVariable::constrain(state);
+// 			t += dt;
+// 		}
+// 
+// 	public:
+// 		double t;
+// 		std::vector<double> state;
+// };
+// 
+// template<typename _tSolver, typename _tEquation, typename _tPrepare>
+// class SolutionStatic : public SolutionDynamic<_tSolver, _tEquation, _tPrepare> {
+// 	public:
+// 		using tBase = SolutionDynamic<_tSolver, _tEquation, _tPrepare>;
+// 
+// 	public:
+// 		using tSolver = typename tBase::tSolver;
+// 		using tEquation = typename tBase::tEquation;
+// 		using tVariable = typename tBase::tVariable;
+// 		using tPrepare = typename tBase::tPrepare;
+// 
+// 	public:
+// 		SolutionStatic(const double p_t = 0.0) : tBase(p_t)  {
+// 		}
+// 
+// 	public:
+// 		void step(const double dt) override {
+// 			tSolver::step(
+// 				[](const double* pState, const unsigned int stateSize, const double t) {
+// 					tEquation::prepare(pState, stateSize, t);
+// 					tPrepare::prepare(pState, stateSize, t);
+// 					return tEquation::stateTemporalDerivative(pState, stateSize, t); 
+// 				},
+// 				tBase::state.data(), 
+// 				tBase::state.size(), 
+// 				tBase::t,
+// 				dt
+// 			);
+// 			tVariable::constrain(tBase::state.data());
+// 			tBase::t += dt;
+// 		}
+// };
+// 
+// // TODO: SolutionGroups should be a SolutionDynamic with meta. I need to think about it.
+// 
+// template<typename _tSolver, typename _tEquation, typename _tPrepare, typename _tVariable>
+// class SolutionGroups {
+// 	public:
+// 		using tSolver = _tSolver;
+// 		using tEquation = _tEquation;
+// 		using tVariable = _tVariable;
+// 		using tPrepare = _tPrepare;
+// 
+// 	public:
+// 		SolutionGroups(const double p_t = 0.0) : states(1, std::vector<double>(tVariable::tVariableMeta::MinSize)), t(p_t) {
+// 		}
+// 
+// 	public:
+// 		virtual void step(const double dt) {
+// 			tSolver::step(
+// 				[](const std::vector<std::vector<double>>& states, const double t) {
+// 					tEquation::prepare(states, t);
+// 					tPrepare::prepare(states, t);
+// 					return tEquation::stateTemporalDerivative(states, t); 
+// 				},
+// 				states,
+// 				t,
+// 				dt
+// 			);
+// 			tVariable::constrain(states);
+// 			t += dt;
+// 		}
+// 
+// 	public:
+// 		double t;
+// 		std::vector<std::vector<double>> states;
+// };
 
 }
 
