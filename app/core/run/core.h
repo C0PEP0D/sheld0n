@@ -9,7 +9,7 @@
 #include <vector>
 #include <string> // stod, to_string
 #include <filesystem>
-#include <iomanip>
+#include <iomanip> // setprecision
 // app includes
 #include "core/learn/neural_network/core.h"
 // lib includes
