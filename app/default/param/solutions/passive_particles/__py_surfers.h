@@ -4,10 +4,6 @@
 
 // std includes
 #include <map>
-#include <iomanip>
-
-// eigen includes
-#include <unsupported/Eigen/MatrixFunctions>
 
 // app includes
 #include "core/solutions/core.h"
@@ -15,6 +11,13 @@
 
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
+
+// include thirdparty
+#include "pybind11/embed.h"
+#include "pybind11/numpy.h"
+#include "pybind11/stl.h"
+namespace py = pybind11;
+using namespace pybind11::literals;
 
 namespace c0p {
 
@@ -26,9 +29,6 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = DIM; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	static constexpr double SwimmingVelocity = 0.5;
-	static constexpr std::array<double, DIM> TargetDirection = {0.0, 1.0}; // defined for 2D simulations, use {0.0, 1.0, 0.0} for 3D
-	static constexpr double TimeHorizon = 0.5;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
@@ -61,17 +61,30 @@ struct _PassiveParticlesParameters {
 			// output
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
-			// ---------------- CUSTOM EQUATION START
-			// parameters
-			const tView<const tSpaceVector> z(TargetDirection.data());
+			/// ---------------- CUSTOM EQUATION START
+			
 			// input
 			const tView<const tSpaceVector> x(pState);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
-			const tSpaceMatrix j = Flow::getVelocityGradients(x.data(), t);
-			// output
-			tView<tSpaceVector> dX(dState.data());
-			dX = u + SwimmingVelocity * ( (j * TimeHorizon).exp().transpose() * z ).normalized();
+			const tSpaceMatrix grad = Flow::getVelocityGradients(x.data(), t);
+
+			// python
+			
+			py::gil_scoped_acquire acquire;
+			auto locals = py::dict(
+				"state"_a = py::array_t<double>(tVariable::Size, pState, py::capsule(pState, [](void* ptr) {})),
+				"u"_a = py::array_t<double>(DIM, u.data(), py::capsule(u.data(), [](void* ptr) {})),
+				"grad_u"_a = py::array_t<double>(DIM * DIM, grad.data(), py::capsule(grad.data(), [](void* ptr) {})),
+				"dstate"_a = py::array_t<double>(tVariable::Size, dState.data(), py::capsule(dState.data(), [](void* ptr) {}))
+			);
+			py::exec(R"(
+				sys.path.append('param/solutions/passive_particles')
+				import parameters
+				
+				dstate[:] = parameters.state_temporal_derivative(state, u, grad_u)
+			)", py::globals(), locals);
+	
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
@@ -88,46 +101,40 @@ struct _PassiveParticlesParameters {
 
 	static void init(double* pState) {
 		// ---------------- CUSTOM INIT START
-		// interpret BoxCenter and BoxSize as vectors
-		const tSpaceVector boxCenter = tView<const tSpaceVector>(BoxCenter.data());
-		const tSpaceVector boxSize = tView<const tSpaceVector>(BoxSize.data());
-		// loop over each member of the variable group
-		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
-			// get the state variable of the subIndex member of the group
-			double* pMemberState = tVariable::state(pState, subIndex);
-			// interpret subState as a tSpaceVector
-			tView<tSpaceVector> x(pMemberState);
-			// set the initial position of this member
-			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
-		}
+		py::gil_scoped_acquire acquire;
+		auto locals = py::dict(
+			"state"_a = py::array_t<double>(Number * StateSize, pState, py::capsule(pState, [](void* ptr) {})),
+			"particle_state_size"_a = StateSize,
+			"particle_number"_a = Number
+		);
+		py::exec(R"(
+			sys.path.append('param/solutions/passive_particles')
+			import parameters
+			
+			state[:] = parameters.init(particle_state_size, particle_number)
+		)", py::globals(), locals);
 		// ---------------- CUSTOM INIT END
 	}
 
-	// static constexpr unsigned FormatNumber = std::ceil(Number/10.0); // compatibility issue with Clang
-	static constexpr unsigned FormatNumber = Number/10 + 1;
+	inline static unsigned int FormatNumber = int(std::log10(Number)) + 1;
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
-		std::map<std::string, double> output;
 		// ---------------- CUSTOM POST START
-		tSpaceVector xAverage = tSpaceVector::Zero();
-		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
-			const double* pMemberState = tVariable::cState(pState, subIndex);
-			// input
-			const tView<const tSpaceVector> x(pMemberState);
-			// generate formated index
-			std::ostringstream ossIndex;
-			ossIndex << "passive_particles__index_" << std::setw(FormatNumber) << std::setfill('0') << subIndex;
-			// output
-			output[ossIndex.str() + "__pos_0"] = x[0];
-			output[ossIndex.str() + "__pos_1"] = x[1];
-			// compute average
-			xAverage += x;
-		}
-		xAverage /= Number;
-		output["passive_particles__average_pos_0"] = xAverage[0];
-		output["passive_particles__average_pos_1"] = xAverage[1];
+		py::gil_scoped_acquire acquire;
+		auto locals = py::dict(
+			"state"_a = py::array_t<double>(Number * StateSize, pState, py::capsule(pState, [](void* ptr) {})),
+			"particle_state_size"_a = StateSize,
+			"particle_number"_a = Number,
+			"output"_a = py::dict()
+		);
+		py::exec(R"(
+			sys.path.append('param/solutions/passive_particles')
+			import parameters
+			
+			output = parameters.post(state, particle_state_size, particle_number)
+		)", py::globals(), locals);
 		// ---------------- CUSTOM POST END
-		return output;
+		return locals["output"].cast<std::map<std::string, tScalar>>();
 	}
 };
 

@@ -23,15 +23,19 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = 2 * DIM; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	static constexpr double ReactionTime = 1.0;
+	static constexpr double AspectRatio = 1.0; // aspect ratio of the spheroidal particles
+	static constexpr double Factor = (AspectRatio*AspectRatio - 1.0) / (AspectRatio*AspectRatio + 1.0); // factor used in the equation
+	static constexpr float SwimmingVelocity = 0.5;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
-	
+		
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
 			// input
 			double* pState = stateArray[0].data() + memberStateIndex;
 			// ---------------- CUSTOM CONSTRAIN START
+			tView<tSpaceVector> p(pState + DIM);
+			p.normalize();
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
@@ -39,12 +43,14 @@ struct _PassiveParticlesParameters {
 	using tGroupVariable = d0t::VariableGroupStatic<d0t::VariableComposed<tMemberVariable>, Number>;
 	using tVariable = tGroupVariable;
 
+	// definition of the member data
 	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
 			// ---------------- CUSTOM PREPARATION START
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
+			Flow::prepareVelocityGradients(cX.data(), t);
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
@@ -58,14 +64,17 @@ struct _PassiveParticlesParameters {
 			// ---------------- CUSTOM EQUATION START
 			// input
 			const tView<const tSpaceVector> x(pState);
-			const tView<const tSpaceVector> v(pState + DIM);
+			const tView<const tSpaceVector> p(pState + DIM);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
+			const tSpaceMatrix grad = Flow::getVelocityGradients(x.data(), t);
+			const tSpaceMatrix symGrad = 0.5 * (grad + grad.transpose());
+			const tSpaceMatrix skewGrad = 0.5 * (grad - grad.transpose());
 			// output
 			tView<tSpaceVector> dX(dState.data());
-			tView<tSpaceVector> dV(dState.data() + DIM);
-			dX = v;
-			dV = (u - v) / ReactionTime;
+			tView<tSpaceVector> dP(dState.data() + DIM);
+			dX = u + SwimmingVelocity * p.normalized();
+			dP = skewGrad * p + Factor * (symGrad * p - (p.dot(symGrad * p)) * p);
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
@@ -91,16 +100,15 @@ struct _PassiveParticlesParameters {
 			double* pMemberState = tVariable::state(pState, subIndex);
 			// interpret subState as a tSpaceVector
 			tView<tSpaceVector> x(pMemberState);
-			tView<tSpaceVector> v(pMemberState + DIM);
+			tView<tSpaceVector> p(pMemberState + DIM);
 			// set the initial position of this member
 			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
-			v = tSpaceVector::Zero();
+			p = tSpaceVector::Random().normalized(); // TODO: this should use a Gaussian distribution using EigenRand
 		}
 		// ---------------- CUSTOM INIT END
 	}
 
-	// static constexpr unsigned FormatNumber = std::ceil(Number/10.0); // compatibility issue with Clang
-	static constexpr unsigned FormatNumber = Number/10 + 1;
+	inline static unsigned int FormatNumber = int(std::log10(Number)) + 1;
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;
@@ -110,17 +118,17 @@ struct _PassiveParticlesParameters {
 			const double* pMemberState = tVariable::cState(pState, subIndex);
 			// input
 			const tView<const tSpaceVector> x(pMemberState);
-			const tView<const tSpaceVector> v(pMemberState + DIM);
+			const tView<const tSpaceVector> p(pMemberState + DIM);
 			// generate formated index
 			std::ostringstream ossIndex;
 			ossIndex << "passive_particles__index_" << std::setw(FormatNumber) << std::setfill('0') << subIndex;
 			// output
 			output[ossIndex.str() + "__pos_0"] = x[0];
 			output[ossIndex.str() + "__pos_1"] = x[1];
-			output[ossIndex.str() + "__vel_0"] = v[0];
-			output[ossIndex.str() + "__vel_1"] = v[1];
+			output[ossIndex.str() + "__dir_0"] = p[0];
+			output[ossIndex.str() + "__dir_1"] = p[1];
 			// compute average
-			xAverage += x;
+						xAverage += x;
 		}
 		xAverage /= Number;
 		output["passive_particles__average_pos_0"] = xAverage[0];

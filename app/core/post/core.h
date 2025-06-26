@@ -34,7 +34,7 @@ class Post {
 					// // load
 					load(t);
 					// // solutions
-					Env::solutions.post(std::stod(t));
+					Env::solutions.post(folder, std::stod(t));
 					// // msg
 					std::cout << "INFO : Post Processed " << t << "/" << time.back() << std::endl;
 				}
@@ -90,9 +90,9 @@ class Post {
 			// directory
 			std::string folder = "time/" + t;
    			// load
-			Solutions::load(folder);
+			Env::solutions.load(folder);
 			// set time
-			Env::solutions.solutionsStatic.t = std::stod(t);
+			Env::solutions.t = std::stod(t);
 		}
 };
 

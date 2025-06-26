@@ -66,7 +66,7 @@ def main():
     parser.add_argument('name', help='specify the name of the new equation')
     choices = list(libchoose.get_choices_file("solutions/passive_particles", []).keys())
     choices.sort()
-    parser.add_argument('-p', '--parameters', default='passive_particles', choices=choices, help='match the new case to an example case')
+    parser.add_argument('-p', '--parameters', default='cpp_passive_particles', choices=choices, help='match the new case to an example case')
     # parse
     args = parser.parse_args()
     # run

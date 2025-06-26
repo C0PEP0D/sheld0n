@@ -142,7 +142,7 @@ struct _PassiveParticlesParameters {
 		std::map<std::string, double> output;
 		// ---------------- CUSTOM INIT START
 		unsigned int number = tVariable::groupSize(stateSize);
-		unsigned int formatNumber = number/10 + 1;
+		unsigned int formatNumber = int(std::log10(number)) + 1;
 		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < number; ++subIndex) {
 			const double* pMemberState = tVariable::cState(pState, subIndex);

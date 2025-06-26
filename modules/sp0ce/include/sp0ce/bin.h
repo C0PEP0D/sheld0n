@@ -75,7 +75,7 @@ class Bin {
 		}
 		
 		void ijkToNeighborIjkAuxiliary(const int* pIjk, const unsigned int i, std::vector<std::array<int, Dim>>& output) const {
-			for(int j = -1; j < 1; ++j) {
+			for(int j = -1; j < 2; ++j) {
 				// newIjk
 				std::array<int, Dim> newIjk;
 				for(unsigned int k = 0; k < Dim; ++k) {
@@ -83,10 +83,10 @@ class Bin {
 				}
 				newIjk[i] += j;
 				// output
-				if(i == Dim) {
-					output.push_back(newIjk);
-				} else {
+				if(i < Dim - 1) {
 					ijkToNeighborIjkAuxiliary(newIjk.data(), i + 1, output);
+				} else {
+					output.push_back(newIjk);
 				}
 			}
 		}

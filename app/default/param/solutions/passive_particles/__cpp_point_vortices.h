@@ -23,7 +23,7 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	static constexpr double Circulation = 1.0/Number;
+	static constexpr double MaxCirculation = 1.0/Number;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// variable
@@ -52,7 +52,7 @@ struct _PassiveParticlesParameters {
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
-		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
+		static tStateVectorDynamic stateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t, const unsigned int memberIndex) {
 			// static input
 			const unsigned int stateSize = tMemberVariable::Size;
 			const double* pState = tGroupVariable::cState(pStateArray[0] + StateIndex, memberIndex);
@@ -75,7 +75,7 @@ struct _PassiveParticlesParameters {
 		}
 	};
 	struct tGroupEquation : public d0t::EquationGroupStatic<tGroupVariable, tMemberEquation> {
-	
+
 		using tBase = d0t::EquationGroupStatic<tVariable, tMemberEquation>;
 	
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
@@ -87,89 +87,30 @@ struct _PassiveParticlesParameters {
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
-	inline static const tSpaceVector Center = EnvParameters::cDomainCenter;
-	inline static const double Radius = 0.125 * EnvParameters::cDomainSize[1];
-	inline static const double Spacing = 0.75 * EnvParameters::cDomainSize[1];
-	inline static const double Separation = 2.0 * EnvParameters::cDomainSize[1];
+	inline static const tSpaceVector BoxCenter = EnvParameters::cDomainCenter;
+	inline static const tSpaceVector BoxSize = EnvParameters::cDomainSize;
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {
 		// ---------------- CUSTOM INIT START
+		// interpret BoxCenter and BoxSize as vectors
+		const tSpaceVector boxCenter = tView<const tSpaceVector>(BoxCenter.data());
+		const tSpaceVector boxSize = tView<const tSpaceVector>(BoxSize.data());
 		// loop over each member of the variable group
-		const unsigned int quarterNumber = Number / 4;
-		for(unsigned int index = 0; index < quarterNumber; ++index) {
-			// get the state variable of the index member of the group
-			double* pMemberState = tVariable::state(pState, index);
+		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
+			// get the state variable of the subIndex member of the group
+			double* pMemberState = tVariable::state(pState, subIndex);
 			// interpret subState as a tSpaceVector
 			tView<tSpaceVector> x(pMemberState);
 			double& w = pMemberState[DIM];
 			// set the initial position of this member
-			x = (
-				Center + 
-				0.5 * tSpaceVector({-Separation, Spacing}) + 
-				Radius * tSpaceVector({
-					std::cos(index * 2 * M_PI / quarterNumber), 
-					std::sin(index * 2 * M_PI / quarterNumber)
-				})
-			);
-			w = Circulation;
-		}
-		for(unsigned int index = 0; index < quarterNumber; ++index) {
-			// get the state variable of the index member of the group
-			double* pMemberState = tVariable::state(pState, index + quarterNumber);
-			// interpret subState as a tSpaceVector
-			tView<tSpaceVector> x(pMemberState);
-			double& w = pMemberState[DIM];
-			// set the initial position of this member
-			x = (
-				Center + 
-				0.5 * tSpaceVector({-Separation, -Spacing}) + 
-				Radius * tSpaceVector({
-					std::cos(index * 2 * M_PI / quarterNumber), 
-					std::sin(index * 2 * M_PI / quarterNumber)
-				})
-			);
-			w = -Circulation;
-		}
-		for(unsigned int index = 0; index < quarterNumber; ++index) {
-			// get the state variable of the index member of the group
-			double* pMemberState = tVariable::state(pState, index + 2 * quarterNumber);
-			// interpret subState as a tSpaceVector
-			tView<tSpaceVector> x(pMemberState);
-			double& w = pMemberState[DIM];
-			// set the initial position of this member
-			x = (
-				Center + 
-				0.5 * tSpaceVector({Separation, Spacing}) + 
-				Radius * tSpaceVector({
-					std::cos(index * 2 * M_PI / quarterNumber), 
-					std::sin(index * 2 * M_PI / quarterNumber)
-				})
-			);
-			w = -Circulation;
-		}
-		for(unsigned int index = 0; index < quarterNumber; ++index) {
-			// get the state variable of the index member of the group
-			double* pMemberState = tVariable::state(pState, index + 3 * quarterNumber);
-			// interpret subState as a tSpaceVector
-			tView<tSpaceVector> x(pMemberState);
-			double& w = pMemberState[DIM];
-			// set the initial position of this member
-			x = (
-				Center + 
-				0.5 * tSpaceVector({Separation, -Spacing}) + 
-				Radius * tSpaceVector({
-					std::cos(index * 2 * M_PI / quarterNumber), 
-					std::sin(index * 2 * M_PI / quarterNumber)
-				})
-			);
-			w = Circulation;
+			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
+			w = MaxCirculation * tVector<1>::Random()[0];
 		}
 		// ---------------- CUSTOM INIT END
 	}
 
-	// static constexpr unsigned FormatNumber = std::ceil(Number/10.0); // compatibility issue with Clang
-	static constexpr unsigned FormatNumber = Number/10 + 1;
+	inline static unsigned int FormatNumber = int(std::log10(Number)) + 1;
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;

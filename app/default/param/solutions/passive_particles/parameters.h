@@ -59,6 +59,7 @@ struct _PassiveParticlesParameters {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START
+
 			// input
 			const tView<const tSpaceVector> x(pState);
 			// flow
@@ -66,6 +67,7 @@ struct _PassiveParticlesParameters {
 			// output
 			tView<tSpaceVector> dX(dState.data());
 			dX = u;
+			
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
@@ -98,8 +100,7 @@ struct _PassiveParticlesParameters {
 		// ---------------- CUSTOM INIT END
 	}
 
-	// static constexpr unsigned FormatNumber = std::ceil(Number/10.0); // compatibility issue with Clang
-	static constexpr unsigned FormatNumber = Number/10 + 1;
+	inline static unsigned int FormatNumber = int(std::log10(Number)) + 1;
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;

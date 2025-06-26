@@ -1,5 +1,5 @@
-#ifndef SP0CE_GEOMETRY_H
-#define SP0CE_GEOMETRY_H
+#ifndef SP0CE_OPERATORS_H
+#define SP0CE_OPERATORS_H
 #pragma once
 
 #include <cmath> // sqrt, fmod
@@ -12,7 +12,7 @@ double dot(const double* pA, const double* pB) {
 	return std::inner_product(pA, pA + Dim, pB, 0.0);
 }
 
-double cross2d(const double* pA, const double* pB) {
+inline double cross2d(const double* pA, const double* pB) {
 	return pA[0] * pB[1] - pA[1] * pB[0];
 }
 

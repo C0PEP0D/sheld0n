@@ -13,7 +13,6 @@
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
 
-#include "param/solutions/interactive_particles/parameters.h"
 #include "param/run/parameters.h"
 
 // FLAG: DYNAMIC
@@ -26,6 +25,14 @@ struct _PassiveParticlesParameters {
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
 	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
+	// physics parameters
+	inline static const tSpaceVector Position = EnvParameters::cDomainCenter + tSpaceVector({-0.25 * EnvParameters::cDomainSize[0], 0.0});
+	inline static const tSpaceVector FlowVelocity = tSpaceVector({std::pow(2, 1), 0.0});
+	inline static const double Separation = std::pow(2, -2) * EnvParameters::cDomainSize[1];
+	inline static const double ReactionTime = 1.0/2.0;
+	// numeric parameters
+	inline static const double VortexInterval = std::max(ReactionTime/8.0, RunParameters::Dt);
+	inline static const double VortexRate = 1.0/VortexInterval;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// variable
@@ -40,53 +47,37 @@ struct _PassiveParticlesParameters {
 		}
 
 	};
-	struct tGroupVariable : public d0t::VariableGroupDynamic<tMemberVariable> {
-		using tBase = d0t::VariableGroupDynamic<tMemberVariable>;
+	using tMetaVariable = d0t::VariableVector<tVector, tView, 1>; // stores timer
+	struct tGroupVariable : public d0t::VariableGroupDynamic<tMemberVariable, tMetaVariable> {
+		using tBase = d0t::VariableGroupDynamic<tMemberVariable, tMetaVariable>;
 
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int stateIndex) {
 			tBase::_constrain(stateArray, t, stateIndex);
 			// input
 			std::vector<double>& _state = stateArray[StateIndex];
-
 			// ---------------- CUSTOM CONSTRAIN START
-
-			// // remove points that get out of domain
-			// for(int index = tBase::groupSize(_state.size()) - 1; index > -1; index--) {
-			// 	const double* pState = tBase::cState(_state.data(), index);
-			// 	const tView<const tSpaceVector> x(pState);
-			// 	if (
-			// 		std::abs(x[0] - EnvParameters::cDomainCenter[0]) > 0.5 * EnvParameters::cDomainSize[0] || 
-			// 		std::abs(x[1] - EnvParameters::cDomainCenter[1]) > 0.5 * EnvParameters::cDomainSize[1]
-			// 	) {
-			// 		tBase::eraseMember(_state, index);
-			// 	}
-			// }
-
-			// merge points that are too close to each other
-
-			_state = Flow::flow.superVortexStateArray[0];
-
-			// interactive particles
-
-			using InteractiveParticlesParameters = _InteractiveParticlesParameters;
-			const double* pInteractiveParticlesState = stateArray[0].data() + InteractiveParticlesParameters::StateIndex;
-			
-			for(unsigned int index = 0; index < InteractiveParticlesParameters::Number; ++index) {
-			
-				const double* pState = InteractiveParticlesParameters::tGroupVariable::cState(pInteractiveParticlesState, index);
-
-				// input
+			// remove points that get out of domain
+			for(int index = tBase::groupSize(_state.size()) - 1; index > -1; index--) {
+				const double* pState = tBase::cState(_state.data(), index);
 				const tView<const tSpaceVector> x(pState);
-				const tView<const tSpaceVector> v(pState + DIM);
-				// flow
-				const tSpaceVector u = Flow::getVelocity(x.data(), t);
-	
-				// apply "force" on flow
-				const tSpaceVector dVelocity = -(u - v) * (u - v).norm() / InteractiveParticlesParameters::Width * RunParameters::Dt;
-				addVelocity(_state, x.data(), dVelocity.data(), InteractiveParticlesParameters::Width);
-				
+				if (
+					std::abs(x[0] - EnvParameters::cDomainCenter[0]) > 0.5 * EnvParameters::cDomainSize[0] || 
+					std::abs(x[1] - EnvParameters::cDomainCenter[1]) > 0.5 * EnvParameters::cDomainSize[1]
+				) {
+					tBase::eraseMember(_state, index);
+				}
 			}
-
+			// add points based on rate
+			double* pTime;
+			pTime = tBase::stateMeta(_state.data());
+			const unsigned int number = int((*pTime) * VortexRate);
+			if (number > 0) {
+				const tSpaceVector dVelocity = (FlowVelocity - Flow::getVelocity(Position.data(), t)) * VortexInterval/ReactionTime;
+				addVelocity(_state, Position.data(), dVelocity.data(), Separation);
+				// update pTime before set
+				pTime = tBase::stateMeta(_state.data());
+				*pTime = 0.0;
+			}
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 		
@@ -168,6 +159,15 @@ struct _PassiveParticlesParameters {
 			// prepare flow
 			Flow::prepare(tVariable::cState(pState, 0), tVariable::groupSize(stateSize));
 		}
+
+		static tStateVectorDynamic stateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t, const unsigned int stateIndex) {
+			tStateVectorDynamic dState = tBase::stateTemporalDerivative(pStateArray, pStateSize, arraySize, t, stateIndex);
+			// meta
+			double* pDTime = tVariable::stateMeta(dState.data());
+			*pDTime = 1.0;
+			// return
+			return dState;
+		}
 	};
 	using tEquation = tGroupEquation;
 
@@ -176,6 +176,8 @@ struct _PassiveParticlesParameters {
 
 	static void init(std::vector<double>& p_state) {
 		// ---------------- CUSTOM INIT START
+		double* pTime = tVariable::stateMeta(p_state.data());
+		*pTime = 1.0/VortexRate;
 		// ---------------- CUSTOM INIT END
 	}
 
@@ -183,7 +185,7 @@ struct _PassiveParticlesParameters {
 		std::map<std::string, double> output;
 		// ---------------- CUSTOM INIT START
 		unsigned int number = tVariable::groupSize(stateSize);
-		unsigned int formatNumber = number/10 + 1;
+		unsigned int formatNumber = int(std::log10(number)) + 1;
 		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < number; ++subIndex) {
 			const double* pMemberState = tVariable::cState(pState, subIndex);

@@ -6,6 +6,9 @@
 #include <map>
 #include <iomanip>
 
+// eigen includes
+#include <unsupported/Eigen/MatrixFunctions>
+
 // app includes
 #include "core/solutions/core.h"
 #include "param/flow/parameters.h"
@@ -23,18 +26,20 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = DIM; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	static constexpr float BuoyantVelocity = 0.5;
-	static constexpr std::array<double, DIM> BuoyancyDirection = {0.0, 1.0}; // defined for 2D simulations, use {0.0, 0.0, 1.0} for 3D
+	static constexpr double SwimmingVelocity = 0.5;
+	static constexpr std::array<double, DIM> TargetDirection = {0.0, 1.0}; // defined for 2D simulations, use {0.0, 1.0, 0.0} for 3D
+	static constexpr double TimeHorizon = 0.5;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
-
+		
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
 			// input
 			double* pState = stateArray[0].data() + memberStateIndex;
 			// ---------------- CUSTOM CONSTRAIN START
 			// ---------------- CUSTOM CONSTRAIN END
 		}
+
 	};
 	using tGroupVariable = d0t::VariableGroupStatic<d0t::VariableComposed<tMemberVariable>, Number>;
 	using tVariable = tGroupVariable;
@@ -45,6 +50,7 @@ struct _PassiveParticlesParameters {
 			// ---------------- CUSTOM PREPARATION START
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
+			Flow::prepareVelocityGradients(cX.data(), t);
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
@@ -57,21 +63,22 @@ struct _PassiveParticlesParameters {
 
 			// ---------------- CUSTOM EQUATION START
 			// parameters
-			const tView<const tSpaceVector> z(BuoyancyDirection.data());
+			const tView<const tSpaceVector> z(TargetDirection.data());
 			// input
 			const tView<const tSpaceVector> x(pState);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
+			const tSpaceMatrix j = Flow::getVelocityGradients(x.data(), t);
 			// output
 			tView<tSpaceVector> dX(dState.data());
-			dX = u + BuoyantVelocity * z;
+			dX = u + SwimmingVelocity * ( (j * TimeHorizon).exp().transpose() * z ).normalized();
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
 			return dState;
 		}
 	};
-	using tGroupEquation = d0t::EquationGroupStatic<tVariable, tMemberEquation>;
+	using tGroupEquation = d0t::EquationGroupStatic<tGroupVariable, tMemberEquation>;
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
@@ -87,26 +94,25 @@ struct _PassiveParticlesParameters {
 		// loop over each member of the variable group
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
 			// get the state variable of the subIndex member of the group
-			double* pSubState = tVariable::state(pState, subIndex);
+			double* pMemberState = tVariable::state(pState, subIndex);
 			// interpret subState as a tSpaceVector
-			tView<tSpaceVector> x(pSubState);
+			tView<tSpaceVector> x(pMemberState);
 			// set the initial position of this member
 			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
 		}
 		// ---------------- CUSTOM INIT END
 	}
 
-	// static constexpr unsigned FormatNumber = std::ceil(Number/10.0); // compatibility issue with Clang
-	static constexpr unsigned FormatNumber = Number/10 + 1;
-	
+	inline static unsigned int FormatNumber = int(std::log10(Number)) + 1;
+
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;
 		// ---------------- CUSTOM POST START
 		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
-			const double* pSubState = tVariable::cState(pState, subIndex);
+			const double* pMemberState = tVariable::cState(pState, subIndex);
 			// input
-			const tView<const tSpaceVector> x(pSubState);
+			const tView<const tSpaceVector> x(pMemberState);
 			// generate formated index
 			std::ostringstream ossIndex;
 			ossIndex << "passive_particles__index_" << std::setw(FormatNumber) << std::setfill('0') << subIndex;

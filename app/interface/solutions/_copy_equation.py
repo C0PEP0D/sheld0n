@@ -23,6 +23,12 @@ def run(args):
     if(name_check.search(args.name) == None):
         # copy
         shutil.copytree(args.source, args.name, symlinks=True)
+        if os.path.exists(args.name + "/parameters_" + args.source + ".pyx"):
+            os.rename(args.name + "/parameters_" + args.source + ".pyx", args.name + "/parameters_" + args.name + ".pyx")
+        if os.path.exists(args.name + "/parameters_" + args.source + ".h"):
+            os.remove(args.name + "/parameters_" + args.source + ".h")
+        if os.path.exists(args.name + "/parameters_" + args.source + ".cpp"):
+            os.remove(args.name + "/parameters_" + args.source + ".cpp")
         # edit
         libchoose.edit_choice(args.name, [args.source], [args.name])
         # register

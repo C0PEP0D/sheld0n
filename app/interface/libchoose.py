@@ -14,113 +14,9 @@ import glob
 import fileinput
 import fnmatch
 
-# # getters
-# def get_selected():
-#     for name in [os.path.basename(os.path.dirname(path)) for path in glob.glob("./*/")]:
-#         if not name.startswith("_"):
-#             return name
-# 
-# def get_object():
-#     re_include = re.compile(r'^#include "param/solutions/.*/(parameters.h|choice.h)"')
-#     with open('choice.h', 'r') as reader:
-#         line = reader.readline()
-#         while line and re_include.match(line) == None:
-#             line = reader.readline()
-#     return line.split("/")[4:-2]
-# 
-# def get_object_type():
-#     re_include = re.compile(r'^#include "param/solutions/.*/(parameters.h|choice.h)"')
-#     with open('choice.h', 'r') as reader:
-#         line = reader.readline()
-#         while line and re_include.match(line) == None:
-#             line = reader.readline()
-#     return line.split("/")[3]
-# 
-# def get_flow():
-#     re_include = re.compile(r'^#include "param/flow/.*/(parameters.h|choice.h)"')
-#     with open('choice.h', 'r') as reader:
-#         line = reader.readline()
-#         while line and re_include.match(line) == None:
-#             line = reader.readline()
-#     return line.split("/")[2:-2]
-# 
-# def get_init():
-#     re_include = re.compile(r'^#include "param/init/solutions/.*/(parameters.h|choice.h)"')
-#     with open('choice.h', 'r') as reader:
-#         line = reader.readline()
-#         while line and re_include.match(line) == None:
-#             line = reader.readline()
-#     return line.split("/")[3:-2]
-# 
-# def get_post():
-#     re_include = re.compile(r'^#include "param/post/solutions/.*/(parameters.h|choice.h)"')
-#     with open('choice.h', 'r') as reader:
-#         line = reader.readline()
-#         while line and re_include.match(line) == None:
-#             line = reader.readline()
-#     return line.split("/")[3:-2]
-
 def get_abs_choices_dir(choices_dir):
     script_dir = os.path.dirname(os.path.realpath(__file__))
     return script_dir[:script_dir.find("interface")-1] + "/default/param/" + choices_dir
-
-# def get_choices_dir(choices_dir, choices_exceptions = []):
-#     abs_choices_dir = get_abs_choices_dir(choices_dir)
-#     _choices = [os.path.basename(os.path.dirname(path)) for path in glob.glob("{abs_choices_dir}/*/".format(abs_choices_dir=abs_choices_dir))]
-#     # build choices dict
-#     choices = {}
-#     for choice in _choices:
-#         if choice.startswith('__'):
-#             choices[choice[2:]] = choice
-#         elif not choice.startswith('_'):
-#             choices[choice] = choice
-#     # remove exceptions
-#     for exception in choices_exceptions:
-#         choices.pop(exception, None)
-#     choices.pop(get_selected(), None)
-#     # reurn
-#     return choices
-# 
-# 
-# def get_default_object(abs_choices_dir):
-#     re_include = re.compile(r'^#include "param/solutions/.*/(parameters.h|choice.h)"')
-#     with open(abs_choices_dir + '/choice.h', 'r') as reader:
-#         line = reader.readline()
-#         while line and re_include.match(line) == None:
-#             line = reader.readline()
-#     return line.split("/")[4:-2]
-# 
-# def get_default_object_type(abs_choices_dir):
-#     re_include = re.compile(r'^#include "param/solutions/.*/(parameters.h|choice.h)"')
-#     with open(abs_choices_dir + '/choice.h', 'r') as reader:
-#         line = reader.readline()
-#         while line and re_include.match(line) == None:
-#             line = reader.readline()
-#     return line.split("/")[3]
-# 
-# def get_default_flow(abs_choices_dir):
-#     re_include = re.compile(r'^#include "param/flow/.*/(parameters.h|choice.h)"')
-#     with open(abs_choices_dir + '/choice.h', 'r') as reader:
-#         line = reader.readline()
-#         while line and re_include.match(line) == None:
-#             line = reader.readline()
-#     return line.split("/")[2:-2]
-# 
-# def get_default_init(abs_choices_dir):
-#     re_include = re.compile(r'^#include "param/init/solutions/.*/(parameters.h|choice.h)"')
-#     with open(abs_choices_dir + '/choice.h', 'r') as reader:
-#         line = reader.readline()
-#         while line and re_include.match(line) == None:
-#             line = reader.readline()
-#     return line.split("/")[3:-2]
-# 
-# def get_default_post(abs_choices_dir):
-#     re_include = re.compile(r'^#include "param/post/solutions/.*/(parameters.h|choice.h)"')
-#     with open(abs_choices_dir + '/choice.h', 'r') as reader:
-#         line = reader.readline()
-#         while line and re_include.match(line) == None:
-#             line = reader.readline()
-#     return line.split("/")[3:-2]
  
 # edit
  
@@ -136,16 +32,6 @@ def object_to_upper_snake_case(obj):
             o = o[1:]
         s += o.upper() + "_"
     return s[:-1]
-
-# def object_to_camel_case(obj):
-#     s = obj[0]
-#     for o in obj[1:]:
-#         if o.startswith("__"):
-#             o = o[2:]
-#         elif o.startswith("_"):
-#             o = o[1:]
-#         s += o.title().replace("_", "")
-#     return s
  
 def object_to_upper_camel_case(obj):
     s = ""
@@ -162,27 +48,6 @@ def object_to_path(obj):
     for o in obj:
         s += o + "/"
     return s[:-1]
-
-# # def edit_header(selected, choice):
-# #     # edit choice.h
-# #     re_include = re.compile(r'^#include "core/solutions/object/.*/core.h"')
-# #     with open('choice.h', 'r') as reader:
-# #         line = reader.readline()
-# #         while line and re_include.match(line) == None:
-# #             line = reader.readline()
-# #     upper_camel_obj = object_to_upper_camel_case(line.split("/")[4:-2])
-# #     if not upper_camel_obj:
-# #         re_include = re.compile(r'^#include "param/solutions/.*/(parameters.h|choice.h)"')
-# #         with open('choice.h', 'r') as reader:
-# #             line = reader.readline()
-# #             while line and re_include.match(line) == None:
-# #                 line = reader.readline()
-# #         upper_camel_obj = object_to_upper_camel_case(line.split("/")[4:-2])
-# #     # replace
-# #     for line in fileinput.FileInput("choice.h", inplace=True):
-# #         line = line.replace("/" + selected + "/", "/" + choice + "/")
-# #         line = line.replace(upper_camel_obj + str_to_upper_camel_case(selected), upper_camel_obj + str_to_upper_camel_case(choice))
-# #         print(line, end='')
 
 ## source https://stackoverflow.com/questions/4205854/python-way-to-recursively-find-and-replace-string-in-text-files
 def find_replace(folder, file_pattern, text, replacement, condition = lambda line : True):
@@ -269,30 +134,17 @@ def edit_add_equation_dynamic(name):
 def edit_choice(choice, default_obj, obj, size = 1):
     obj = obj[0:len(obj) - len(default_obj) + size]
     default_obj = default_obj[0:size]
+    # h
+    find_replace(choice, "*.h", "".join(default_obj) + "_", "".join(obj) + "_")
+    find_replace(choice, "*.h", "_" + "".join(default_obj), "_" + "".join(obj))
     find_replace(choice, "*.h", '"' + "".join(default_obj), '"' + "".join(obj))
     find_replace(choice, "*.h", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
     find_replace(choice, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
     find_replace(choice, "*.h", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))
-# 
-# def create_sym_links(choice, choice_alt):
-#     script_dir = os.path.dirname(os.path.realpath(__file__))
-#     interface_dir = script_dir[:script_dir.find("interface")-1] + "/interface/" + choices_dir + "/" + choice_alt
-#     if os.path.exists(interface_dir + "/choose.py"):
-#         os.symlink(os.path.relpath(interface_dir + "/choose.py", choice), choice + "/choose")
-#     for path in glob.glob(interface_dir + "/*/"):
-#         subdir = os.path.basename(os.path.dirname(path))
-#         if not subdir.startswith("__"):
-#             #if os.path.exists(path + "choose.py"):
-#             #    os.symlink(path + "choose.py", choice + "/" + subdir + "/choose")
-#             create_sym_links(choice + "/" + subdir, choice_alt + "/" + subdir)
-
-
-
-
-
-
-
-
+    # py
+    find_replace(choice, "*.py", "".join(default_obj) + "_", "".join(obj) + "_")
+    # pyx
+    find_replace(choice, "*.pyx", "".join(default_obj) + "_", "".join(obj) + "_")
 
 # choose file
 
@@ -315,13 +167,32 @@ def get_choices_file(choices_dir, choices_exceptions = []):
 def apply_choice(args):
     choices = get_choices_file(choices_dir, choices_exceptions)
     shutil.copyfile(get_abs_choices_dir(choices_dir) + "/" + choices[args.choice], "parameters.h")
-    if args.choice.endswith("_py"):
-        shutil.copyfile(get_abs_choices_dir(choices_dir) + "/" + choices[args.choice].replace(".h", ".py"), "parameters.py")
-    else:
-        if os.path.exists("parameters.py"):
-            os.remove("parameters.py")
-    # edit
+
     name = os.path.basename(os.getcwd())
+
+    if os.path.exists("parameters.py"):
+        os.remove("parameters.py")
+    if os.path.exists("parameters_" + name + ".pyx"):
+        os.remove("parameters_" + name + ".pyx")
+    if os.path.lexists("c0p.pxd"):
+        os.unlink("c0p.pxd")
+    if os.path.lexists("std.pxd"):
+        os.unlink("std.pxd")
+    if os.path.exists("parameters_" + name + ".h"):
+        os.remove("parameters_" + name + ".h")
+    if os.path.exists("parameters_" + name + ".cpp"):
+        os.remove("parameters_" + name + ".cpp")
+
+    if args.choice.startswith("pyx"):
+        shutil.copyfile(get_abs_choices_dir(choices_dir) + "/" + choices[args.choice].replace(".h", ".pyx"), "parameters_" + name + ".pyx")
+        # links
+        cython_dir = os.path.dirname(os.path.realpath(__file__)).split("interface")[0] + "interface/cython/"
+        os.symlink(os.path.relpath(cython_dir + "c0p.pxd", "."), "c0p.pxd")
+        os.symlink(os.path.relpath(cython_dir + "std.pxd", "."), "std.pxd")
+    elif args.choice.startswith("py"):
+        shutil.copyfile(get_abs_choices_dir(choices_dir) + "/" + choices[args.choice].replace(".h", ".py"), "parameters.py")
+
+    # edit
     if not name == "flow":
         edit_file(name, ["passive_particles"], [name])
         # register
@@ -370,11 +241,14 @@ def choose_file(choices_dir, choices_exceptions, edit=True):
 def edit_file(choice, default_obj, obj, size = 1):
     obj = obj[0:len(obj) - len(default_obj) + size]
     default_obj = default_obj[0:size]
-    find_replace(".", "parameters.h", '"' + "".join(default_obj), '"' + "".join(obj))
-    find_replace(".", "parameters.h", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
-    find_replace(".", "parameters.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
-    find_replace(".", "parameters.h", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))
-    find_replace(".", "parameters.py", '"' + "".join(default_obj), '"' + "".join(obj))
-    find_replace(".", "parameters.py", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
-    find_replace(".", "parameters.py", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
-    find_replace(".", "parameters.py", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))
+    # h
+    find_replace(choice, "*.h", "".join(default_obj) + "_", "".join(obj) + "_")
+    find_replace(choice, "*.h", "_" + "".join(default_obj), "_" + "".join(obj))
+    find_replace(choice, "*.h", '"' + "".join(default_obj), '"' + "".join(obj))
+    find_replace(choice, "*.h", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
+    find_replace(choice, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
+    find_replace(choice, "*.h", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))
+    # py
+    find_replace(choice, "*.py", "".join(default_obj) + "_", "".join(obj) + "_")
+    # pyx
+    find_replace(choice, "*.pyx", "".join(default_obj) + "_", "".join(obj) + "_")

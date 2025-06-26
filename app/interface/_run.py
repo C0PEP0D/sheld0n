@@ -6,10 +6,14 @@ from cli2gui import Cli2Gui
 import argparse
 # directory operations
 import os
-# file edit
+import glob
+# process
 import subprocess
 
 def run(args):
+    # cython
+    sources = glob.glob('param/solutions/**/parameters_*.pyx')
+    subprocess.run("cython -tv --cplus {sources}; exit 0".format(sources=" ".join(sources)), shell=True, check=True)
     # create build dir
     if not os.path.exists('build'):
         os.makedirs('build')
@@ -20,11 +24,11 @@ def run(args):
     if args.compiler:
         flags += " -DCMAKE_CXX_COMPILER={compiler}".format(compiler=args.compiler)
     # configure
-    subprocess.run("{cmake_cmd} .. {flags}; exit 0".format(cmake_cmd=args.cmake_cmd, flags=flags), cwd="build", shell=True)
+    subprocess.run("{cmake_cmd} .. {flags}; exit 0".format(cmake_cmd=args.cmake_cmd, flags=flags), cwd="build", shell=True, check=True)
     # build
-    subprocess.run("{cmake_cmd} --build . -j {jobs} --target run; exit 0".format(cmake_cmd=args.cmake_cmd, jobs=args.jobs), cwd="build", shell=True)
+    subprocess.run("{cmake_cmd} --build . -j {jobs} --target run; exit 0".format(cmake_cmd=args.cmake_cmd, jobs=args.jobs), cwd="build", shell=True, check=True)
     # run
-    subprocess.run("./build/run", shell=True)
+    subprocess.run("./build/run", shell=True, check=True)
 
 @Cli2Gui(run_function=run)
 def main():

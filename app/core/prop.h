@@ -29,13 +29,13 @@ using tStateVectorDynamic = tVector<Eigen::Dynamic>;
 using tSolver = s0s::SolverRungeKuttaFehlberg<tStateVectorDynamic, tView>;
 
 namespace rand0m {
-	std::random_device device;
-	std::default_random_engine engine(device());
+	inline std::random_device device;
+	inline std::default_random_engine engine(device());
 	// distribution
-	std::normal_distribution<> standardNormalDistribution(0.0, 1.0);
-	std::uniform_real_distribution<> uniformRealDistribution(-1.0, 1.0);
+	inline std::normal_distribution<> standardNormalDistribution(0.0, 1.0);
+	inline std::uniform_real_distribution<> uniformRealDistribution(-1.0, 1.0);
 
-	void seed(unsigned int p_seed) {
+	inline void seed(unsigned int p_seed) {
 		engine.seed(p_seed);
 		std::srand(p_seed);
 	}

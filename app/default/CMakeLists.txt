@@ -31,8 +31,11 @@ find_package(TBB REQUIRED)
 ### Python
 find_package(Python COMPONENTS Interpreter Development NumPy REQUIRED)
 
+# Additional cpp files (cython)
+file(GLOB_RECURSE ADD_CPP_FILES "./param/solutions/*.cpp")
+
 # Build run
-add_executable(run ${C0P_PROJECT_DIR}/app/core/run/main.cpp)
+add_executable(run ${C0P_PROJECT_DIR}/app/core/run/main.cpp ${ADD_CPP_FILES})
 ## Link Libraries
 target_link_libraries(run TBB::tbb)
 target_link_libraries(run Python::Python Python::NumPy)
@@ -91,7 +94,7 @@ target_include_directories(run PRIVATE ${PYTHON_INCLUDE_DIRS})
 target_compile_features(run PUBLIC cxx_std_17)
 
 # Build post
-add_executable(post ${C0P_PROJECT_DIR}/app/core/post/main.cpp)
+add_executable(post ${C0P_PROJECT_DIR}/app/core/post/main.cpp ${ADD_CPP_FILES})
 ## Libraries
 target_link_libraries(post TBB::tbb)
 target_link_libraries(post Python::Python Python::NumPy)
@@ -121,7 +124,7 @@ target_include_directories(post PRIVATE ${PYTHON_INCLUDE_DIRS})
 target_compile_features(post PUBLIC cxx_std_17)
 
 # Build learn
-add_executable(learn ${C0P_PROJECT_DIR}/app/core/learn/main.cpp)
+add_executable(learn ${C0P_PROJECT_DIR}/app/core/learn/main.cpp ${ADD_CPP_FILES})
 ## Link Libraries
 target_link_libraries(learn TBB::tbb)
 target_link_libraries(learn Python::Python Python::NumPy)

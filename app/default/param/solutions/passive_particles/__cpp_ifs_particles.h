@@ -6,15 +6,15 @@
 #include <map>
 #include <iomanip>
 
-// lib includes
-#include "sp0ce/operators.h"
-
 // app includes
 #include "core/solutions/core.h"
 #include "param/flow/parameters.h"
 
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
+
+// #include "param/solutions/point_vortices/parameters.h"
+// #include "param/run/parameters.h"
 
 namespace c0p {
 
@@ -23,25 +23,20 @@ struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
-	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
+	static const unsigned StateSize = 2 * DIM; // dimension of the state variable 
 	// feel free to add parameters if you need
-	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	// circulation
-	static constexpr double MaxCirculation = 1.0/Number;
-	// periodicity
-	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
-	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
-	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
+	static const unsigned Number = 16;// EnvParameters::cGroupSize; // number of members in the group
+	static constexpr double ReactionLength = 1.0;
+	static constexpr double Width = std::pow(2, -3);
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
-
+	
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
 			// input
 			double* pState = stateArray[0].data() + memberStateIndex;
+			
 			// ---------------- CUSTOM CONSTRAIN START
-			tView<tSpaceVector> x(pState);
-			x = sp0ce::xPeriodic<tSpaceVector>(x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
@@ -53,7 +48,6 @@ struct _PassiveParticlesParameters {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
 			// ---------------- CUSTOM PREPARATION START
-			// prepare velocity just in case
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
 			// ---------------- CUSTOM PREPARATION END
@@ -67,30 +61,25 @@ struct _PassiveParticlesParameters {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START
+
 			// input
 			const tView<const tSpaceVector> x(pState);
+			const tView<const tSpaceVector> v(pState + DIM);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
-			const double w = pState[DIM];
 			// output
 			tView<tSpaceVector> dX(dState.data());
-			dX = u;
+			tView<tSpaceVector> dV(dState.data() + DIM);
+			dX = v;
+			dV = (u - v) * (u - v).norm() / ReactionLength;
+			
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
 			return dState;
 		}
 	};
-	struct tGroupEquation : public d0t::EquationGroupStatic<tVariable, tMemberEquation> {
-
-		using tBase = d0t::EquationGroupStatic<tVariable, tMemberEquation>;
-	
-		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
-			tBase::prepare(pState, stateSize, t);
-			// prepare flow
-			Flow::prepare(pState, stateSize/StateSize);
-		}
-	};
+	using tGroupEquation = d0t::EquationGroupStatic<tGroupVariable, tMemberEquation>;
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
@@ -109,43 +98,39 @@ struct _PassiveParticlesParameters {
 			double* pMemberState = tVariable::state(pState, subIndex);
 			// interpret subState as a tSpaceVector
 			tView<tSpaceVector> x(pMemberState);
-			double& w = pMemberState[DIM];
+			tView<tSpaceVector> v(pMemberState + DIM);
 			// set the initial position of this member
 			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
-			w = MaxCirculation * tVector<1>::Random()[0];
+			v = tSpaceVector::Zero();
 		}
 		// ---------------- CUSTOM INIT END
 	}
 
-	// static constexpr unsigned FormatNumber = std::ceil(Number/10.0); // compatibility issue with Clang
-	static constexpr unsigned FormatNumber = Number/10 + 1;
+	inline static unsigned int FormatNumber = int(std::log10(Number)) + 1;
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;
 		// ---------------- CUSTOM POST START
 		tSpaceVector xAverage = tSpaceVector::Zero();
-		double wAverage = 0.0;
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
 			const double* pMemberState = tVariable::cState(pState, subIndex);
 			// input
 			const tView<const tSpaceVector> x(pMemberState);
-			const double w = pMemberState[DIM];
+			const tView<const tSpaceVector> v(pMemberState + DIM);
 			// generate formated index
 			std::ostringstream ossIndex;
 			ossIndex << "passive_particles__index_" << std::setw(FormatNumber) << std::setfill('0') << subIndex;
 			// output
 			output[ossIndex.str() + "__pos_0"] = x[0];
 			output[ossIndex.str() + "__pos_1"] = x[1];
-			output[ossIndex.str() + "__circulation"] = w;
+			output[ossIndex.str() + "__vel_0"] = v[0];
+			output[ossIndex.str() + "__vel_1"] = v[1];
 			// compute average
 			xAverage += x;
-			wAverage += w;
 		}
 		xAverage /= Number;
-		wAverage /= Number;
 		output["passive_particles__average_pos_0"] = xAverage[0];
 		output["passive_particles__average_pos_1"] = xAverage[1];
-		output["passive_particles__average_circulation"] = wAverage;
 		// ---------------- CUSTOM POST END
 		return output;
 	}

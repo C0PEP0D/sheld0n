@@ -3,7 +3,6 @@
 #pragma once
 
 // std includes
-#include <memory> // shared_ptr
 #include <vector>
 // other modules includes
 #include "p0l/lagrange.h"
@@ -17,7 +16,7 @@
 
 namespace d0t {
 
-template<typename _tVariableMember, unsigned int _Density, bool _IsClosed, unsigned int _InterpolationOrder>
+template<typename _tVariableMember, unsigned int _Dim, unsigned int _Density, bool _IsClosed, unsigned int _InterpolationOrder>
 class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 	public:
 		using tBase = VariableGroupDynamic<_tVariableMember>;
@@ -30,8 +29,8 @@ class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 		using tVariableMeta = typename tBase::tVariableMeta;
 	public:
 		constexpr static unsigned int VariableMemberSize = tVariableMember::Size;
-		constexpr static unsigned int Dim = tVariableMember::Dim;
-		using tSpaceVector = typename tVariableMember::tSpaceVector;
+		constexpr static unsigned int Dim = _Dim;
+		using tSpaceVector = tVector<Dim>;
 	public:
 		constexpr static double Density = _Density;
 		constexpr static bool IsClosed = _IsClosed;
@@ -85,13 +84,13 @@ class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 		}
 		
 		static tSpaceVector cPositionInterpolated(const double* pState, const unsigned int stateSize, const double s) {
-			return tVariableMember::cPosition(cStateInterpolated(pState, stateSize, s).data());
+			return tView<const tSpaceVector>(cStateInterpolated(pState, stateSize, s).data());
 		}
 		
 		static const tSpaceVector cTangentInterpolated(const double* pState, const unsigned int stateSize, const double s) {
 			std::vector<tStateVectorDynamic> interpolationPolynome = cStateInterpolationPolynome(pState, stateSize, s);
 			p0l::polynome::differentiate(interpolationPolynome);
-			const tSpaceVector positionDerivative = tVariableMember::cPosition(p0l::polynome::evaluation(interpolationPolynome.data(), interpolationPolynome.size(), s).data());
+			const tView<const tSpaceVector> positionDerivative(p0l::polynome::evaluation(interpolationPolynome.data(), interpolationPolynome.size(), s).data());
 			return positionDerivative / positionDerivative.norm();
 		}
 		
@@ -111,6 +110,61 @@ class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 		}
 
 	public:
+		static double cClosestS(const double* pState, const unsigned int stateSize, const double* pX) {
+			return cClosestS(pState, stateSize, pX, cS(pState, stateSize, cClosestMember(pState, stateSize, pX)));
+		}
+		
+		static unsigned int cClosestMember(const double* pState, const unsigned int stateSize, const double* pX) {
+			// input
+			const tView<tSpaceVector> x(pX);
+			// compute
+			unsigned int minIndex = 0;
+			double minDistance = (cPosition(pState, 0) - x).norm();
+			for(std::size_t index = 1; index < tBase::groupSize(stateSize); ++index){ 
+				const double distance = (cPosition(pState, index) - x).norm();
+				if(distance < minDistance) {
+					minIndex = index;
+					minDistance = distance;
+				}
+			}
+			return minIndex;
+		}
+
+		static double cClosestS(const double* pState, const unsigned int stateSize, const double* pX, const double s0) { // TODO: deal with s0 = NAN -> find closest s0 with closest to polygon
+			const std::vector<tStateVectorDynamic> stateInterpolationPolynome = cStateInterpolationPolynome(pState, stateSize, s0);
+			// compute position polynomes
+			std::vector<std::vector<double>> positionPolynomes(Dim, std::vector<double>(stateInterpolationPolynome.size()));
+			for (unsigned int j = 0; j < stateInterpolationPolynome.size(); ++j) {
+				const tView<const tSpaceVector> position(stateInterpolationPolynome[j].data());
+				for (unsigned int i = 0; i < Dim; ++i) {
+					positionPolynomes[i][j] = position[i];
+				}
+			}
+			for (unsigned int i = 0; i < Dim; ++i) {
+				p0l::polynome::substract(positionPolynomes[i], pX[i]);
+			}
+			// compute distance polynome
+			std::vector<double> squaredDistancePolynome = positionPolynomes[0];
+			p0l::polynome::multiply(squaredDistancePolynome, positionPolynomes[0].data(), positionPolynomes[0].size(), 0.0);
+			for (unsigned int i = 1; i < Dim; ++i) {
+				std::vector<double> subPolynome = positionPolynomes[i];
+				p0l::polynome::multiply(subPolynome, positionPolynomes[i].data(), positionPolynomes[0].size(), 0.0);
+				// add 
+				p0l::polynome::add(squaredDistancePolynome, subPolynome.data(), subPolynome.size(), 0.0);
+			}
+			// compute gradient
+			p0l::polynome::differentiate(squaredDistancePolynome);
+			// just solve
+			double s(s0);
+			s0s::SolverGradientDescent<tScalar, tView>::solve(
+				[&squaredDistancePolynome](const double* pS, const unsigned int sSize){ return tScalar(p0l::polynome::evaluation(squaredDistancePolynome.data(), squaredDistancePolynome.size(), *pS)); },
+				&s,
+				1,
+				1e-6 // TODO: tolerance should be a numeric parameter
+			);
+			return s;
+		}
+
 		static double cS(const double* pState, const unsigned int stateSize, const unsigned int memberIndex) { // TODO: compute length using integral
 			if (memberIndex > 0) {
 				double lengthIndex = 0.0;
@@ -132,41 +186,6 @@ class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 			} else {
 				return 0.0;
 			}
-		}
-
-		static double cClosestS(const double* pState, const unsigned int stateSize, const double* pX, const double s0) { // TODO: deal with s0 = NAN -> find closest s0 with closest to polygon
-			const std::vector<tStateVectorDynamic> stateInterpolationPolynome = cStateInterpolationPolynome(pState, stateSize, s0);
-			// compute position polynomes
-			std::vector<std::vector<tScalar>> positionPolynomes(Dim, std::vector<double>(stateInterpolationPolynome.size()));
-			for (unsigned int j = 0; j < stateInterpolationPolynome.size(); ++j) {
-				const tSpaceVector position = tVariableMember::cPosition(stateInterpolationPolynome[j].data());
-				for (unsigned int i = 0; i < Dim; ++i) {
-					positionPolynomes[i][j] = position[i];
-				}
-			}
-			for (unsigned int i = 0; i < Dim; ++i) {
-				p0l::polynome::substract(positionPolynomes[i], pX[i]);
-			}
-			// compute distance polynome
-			std::vector<tScalar> squaredDistancePolynome = positionPolynomes[0];
-			p0l::polynome::multiply(squaredDistancePolynome, positionPolynomes[0].data(), positionPolynomes[0].size(), 0.0);
-			for (unsigned int i = 1; i < Dim; ++i) {
-				std::vector<tScalar> subPolynome = positionPolynomes[i];
-				p0l::polynome::multiply(subPolynome, positionPolynomes[i].data(), positionPolynomes[0].size(), 0.0);
-				// add 
-				p0l::polynome::add(squaredDistancePolynome, subPolynome.data(), subPolynome.size(), 0.0);
-			}
-			// compute gradient
-			p0l::polynome::differentiate(squaredDistancePolynome);
-			// just solve
-			tScalar s(s0);
-			s0s::SolverGradientDescent<tScalar, tView>::solve(
-				[&squaredDistancePolynome](const double* pS, const unsigned int sSize){ return p0l::polynome::evaluation(squaredDistancePolynome.data(), squaredDistancePolynome.size(), *pS); },
-				s.data(),
-				1,
-				1e-6 // TODO: tolerance should be a numeric parameter
-			);
-			return s;
 		}
 	
 		static double cLength(const double* pState, const unsigned int stateSize) { // TODO: compute length using integral
