@@ -32,7 +32,9 @@ struct _PassiveParticlesParameters {
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
 			// input
 			double* pState = stateArray[0].data() + memberStateIndex;
+
 			// ---------------- CUSTOM CONSTRAIN START
+
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
@@ -45,9 +47,12 @@ struct _PassiveParticlesParameters {
 	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+
 			// ---------------- CUSTOM PREPARATION START
+
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
+
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
@@ -59,6 +64,7 @@ struct _PassiveParticlesParameters {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START
+
 			// input
 			const tView<const tSpaceVector> x(pState);
 			// flow
@@ -66,6 +72,7 @@ struct _PassiveParticlesParameters {
 			// output
 			tView<tSpaceVector> dX(dState.data());
 			dX = u;
+
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
@@ -82,7 +89,9 @@ struct _PassiveParticlesParameters {
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {
+
 		// ---------------- CUSTOM INIT START
+
 		// interpret BoxCenter and BoxSize as vectors
 		const tSpaceVector boxCenter = tView<const tSpaceVector>(BoxCenter.data());
 		const tSpaceVector boxSize = tView<const tSpaceVector>(BoxSize.data());
@@ -95,6 +104,7 @@ struct _PassiveParticlesParameters {
 			// set the initial position of this member
 			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
 		}
+
 		// ---------------- CUSTOM INIT END
 	}
 
@@ -102,7 +112,9 @@ struct _PassiveParticlesParameters {
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;
+
 		// ---------------- CUSTOM INIT START
+
 		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
 			const double* pMemberState = tVariable::cState(pState, subIndex);
@@ -120,6 +132,7 @@ struct _PassiveParticlesParameters {
 		xAverage /= Number;
 		output["passive_particles__average_pos_0"] = xAverage[0];
 		output["passive_particles__average_pos_1"] = xAverage[1];
+
 		// ---------------- CUSTOM INIT END
 		return output;
 	}

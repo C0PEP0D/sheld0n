@@ -31,7 +31,9 @@ struct _PassiveParticlesParameters {
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
 			// input
 			double* pState = stateArray[0].data() + memberStateIndex;
+
 			// ---------------- CUSTOM CONSTRAIN START
+
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 	};
@@ -41,9 +43,12 @@ struct _PassiveParticlesParameters {
 	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+
 			// ---------------- CUSTOM PREPARATION START
+
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
+
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
@@ -55,6 +60,7 @@ struct _PassiveParticlesParameters {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START
+
 			// input
 			const tView<const tSpaceVector> x(pState);
 			// flow
@@ -63,6 +69,7 @@ struct _PassiveParticlesParameters {
 			// output
 			tView<tSpaceVector> dX(dState.data());
 			dX = u;
+
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
@@ -82,13 +89,16 @@ struct _PassiveParticlesParameters {
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
+
 	inline static const tSpaceVector Center = EnvParameters::cDomainCenter;
 	inline static const double Radius = 0.125 * EnvParameters::cDomainSize[1];
 	inline static const double Spacing = 0.75 * EnvParameters::cDomainSize[1];
+
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {
 		// ---------------- CUSTOM INIT START
+
 		// loop over each member of the variable group
 		const unsigned int halfNumber = Number / 2;
 		for(unsigned int index = 0; index < halfNumber; ++index) {
@@ -117,6 +127,7 @@ struct _PassiveParticlesParameters {
 			});
 			w = -Circulation;
 		}
+
 		// ---------------- CUSTOM INIT END
 	}
 
@@ -126,6 +137,7 @@ struct _PassiveParticlesParameters {
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;
 		// ---------------- CUSTOM POST START
+
 		tSpaceVector xAverage = tSpaceVector::Zero();
 		double wAverage = 0.0;
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
@@ -149,6 +161,7 @@ struct _PassiveParticlesParameters {
 		output["passive_particles__average_pos_0"] = xAverage[0];
 		output["passive_particles__average_pos_1"] = xAverage[1];
 		output["passive_particles__average_circulation"] = wAverage;
+
 		// ---------------- CUSTOM POST END
 		return output;
 	}

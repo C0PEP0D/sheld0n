@@ -22,7 +22,7 @@ struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
-	static const unsigned StateSize = DIM; // dimension of the state variable 
+	static const unsigned StateSize = 2 * DIM; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
 	// ---------------- CUSTOM EQUATION PARAMETERS END
@@ -35,10 +35,11 @@ struct _PassiveParticlesParameters {
 
 			// ---------------- CUSTOM CONSTRAIN START
 
-			// input and output
+			// output
 			tView<tSpaceVector> x(pState);
+			tView<tSpaceVector> v(pState + DIM);
 			// cython
-			passive_particles_constrain(t, x);
+			passive_particles_constrain(t, x, v);
 			
 			// ---------------- CUSTOM CONSTRAIN END
 		}
@@ -55,8 +56,9 @@ struct _PassiveParticlesParameters {
 
 			// input
 			const tView<const tSpaceVector> x(pState);
+			const tView<const tSpaceVector> v(pState + DIM);
 			// cython
-			passive_particles_prepare(x, t);
+			passive_particles_prepare(x, v, t);
 			
 			// ---------------- CUSTOM PREPARATION END
 		}
@@ -68,15 +70,17 @@ struct _PassiveParticlesParameters {
 			// output
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
-			// ---------------- CUSTOM EQUATION START
+			/// ---------------- CUSTOM EQUATION START
 			
 			// input
 			const tView<const tSpaceVector> x(pState);
-			// output
+			const tView<const tSpaceVector> v(pState + DIM);
+
 			tView<tSpaceVector> dx(dState.data());
+			tView<tSpaceVector> dv(dState.data() + DIM);
 
 			// cython
-			passive_particles_state_temporal_derivative(x, t, dx);
+			passive_particles_state_temporal_derivative(x, v, t, dx, dv);
 	
 			// ---------------- CUSTOM EQUATION END
 
@@ -100,13 +104,16 @@ struct _PassiveParticlesParameters {
 
 		// input
 		std::vector<tView<tSpaceVector>> xArray;
+		std::vector<tView<tSpaceVector>> vArray;
 		xArray.reserve(Number);
+		vArray.reserve(Number);
 		for(unsigned int index = 0; index < Number; ++index) {
 			xArray.emplace_back(pState + index * StateSize);
+			vArray.emplace_back(pState + DIM + index * StateSize);
 		}
 
 		// cython
-		passive_particles_init(Number, xArray.data());
+		passive_particles_init(Number, xArray.data(), vArray.data());
 		
 		// ---------------- CUSTOM INIT END
 	}
@@ -120,13 +127,16 @@ struct _PassiveParticlesParameters {
 
 		// input
 		std::vector<tView<const tSpaceVector>> xArray;
+		std::vector<tView<const tSpaceVector>> vArray;
 		xArray.reserve(Number);
+		vArray.reserve(Number);
 		for(unsigned int index = 0; index < Number; ++index) {
 			xArray.emplace_back(pState + index * StateSize);
+			vArray.emplace_back(pState + DIM + index * StateSize);
 		}
 
 		// cython
-		passive_particles_post(xArray.data(), Number, t, output);
+		passive_particles_post(xArray.data(), vArray.data(), Number, t, output);
 		
 		// ---------------- CUSTOM POST END
 

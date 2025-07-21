@@ -26,9 +26,11 @@ struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
-	static const unsigned StateSize = DIM; // dimension of the state variable 
+
+	static const unsigned StateSize = 2 * DIM; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
+
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
@@ -36,7 +38,9 @@ struct _PassiveParticlesParameters {
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
 			// input
 			double* pState = stateArray[0].data() + memberStateIndex;
+
 			// ---------------- CUSTOM CONSTRAIN START
+
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
@@ -44,16 +48,18 @@ struct _PassiveParticlesParameters {
 	using tGroupVariable = d0t::VariableGroupStatic<d0t::VariableComposed<tMemberVariable>, Number>;
 	using tVariable = tGroupVariable;
 
-	// definition of the member data
 	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+
 			// ---------------- CUSTOM PREPARATION START
+
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
+
 			// ---------------- CUSTOM PREPARATION END
 		}
-		
+	
 		static tStateVectorDynamic stateTemporalDerivative(const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t, const unsigned int memberIndex) {
 			// static input
 			const unsigned int stateSize = tMemberVariable::Size;
@@ -93,12 +99,15 @@ struct _PassiveParticlesParameters {
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
+
 	inline static const tSpaceVector BoxCenter = EnvParameters::cDomainCenter;
 	inline static const tSpaceVector BoxSize = EnvParameters::cDomainSize;
+
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {
 		// ---------------- CUSTOM INIT START
+
 		py::gil_scoped_acquire acquire;
 		auto locals = py::dict(
 			"state"_a = py::array_t<double>(Number * StateSize, pState, py::capsule(pState, [](void* ptr) {})),
@@ -111,13 +120,16 @@ struct _PassiveParticlesParameters {
 			
 			state[:] = parameters.init(particle_state_size, particle_number)
 		)", py::globals(), locals);
+
 		// ---------------- CUSTOM INIT END
 	}
 
 	inline static unsigned int FormatNumber = int(std::log10(Number)) + 1;
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
+
 		// ---------------- CUSTOM POST START
+
 		py::gil_scoped_acquire acquire;
 		auto locals = py::dict(
 			"state"_a = py::array_t<double>(Number * StateSize, pState, py::capsule(pState, [](void* ptr) {})),
@@ -131,6 +143,7 @@ struct _PassiveParticlesParameters {
 			
 			output = parameters.post(state, particle_state_size, particle_number)
 		)", py::globals(), locals);
+
 		// ---------------- CUSTOM POST END
 		return locals["output"].cast<std::map<std::string, tScalar>>();
 	}

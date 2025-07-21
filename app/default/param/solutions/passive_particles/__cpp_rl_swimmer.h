@@ -25,12 +25,14 @@ struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
+
 	static const unsigned StateSize = DIM + DIM + DIM; // position + target direction + swimming direction
 	// feel free to add parameters if you need
 	static constexpr double SwimmingVelocity = 0.5;
 	// rl
 	static constexpr unsigned int ObservationDim = DIM + DIM * DIM; // target direction + flow velocity gradients
 	static constexpr unsigned int ActionDim = DIM; // swimming direction
+
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tVariable : public d0t::VariableVector<tVector, tView, StateSize> {
@@ -38,7 +40,9 @@ struct _PassiveParticlesParameters {
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int stateIndex) {
 			// input
 			double* pState = stateArray[0].data() + stateIndex;
+
 			// ---------------- CUSTOM CONSTRAIN START
+
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
@@ -47,9 +51,12 @@ struct _PassiveParticlesParameters {
 	struct tEquation : public d0t::Equation<tVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+
 			// ---------------- CUSTOM PREPARATION START
+
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
+
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
@@ -61,6 +68,7 @@ struct _PassiveParticlesParameters {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START
+
 			// input
 			const tView<const tSpaceVector> x(pState);
 			const tView<const tSpaceVector> z(pState + DIM);
@@ -70,6 +78,7 @@ struct _PassiveParticlesParameters {
 			// output
 			tView<tSpaceVector> dX(dState.data());
 			dX = u + n.normalized() * SwimmingVelocity;
+
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
@@ -83,7 +92,9 @@ struct _PassiveParticlesParameters {
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {
+
 		// ---------------- CUSTOM INIT START
+
 		// interpret BoxCenter and BoxSize as vectors
 		const tSpaceVector boxCenter = tView<const tSpaceVector>(BoxCenter.data());
 		const tSpaceVector boxSize = tView<const tSpaceVector>(BoxSize.data());
@@ -95,16 +106,21 @@ struct _PassiveParticlesParameters {
 		x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
 		z = tSpaceVector::Random().normalized();
 		n = z;
+
 		// ---------------- CUSTOM INIT END
 	}
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;
+
 		// ---------------- CUSTOM POST START
+
 		const tView<const tSpaceVector> x(pState);
 		output["passive_particles__pos_0"] = x[0];
 		output["passive_particles__pos_1"] = x[1];
+
 		// ---------------- CUSTOM POST END
+
 		return output;
 	}
 
@@ -112,7 +128,9 @@ struct _PassiveParticlesParameters {
 
 	template<typename tObsSpec>
 	static void observe(const double* pState, const double t, rlt::Matrix<tObsSpec>& observation) {
+
 		// ---------------- CUSTOM OBSERVE START
+
 		// input
 		const tView<const tSpaceVector> x(pState);
 		const tView<const tSpaceVector> z(pState + DIM);
@@ -125,24 +143,31 @@ struct _PassiveParticlesParameters {
 		set(observation, 0, 3, grad(0, 1));
 		set(observation, 0, 4, grad(1, 0));
 		set(observation, 0, 5, grad(1, 1));
+
 		// ---------------- CUSTOM OBSERVE END
 	}
 
 	template<typename tActionSpec>
 	static void act(const rlt::Matrix<tActionSpec>& action, double* pState) {
+
 		// ---------------- CUSTOM ACT START
+
 		tView<tSpaceVector> n(pState + 2 * DIM);
 		std::copy(action._data, action._data + DIM, n.data());
+
 		// ---------------- CUSTOM ACT END
 	}
 
 	static double reward(const double* pState, const double* pNextState) {
+
 		// ---------------- CUSTOM REWARD START
+
 		const tView<const tSpaceVector> x(pState);
 		const tView<const tSpaceVector> z(pState + DIM);
 		const tView<const tSpaceVector> n(pState + 2 * DIM);
 		const tView<const tSpaceVector> nextX(pNextState);
 		return (nextX - x).dot(z) + 0.001 * -std::abs(n.norm() - 1.0);
+
 		// ---------------- CUSTOM REWARD END
 	}
 };

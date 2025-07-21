@@ -24,6 +24,7 @@ struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
+
 	static const unsigned StateSize = DIM + 1; // dimension of the state variable 
 	// physics parameters
 	inline static const tSpaceVector Position = EnvParameters::cDomainCenter + tSpaceVector({-0.25 * EnvParameters::cDomainSize[0], 0.0});
@@ -33,6 +34,7 @@ struct _PassiveParticlesParameters {
 	// numeric parameters
 	inline static const double VortexInterval = std::max(ReactionTime/8.0, RunParameters::Dt);
 	inline static const double VortexRate = 1.0/VortexInterval;
+
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// variable
@@ -43,6 +45,7 @@ struct _PassiveParticlesParameters {
 			// input
 			double* pState = stateArray[StateIndex].data() + memberStateIndex;
 			// ---------------- CUSTOM CONSTRAIN START
+
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
@@ -55,7 +58,9 @@ struct _PassiveParticlesParameters {
 			tBase::_constrain(stateArray, t, stateIndex);
 			// input
 			std::vector<double>& _state = stateArray[StateIndex];
+
 			// ---------------- CUSTOM CONSTRAIN START
+
 			// remove points that get out of domain
 			for(int index = tBase::groupSize(_state.size()) - 1; index > -1; index--) {
 				const double* pState = tBase::cState(_state.data(), index);
@@ -78,6 +83,7 @@ struct _PassiveParticlesParameters {
 				pTime = tBase::stateMeta(_state.data());
 				*pTime = 0.0;
 			}
+
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 		
@@ -122,8 +128,10 @@ struct _PassiveParticlesParameters {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
 			// ---------------- CUSTOM PREPARATION START
+
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
+
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
@@ -135,6 +143,7 @@ struct _PassiveParticlesParameters {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START
+
 			// input
 			const tView<const tSpaceVector> x(pState);
 			// flow
@@ -143,6 +152,7 @@ struct _PassiveParticlesParameters {
 			tView<tSpaceVector> dX(dState.data());
 			// equation
 			dX = u;
+
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
@@ -172,6 +182,7 @@ struct _PassiveParticlesParameters {
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
+
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(std::vector<double>& p_state) {
@@ -183,7 +194,9 @@ struct _PassiveParticlesParameters {
 
 	static std::map<std::string, tScalar> post(const double* pState, const unsigned int stateSize, const double t) {
 		std::map<std::string, double> output;
+
 		// ---------------- CUSTOM INIT START
+
 		unsigned int number = tVariable::groupSize(stateSize);
 		unsigned int formatNumber = int(std::log10(number)) + 1;
 		tSpaceVector xAverage = tSpaceVector::Zero();
@@ -203,6 +216,7 @@ struct _PassiveParticlesParameters {
 		xAverage /= number;
 		output["passive_particles__average_pos_0"] = xAverage[0];
 		output["passive_particles__average_pos_1"] = xAverage[1];
+
 		// ---------------- CUSTOM INIT END
 		return output;
 	}

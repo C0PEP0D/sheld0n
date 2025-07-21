@@ -22,9 +22,11 @@ struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
+
 	static const unsigned StateSize = DIM; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
+
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
@@ -34,8 +36,8 @@ struct _PassiveParticlesParameters {
 			double* pState = stateArray[0].data() + memberStateIndex;
 
 			// ---------------- CUSTOM CONSTRAIN START
-
-			// input and output
+			
+			// output
 			tView<tSpaceVector> x(pState);
 			// cython
 			passive_particles_constrain(t, x);
@@ -57,7 +59,7 @@ struct _PassiveParticlesParameters {
 			const tView<const tSpaceVector> x(pState);
 			// cython
 			passive_particles_prepare(x, t);
-			
+
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
@@ -68,13 +70,12 @@ struct _PassiveParticlesParameters {
 			// output
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
-			// ---------------- CUSTOM EQUATION START
+			/// ---------------- CUSTOM EQUATION START
 			
 			// input
 			const tView<const tSpaceVector> x(pState);
 			// output
 			tView<tSpaceVector> dx(dState.data());
-
 			// cython
 			passive_particles_state_temporal_derivative(x, t, dx);
 	
@@ -88,10 +89,8 @@ struct _PassiveParticlesParameters {
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
-
 	inline static const tSpaceVector BoxCenter = EnvParameters::cDomainCenter;
 	inline static const tSpaceVector BoxSize = EnvParameters::cDomainSize;
-
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {

@@ -27,12 +27,14 @@ struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
+
 	static const unsigned StateSize = DIM + DIM * DIM + DIM * DIM; // x, L, Tau
 	// feel free to add parameters if you need
 	inline static const double Diffusivity = 1.0;
 	inline static const double InitMaxC = 1.0; // TODO: should be a state variable rather than a parameter (or use tau)
 	inline static const double InitW = 1.0;
 	static constexpr unsigned int Dx = 4.0;
+
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	using Bin = sp0ce::Bin<DIM>;
@@ -45,10 +47,13 @@ struct _PassiveParticlesParameters {
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
 			// input
 			double* pState = stateArray[StateIndex].data() + memberStateIndex;
+
 			// ---------------- CUSTOM CONSTRAIN START
+
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
 			Flow::prepareVelocityGradients(cX.data(), t);
+
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
@@ -167,9 +172,12 @@ struct _PassiveParticlesParameters {
 	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+
 			// ---------------- CUSTOM PREPARATION START
+
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
+
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
@@ -230,9 +238,11 @@ struct _PassiveParticlesParameters {
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
+
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(std::vector<double>& state) {
+
 		// ---------------- CUSTOM INIT START
 
 		{ // 0
@@ -266,7 +276,9 @@ struct _PassiveParticlesParameters {
 
 	static std::map<std::string, tScalar> post(const double* pState, const unsigned int stateSize, const double t) {
 		std::map<std::string, double> output;
+
 		// ---------------- CUSTOM INIT START
+
 		unsigned int number = tVariable::groupSize(stateSize);
 		unsigned int formatNumber = int(std::log10(number)) + 1;
 		tSpaceVector xAverage = tSpaceVector::Zero();
@@ -287,6 +299,7 @@ struct _PassiveParticlesParameters {
 		xAverage /= number;
 		output["passive_particles__average_pos_0"] = xAverage[0];
 		output["passive_particles__average_pos_1"] = xAverage[1];
+
 		// ---------------- CUSTOM INIT END
 		return output;
 	}

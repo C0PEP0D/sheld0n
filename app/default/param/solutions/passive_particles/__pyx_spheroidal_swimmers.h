@@ -12,12 +12,8 @@
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
 
-// include thirdparty
-#include "pybind11/embed.h"
-#include "pybind11/numpy.h"
-#include "pybind11/stl.h"
-namespace py = pybind11;
-using namespace pybind11::literals;
+// cython
+#include "param/solutions/passive_particles/parameters_passive_particles.h"
 
 namespace c0p {
 
@@ -32,13 +28,19 @@ struct _PassiveParticlesParameters {
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
-		
+	
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
 			// input
 			double* pState = stateArray[0].data() + memberStateIndex;
+
 			// ---------------- CUSTOM CONSTRAIN START
+
+			// input and output
+			tView<tSpaceVector> x(pState);
 			tView<tSpaceVector> p(pState + DIM);
-			p.normalize();
+			// cython
+			passive_particles_constrain(t, x, p);
+
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
@@ -49,10 +51,15 @@ struct _PassiveParticlesParameters {
 	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+
 			// ---------------- CUSTOM PREPARATION START
-			const tView<const tSpaceVector> cX(pState);
-			Flow::prepareVelocity(cX.data(), t);
-			Flow::prepareVelocityGradients(cX.data(), t);
+
+			// input
+			const tView<const tSpaceVector> x(pState);
+			const tView<const tSpaceVector> p(pState + DIM);
+			// cython
+			passive_particles_prepare(x, p, t);
+
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
@@ -63,29 +70,17 @@ struct _PassiveParticlesParameters {
 			// output
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
-			/// ---------------- CUSTOM EQUATION START
+			// ---------------- CUSTOM EQUATION START
 			
 			// input
 			const tView<const tSpaceVector> x(pState);
-			// flow
-			const tSpaceVector u = Flow::getVelocity(x.data(), t);
-			const tSpaceMatrix grad = Flow::getVelocityGradients(x.data(), t);
+			const tView<const tSpaceVector> p(pState + DIM);
 
-			// python
-			
-			py::gil_scoped_acquire acquire;
-			auto locals = py::dict(
-				"state"_a = py::array_t<double>(tVariable::Size, pState, py::capsule(pState, [](void* ptr) {})),
-				"u"_a = py::array_t<double>(DIM, u.data(), py::capsule(u.data(), [](void* ptr) {})),
-				"grad_u"_a = py::array_t<double>(DIM * DIM, grad.data(), py::capsule(grad.data(), [](void* ptr) {})),
-				"dstate"_a = py::array_t<double>(tVariable::Size, dState.data(), py::capsule(dState.data(), [](void* ptr) {}))
-			);
-			py::exec(R"(
-				sys.path.append('param/solutions/passive_particles')
-				import parameters
-				
-				dstate[:] = parameters.state_temporal_derivative(state, u, grad_u)
-			)", py::globals(), locals);
+			tView<tSpaceVector> dx(dState.data());
+			tView<tSpaceVector> dp(dState.data() + DIM);
+
+			// cython
+			passive_particles_state_temporal_derivative(x, p, t, dx, dp);
 	
 			// ---------------- CUSTOM EQUATION END
 
@@ -97,46 +92,55 @@ struct _PassiveParticlesParameters {
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
+
 	inline static const tSpaceVector BoxCenter = EnvParameters::cDomainCenter;
 	inline static const tSpaceVector BoxSize = EnvParameters::cDomainSize;
+
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {
+
 		// ---------------- CUSTOM INIT START
-		py::gil_scoped_acquire acquire;
-		auto locals = py::dict(
-			"state"_a = py::array_t<double>(Number * StateSize, pState, py::capsule(pState, [](void* ptr) {})),
-			"particle_state_size"_a = StateSize,
-			"particle_number"_a = Number
-		);
-		py::exec(R"(
-			sys.path.append('param/solutions/passive_particles')
-			import parameters
-			
-			state[:] = parameters.init(particle_state_size, particle_number)
-		)", py::globals(), locals);
+
+		// input
+		std::vector<tView<tSpaceVector>> xArray;
+		std::vector<tView<tSpaceVector>> pArray;
+		xArray.reserve(Number);
+		pArray.reserve(Number);
+		for(unsigned int index = 0; index < Number; ++index) {
+			xArray.emplace_back(pState + index * StateSize);
+			pArray.emplace_back(pState + DIM + index * StateSize);
+		}
+
+		// cython
+		passive_particles_init(Number, xArray.data(), pArray.data());
+		
 		// ---------------- CUSTOM INIT END
 	}
 
 	inline static unsigned int FormatNumber = int(std::log10(Number)) + 1;
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
+		std::map<std::string, double> output;
+		
 		// ---------------- CUSTOM POST START
-		py::gil_scoped_acquire acquire;
-		auto locals = py::dict(
-			"state"_a = py::array_t<double>(Number * StateSize, pState, py::capsule(pState, [](void* ptr) {})),
-			"particle_state_size"_a = StateSize,
-			"particle_number"_a = Number,
-			"output"_a = py::dict()
-		);
-		py::exec(R"(
-			sys.path.append('param/solutions/passive_particles')
-			import parameters
-			
-			output = parameters.post(state, particle_state_size, particle_number)
-		)", py::globals(), locals);
+
+		// input
+		std::vector<tView<const tSpaceVector>> xArray;
+		std::vector<tView<const tSpaceVector>> pArray;
+		xArray.reserve(Number);
+		pArray.reserve(Number);
+		for(unsigned int index = 0; index < Number; ++index) {
+			xArray.emplace_back(pState + index * StateSize);
+			pArray.emplace_back(pState + DIM + index * StateSize);
+		}
+
+		// cython
+		passive_particles_post(xArray.data(), pArray.data(), Number, t, output);
+		
 		// ---------------- CUSTOM POST END
-		return locals["output"].cast<std::map<std::string, tScalar>>();
+
+		return output;
 	}
 };
 

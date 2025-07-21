@@ -13,7 +13,8 @@ import subprocess
 def run(args):
     # cython
     sources = glob.glob('param/solutions/**/parameters_*.pyx')
-    subprocess.run("cython -tv --cplus {sources}; exit 0".format(sources=" ".join(sources)), shell=True, check=True)
+    if sources:
+        subprocess.run("cython -tv --cplus {sources}; exit 0".format(sources=" ".join(sources)), shell=True, check=True)
     # create build dir
     if not os.path.exists('build'):
         os.makedirs('build')
@@ -23,6 +24,7 @@ def run(args):
         flags = "-DCMAKE_BUILD_TYPE=Debug"
     if args.compiler:
         flags += " -DCMAKE_CXX_COMPILER={compiler}".format(compiler=args.compiler)
+    flags += " -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
     # configure
     subprocess.run("{cmake_cmd} .. {flags}; exit 0".format(cmake_cmd=args.cmake_cmd, flags=flags), cwd="build", shell=True, check=True)
     # build

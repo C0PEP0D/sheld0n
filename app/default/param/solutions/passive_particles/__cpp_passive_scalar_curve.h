@@ -25,6 +25,7 @@ struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
+
 	static const unsigned StateSize = DIM + 2; // dimension of the state variable 
 	// feel free to add parameters if you need
 	inline static const double Diffusivity = 1.0;
@@ -32,6 +33,7 @@ struct _PassiveParticlesParameters {
 	static constexpr unsigned int Density = 16;
 	static constexpr bool IsClosed = false;
 	static constexpr unsigned int InterpolationOrder = 2;
+
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
@@ -39,7 +41,9 @@ struct _PassiveParticlesParameters {
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
 			// input
 			double* pState = stateArray[StateIndex].data() + memberStateIndex;
+
 			// ---------------- CUSTOM CONSTRAIN START
+
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
@@ -50,10 +54,13 @@ struct _PassiveParticlesParameters {
 	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
+
 			// ---------------- CUSTOM PREPARATION START
+
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
 			Flow::prepareVelocityGradients(cX.data(), t);
+
 			// ---------------- CUSTOM PREPARATION END
 		}
 	
@@ -65,6 +72,7 @@ struct _PassiveParticlesParameters {
 			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tMemberVariable::Size);
 
 			// ---------------- CUSTOM EQUATION START
+
 			// input
 			const tView<const tSpaceVector> x(pState);
 			const double* pW = pState + DIM; // thickness
@@ -79,10 +87,12 @@ struct _PassiveParticlesParameters {
 			tView<tSpaceVector> dX(dState.data());
 			double* pDW(dState.data() + DIM);
 			double* pDTau(dState.data() + DIM + 1);
+
 			// equation
 			dX = u;
 			*pDW = n.transpose() * -j.transpose() * n;
 			*pDTau = 4.0 * Diffusivity / std::pow(*pW, 2);
+
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
@@ -102,7 +112,6 @@ struct _PassiveParticlesParameters {
 			const double tau = state[DIM+1]; // tau
 			// return concentration
 			return InitMaxC/std::sqrt(tau) * std::exp(-std::pow((x - xs).dot(n), 2) / (std::pow(w, 2) * tau));
-			// ---------------- CUSTOM PREPARATION END
 		}
 
 	};
@@ -117,6 +126,7 @@ struct _PassiveParticlesParameters {
 
 	static void init(std::vector<double>& p_state) {
 		// ---------------- CUSTOM INIT START
+
 		const tSpaceVector step = (InitPositionEnd - InitPositionStart) / InterpolationOrder;
 		for(unsigned int i = 0; i < InterpolationOrder + 1; ++i) {
 			tVariable::pushBackMember(p_state);
@@ -130,12 +140,14 @@ struct _PassiveParticlesParameters {
 			*pW = InitW;
 			*pTau = 1.0;
 		}
+
 		// ---------------- CUSTOM INIT END
 	}
 
 	static std::map<std::string, tScalar> post(const double* pState, const unsigned int stateSize, const double t) {
 		std::map<std::string, double> output;
 		// ---------------- CUSTOM INIT START
+
 		unsigned int number = tVariable::groupSize(stateSize);
 		unsigned int formatNumber = int(std::log10(number)) + 1;
 		tSpaceVector xAverage = tSpaceVector::Zero();
@@ -155,6 +167,7 @@ struct _PassiveParticlesParameters {
 		xAverage /= number;
 		output["passive_particles__average_pos_0"] = xAverage[0];
 		output["passive_particles__average_pos_1"] = xAverage[1];
+
 		// ---------------- CUSTOM INIT END
 		return output;
 	}

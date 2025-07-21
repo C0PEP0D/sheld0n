@@ -1,6 +1,10 @@
 cimport c0p
 cimport std
 
+# parameters
+cdef double buoyant_velocity = 0.5
+cdef c0p.tSpaceVector buoyancy_direction = c0p.tSpaceVector(0.0, 1.0)
+
 # Constrain: constrain the state variable if necessary (normalize unit vectors for instance)
 # input:
 #   t: current time
@@ -28,7 +32,7 @@ cdef public void passive_particles_state_temporal_derivative(c0p.tViewConstSpace
 	# get flow velocity at position x and time t
 	cdef c0p.tSpaceVector u = c0p.Flow.getVelocity(x.data(), t)
 	# set the temporal derivative of x as the flow velocity
-	dx = u
+	dx = u + buoyant_velocity * buoyant_direction
 
 # Init: initialize your state variable.
 # input:
@@ -57,7 +61,6 @@ cdef public void passive_particles_post(c0p.tViewConstSpaceVector* x_array, cons
 
 	# post process the position of each particle, and compute average position
 	cdef c0p.tSpaceVector x_average = c0p.tSpaceVector.Zero()
-
 	for particle_index in range(particle_number):
 		format_particle_index = std.log10(particle_index)
 		for dim_index in range(x_array[particle_index].size()):
@@ -78,6 +81,7 @@ cdef public void passive_particles_post(c0p.tViewConstSpaceVector* x_array, cons
 	x_average /= particle_number
 
 	# store average in output dictionary
+	output_dictionary['passive_particles__average_pos_']
 	for dim_index in range(x_average.size()):
 		# zero padding
 		key = std.string('passive_particles__average_pos_')

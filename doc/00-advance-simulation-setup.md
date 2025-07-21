@@ -13,15 +13,10 @@ This tutorial series assumes you already learnt the basic usage of the code in t
 - [Running the simulation](#running-the-simulation)
 - [Next tutorial](#next-tutorial)
 
-## Setting up the case 
+## Setting up the case
 
-Start by creating a new case and moving to its root.
-
-```sh
-$ cd cases/
-$ ./generate_new_case case_00
-$ cd case_00/
-```
+* Start by creating a new case using the `*_generate_new_case` script with the name **case-00** for instance. You do not have to specify anything in the *case* option for now.
+* Then move to the **case-00** directory.
 
 ## Global parameters
 
@@ -64,205 +59,106 @@ Let's move on for now, we'll come back to these parameters later.
 
 ## Adding a new particles
 
-The default simulation case created using the `./generate_new_case` script is a 2D simulation of passive particles in a Taylor-Green flow.
+The default simulation case created using the `*_generate_new_case` script is a 2D simulation of passive particles in a Taylor-Green flow.
 
 Let's first try to add some buoyant particles in the flow.
-To do so, move to the `param/solutions` directory.
 
-```sh
-$ cd param/solutions/
-```
+* Move to the `param/solutions` directory.
 
 This directory contains the parameters that describe the equation of motion of all particles in the flow that will be solved by the flow.
-Checkout its content.
 
-```sh
-$ ls
-batch_copy_equation  copy_equation  create_new_equation  parameters.h  passive_particles  remove_equation  rename_equation
-```
+* Checkout its content.
 
 The `parameters.h` file lists the equations to be solved in your simulation.
 Contrary to most of the other `parameters.h` files in the `param/` directory, 
-this file is solely meant to be modified using the scripts 
-`batch_copy_equation`, `copy_equation`, `create_new_equation`, `remove_equation`, `rename_equation`.
+this particular file is solely meant to be modified using the scripts 
+`*_batch_copy_equation`, `*_copy_equation`, `*_create_new_equation`, `*_remove_equation`, `*_rename_equation`.
 
 Each execution of a script will change the directories content while editing the `parameters.h` file.
 
 For now, our simulation only solves the trajectory of passive particles, represented by the `passive_particles` directory.
-Let's try to add **buoyant particles** in the flow using the `create_new_equation` script and specify a name for these particles.
+Let's try to add **buoyant particles** in the flow using the `*_create_new_equation` script.
 
-```sh
-$ ./create_new_equation buoyant_particles
-```
-
-Checkout again the content of the directory.
-
-```sh
-$ ls
-batch_copy_equation  buoyant_particles  copy_equation  create_new_equation  parameters.h  passive_particles  remove_equation  rename_equation
-```
-
-The `buoyant_particles` directory appeared. 
-However when creating a new equation, regardless of its name, 
-the default behavior is the behavior of passive particles so we will have to change that.
-
-Move into that directory and checkout its content.
-
-```sh
-$ cd buoyant_particles
-$ ls
-choose  parameters.h
-```
-
-Let's open the `parameters.h` file and analyse its content.
-Every part of the file that can be edited by the user is between comment flags such as the following.
-
-```cpp
-// ---------------- CUSTOM [...] START
-// [...]
-// ---------------- CUSTOM [...] END
-```
-
-Let's focus on the first editable part of the file: the equation parameters.
-The first parameter, `StateSize`, represents the dimension of the state variable you want to solve.
-
-In our case, the state variable we want to solve is the position of a particle. 
-This represents a state variable of dimension `2` in 2D and `3` in 3D (we will go through a different example later on).
-Currently `StateSize` is set to `DIM` representing the current dimension of the space defined in the `param/parameters.h` file.
-
-```cpp
-22	// ---------------- CUSTOM EQUATION PARAMETERS START
-23	static const unsigned StateSize = DIM; // dimension of the state variable 
-24	// feel free to add parameters if you need
-25	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-26	// ---------------- CUSTOM EQUATION PARAMETERS END
-```
-
-The second parameter, `Number`, defines the number of particles to be set inside the simulation.
-Currently, it is set to `EnvParameters::cGroupSize`. 
-If you remember well, `EnvParameters::cGroupSize` is defined in `param/parameters.h` where it is set to `16`.
-Therefore `Number = EnvParameters::cGroupSize;` is equivalent `Number = 16;`.
-
-The use of a global parameter `EnvParameters::cGroupSize` may be useful in certain cases but is completely optional.
-
-Furthermore, when defining parameters, simple mathematical operations can be performed:
-```cpp
-25	static const unsigned Number = 2 * EnvParameters::cGroupSize; // number of members in the group
-```
-```cpp
-25	static const unsigned Number = EnvParameters::cGroupSize / 2; // number of members in the group
-```
+* Execute the `create_new_equation` script and set the name of the new equation to **buoyant_particles** using the **name** argument. Select the **pyx_passive_particles** as the **parameters** option.
 
 > [!NOTE]
-> You can also add your own parameters in between these flags if you need.
-
-Let's move on to the next editable part: the definition of the equation and more specifically, 
-the definition of the temporal derivative of your state variables.
-
-```cpp
-31		static tStateVectorDynamic stateTemporalDerivative(const double* pState, const unsigned int stateSize, const double t) {
-32			tStateVectorDynamic dState = tStateVectorDynamic::Zero(tVariable::Size);
-33
-34			// ---------------- CUSTOM EQUATION START
-35			// input
-36			const tView<const tSpaceVector> x(pState);
-37			// flow
-38			const tSpaceVector u = Flow::getVelocity(x.data(), t);
-39			// output
-40			tView<tSpaceVector> dX(dState.data());
-41			dX = u;
-42			// ---------------- CUSTOM EQUATION END
-43
-44			// return result
-45			return dState;
-46		}
-```
-
-This function takes three arguments:
-* `pState`, an array of scalars of size `StateSize` that represent the current values of your state variables
-* `stateSize` equal to `StateSize` in this particular case
-* `t` represents the current time of the simulation
+> If you are using the GUI interface, press the *run* button 
+> when you are done configuring.
+> Once it is done, you can press the *exit* button to close the window.
 
 > [!NOTE]
-> For the reader that knows about C++, all pointers in the code will be preceded by the letter *p*.
-> That is why the array is named *pState* rather that *state*.
+> The **pyx_** specifies that the equation is describe the Cython interface, recommended for beginners. The **cpp_** prefixed equations use the more advance and flexible C++ interface.
 
-The variable `dState` represents the temporal derivative of `pState` that describes the motion of this type of particle.
-The code in between the `CUSTOM EQUATION` flags is meant to encode that particle behavior.
+* Checkout again the content of the directory.
 
-Let's analyse further this code. 
-In the line **36**, the first 2 elements of the array `pState` are interpreted as a 2D Vector (`tSpaceVector`) called `x` here and representing the particle position.
-This variable `x` can now be used as a vector and employed in mathematical expressions as such.
+You will notice that a directory `buoyant_particles` has appeared.
+However because we have selected the **pyx_passive_particles** option, the equation that will be solve is that of passive particles despite its name.
 
-The line **38** just means we are getting and storing the flow velocity at position `x` and time `t` in the variable `u`.
+* Move into the `buoyant_particles` directory and checkout its content.
 
-In the line **40**, the first 2 elements of the array `dState` are interpreted as a `tSpaceVector`.
-The variable `dX` now represent the temporal derivative of `x` aka the particle velocity.
+Let's open the `parameters_buoyant_particles.pyx` file and analyse its content.
 
-As stated above, the default behavior of a new equation added in the solver is that of a passive particle in a flow.
+It is a **Cython** file decomposed in various functions:
+
+1. **constrain**: used to contrain state variables (for instance normalize a unit vector) if necessary.
+2. **prepare**: used to prepare the solver before the computation, is mainly used to prepare the flow to query the data that will be used in other functions (require by the use of the Johns Hopkins Database flow).
+3. **state_temporal_derivative**: used to describe the equation to be solved by describing the temporal derivative of the state variable to be solved.
+4. **init**: used to initialize the state variable at the start of the simulation
+5. **post**: post process the state variable and stores data in a dictionary
+
+If you are not familiar with **Cython**. 
+**Cython** is a tool that can be used to generate **C++** files using a **Python**-like syntax. 
+If you are interested in **Cython**, feel free to check their website.
+
+> [!CAUTION]
+> If you are already familiar with **Cython**, contrary to most **Cython** projects, 
+> in this solver, **Cython** files have to compile into a pure **C++** depraved of any **Python** calls.
+> This means that you are not allowed 1) to import any Python modules, 2) use directly any Python object (such as numpy arrays, python strings, python lists or python dictionaries).
+> You will have to use the alternative modules and objects provided by the solvers and you will have to declare all the variables you use using **cdef**.
+
+If you are not familiar with **Cython**, in this solver, just consider that the **Cython** files use a **Python**-like syntax where the type of variable has to be declared before using it.
+
+As an example, rather than declaring `a = 1`, you will declare `cdef int a = 1`. Similarly `a = 1.0` will be `cdef double a = 1.0`. 
+And if you want to declare a vector $\vec{a} = (1.0, 0)$ you will state `cdef c0p.tSpaceVector a = c0p.tSpaceVector(1.0, 0.0)`.
+
+> [!NOTE]
+> Here the word **SpaceVector** refers to a vector of the dimension of the simulation (2 for 2D simulation, 3 for 3D simulation). Similarly a **SpaceMatrix** is 2x2 matrix in 2D and 3x3 matrix in 3D.
+>
+> You may further note the use of View or ViewConst vectors in function arguments.
+> This distinction is used to avoid usely copy of data to avoid performance loss. 
+> Do not bother too much about that, you should not have to edit these parameters.
+
+
+Let's now focus on the **state_temporal_derivative** function.
+
+Here `x` represents the particle as a *SpaceVector* (vector of dimension 2 in 2D).
+`t` is a floating number (*double*) giving the current time.
+Finally `dx` describes the temporal derivative of the particle position, i.e. its velocity.
+
+The aim of this function is set `dx` as a function of `x` and `t` to describe the behavior of our particle.
+
+As stated above, the behavior of our new equation added in the solver is that of a passive particle in a flow.
 The motion of such a particle is described by the following equation
 ```math
 \frac{d \vec{x}}{dt} = \vec{u} \left ( \vec{x}, t \right ) \, \mathrm{,}
 ```
 with $\vec{x}$ the position of the particle, $\vec{u}$ the flow velocity field and $t$ the time.
-This is exactly what the line **41** states and this is the line that should be edited to change the behavior of the particle.
-
-Before changing the behavior from a passive particle to a buoyant particle, let's move on to :
-* the `init` function, used to initialize the state variables of your particles.
-* the `post` function, used to extract data from the simulation when post processing.
-```cpp
-57	static void init(double* pState) {
-	// [...]
-72	}
-	// [...]
-77	static std::map<std::string, tScalar> post(const double* pState, const double t) {
-	// [...]
-93	}
-
-```
-
-Contrary to the `stateTemporalDerivative` function, 
-these functions affect all the particles of this type in the simulation (their number defined by the parameter `Number`).
-Therefore, one must iterate over the number of particles to initialize or post process each particle.
-
-Currently the function `init` sets the particle position randomly within a box of center `BoxCenter` and size `BoxSize`.
-The `post` function extracts the position of each particle and computes the average position of all particles.
+This is exactly what the last line of this function states.
+This line is the line to edit to modify the particles behavior.
 
 ## Choosing the particles behavior
 
-Now that we analysed the `parameters.h` file of a passive particle, we want to change that file to match the behavior of a **buoyant** particle.
-We could manually edit the `parameters.h`, but we can also use the `choose` script in the same directory to choose another default behavior.
+Now that we analysed the `parameters_buoyant_particles.pyx` file of a passive particle, we want to change that file to match the behavior of a **buoyant** particle.
 
-Let's first see what are the available options:
-```sh
-$ ./choose -h
-usage: choose [-h] {surfers,passive_particles,buoyant_particles,inertial_particles}
+We could manually edit the `parameters_buoyant_particles.pyx`, but we can also use the `*_choose` script in the same directory to choose another default behavior.
 
-Script to choose parameters among default ones.
-
-positional arguments:
-  {surfers,passive_particles,buoyant_particles,inertial_particles}
-                        specify your choice
-
-options:
-  -h, --help            show this help message and exit
-```
-
-Buoyant particles are an available option, let's choose that.
-```sh
-$ ./choose buoyant_particles
-```
+* close the `parameters_buoyant_particles.pyx` file and run the `*_choose` script with `pyx_buoyant_particles` as the **choice** option.
 
 > [!CAUTION]
-> Using a `choice` script will override the `parameters.h` file in the same directory and all changes will be lost.
+> Using a `*_choose` script will override the `parameters.h` and the `parameters_buoyant_particles.pyx` files and all changes will be lost.
 
-If you open again the `parameters.h` file, you'll see it has changed.
-You may note two new parameters,
-```cpp
-26	static constexpr float BuoyantVelocity = 0.5;
-27	static constexpr std::array<double, DIM> BuoyancyDirection = {0.0, 1.0}; // defined for 2D simulations, use {0.0, 0.0, 1.0} for 3D
-```
-and a different definition of the temporal derivative corresponding to the following equation
+If you open again the `parameters_buoyant_particles.pyx` file, you'll see it has changed.
+You may note two new parameters defined at the top of the file (`buoyant_velocity` and `buoyancy_direction`) and a different definition of the temporal derivative corresponding to the following equation
 ```math
 \frac{d \vec{x}}{dt} = \vec{u} \left ( \vec{x}, t \right ) + V_{\mathrm{buoyancy}} \vec{z} \, \mathrm{,}
 ```
@@ -271,14 +167,10 @@ with $V_{\mathrm{buoyancy}}$ the buoyancy induced velocity of the particle and $
 Now our buoyant particles are setup. 
 Now that we know how to do, let's just add inertial particles to the simulation just for fun.
 
-```sh
-$ cd ..
-$ ./create_new_equation inertial_particles
-$ cd inertial_particles
-$ ./choose inertial_particles
-```
+* move back to the `param/solutions` directory 
+* execute the `*_create_new_equation` script with the **name** inertial_particles and **pyx_inertial_particles** as the option **parameters** (this avoids having to use the choose script to change the particle behavior).
 
-Before moving on, let's just analyse the `parameters.h` file of our inertial particles.
+Before moving on, let's just analyse the `parameters_inertial_particles.pyx` file of our inertial particles.
 First of all, the motion of inertial particles is described by the following equations
 ```math
 \frac{d \vec{x}}{dt} = \vec{v}
@@ -288,11 +180,7 @@ First of all, the motion of inertial particles is described by the following equ
 ```
 with a $\vec{v}$ the velocity of the particle and $\tau$ a constant reaction time.
 
-This time, this particle is described by two state variables, its position and its velocity, both of dimension `DIM`.
-Therefore you can see that the parameter `StateSize` is set accordingly.
-```sh
-23	static const unsigned StateSize = 2 * DIM; // dimension of the state variable 
-```
+This time, this particle is described by two state variables, its position (`x`) and its velocity (`v`).
 
 You can read further the file to understand how having two state variable changes:
 * the way to define the temporal derivative.
@@ -301,7 +189,7 @@ You can read further the file to understand how having two state variable change
 
 ## Choosing the flow
 
-Similarly the flow can be chosen and its parameters edited in the `param/flow` directory.
+Similarly the flow can be chosen and its parameters edited in the `param/flow` directory
 
 > [!CAUTION]
 > If you need a 3D flow, you will also have to change the `DIM` parameter in the `param/parameters.h` file.
@@ -313,14 +201,8 @@ To control further the simulation, three other directories exists with parameter
 * The `param/run` directory where you can set the parameters of the solver (such as the time step, the total time of the simulation, etc...).
 * The `param/post` directory where you can control the post processing.
 
-Once that is done, we can run the simulation and the post processing.
-```sh
-$ cd ../../..
-$ ./run
-```
-```sh
-$ ./post
-```
+Once that is done, we can run the simulation by running `*_run` at the root directory of the current case.
+
 > [!NOTE]
 > You may note that compilation takes a long time compared to the time of the simulation.
 > This choice of compiling again each time you change parameters has been made to increase
@@ -330,14 +212,9 @@ $ ./post
 > To speed things up, you can use the `-j` option to run the compilation in parallel.
 
 Finally one can visualize its simulation by generating an animation of the particle trajectories.
-```sh
-$ cd post_process
-$ ls
-generate_trajectory_animation.py  libpost.py  plot_over_time.py  time
-$ ./generate_trajectory_animation.py
-$ ls
-generate_trajectory_animation.py  libpost.py  plot_over_time.py  time  trajectory_animation.mp4
-```
+
+* move to `post_process` directory and execute the `generate_trajectory_animation.py` script (it may take a while). 
+It should create the file `trajectory_animation.mp4` you can read with your own video player.
 
 The `time` directory at the root of the case contains the saved state of all particles for each time step saved once the simulation has been run.
 If the simulation stops before it ends for any kind of reason, when running again the simulation, the last saved simulation step in `time` will be used to continue the simulation.
@@ -350,7 +227,7 @@ Similarly, the directory `post_process/time` is created when running the post pr
 In certain cases, if the simulation or the post_processing was stopped while writing a file, the last time step may be corrupted.
 In that case, just delete the last step (the last directory in `time` directory) to continue from the previous step.
 
-Because the `run` and the `post` are separated,
+Because the `*_run` and the `*_post` are separated,
 you may change any post-processing function after the simulation has been executed without having to run again the whole simulation.
 However, in that case, make sure you delete the directory `post_process/time` before running again the `post` script.
 To do so, one can use the `post_process/clean` script.
