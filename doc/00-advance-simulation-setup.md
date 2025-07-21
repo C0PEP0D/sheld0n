@@ -15,7 +15,7 @@ This tutorial series assumes you already learnt the basic usage of the code in t
 
 ## Setting up the case
 
-* Start by creating a new case using the `*_generate_new_case` script with the name **case-00** for instance. You do not have to specify anything in the *case* option for now.
+* Start by creating a new case using the `*_generate_new_case` script with the name **case-00** for instance. You do not have to specify anything in the **case** option for now.
 * Then move to the **case-00** directory.
 
 ## Global parameters
@@ -82,12 +82,12 @@ Let's try to add **buoyant particles** in the flow using the `*_create_new_equat
 * Execute the `create_new_equation` script and set the name of the new equation to **buoyant_particles** using the **name** argument. Select the **pyx_passive_particles** as the **parameters** option.
 
 > [!NOTE]
-> If you are using the GUI interface, press the *run* button 
+> If you are using the GUI interface, press the **run** button 
 > when you are done configuring.
-> Once it is done, you can press the *exit* button to close the window.
-
-> [!NOTE]
-> The **pyx_** specifies that the equation is describe the Cython interface, recommended for beginners. The **cpp_** prefixed equations use the more advance and flexible C++ interface.
+> Once it is done, you can press the **exit** button to close the window.
+>
+> The **pyx_** prefix specifies that the equation is describe the Cython interface, recommended for beginners. 
+> The **cpp_** prefixed equations use the more advance and flexible C++ interface.
 
 * Checkout again the content of the directory.
 

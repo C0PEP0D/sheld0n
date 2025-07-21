@@ -106,8 +106,8 @@ The following covers basic usage of the code, while the documentation is improvi
 Each file starting with `gui_` is a file that can be executed, for instance by double-clicking on it from your file browser. Doing so will open a window that will explain what the program does and how to use it.
 
 > [!NOTE]
-> You will have to press the button *run* to run the script and 
-> you will have to press the close button to exit the program. 
+> You will have to press the button **run** to run the script and 
+> you will have to press the **close** button to exit the program. 
 > If the program is still computing when you press the close button, 
 > the program will be closed at the end of its computation.
 
