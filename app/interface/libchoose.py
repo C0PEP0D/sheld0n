@@ -51,8 +51,15 @@ def object_to_path(obj):
 
 ## source https://stackoverflow.com/questions/4205854/python-way-to-recursively-find-and-replace-string-in-text-files
 def find_replace(folder, file_pattern, text, replacement, condition = lambda line : True):
+
+    print(folder)
+    print(file_pattern)
+
     for dirpath, dirs, files in os.walk(folder, topdown=True):
         files = [os.path.join(dirpath, filename) for filename in fnmatch.filter(files, file_pattern)]
+
+        print(files)
+        
         if files:
             for line in fileinput.FileInput(files, inplace=True):
                 if condition(line):
@@ -194,7 +201,7 @@ def apply_choice(args):
 
     # edit
     if not name == "flow":
-        edit_file(name, ["passive_particles"], [name])
+        edit_file(".", ["passive_particles"], [name])
         # register
         is_static = True
         is_dynamic = False
@@ -238,17 +245,19 @@ def choose_file(choices_dir, choices_exceptions, edit=True):
     # apply choice
     apply_choice(args)
 
-def edit_file(choice, default_obj, obj, size = 1):
+def edit_file(directory, default_obj, obj, size = 1):
     obj = obj[0:len(obj) - len(default_obj) + size]
     default_obj = default_obj[0:size]
+
+    print("default: ", default_obj, "new: ", obj)
     # h
-    find_replace(choice, "*.h", "".join(default_obj) + "_", "".join(obj) + "_")
-    find_replace(choice, "*.h", "_" + "".join(default_obj), "_" + "".join(obj))
-    find_replace(choice, "*.h", '"' + "".join(default_obj), '"' + "".join(obj))
-    find_replace(choice, "*.h", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
-    find_replace(choice, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
-    find_replace(choice, "*.h", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))
+    find_replace(directory, "*.h", "".join(default_obj) + "_", "".join(obj) + "_")
+    find_replace(directory, "*.h", "_" + "".join(default_obj), "_" + "".join(obj))
+    find_replace(directory, "*.h", '"' + "".join(default_obj), '"' + "".join(obj))
+    find_replace(directory, "*.h", "_" + object_to_upper_snake_case(default_obj) + "_", "_" + object_to_upper_snake_case(obj) + "_")
+    find_replace(directory, "*.h", "/" + object_to_path(default_obj) + "/", "/" + object_to_path(obj) + "/", lambda line : line.startswith('#include "param'))
+    find_replace(directory, "*.h", "_" + object_to_upper_camel_case(default_obj), "_" + object_to_upper_camel_case(obj))
     # py
-    find_replace(choice, "*.py", "".join(default_obj) + "_", "".join(obj) + "_")
+    find_replace(directory, "*.py", "".join(default_obj) + "_", "".join(obj) + "_")
     # pyx
-    find_replace(choice, "*.pyx", "".join(default_obj) + "_", "".join(obj) + "_")
+    find_replace(directory, "*.pyx", "".join(default_obj) + "_", "".join(obj) + "_")

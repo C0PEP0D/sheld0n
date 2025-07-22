@@ -60,14 +60,17 @@ Let's move on for now, we'll come back to these parameters later.
 ## Adding a new particles
 
 The default simulation case created using the `*_generate_new_case` script is a 2D simulation of passive particles in a Taylor-Green flow.
-
 Let's first try to add some buoyant particles in the flow.
 
-* Move to the `param/solutions` directory.
+```
+Move to the param/solutions directory.
+```
 
 This directory contains the parameters that describe the equation of motion of all particles in the flow that will be solved by the flow.
 
-* Checkout its content.
+```
+Check the content of the directory.
+```
 
 The `parameters.h` file lists the equations to be solved in your simulation.
 Contrary to most of the other `parameters.h` files in the `param/` directory, 
@@ -79,7 +82,10 @@ Each execution of a script will change the directories content while editing the
 For now, our simulation only solves the trajectory of passive particles, represented by the `passive_particles` directory.
 Let's try to add **buoyant particles** in the flow using the `*_create_new_equation` script.
 
-* Execute the `create_new_equation` script and set the name of the new equation to **buoyant_particles** using the **name** argument. Select the **pyx_passive_particles** as the **parameters** option.
+```
+Execute the *_create_new_equation script and set the name of the new equation to buoyant_particles using the **name** argument. 
+Select the pyx_passive_particles as the parameters option.
+```
 
 > [!NOTE]
 > If you are using the GUI interface, press the **run** button 
@@ -89,45 +95,45 @@ Let's try to add **buoyant particles** in the flow using the `*_create_new_equat
 > The **pyx_** prefix specifies that the equation is describe the Cython interface, recommended for beginners. 
 > The **cpp_** prefixed equations use the more advance and flexible C++ interface.
 
-* Checkout again the content of the directory.
+```
+Check again the content of the directory.
+```
 
 You will notice that a directory `buoyant_particles` has appeared.
-However because we have selected the **pyx_passive_particles** option, the equation that will be solve is that of passive particles despite its name.
+However because we have selected the **pyx_passive_particles** option, despite its name, the equation that will be solve is that of passive particles.
 
-* Move into the `buoyant_particles` directory and checkout its content.
+```
+Move into the buoyant_particles directory and check its content.
+```
 
-Let's open the `parameters_buoyant_particles.pyx` file and analyse its content.
-
+Let's open the `parameters_buoyant_particles.pyx` file and analyse it.
 It is a **Cython** file decomposed in various functions:
 
-1. **constrain**: used to contrain state variables (for instance normalize a unit vector) if necessary.
-2. **prepare**: used to prepare the solver before the computation, is mainly used to prepare the flow to query the data that will be used in other functions (require by the use of the Johns Hopkins Database flow).
+1. **constrain**: used to constrain state variables if necessary (for instance normalize a unit vector).
+2. **prepare**: used to prepare the solver before the computation, is mainly used to prepare the flow to query the data that will be used in other functions (particularly important when you rely on the Johns Hopkins Database).
 3. **state_temporal_derivative**: used to describe the equation to be solved by describing the temporal derivative of the state variable to be solved.
 4. **init**: used to initialize the state variable at the start of the simulation
 5. **post**: post process the state variable and stores data in a dictionary
 
-If you are not familiar with **Cython**. 
-**Cython** is a tool that can be used to generate **C++** files using a **Python**-like syntax. 
+If you are not familiar with **Cython**,
+**Cython** is a tool that can be used to generate **C++** files using a **Python**-like syntax.
 If you are interested in **Cython**, feel free to check their website.
 
 > [!CAUTION]
-> If you are already familiar with **Cython**, contrary to most **Cython** projects, 
-> in this solver, **Cython** files have to compile into a pure **C++** depraved of any **Python** calls.
+> In this solver, **Cython** files have to compile into a pure **C++** depraved of any **Python** calls.
 > This means that you are not allowed 1) to import any Python modules, 2) use directly any Python object (such as numpy arrays, python strings, python lists or python dictionaries).
 > You will have to use the alternative modules and objects provided by the solvers and you will have to declare all the variables you use using **cdef**.
 
-If you are not familiar with **Cython**, in this solver, just consider that the **Cython** files use a **Python**-like syntax where the type of variable has to be declared before using it.
-
+Here, the most important difference with **Python** is that you will have to declare the variables with their type before using them.
 As an example, rather than declaring `a = 1`, you will declare `cdef int a = 1`. Similarly `a = 1.0` will be `cdef double a = 1.0`. 
 And if you want to declare a vector $\vec{a} = (1.0, 0)$ you will state `cdef c0p.tSpaceVector a = c0p.tSpaceVector(1.0, 0.0)`.
 
 > [!NOTE]
-> Here the word **SpaceVector** refers to a vector of the dimension of the simulation (2 for 2D simulation, 3 for 3D simulation). Similarly a **SpaceMatrix** is 2x2 matrix in 2D and 3x3 matrix in 3D.
+> Here the word **SpaceVector** refers to a vector of the dimension of the current dimension of the simulation (2 for 2D simulation, 3 for 3D simulation). Similarly a **SpaceMatrix** is 2x2 matrix in 2D and 3x3 matrix in 3D.
 >
 > You may further note the use of View or ViewConst vectors in function arguments.
-> This distinction is used to avoid usely copy of data to avoid performance loss. 
-> Do not bother too much about that, you should not have to edit these parameters.
-
+> This distinction is used to avoid the copy of data and therefore avoid performance loss. 
+> Do not bother too much about that, just consider these as normal maths vectors, you should not have to edit these parameters.
 
 Let's now focus on the **state_temporal_derivative** function.
 
@@ -144,31 +150,35 @@ The motion of such a particle is described by the following equation
 ```
 with $\vec{x}$ the position of the particle, $\vec{u}$ the flow velocity field and $t$ the time.
 This is exactly what the last line of this function states.
-This line is the line to edit to modify the particles behavior.
 
 ## Choosing the particles behavior
 
 Now that we analysed the `parameters_buoyant_particles.pyx` file of a passive particle, we want to change that file to match the behavior of a **buoyant** particle.
-
 We could manually edit the `parameters_buoyant_particles.pyx`, but we can also use the `*_choose` script in the same directory to choose another default behavior.
 
-* close the `parameters_buoyant_particles.pyx` file and run the `*_choose` script with `pyx_buoyant_particles` as the **choice** option.
+```
+Close the parameters_buoyant_particles.pyx file and run the *_choose script with pyx_buoyant_particles as the **choice** option.
+```
 
 > [!CAUTION]
 > Using a `*_choose` script will override the `parameters.h` and the `parameters_buoyant_particles.pyx` files and all changes will be lost.
 
-If you open again the `parameters_buoyant_particles.pyx` file, you'll see it has changed.
+If you open again the `parameters_buoyant_particles.pyx` file, you can see it has changed.
 You may note two new parameters defined at the top of the file (`buoyant_velocity` and `buoyancy_direction`) and a different definition of the temporal derivative corresponding to the following equation
 ```math
 \frac{d \vec{x}}{dt} = \vec{u} \left ( \vec{x}, t \right ) + V_{\mathrm{buoyancy}} \vec{z} \, \mathrm{,}
 ```
 with $V_{\mathrm{buoyancy}}$ the buoyancy induced velocity of the particle and $\vec{z}$ the vertical.
-
 Now our buoyant particles are setup. 
+
 Now that we know how to do, let's just add inertial particles to the simulation just for fun.
 
-* move back to the `param/solutions` directory 
-* execute the `*_create_new_equation` script with the **name** inertial_particles and **pyx_inertial_particles** as the option **parameters** (this avoids having to use the choose script to change the particle behavior).
+```
+move back to the param/solutions directory
+```
+```
+execute the *_create_new_equation script with the name inertial_particles and with the options pyx_inertial_particles (this avoids having to use the choose script to change the particle behavior).
+```
 
 Before moving on, let's just analyse the `parameters_inertial_particles.pyx` file of our inertial particles.
 First of all, the motion of inertial particles is described by the following equations

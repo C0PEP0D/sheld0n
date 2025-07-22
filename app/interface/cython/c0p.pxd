@@ -162,3 +162,20 @@ cdef extern from "param/flow/parameters.h" namespace "c0p":
 		tSpaceVector getVelocity(const double* pX, const double t) nogil
 		@staticmethod
 		tSpaceMatrix getVelocityGradients(const double* pX, const double t) nogil
+
+cdef extern from "param/parameters.h" namespace "c0p":
+	unsigned int DIM
+
+cdef extern from "param/parameters.h" namespace "c0p::EnvParameters":
+
+	const double cGroupSize
+
+	const double cLength
+	const double cTime
+	const double cVelocity
+
+	const tSpaceVector cDomainCenter
+	const tSpaceVector cDomainSize
+	# const std::array<bool, DIM> cDomainIsAxisPeriodic
+
+	const unsigned int randomSeed

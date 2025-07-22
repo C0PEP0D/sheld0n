@@ -24,6 +24,7 @@ def run(args):
         flags = "-DCMAKE_BUILD_TYPE=Debug"
     if args.compiler:
         flags += " -DCMAKE_CXX_COMPILER={}".format(args.compiler)
+    flags += " -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
     # configure
     subprocess.run("{cmake_cmd} .. {flags}".format(cmake_cmd=args.cmake_cmd, flags=flags), cwd="build", shell=True, check=True)
     # build
