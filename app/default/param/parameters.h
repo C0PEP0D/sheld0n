@@ -6,7 +6,7 @@
 
 namespace c0p {
 
-// define if the simulation is in 2D or 3D 
+// definition of the dimension of the simulation is in 2D or 3D
 constexpr unsigned int DIM = 2;
 // definition of a SpaceVector and a SpaceMatrix,
 // this should not be edited
