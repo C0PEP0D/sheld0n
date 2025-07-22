@@ -43,21 +43,23 @@ The following must be installed:
 * **Python** (`sudo apt install python`) with additional modules
 	* **numpy**, `python -m pip install numpy`
 	* **matplotlib**, `python -m pip install matplotlib`, used for plotting
-* **Cython** (`sudo apt install cython`) used for the cython interface
+* **Cython** (`python -m pip install cython`) used for the cython interface
 * **CMake**, `sudo apt install cmake`
-* **Threading Building Block Library**, `sudo apt install tbb`
+* **Threading Building Block Library**, `sudo apt install libtbb-dev`
 * a c++20 compliant compiler such as one of the following:
 	* **gcc** `v14`, `sudo apt install gcc-14`
 	* **clang** `v18`, `sudo apt install clang-18`
 * **ffmpeg**, `sudo apt install ffmpeg`, used to generate animations
-* **cli2gui**, `python -m pip install cli2gui`, used for the graphical interface
+* **cli2gui**, `python -m pip install cli2gui`, used for the graphical interface 
+
+* TODO: **--no-deps** + setup bien plus simple à faire
 
 ### Installing
 
 Start by cloning this repository on some of its submodules.
 
 ```sh
-$ git clone --recursive --no-checkout thirdparty/rl-tools
+$ git clone --recursive --no-checkout thirdparty/rl-tools https://github.com/C0PEP0D/sheld0n.git
 ```
 Make sure to add the `--no-checkout thirdparty/rl-tools` option even if you'd like to use reinforcement learning tools.
 If you'd like to have this tools, just execute the following afterwards.
