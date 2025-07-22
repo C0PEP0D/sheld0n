@@ -18,6 +18,8 @@ cdef extern from "param/parameters.h" namespace "c0p":
 		tSpaceVector Random() nogil
 		@staticmethod
 		tSpaceVector Zero() nogil
+		@staticmethod
+		tSpaceVector Constant(const double) nogil
 
 		# operators
 		double operator[](const int) nogil
@@ -89,7 +91,10 @@ cdef extern from "param/parameters.h" namespace "c0p":
 		tSpaceMatrix Random() nogil
 		@staticmethod
 		tSpaceMatrix Zero() nogil
+		@staticmethod
 		tSpaceMatrix Identity() nogil
+		@staticmethod
+		tSpaceVector Constant(const double) nogil
 		# operators
 		double operator[](const int) nogil
 		

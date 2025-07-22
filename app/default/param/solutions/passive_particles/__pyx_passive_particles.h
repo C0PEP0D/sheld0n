@@ -98,6 +98,8 @@ struct _PassiveParticlesParameters {
 
 		// ---------------- CUSTOM INIT START
 
+		passive_particles_parameters();
+
 		// input
 		std::vector<tView<tSpaceVector>> xArray;
 		xArray.reserve(Number);

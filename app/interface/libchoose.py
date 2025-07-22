@@ -52,14 +52,9 @@ def object_to_path(obj):
 ## source https://stackoverflow.com/questions/4205854/python-way-to-recursively-find-and-replace-string-in-text-files
 def find_replace(folder, file_pattern, text, replacement, condition = lambda line : True):
 
-    print(folder)
-    print(file_pattern)
-
     for dirpath, dirs, files in os.walk(folder, topdown=True):
         files = [os.path.join(dirpath, filename) for filename in fnmatch.filter(files, file_pattern)]
 
-        print(files)
-        
         if files:
             for line in fileinput.FileInput(files, inplace=True):
                 if condition(line):
@@ -248,8 +243,6 @@ def choose_file(choices_dir, choices_exceptions, edit=True):
 def edit_file(directory, default_obj, obj, size = 1):
     obj = obj[0:len(obj) - len(default_obj) + size]
     default_obj = default_obj[0:size]
-
-    print("default: ", default_obj, "new: ", obj)
     # h
     find_replace(directory, "*.h", "".join(default_obj) + "_", "".join(obj) + "_")
     find_replace(directory, "*.h", "_" + "".join(default_obj), "_" + "".join(obj))

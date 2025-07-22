@@ -96,7 +96,10 @@ struct _PassiveParticlesParameters {
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {
+
 		// ---------------- CUSTOM INIT START
+
+		passive_particles_parameters();
 
 		// input
 		std::vector<tView<tSpaceVector>> xArray;

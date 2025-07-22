@@ -2,10 +2,16 @@ cimport c0p
 cimport std
 
 # parameters
-cdef double swimming_velocity = 1.0
+cdef double swimming_velocity # swimming velocity
+cdef double aspect_ratio # aspect ratio of the spheroidal particles (0 = disks, 1 = spheres, +infinity = rods)
+cdef double factor # factor used in the equation
 
-cdef double aspect_ratio = 1.0 # aspect ratio of the spheroidal particles
-cdef double factor = (aspect_ratio * aspect_ratio - 1.0) / (aspect_ratio * aspect_ratio + 1.0) # factor used in the equation
+# Parameters: initialize global parameters
+cdef public void passive_particles_parameters() noexcept nogil:
+	global swimming_velocity, aspect_ratio, factor
+	swimming_velocity = 1.0
+	aspect_ratio = 1.0
+	factor = (aspect_ratio * aspect_ratio - 1.0) / (aspect_ratio * aspect_ratio + 1.0)
 
 # Constrain: constrain the state variable if necessary (normalize unit vectors for instance)
 # input:

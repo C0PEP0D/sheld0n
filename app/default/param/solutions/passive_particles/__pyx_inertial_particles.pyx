@@ -2,7 +2,12 @@ cimport c0p
 cimport std
 
 # parameters
-cdef double reaction_time = 1.0
+cdef double reaction_time
+
+# Parameters: initialize global parameters
+cdef public void passive_particles_parameters() noexcept nogil:
+	global reaction_time
+	reaction_time = 1.0
 
 # Constrain: constrain the state variable if necessary (normalize unit vectors for instance)
 # input:
@@ -35,7 +40,7 @@ cdef public void passive_particles_state_temporal_derivative(c0p.tViewConstSpace
 	# get flow velocity at position x and time t
 	cdef c0p.tSpaceVector u = c0p.Flow.getVelocity(x.data(), t)
 	# set the temporal derivative of x as the flow velocity
-	dx = u
+	dx = v
 	dv = (u - v) / reaction_time
 
 # Init: initialize your state variable.

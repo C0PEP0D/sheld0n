@@ -2,9 +2,17 @@ cimport c0p
 cimport std
 
 # parameters
-cdef c0p.tSpaceVector target_direction = c0p.tSpaceVector(1.0, 0.0)
-cdef const double swimming_velocity = 1.0
-cdef const double time_horizon = 1.0
+cdef c0p.tSpaceVector target_direction
+cdef const double swimming_velocity
+cdef const double time_horizon
+
+# Parameters: initialize global parameters
+cdef public void passive_particles_parameters() noexcept nogil:
+	global target_direction, swimming_velocity, time_horizon
+
+	target_direction = c0p.tSpaceVector(1.0, 0.0)
+	swimming_velocity = 1.0
+	time_horizon = 1.0
 
 # Constrain: constrain the state variable if necessary (normalize unit vectors for instance)
 # input:

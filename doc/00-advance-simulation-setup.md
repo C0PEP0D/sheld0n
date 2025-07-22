@@ -16,11 +16,11 @@ This tutorial series assumes you already learnt the basic usage of the code in t
 ## Setting up the case
 
 ```
-Start by creating a new case using the `*_generate_new_case` script with the name **case-00** for instance. 
-You do not have to specify anything in the **case** option for now.
+Start by creating a new case using the *_generate_new_case script with the name case-00 for instance. 
+You do not have to specify anything in the case option for now.
 ```
 ```
-Then move to the **case-00** directory.
+Then move to the case-00 directory.
 ```
 
 ## Global parameters

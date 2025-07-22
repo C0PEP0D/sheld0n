@@ -1,6 +1,10 @@
 cimport c0p
 cimport std
 
+# Parameters: initialize global parameters
+cdef public void passive_particles_parameters() noexcept nogil:
+	pass
+
 # Constrain: constrain the state variable if necessary (normalize unit vectors for instance)
 # input:
 #   t: current time

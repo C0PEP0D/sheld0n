@@ -2,8 +2,15 @@ cimport c0p
 cimport std
 
 # parameters
-cdef double buoyant_velocity = 0.5
-cdef c0p.tSpaceVector buoyancy_direction = c0p.tSpaceVector(0.0, 1.0)
+cdef double buoyant_velocity
+cdef c0p.tSpaceVector buoyancy_direction
+
+# Parameters: initialize global parameters
+cdef public void passive_particles_parameters() noexcept nogil:
+	global buoyant_velocity, buoyancy_direction
+
+	buoyant_velocity = 0.5
+	buoyancy_direction = c0p.tSpaceVector(0.0, 1.0)
 
 # Constrain: constrain the state variable if necessary (normalize unit vectors for instance)
 # input:

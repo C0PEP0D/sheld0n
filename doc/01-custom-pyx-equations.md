@@ -20,67 +20,18 @@ or an easier to use **Cython** interface slightly less flexible.
 If you need more flexibility and slightly better simulation performance, the next tutorial will transpose what you will learn here 
 into directly editing **C++** parameter files for more flexibility.
 
-## Python equation
-
 First let's generate a new case to avoid breaking the first tutorial case.
 Rather than generating a new case from scratch, let's just copy our first case.
 
 ```
-Copy you first case **case-00** as **case-01**
+Copy you first case case-00 as case-01.
 ```
 
 Before doing anything, let's clean everything inside this new case.
 
 ```
-Move into the `**`case-01`**` directory and execute both the `**`clean_build`**` and the **clean_time** scripts.
+Move into the case-01 directory and execute both the clean_build and the clean_time scripts.
 ```
-
-
-```sh
-$ cd case_01
-$ ./clean_build
-$ ./clean_time
-$ cd post_process
-$ ./clean
-$ cd ..
-$ cd param/solutions
-$ ./create_new_equation custom_particles
-$ cd custom_particles
-```
-
-First, let's create a particle that is parameterized in **Python**.
-
-```sh
-$ ./choose py_passive_particles
-$ ls
-choose parameters.h parameters.py
-```
-
-Note that a new file appeared: the `parameters.py` file.
-Editing the `parameters.py` will be enough to describe a specific behavior of particle.
-However the `StateSize` and `Number` parameters are still included in the `parameters.h` file.
-
-Let's take a look a the first function of this `parameters.py` file now.
-
-```python
-# input:
-#   state: particle state variable (position)
-#   u: flow velocity at the particle position
-# output:
-#   dstate: temporal derivative of the particle state variable (its velocity in this case)
-def state_temporal_derivative(state, u):
-    return u
-```
-
-Similarly to its *C++* counterpart, this function describes the temporal derivative of the state 
-variable of one particle. 
-In the case of passive particles, this function is directly returning the flow velocity.
-
-Further down in that file, you also have the description of both an `init` and a `post` function,
-used respectively for data initialization and post processing.
-
-Feel free to **choose** other particle types (ending with **_py**) to see how the `parameters.py` 
-file varies with different examples.
 
 ## Custom particle equation
 
@@ -93,89 +44,78 @@ The motion of such a particle would be described by the following equations
 \frac{d \vec{v}}{dt} = \frac{ u \left ( \vec{x}, t \right ) + V_{\mathrm{buoyancy}} \vec{z} - \vec{v} }{\tau} \, \mathrm{.}
 ```
 
-While this equation is not included in the choices available in the solver, `buoyant_particles_py` and 
-`inertial_particles_py` are both already available.
+While this equation is not included in the choices available in the solver, `pyx_buoyant_particles` and 
+`pyx_inertial_particles` are both already available.
 By merging together both behavior, we should be fine.
 
-Let's first get the `parameters.py` for buoyant particles and save it to have access to it later.
-```sh
-$ ./choose buoyant_particles_py
-$ cp parameters.py save_buoyant_parameters.py
+Let's first start by adding a new custom particle equation based on **pyx_buoyant_particles**.
+```
+Move to the param/solutions directory and execute the *_create_new_equation script.
+Give the name custom_particles to your new equation and choose **pyx_buoyant_particles**.
+```
+
+Let's just copy the `parameters_custom_particles.pyx` for buoyant particles and save it to have access to it later.
+```
+Move to the custom_particles directory.
+Copy parameters_custom_particles.pyx into parameters_buoyant_saved.pyx.
 ```
 
 Let's now start our new custom behavior based on that of inertial particles.
-```sh
-$ ./choose inertial_particles_py
+```
+Execute the choose script and choose the **pyx_inertial_particles**.
 ```
 
-We can now open both file at the same time and try to merge the `save_buoyant_parameters.py` file into the `parameters.py` file.
+We can now open both file at the same time and try to merge the `parameters_buoyant_saved.pyx` file into the `parameters_custom_particles.pyx` file.
 Let us first copy paste the buoyancy parameters into our parameters.
-```python
+```cython
 # parameters
-reaction_time = 1.0
-buoyant_velocity = 1.0 # <--- ADDED
-buoyant_direction = np.array([0.0, 1.0]) # <--- ADDED
+cdef double reaction_time
+cdef double buoyant_velocity # <--- ADDED
+cdef c0p.tSpaceVector buoyancy_direction # <--- ADDED
+
+# Parameters: initialize global parameters
+cdef public void buoyant_particles_parameters() noexcept nogil:
+	global reaction_time, buoyant_velocity, buoyancy_direction # <--- CHANGED
+
+	buoyant_velocity = 0.5 # <--- ADDED
+	buoyancy_direction = c0p.tSpaceVector(0.0, 1.0) # <--- ADDED
 ```
 
 Then we need to modify the definition of the temporal derivative of our state variables to match the previous equation.
 
-```python
-# input:
-#   state: particle state variable (position)
-#   u: flow velocity at the particle position
-# output:
-#   dstate: temporal derivative of the particle state variable (its velocity in this case)
-def state_temporal_derivative(state, u):
-    # extracting input
-    x = state[0:2]
-    v = state[2:4]
-    # initializing output
-    dstate = np.empty(state.shape)
-    dx = dstate[0:2]
-    dv = dstate[2:4]
-    # equation
-    dx[:] = v
-    dv[:] = (u + buoyant_velocity * buoyant_direction - v) / reaction_time # <--- CHANGED
-    # return state
-    return dstate
+```cython
+cdef public void custom_particles_state_temporal_derivative(c0p.tViewConstSpaceVector x, c0p.tViewConstSpaceVector v, const double t, c0p.tViewSpaceVector dx, c0p.tViewSpaceVector dv) noexcept nogil:
+	# get flow velocity at position x and time t
+	cdef c0p.tSpaceVector u = c0p.Flow.getVelocity(x.data(), t)
+	# set the temporal derivative of x as the flow velocity
+	dx = v
+	dv = (u + buoyant_velocity * buoyancy_direction - v) / reaction_time # <--- CHANGED
 ```
-
 
 Congrats ! You implemented your first custom equation into the solver.
 The code should already be able to run and solve your equation,
 but before moving on, let's try to edit the `init` function too.
 
-Starting with the `init`, it might make more sense to initialize the velocity of particles to
-their buoyant velocity rather than to zero.
-```python
-# input:
-#   particle_state_size: dimension of the state variable of one particle
-#   particle_number: number of particle
-# output:
-#   initial particle state
-def init(particle_state_size, particle_number):
-    # initialize output
-    initial_particles_position = np.empty(shape=(particle_number, particle_state_size))
-    # set random initial positions to all particles
-    for particle_index in range(particle_number):
-        x = initial_particles_position[particle_index, 0:2]
-        v = initial_particles_position[particle_index, 2:4]
-        x[:] = np.random.default_rng().uniform(-np.pi, np.pi, size=(1, particle_state_size))
-        v[:] = buoyant_velocity * buoyant_direction # <-- CHANGED
-    # return output
-    return initial_particles_position.flatten()
+Starting with the `init`, it might make more sense to initialize the velocity of particles to their buoyant velocity rather than to the flow velocity.
+```cython
+cdef public void custom_particles_init(const unsigned int particle_number, c0p.tViewSpaceVector* x_array, c0p.tViewSpaceVector* v_array) noexcept nogil:
+	# set random initial positions to all particles
+	cdef int particle_index, state_index
+	for particle_index in range(int(particle_number)):
+		x_array[particle_index] = c0p.tSpaceVector.Random() * std.M_PI
+		v_array[particle_index] = buoyant_velocity * buoyancy_direction # <--- CHANGED
 ```
 
 One could similarly change the `post` function too to match your needs.
 Once everything is setup, we can run the simulation and the post processing.
-```sh
-$ cd ../../..
-$ ./run
-[...]
-$ ./post
-[...]
-$ cd post_process
-$ ./generate_trajectory_animation
+```
+Move back to the case-01 directory.
+And execute the *_run script.
+```
+
+Finally you can see your own custom particles in action.
+```
+Move to the post_process directory and run the generate_trajectory_animation.py script (again, it may take a while).
 ```
 
 ## Custom post processing
