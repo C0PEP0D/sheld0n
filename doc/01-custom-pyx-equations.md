@@ -32,7 +32,7 @@ Copy you first case **case-00** as **case-01**
 Before doing anything, let's clean everything inside this new case.
 
 ```
-Move into the **case-01** directory and execute both the **clean_build** and the **clean_time** scripts.
+Move into the `**`case-01`**` directory and execute both the `**`clean_build`**` and the **clean_time** scripts.
 ```
 
 
