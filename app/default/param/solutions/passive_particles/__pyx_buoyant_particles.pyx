@@ -32,7 +32,7 @@ cdef public void passive_particles_state_temporal_derivative(c0p.tViewConstSpace
 	# get flow velocity at position x and time t
 	cdef c0p.tSpaceVector u = c0p.Flow.getVelocity(x.data(), t)
 	# set the temporal derivative of x as the flow velocity
-	dx = u + buoyant_velocity * buoyant_direction
+	dx = u + buoyant_velocity * buoyancy_direction
 
 # Init: initialize your state variable.
 # input:
