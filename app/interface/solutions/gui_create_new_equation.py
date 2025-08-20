@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
-import os
+from gooey import Gooey
 
-def main():
-    os.system("./._create_new_equation --cli2gui")
+if __name__ == '__main__': 
+    __name__ = ""
+    exec(open("._create_new_equation").read())
+    __name__ = "__main__"
+else:
+    exec(open("._create_new_equation").read())
+
+@Gooey(
+    show_success_modal=False
+)
+def main_gui():
+    main(True)
 
 if __name__ == '__main__':
-    main()
+    main_gui()

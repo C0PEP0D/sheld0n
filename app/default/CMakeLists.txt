@@ -29,7 +29,7 @@ list(APPEND CMAKE_MODULE_PATH ${C0P_PROJECT_DIR}/cmake/modules) # maybe unecessa
 find_package(TBB REQUIRED)
 
 ### Python
-find_package(Python COMPONENTS Interpreter Development NumPy REQUIRED)
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
 
 # Additional cpp files (cython)
 file(GLOB_RECURSE ADD_CPP_FILES "./param/solutions/*.cpp")
@@ -38,14 +38,13 @@ file(GLOB_RECURSE ADD_CPP_FILES "./param/solutions/*.cpp")
 add_executable(run ${C0P_PROJECT_DIR}/app/core/run/main.cpp ${ADD_CPP_FILES})
 ## Link Libraries
 target_link_libraries(run TBB::tbb)
-target_link_libraries(run Python::Python Python::NumPy)
+target_link_libraries(run Python::Python)
 target_link_libraries(run RLtools::RLtools)
 target_link_libraries(run getjhtdb)
 
 
 ## Precompile headers
 target_precompile_headers(run PUBLIC <Eigen/Dense>)
-target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/thirdparty/pybind11/include/pybind11/embed.h)
 ### s0s
 target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/s0s/include/s0s/runge_kutta_fehlberg.h)
 ### sp0ce
@@ -76,7 +75,6 @@ target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/pl0f/include/pl0
 target_include_directories(run PRIVATE .)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/app)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/thirdparty/eigen)
-target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/thirdparty/pybind11/include)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/s0s/include)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/sp0ce/include)
 target_include_directories(run PRIVATE ${C0P_PROJECT_DIR}/modules/d0t/include)
@@ -97,7 +95,7 @@ target_compile_features(run PUBLIC cxx_std_17)
 add_executable(post ${C0P_PROJECT_DIR}/app/core/post/main.cpp ${ADD_CPP_FILES})
 ## Libraries
 target_link_libraries(post TBB::tbb)
-target_link_libraries(post Python::Python Python::NumPy)
+target_link_libraries(post Python::Python)
 target_link_libraries(post RLtools::RLtools)
 target_link_libraries(post getjhtdb)
 ## Precompile headers
@@ -106,7 +104,6 @@ target_precompile_headers(post REUSE_FROM run)
 target_include_directories(post PRIVATE .)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/app)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/thirdparty/eigen)
-target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/thirdparty/pybind11/include)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/s0s/include)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/sp0ce/include)
 target_include_directories(post PRIVATE ${C0P_PROJECT_DIR}/modules/d0t/include)
@@ -127,7 +124,7 @@ target_compile_features(post PUBLIC cxx_std_17)
 add_executable(learn ${C0P_PROJECT_DIR}/app/core/learn/main.cpp ${ADD_CPP_FILES})
 ## Link Libraries
 target_link_libraries(learn TBB::tbb)
-target_link_libraries(learn Python::Python Python::NumPy)
+target_link_libraries(learn Python::Python)
 target_link_libraries(learn RLtools::RLtools)
 target_link_libraries(learn getjhtdb)
 ## Precompile headers
@@ -136,7 +133,6 @@ target_precompile_headers(learn REUSE_FROM run)
 target_include_directories(learn PRIVATE .)
 target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/app)
 target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/thirdparty/eigen)
-target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/thirdparty/pybind11/include)
 target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/s0s/include)
 target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/sp0ce/include)
 target_include_directories(learn PRIVATE ${C0P_PROJECT_DIR}/modules/d0t/include)

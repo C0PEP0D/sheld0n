@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# gui
-from cli2gui import Cli2Gui
 # command line program
 import argparse
 # name check
@@ -49,7 +47,6 @@ def run(args):
     else:
         print("ERROR: name shouldn't contain special characters")
 
-@Cli2Gui(run_function=run)
 def main():
     # parser
     parser = argparse.ArgumentParser(description='copy an equation')

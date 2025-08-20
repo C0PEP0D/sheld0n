@@ -10,3 +10,5 @@ cdef extern from "<string>" namespace "std":
 
 cdef extern from "<cmath>" namespace "std":
 	int log10(int) nogil
+	double sin(double) nogil
+	double cos(double) nogil

@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# gui
-from cli2gui import Cli2Gui
 # command line program
 import argparse
 # directory operations
@@ -36,13 +34,9 @@ def run_aux(name):
     # shutil.rmtree("../../../init/solutions/" + name)
 
 def run(args):
-    if "--cli2gui" in sys.argv:
-        run_aux(os.path.normpath(args.equations))
-    else:
-        for equation in args.equations:
-            run_aux(os.path.normpath(equation))
+    for equation in args.equations:
+        run_aux(os.path.normpath(equation))
 
-@Cli2Gui(run_function=run)
 def main():
     parser = argparse.ArgumentParser(description='remove equations')
     parser.add_argument('equations', nargs='+', choices=[equation for equation in os.listdir(".") if os.path.isdir(equation)], help='select the equations to remove')

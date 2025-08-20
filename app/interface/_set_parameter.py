@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# gui
-from cli2gui import Cli2Gui
 # command line program
 import argparse
 # util
@@ -13,7 +11,6 @@ import libset
 def run(args):
     libset.set_parameter(args.file, args.parameter, args.value)
 
-@Cli2Gui(run_function=run)
 def main():
     parser = argparse.ArgumentParser(description='Set a simulation parameter.')
     parser.add_argument('file', type=str, help='parameter file')

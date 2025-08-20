@@ -1,8 +1,19 @@
 #!/usr/bin/env python3
-import os
+from gooey import Gooey
 
-def main():
-    os.system("./._run --cli2gui")
+if __name__ == '__main__': 
+    __name__ = ""
+    exec(open("._run").read())
+    __name__ = "__main__"
+else:
+    exec(open("._run").read())
+
+@Gooey(
+    show_success_modal=False,
+    show_restart_button=False
+)
+def main_gui():
+    main()
 
 if __name__ == '__main__':
-    main()
+    main_gui()

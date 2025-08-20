@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# gui
-from cli2gui import Cli2Gui
 # cli
 import argparse
 import numpy as np
@@ -23,7 +21,6 @@ def compute(source, name):
 def run(args):
     compute(args.source, args.name)
 
-@Cli2Gui(run_function=run)
 def main():
     parser = argparse.ArgumentParser(description='rename an equation')
     parser.add_argument('source', choices=[equation for equation in os.listdir(".") if os.path.isdir(equation)], help='specify the name of the equation')

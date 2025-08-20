@@ -23,6 +23,7 @@ cdef extern from "param/parameters.h" namespace "c0p":
 
 		# operators
 		double operator[](const int) nogil
+		double& operator[](const int) nogil
 		
 		tSpaceVector operator*(const double) nogil
 		tSpaceVector operator*(const double, const tSpaceVector&) nogil
@@ -97,6 +98,10 @@ cdef extern from "param/parameters.h" namespace "c0p":
 		tSpaceVector Constant(const double) nogil
 		# operators
 		double operator[](const int) nogil
+		double& operator[](const int) nogil
+
+		double operator()(const int, const int) nogil
+		double& operator()(const int, const int) nogil
 		
 		tSpaceMatrix operator*(const double) nogil
 		tSpaceMatrix operator*(const double, const tSpaceMatrix&) nogil
@@ -129,6 +134,7 @@ cdef extern from "core/prop.h" namespace "c0p":
 
 		# operators
 		double operator[](const int) nogil
+		double& operator[](const int) nogil
 		
 		tSpaceVector operator*(const double) nogil
 		tSpaceVector operator*(const double, const tViewSpaceVector&) nogil

@@ -50,9 +50,18 @@ The following must be installed:
 	* **gcc** `v14`, `sudo apt install gcc-14`
 	* **clang** `v18`, `sudo apt install clang-18`
 * **ffmpeg**, `sudo apt install ffmpeg`, used to generate animations
-* **cli2gui**, `python -m pip install cli2gui`, used for the graphical interface 
+* **Gooey**, `python -m pip install Gooey`, used for the graphical interface (may take a while)
 
-* TODO: **--no-deps** + setup bien plus simple à faire
+* TODO: VIRTUAL ENV INSTALL !!!
+
+* TODO: conan install
+
+* TODO: more cleaning !!!
+* TODO: enlever les dollars.
+
+* TODO: mise à jour : init submodules
+
+* TODO: mark DONE when command is done.
 
 ### Installing
 
@@ -67,6 +76,8 @@ If you'd like to have this tools, just execute the following afterwards.
 ```sh
 $ git submodule update --init thirdparty/rl-tools
 ```
+
+* TODO: **--NO-CHECKOUT NOT WORKING**
 
 And that's it!
 
@@ -137,7 +148,9 @@ Then navigate in the case and run the case by executing the `*_run` script.
 
 > [!NOTE]
 > If it does not work, it might mean that your default compiler might not support all necessary C++ features.
-> Try specifying another C++ compiler, `g++-14` or `clang++-18` using the **compiler** option.
+> Try specifying another C++ compiler, `cpp-14`, `g++-14` or `clang++-18` using the **compiler** option.
+
+* TODO: screenshot
 
 Final data should be in the `post_process` directory. 
 Further post processing is provided using python scripts in that directory.

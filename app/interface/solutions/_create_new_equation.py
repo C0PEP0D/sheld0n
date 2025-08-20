@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# gui
-from cli2gui import Cli2Gui
 # command line program
 import argparse
 # name check
@@ -18,8 +16,9 @@ lib_directory = script_dir[:script_dir.find("interface") + len("interface")]
 sys.path.append(lib_directory)
 import libchoose
 
+is_gui = False
+
 def run(args):
-    is_gui = "--cli2gui" in sys.argv
     # compute
     name_check = re.compile(r'[][@!#$%^&*()<>?/\|}{~:+.\'"]')
     if(name_check.search(args.name) == None):
@@ -59,8 +58,9 @@ def run(args):
     else:
         print("ERROR: name shouldn't contain special characters")
 
-@Cli2Gui(run_function=run)
-def main():
+def main(_is_gui = False):
+    global is_gui
+    is_gui = _is_gui
     # parser
     parser = argparse.ArgumentParser(description='create a new equation based on the default one')
     parser.add_argument('name', help='specify the name of the new equation')

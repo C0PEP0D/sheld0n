@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# gui
-from cli2gui import Cli2Gui
 # command line program
 import argparse
 # directory operations
@@ -32,7 +30,6 @@ def run(args):
     # run
     subprocess.run("./build/post", shell=True)
 
-@Cli2Gui(run_function=run)
 def main():
     parser = argparse.ArgumentParser(description='Run the simulation')
     parser.add_argument('-d', '--debug', action='store_true', help='activates debug')

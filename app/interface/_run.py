@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# gui
-from cli2gui import Cli2Gui
 # command line program
 import argparse
 # directory operations
@@ -12,7 +10,7 @@ import subprocess
 
 def run(args):
     # cython
-    sources = glob.glob('param/solutions/**/parameters_*.pyx')
+    sources = glob.glob('param/**/parameters_*.pyx') + glob.glob('param/solutions/**/parameters_*.pyx')
     print(sources)
     if sources:
         subprocess.run("cython -tv --cplus {sources}; exit 0".format(sources=" ".join(sources)), shell=True, check=True)
@@ -33,7 +31,6 @@ def run(args):
     # run
     subprocess.run("./build/run", shell=True, check=True)
 
-@Cli2Gui(run_function=run)
 def main():
     parser = argparse.ArgumentParser(description='Run the simulation')
     parser.add_argument('-d', '--debug', action='store_true', help='activates debug')

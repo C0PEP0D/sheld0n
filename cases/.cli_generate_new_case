@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# gui
-from cli2gui import Cli2Gui
 # core
 import sys
 import os
@@ -20,8 +18,6 @@ import fileinput
 is_gui = False
 
 def run(args):
-    global is_gui
-    is_gui = "--cli2gui" in sys.argv
     # init utils
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/.."
@@ -152,8 +148,10 @@ def run(args):
             
     os.chdir('..')
 
-@Cli2Gui(run_function=run)
-def main():
+def main(_is_gui = False):
+    global is_gui
+    is_gui = _is_gui
+    # set choices
     choices = [
         'default',
         'surf_tgv',

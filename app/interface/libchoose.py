@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# gui
-from cli2gui import Cli2Gui
 # command line program
 import argparse
 # aame check
@@ -184,6 +182,8 @@ def apply_choice(args):
         os.remove("parameters_" + name + ".h")
     if os.path.exists("parameters_" + name + ".cpp"):
         os.remove("parameters_" + name + ".cpp")
+    if os.path.exists("parameters_" + name + ".c"):
+        os.remove("parameters_" + name + ".c")
 
     if args.choice.startswith("pyx"):
         shutil.copyfile(get_abs_choices_dir(choices_dir) + "/" + choices[args.choice].replace(".h", ".pyx"), "parameters_" + name + ".pyx")
@@ -227,8 +227,6 @@ def apply_choice(args):
         # move back
         os.chdir(name)
     
-
-@Cli2Gui(run_function=apply_choice)
 def choose_file(choices_dir, choices_exceptions, edit=True):
     # get choices
     choices = list(get_choices_file(choices_dir, choices_exceptions).keys())
