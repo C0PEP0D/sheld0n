@@ -41,52 +41,45 @@ If not, you should be able to install these dependencies with your package manag
 
 The following must be installed:
 * **Python** (`sudo apt install python`) with additional modules
-	* **numpy**, `python -m pip install numpy`
-	* **matplotlib**, `python -m pip install matplotlib`, used for plotting
-* **Cython** (`python -m pip install cython`) used for the cython interface
 * **CMake**, `sudo apt install cmake`
-* **Threading Building Block Library**, `sudo apt install libtbb-dev`
-* a c++20 compliant compiler such as one of the following:
-	* **gcc** `v14`, `sudo apt install gcc-14`
+* A C++17 compliant compiler such as one of the following:
+	* **gcc** `v12`, `sudo apt install gcc-12`
 	* **clang** `v18`, `sudo apt install clang-18`
 * **ffmpeg**, `sudo apt install ffmpeg`, used to generate animations
-* **Gooey**, `python -m pip install Gooey`, used for the graphical interface (may take a while)
-
-* TODO: VIRTUAL ENV INSTALL !!!
-
-* TODO: conan install
-
-* TODO: more cleaning !!!
-* TODO: enlever les dollars.
-
-* TODO: mise à jour : init submodules
 
 * TODO: mark DONE when command is done.
 
 ### Installing
 
-Start by cloning this repository on some of its submodules.
+Start by creating a python virtual environment to encapsulate all python dependencies.
 
 ```sh
-$ git clone --recursive --no-checkout thirdparty/rl-tools https://github.com/C0PEP0D/sheld0n.git
+python -m venv venv-sheld0n
+cd venv-sheld0n
+source bin/activate
 ```
-Make sure to add the `--no-checkout thirdparty/rl-tools` option even if you'd like to use reinforcement learning tools.
-If you'd like to have this tools, just execute the following afterwards.
+
+Then execute clone the sheld0n project and move into its directory.
 
 ```sh
-$ git submodule update --init thirdparty/rl-tools
+git clone https://github.com/C0PEP0D/sheld0n.git
+cd sheld0n
 ```
 
-* TODO: **--NO-CHECKOUT NOT WORKING**
+Finally install all python dependencies by executing the `install.py` script.
 
-And that's it!
+```sh
+./install.py
+```
+This may take a while, especially during the operation **Building wheel for wxpython (pyproject.toml) ...**
+And you should be done!
 
 ### Updating
 
 A simple pull should be enough.
 
 ```sh
-$ git pull --recurse-submodules
+git pull --recurse-submodules
 ```
 
 ## Usage
@@ -131,11 +124,11 @@ Each file starting with `cli_` is a file that can be executed from you terminal.
 Most scripts provided by this software contain their description, explaining how to use them. One can access this description using the following:
 
 ```sh
-$ ./cli_script -h
+./cli_script -h
 ```
 or
 ```sh
-$ ./cli_script --help
+./cli_script --help
 ```
 
 ### Quick start
