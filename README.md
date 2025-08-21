@@ -47,7 +47,7 @@ The following must be installed **sytem wide**:
 * **ffmpeg**, `sudo apt install ffmpeg`, used to generate animations
 * A C++17 compliant compiler for instance **g++** `v12` or more, `sudo apt install g++`
 
-The installation has been tested for ArchLinux and Ubuntu 24.04.2 LTS (noble).
+The installation has been tested for ArchLinux (2025-08-21) and Ubuntu 24.04.2 LTS (noble).
 
 ```sh tab 0
 python -m venv venv-sheld0n
