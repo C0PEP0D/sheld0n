@@ -39,15 +39,26 @@ This software has been produced during my PhD thesis and as part as the European
 The dependencies are standard softwares that may already be installed on your system.
 If not, you should be able to install these dependencies with your package manager.
 
-The following must be installed:
-* **Python** (`sudo apt install python`) with additional modules
+The following must be installed **sytem wide**:
+* **git**, `sudo apt install git`
+* **Python**, `sudo apt install python-is-python3 python3-venv python3-dev`
+* **libcurl-dev**, `sudo apt install libcurl4-openssl-dev`
 * **CMake**, `sudo apt install cmake`
-* A C++17 compliant compiler such as one of the following:
-	* **gcc** `v12`, `sudo apt install gcc-12`
-	* **clang** `v18`, `sudo apt install clang-18`
 * **ffmpeg**, `sudo apt install ffmpeg`, used to generate animations
+* A C++17 compliant compiler for instance **g++** `v12` or more, `sudo apt install g++`
 
-* TODO: mark DONE when command is done.
+The installation has been tested for ArchLinux and Ubuntu 24.04.2 LTS (noble).
+
+```sh tab 0
+python -m venv venv-sheld0n
+cd venv-sheld0n
+source bin/activate
+```
+```sh tab 1
+python -m venv venv-sheld0n
+cd venv-sheld0n
+source bin/activate
+```
 
 ### Installing
 
@@ -66,7 +77,7 @@ git clone https://github.com/C0PEP0D/sheld0n.git
 cd sheld0n
 ```
 
-Finally install all python dependencies by executing the `install.py` script.
+Finally pull submodules and install python dependencies by executing the `install.py` script.
 
 ```sh
 ./install.py
@@ -76,8 +87,7 @@ And you should be done!
 
 ### Updating
 
-A simple pull should be enough.
-
+In the future, if you'd like to update the code, a simple pull should be enough.
 ```sh
 git pull --recurse-submodules
 ```
@@ -88,18 +98,18 @@ git pull --recurse-submodules
 
 The solver is written in **C++** and the interface is written in **Python**.
 Parameters are set by editing **C++** files or **Cython** parameter files.
-**You do not need to know** how to write in **C++**, **Python** nor **Cython** prior to the use the code (even though it can help).
+**You do not need to know** how to write in **C++**, nor **Cython** prior to the use the code (even though it can help).
 
-Even for a more advance usage of the code, you'll be able to edit the **C++**, **Cython** or **Python** files 
+Even for a more advance usage of the code, you'll be able to edit the **C++** or **Cython** files
 by imitating the examples provided in the code, following the provided tutorial series.
 
-The solver provides as a series of tools that can be used either using a command line interface or a graphical user interface.
+The solver provides a series of tools that can be used either using a command line interface or a graphical user interface.
 
 ### General usage
 
 The whole interface of the code is located in the `cases` folder.
 
-You can either use the code using Graphical User Interface (GUI) or a Command Line Interface (CLI). If you see the file `gui_generate_new_case` in the `cases` folder, you are currently using the graphical interface. On the contrary, if the `cli_generate_new_case` is present, you are using the command line interface.
+You can either use the code using its Graphical User Interface (GUI) or a Command Line Interface (CLI). If you see the file `gui_generate_new_case` in the `cases` folder, you are currently using the graphical interface. On the contrary, if the `cli_generate_new_case` is present, you are using the command line interface.
 
 If you start using the code, using the GUI is recommended.
 To switch from the `CLI` to the `GUI`, just execute the `switch_to_cli` command.
