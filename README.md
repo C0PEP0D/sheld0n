@@ -40,41 +40,37 @@ The dependencies are standard softwares that may already be installed on your sy
 If not, you should be able to install these dependencies with your package manager.
 
 The following must be installed **sytem wide**:
-* **git**, `sudo apt install git`
-* **Python**, `sudo apt install python-is-python3 python3-venv python3-dev`
-* **libcurl-dev**, `sudo apt install libcurl4-openssl-dev`
-* **CMake**, `sudo apt install cmake`
-* **ffmpeg**, `sudo apt install ffmpeg`, used to generate animations
-* A C++17 compliant compiler for instance **g++** `v12` or more, `sudo apt install g++`
+
+* **git**
+* **Python3** and its development libraries
+* **Curl** development libraries
+* **CMake**
+* **ffmpeg**
+* A C++17 compliant compiler (**clang++**, **g++**)
 
 The installation has been tested for ArchLinux (2025-08-21) and Ubuntu 24.04.2 LTS (noble).
 
-```sh tab 0
-python -m venv venv-sheld0n
-cd venv-sheld0n
-source bin/activate
+#### Ubuntu
+
+To install those dependencies on Ubuntu, just execute the following:
+```sh
+sudo apt install git python-is-python3 python3-venv python3-dev libcurl4-openssl-dev cmake ffmpeg g++
 ```
-```sh tab 1
-python -m venv venv-sheld0n
-cd venv-sheld0n
-source bin/activate
+
+#### OSX
+
+To install those dependencies on Ubuntu, just execute the following (with **Homebrew** previously installed):
+```sh
+brew install git python3 cmake ffmpeg`
 ```
 
 ### Installing
 
-Start by creating a python virtual environment to encapsulate all python dependencies.
+The following command will create a python virtual environment to encapsulate all python dependencies,
+then clone the sheld0n project and move into its directory.
 
 ```sh
-python -m venv venv-sheld0n
-cd venv-sheld0n
-source bin/activate
-```
-
-Then execute clone the sheld0n project and move into its directory.
-
-```sh
-git clone https://github.com/C0PEP0D/sheld0n.git
-cd sheld0n
+python -m venv venv-sheld0n; cd venv-sheld0n; source bin/activate; git clone https://github.com/C0PEP0D/sheld0n.git; cd sheld0n
 ```
 
 Finally pull submodules and install python dependencies by executing the `install.py` script.
@@ -83,7 +79,6 @@ Finally pull submodules and install python dependencies by executing the `instal
 ./install.py
 ```
 This may take a while, especially during the operation **Building wheel for wxpython (pyproject.toml) ...**
-And you should be done!
 
 ### Updating
 
