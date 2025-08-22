@@ -25,8 +25,14 @@ using tVector = tMatrix<Size, 1>;
 template<typename ...Args>
 using tView = Eigen::Map<Args...>;
 using tStateVectorDynamic = tVector<Eigen::Dynamic>;
+using tMatrixDynamic = tMatrix<Eigen::Dynamic, Eigen::Dynamic>;
 // Solver
 using tSolver = s0s::SolverRungeKuttaFehlberg<tStateVectorDynamic, tView>;
+
+template<const int ...Args>
+void set(tMatrix<Args...>& m, const unsigned int i, const unsigned int j, const tScalar v) {
+	m(i, j) = v;
+}
 
 namespace rand0m {
 	inline std::random_device device;

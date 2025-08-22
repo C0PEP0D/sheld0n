@@ -63,7 +63,7 @@ def run(args):
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/cli_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_create_new_equation")
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/cli_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_rename_equation")
     #### equation
-    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/.cli_choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/cli_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/.cli_choose")
     ###################### gui
     ### basic
     os.symlink(os.path.relpath(code_dir + "/app/interface/gui_run.py", args.name), args.name + "/.gui_run")
@@ -72,7 +72,7 @@ def run(args):
     os.symlink(os.path.relpath(code_dir + "/app/interface/gui_learn.py", args.name), args.name + "/.gui_learn")
     ### env
     #### flow
-    os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name + "/param/flow"), args.name + "/param/flow/gui_choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name + "/param/flow"), args.name + "/param/flow/.gui_choose")
     #### solutions
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_copy_equation")
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_remove_equation")
