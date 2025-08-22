@@ -3,10 +3,10 @@ from gooey import Gooey
 
 if __name__ == '__main__': 
     __name__ = ""
-    exec(open("._remove_equation").read())
+    exec(open(".cli_remove_equation").read())
     __name__ = "__main__"
 else:
-    exec(open("._remove_equation").read())
+    exec(open(".cli_remove_equation").read())
 
 @Gooey(
     show_success_modal=False

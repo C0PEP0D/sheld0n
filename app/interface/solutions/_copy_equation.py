@@ -1,61 +1,25 @@
 #!/usr/bin/env python3
-
-# command line program
-import argparse
-# name check
-import re
-# directory operations
-import shutil
-import os
-# replace operations
-import fileinput
-# custom Libraries
 import sys
-script_dir = os.path.dirname(os.path.realpath(__file__))
-lib_directory = script_dir[:script_dir.find("interface") + len("interface")]
-sys.path.append(lib_directory)
-import libchoose
-
-def run(args):
-    name_check = re.compile('[][@!#$%^&*()<>?/\\|}{~:+.\'"]')
-    if(name_check.search(args.name) == None):
-        # copy
-        shutil.copytree(args.source, args.name, symlinks=True)
-        if os.path.exists(args.name + "/parameters_" + args.source + ".pyx"):
-            os.rename(args.name + "/parameters_" + args.source + ".pyx", args.name + "/parameters_" + args.name + ".pyx")
-        if os.path.exists(args.name + "/parameters_" + args.source + ".h"):
-            os.remove(args.name + "/parameters_" + args.source + ".h")
-        if os.path.exists(args.name + "/parameters_" + args.source + ".cpp"):
-            os.remove(args.name + "/parameters_" + args.source + ".cpp")
-        # edit
-        libchoose.edit_choice(args.name, [args.source], [args.name])
-        # register
-        is_static = True
-        is_dynamic = False
-        with open(args.name + '/parameters.h', 'r') as file:
-            for line in file:
-                if line.startswith("// FLAG: DYNAMIC"):
-                    is_static = False
-                    is_dynamic = True
-                    break
-                elif line.startswith("namespace c0p {"):
-                    break
-        if is_static:
-            libchoose.edit_add_equation_static(args.name)
-        elif is_dynamic:
-            libchoose.edit_add_equation_dynamic(args.name)
-    else:
-        print("ERROR: name shouldn't contain special characters")
+import os
 
 def main():
-    # parser
-    parser = argparse.ArgumentParser(description='copy an equation')
-    parser.add_argument('source', choices=[equation for equation in os.listdir(".") if os.path.isdir(equation)], help='specify the name of source equation')
-    parser.add_argument('name', help='specify the name of the copy')
-    # parse
-    args = parser.parse_args()
-    # run
-    run(args)
+    script_path = __file__
+    script_dir = os.path.dirname(script_path)
+    script_name = os.path.basename(script_path)
+
+    cases_dir = script_dir + "/../.."
+
+    if os.path.exists(cases_dir + "/switch_to_cli"):
+        interface = "gui"
+    else:
+        interface = "cli"
+
+    os.chdir(script_dir)
+    if os.path.exists(cases_dir + "/../../bin/activate"):
+        os.system("bash -c 'source {cases_dir}/../../bin/activate && ./.{interface}_copy_equation {argv}'".format(cases_dir=cases_dir, interface=interface, argv=" ".join(sys.argv[1:])))
+    else:
+        print("WARNING: Can't find the standard sheld0n virtual environment. Trying to execute anyway.")
+        os.system("./.{interface}_copy_equation {argv}".format(interface=interface, argv=" ".join(sys.argv[1:])))
 
 if __name__ == '__main__':
     main()

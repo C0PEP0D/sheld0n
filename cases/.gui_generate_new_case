@@ -9,10 +9,11 @@ else:
     exec(open(".cli_generate_new_case").read())
 
 @Gooey(
+    show_restart_button=False,
     show_success_modal=False
 )
 def main_gui():
-    main(True)
+    main()
 
 if __name__ == '__main__':
     main_gui()

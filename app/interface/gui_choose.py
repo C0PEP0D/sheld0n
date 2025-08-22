@@ -4,10 +4,10 @@ import sys
 
 if __name__ == '__main__': 
     __name__ = ""
-    exec(open("._choose").read())
+    exec(open(".cli_choose").read())
     __name__ = "__main__"
 else:
-    exec(open("._choose").read())
+    exec(open(".cli_choose").read())
 
 @Gooey(
     show_success_modal=False

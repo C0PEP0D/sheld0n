@@ -3,16 +3,16 @@ from gooey import Gooey
 
 if __name__ == '__main__': 
     __name__ = ""
-    exec(open("._create_new_equation").read())
+    exec(open(".cli_create_new_equation").read())
     __name__ = "__main__"
 else:
-    exec(open("._create_new_equation").read())
+    exec(open(".cli_create_new_equation").read())
 
 @Gooey(
     show_success_modal=False
 )
 def main_gui():
-    main(True)
+    main()
 
 if __name__ == '__main__':
     main_gui()

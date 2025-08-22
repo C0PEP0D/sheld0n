@@ -1,50 +1,25 @@
 #!/usr/bin/env python3
-
-# command line program
-import argparse
-# directory operations
-import shutil
-import os
-# replace operations
-import fnmatch
-import fileinput
-# custom Libraries
 import sys
-script_dir = os.path.dirname(os.path.realpath(__file__))
-lib_directory = script_dir[:script_dir.find("interface") + len("interface")]
-sys.path.append(lib_directory)
-import libchoose
-    
-def edit(name):
-    upper_camel_name = libchoose.object_to_upper_camel_case([name])
-    # solutions
-    for line in fileinput.FileInput("parameters.h", inplace=True):
-        if (line == '#include "param/solutions/{}/parameters.h"\n'.format(name)):
-            pass
-        elif ('_{Name}::'.format(Name=upper_camel_name) in line):
-            pass
-        else:
-            print(line, end='')
-
-def run_aux(name):
-    # edit
-    edit(name)
-    # remove dir
-    shutil.rmtree(name)
-    # shutil.rmtree("../../../init/solutions/" + name)
-
-def run(args):
-    for equation in args.equations:
-        run_aux(os.path.normpath(equation))
+import os
 
 def main():
-    parser = argparse.ArgumentParser(description='remove equations')
-    parser.add_argument('equations', nargs='+', choices=[equation for equation in os.listdir(".") if os.path.isdir(equation)], help='select the equations to remove')
-    args = parser.parse_args()
-    # run
-    run(args)
-    
+    script_path = __file__
+    script_dir = os.path.dirname(script_path)
+    script_name = os.path.basename(script_path)
+
+    cases_dir = script_dir + "/../.."
+
+    if os.path.exists(cases_dir + "/switch_to_cli"):
+        interface = "gui"
+    else:
+        interface = "cli"
+
+    os.chdir(script_dir)
+    if os.path.exists(cases_dir + "/../../bin/activate"):
+        os.system("bash -c 'source {cases_dir}/../../bin/activate && ./.{interface}_remove_equation {argv}'".format(cases_dir=cases_dir, interface=interface, argv=" ".join(sys.argv[1:])))
+    else:
+        print("WARNING: Can't find the standard sheld0n virtual environment. Trying to execute anyway.")
+        os.system("./.{interface}_remove_equation {argv}".format(interface=interface, argv=" ".join(sys.argv[1:])))
 
 if __name__ == '__main__':
     main()
-    

@@ -54,14 +54,14 @@ The installation has been tested for ArchLinux (2025-08-21) and Ubuntu 24.04.2 L
 
 To install those dependencies on Ubuntu, just execute the following:
 ```sh
-sudo apt install git python-is-python3 python3-venv python3-dev libcurl4-openssl-dev cmake ffmpeg g++
+sudo apt update && sudo apt install git python-is-python3 python3-venv python3-dev libcurl4-openssl-dev cmake ffmpeg g++
 ```
 
 #### OSX
 
 To install those dependencies on Ubuntu, just execute the following (with **Homebrew** previously installed):
 ```sh
-brew install git python3 cmake ffmpeg`
+brew reinstall python3 && brew install git cmake ffmpeg`
 ```
 
 ### Installing
@@ -70,13 +70,16 @@ The following command will create a python virtual environment to encapsulate al
 then clone the sheld0n project and move into its directory.
 
 ```sh
-python -m venv venv-sheld0n; cd venv-sheld0n; source bin/activate; git clone https://github.com/C0PEP0D/sheld0n.git; cd sheld0n
+python -m venv venv-sheld0n && cd venv-sheld0n && source bin/activate && git clone https://github.com/C0PEP0D/sheld0n.git && cd sheld0n
 ```
 
-Finally pull submodules and install python dependencies by executing the `install.py` script.
+Finally pull submodules and install python dependencies by executing the `install-with-gui.py` script.
+When using the code, you can use either a Command Line Interface or a Graphical User Interface (GUI).
+When first trying out the code, the usage of the GUI is advised. 
+However, if you feel like you do not need it or if the installation with gui does not work, feel free to execute `./install-without-gui.py && deactivate` instead.
 
 ```sh
-./install.py
+./install-with-gui.py && deactivate
 ```
 This may take a while, especially during the operation **Building wheel for wxpython (pyproject.toml) ...**
 

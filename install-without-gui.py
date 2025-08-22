@@ -16,14 +16,17 @@ def run(args):
     # install python requirements
     ## interface
     subprocess.run("python -m pip install cython", cwd=".", shell=True, check=True)
-    subprocess.run("python -m pip install gooey", cwd=".", shell=True, check=True)
     ## post processing
     subprocess.run("python -m pip install numpy", cwd=".", shell=True, check=True)
     subprocess.run("python -m pip install matplotlib", cwd=".", shell=True, check=True)
     ## compiling
     subprocess.run("python -m pip install tbb-devel", cwd=".", shell=True, check=True)
-
-    # add: g++ and ffmpeg
+    # switch to cli
+    if os.path.exists("cases/switch_to_cli"):
+        os.chdir('cases')
+        os.system('./switch_to_cli')
+        os.rename('switch_to_gui', '._switch_to_gui')
+        os.chdir('..')
     
 def main():
     parser = argparse.ArgumentParser(description='Install dependencies.')

@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
-
-# command line program
-import argparse
-# util
-import math
-# lib param
-import libset
-
-
-def run(args):
-    libset.set_parameter(args.file, args.parameter, args.value)
+import sys
+import os
 
 def main():
-    parser = argparse.ArgumentParser(description='Set a simulation parameter.')
-    parser.add_argument('file', type=str, help='parameter file')
-    parser.add_argument('parameter', type=str, help='parameter name')
-    parser.add_argument('value', type=str, help='new value of that parameter')
-    args = parser.parse_args()
-    # run
-    run(args)
+    script_path = __file__
+    script_dir = os.path.dirname(script_path)
+    script_name = os.path.basename(script_path)
+
+    cases_dir = script_dir + "/.."
+
+    if os.path.exists(cases_dir + "/switch_to_cli"):
+        interface = "gui"
+    else:
+        interface = "cli"
+
+    os.chdir(script_dir)
+    if os.path.exists(cases_dir + "/../../bin/activate"):
+        os.system("bash -c 'source {cases_dir}/../../bin/activate && ./.{interface}_set_parameter {argv}'".format(cases_dir=cases_dir, interface=interface, argv=" ".join(sys.argv[1:])))
+    else:
+        print("WARNING: Can't find the standard sheld0n virtual environment. Trying to execute anyway.")
+        os.system("./.{interface}_set_parameter {argv}".format(interface=interface, argv=" ".join(sys.argv[1:])))
 
 if __name__ == '__main__':
     main()

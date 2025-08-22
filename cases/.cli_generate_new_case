@@ -15,8 +15,6 @@ import fileinput
 
 # TODO: try removing the learn parameters when not relevant
 
-is_gui = False
-
 def run(args):
     # init utils
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -32,91 +30,56 @@ def run(args):
     os.symlink(os.path.relpath(code_dir + "/app/interface/clean_build.py", args.name), args.name + "/clean_build")
     os.symlink(os.path.relpath(code_dir + "/app/interface/clean_time.py", args.name), args.name + "/clean_time")
     os.symlink(os.path.relpath(code_dir + "/app/interface/clean_post_process.py", args.name + "/post_process"), args.name + "/post_process/clean")
+    ###################### main
     ### basic
-    os.symlink(os.path.relpath(code_dir + "/app/interface/_run.py", args.name), args.name + "/._run")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/_set_parameter.py", args.name), args.name + "/._set_parameter")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/_post.py", args.name), args.name + "/._post")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/_learn.py", args.name), args.name + "/._learn")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/_run.py", args.name), args.name + "/run")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/_set_parameter.py", args.name), args.name + "/set_parameter")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/_post.py", args.name), args.name + "/post")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/_learn.py", args.name), args.name + "/learn")
     ### env
     #### flow
-    os.symlink(os.path.relpath(code_dir + "/app/interface/flow/_choose.py", args.name + "/param/flow"), args.name + "/param/flow/._choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/flow/_choose.py", args.name + "/param/flow"), args.name + "/param/flow/choose")
     #### solutions
-    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/._copy_equation")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/._remove_equation")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_batch_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/._batch_copy_equation")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/._create_new_equation")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/._rename_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/copy_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/remove_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_batch_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/batch_copy_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/create_new_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/rename_equation")
     #### equation
-    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/._choose")
-    ### gui
-    if is_gui:
-        ###################### cli
-        ### basic
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_run.py", args.name), args.name + "/.cli_run")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_set_parameter.py", args.name), args.name + "/.cli_set_parameter")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_post.py", args.name), args.name + "/.cli_post")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_learn.py", args.name), args.name + "/.cli_learn")
-        ### env
-        #### flow
-        os.symlink(os.path.relpath(code_dir + "/app/interface/flow/_choose.py", args.name + "/param/flow"), args.name + "/param/flow/.cli_choose")
-        #### solutions
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_copy_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_remove_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_batch_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_batch_copy_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_create_new_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_rename_equation")
-        #### equation
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/.cli_choose")
-        ###################### gui
-        ### basic
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_run.py", args.name), args.name + "/gui_run")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_set_parameter.py", args.name), args.name + "/gui_set_parameter")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_post.py", args.name), args.name + "/gui_post")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_learn.py", args.name), args.name + "/gui_learn")
-        ### env
-        #### flow
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name + "/param/flow"), args.name + "/param/flow/gui_choose")
-        #### solutions
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/gui_copy_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/gui_remove_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/gui_create_new_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/gui_rename_equation")
-        #### equation
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/gui_choose")
-    else:
-        ###################### cli
-        ### basic
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_run.py", args.name), args.name + "/cli_run")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_set_parameter.py", args.name), args.name + "/cli_set_parameter")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_post.py", args.name), args.name + "/cli_post")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/_learn.py", args.name), args.name + "/cli_learn")
-        ### env
-        #### flow
-        os.symlink(os.path.relpath(code_dir + "/app/interface/flow/_choose.py", args.name + "/param/flow"), args.name + "/param/flow/cli_choose")
-        #### solutions
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/cli_copy_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/cli_remove_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_batch_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/cli_batch_copy_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/cli_create_new_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/cli_rename_equation")
-        #### equation
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/cli_choose")
-        ###################### gui
-        ### basic
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_run.py", args.name), args.name + "/.gui_run")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_set_parameter.py", args.name), args.name + "/.gui_set_parameter")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_post.py", args.name), args.name + "/.gui_post")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_learn.py", args.name), args.name + "/.gui_learn")
-        ### env
-        #### flow
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name + "/param/flow"), args.name + "/param/flow/.gui_choose")
-        #### solutions
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_copy_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_remove_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_create_new_equation")
-        os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_rename_equation")
-        #### equation
-        os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/.gui_choose")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/choose")
+    ###################### cli
+    ### basic
+    os.symlink(os.path.relpath(code_dir + "/app/interface/cli_run.py", args.name), args.name + "/.cli_run")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/cli_set_parameter.py", args.name), args.name + "/.cli_set_parameter")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/cli_post.py", args.name), args.name + "/.cli_post")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/cli_learn.py", args.name), args.name + "/.cli_learn")
+    ### env
+    #### flow
+    os.symlink(os.path.relpath(code_dir + "/app/interface/flow/cli_choose.py", args.name + "/param/flow"), args.name + "/param/flow/.cli_choose")
+    #### solutions
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/cli_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_copy_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/cli_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_remove_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/cli_batch_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_batch_copy_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/cli_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_create_new_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/cli_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.cli_rename_equation")
+    #### equation
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/equation/_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/.cli_choose")
+    ###################### gui
+    ### basic
+    os.symlink(os.path.relpath(code_dir + "/app/interface/gui_run.py", args.name), args.name + "/.gui_run")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/gui_set_parameter.py", args.name), args.name + "/.gui_set_parameter")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/gui_post.py", args.name), args.name + "/.gui_post")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/gui_learn.py", args.name), args.name + "/.gui_learn")
+    ### env
+    #### flow
+    os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name + "/param/flow"), args.name + "/param/flow/gui_choose")
+    #### solutions
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_copy_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_remove_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_create_new_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_rename_equation")
+    #### equation
+    os.symlink(os.path.relpath(code_dir + "/app/interface/gui_choose.py", args.name + "/param/solutions/passive_particles"), args.name + "/param/solutions/passive_particles/.gui_choose")
     ### set default case
     os.chdir(args.name)
     match args.case:
@@ -145,12 +108,9 @@ def run(args):
         case _:
             print('WARNING: Example case "' + args.case + '" not recognised. Using default one.')
             set_case_default()
-            
     os.chdir('..')
 
-def main(_is_gui = False):
-    global is_gui
-    is_gui = _is_gui
+def main():
     # set choices
     choices = [
         'default',
@@ -179,25 +139,20 @@ def set_case_default():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/.."
     # remove symbolic link
-    if is_gui:
-        os.unlink(".cli_learn")
-        os.unlink("gui_learn")
-    else:
-        os.unlink("cli_learn")
-        os.unlink(".gui_learn")
+    os.unlink("learn")
     # shutil.rmtree("param/learn")
 
 def set_case_surf_tgv():
     set_flow_tgv()
     set_solutions_surfers(math.pi, math.pi)
     # param
-    os.system('./._set_parameter param cGroupSize 128')
+    os.system('./.cli_set_parameter param cGroupSize 128')
     # run
-    os.system('./._set_parameter param/run Dt "1.0/128.0"')
-    os.system('./._set_parameter param/run NTime "8.0 * M_PI / Dt"')
-    os.system('./._set_parameter param/run NSave 16')
+    os.system('./.cli_set_parameter param/run Dt "1.0/128.0"')
+    os.system('./.cli_set_parameter param/run NTime "8.0 * M_PI / Dt"')
+    os.system('./.cli_set_parameter param/run NSave 16')
     # post
-    os.system('./._set_parameter param/run Number 0')
+    os.system('./.cli_set_parameter param/run Number 0')
     # post processing
     ## input
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -205,39 +160,26 @@ def set_case_surf_tgv():
     ## copy
     shutil.copy(code_dir + "/app/post/plot_vertical_migration_performance_over_time_horizon.py", "post_process/plot_vertical_migration_performance_over_time_horizon.py")
     # remove symbolic link
-    if is_gui:
-        os.unlink(".cli_learn")
-        os.unlink("gui_learn")
-    else:
-        os.unlink("cli_learn")
-        os.unlink(".gui_learn")
+    os.unlink("learn")
     # shutil.rmtree("param/learn")
 
 def set_case_rl_tgv():
     set_flow_tgv()
     set_solutions_rl_swimmer()
     # run
-    os.system('./._set_parameter param/run Dt "1.0/128.0"')
-    os.system('./._set_parameter param/run NTime "8.0 * M_PI / Dt"')
+    os.system('./.cli_set_parameter param/run Dt "1.0/128.0"')
+    os.system('./.cli_set_parameter param/run NTime "8.0 * M_PI / Dt"')
     # remove symbolic link
-    if is_gui:
-        os.unlink(".cli_run")
-        os.unlink("gui_run")
-        os.unlink(".cli_post")
-        os.unlink("gui_post")
-    else:
-        os.unlink("cli_run")
-        os.unlink(".gui_run")
-        os.unlink("cli_post")
-        os.unlink(".gui_post")
+    os.unlink("run")
+    os.unlink("post")
     shutil.rmtree("post_process")
 
 def set_case_nn_tgv():
     set_flow_tgv()
     set_solutions_nn_swimmers()
     # run
-    os.system('./._set_parameter param/run Dt "1.0/128.0"')
-    os.system('./._set_parameter param/run NTime "8.0 * M_PI / Dt"')
+    os.system('./.cli_set_parameter param/run Dt "1.0/128.0"')
+    os.system('./.cli_set_parameter param/run NTime "8.0 * M_PI / Dt"')
     # post processing
     ## input
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -245,12 +187,7 @@ def set_case_nn_tgv():
     ## copy
     shutil.copy(code_dir + "/app/post/plot_average_vertical_velocity_over_time.py", "post_process/plot_average_vertical_velocity_over_time.py")
     # remove symbolic link
-    if is_gui:
-        os.unlink(".cli_learn")
-        os.unlink("gui_learn")
-    else:
-        os.unlink("cli_learn")
-        os.unlink(".gui_learn")
+    os.unlink("learn")
     # print
     print('WARNING: This case is designed for the evaluation of a neural network learn using the rl_tgv case.\n         To do so, copy the files in "param/learn/neural_network/data" from the rl_tgv case to this one after the reinforcement learning process ended.\n         Make sure the environment parameters from the rl_tgv case are the same (in particular the agent\'s swimming velocity) as this one before running the evaluation.')
 
@@ -261,12 +198,7 @@ def set_case_jhtdb():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/.."
     # remove symbolic link
-    if is_gui:
-        os.unlink(".cli_learn")
-        os.unlink("gui_learn")
-    else:
-        os.unlink("cli_learn")
-        os.unlink(".gui_learn")
+    os.unlink("learn")
     # shutil.rmtree("param/learn")
 
 def set_case_point_vortices():
@@ -276,12 +208,7 @@ def set_case_point_vortices():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/.."
     # remove symbolic link
-    if is_gui:
-        os.unlink(".cli_learn")
-        os.unlink("gui_learn")
-    else:
-        os.unlink("cli_learn")
-        os.unlink(".gui_learn")
+    os.unlink("learn")
     # shutil.rmtree("param/learn")
 
 def set_case_point_vortices_periodic():
@@ -291,12 +218,7 @@ def set_case_point_vortices_periodic():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/.."
     # remove symbolic link
-    if is_gui:
-        os.unlink(".cli_learn")
-        os.unlink("gui_learn")
-    else:
-        os.unlink("cli_learn")
-        os.unlink(".gui_learn")
+    os.unlink("learn")
     # shutil.rmtree("param/learn")
 
 def set_case_point_vortices_dipole():
@@ -306,31 +228,21 @@ def set_case_point_vortices_dipole():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/.."
     # remove symbolic link
-    if is_gui:
-        os.unlink(".cli_learn")
-        os.unlink("gui_learn")
-    else:
-        os.unlink("cli_learn")
-        os.unlink(".gui_learn")
+    os.unlink("learn")
     # shutil.rmtree("param/learn")
 
 def set_case_point_vortices_jet():
     set_flow_point_vortices_jet()
     # edit passive_particles
     os.chdir('param/solutions/passive_particles')
-    os.system('./._choose cpp_source_of_passive_particles')
+    os.system('./.cli_choose cpp_source_of_passive_particles')
     os.chdir('../../..')
     # post processing
     ## input
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/.."
     # remove symbolic link
-    if is_gui:
-        os.unlink(".cli_learn")
-        os.unlink("gui_learn")
-    else:
-        os.unlink("cli_learn")
-        os.unlink(".gui_learn")
+    os.unlink("learn")
     # shutil.rmtree("param/learn")
 
 def set_case_passive_curve():
@@ -341,249 +253,239 @@ def set_case_passive_curve():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/.."
     # remove symbolic link
-    if is_gui:
-        os.unlink(".cli_learn")
-        os.unlink("gui_learn")
-    else:
-        os.unlink("cli_learn")
-        os.unlink(".gui_learn")
+    os.unlink("learn")
     # shutil.rmtree("param/learn")
 
 def set_case_ifs_particles():
     set_flow_point_vortices_ifs_particles()
     # edit meanVelocity
-    os.system('./._set_parameter param/flow meanVelocity "tSpaceVector({1.0, 0.0})"')
+    os.system('./.cli_set_parameter param/flow meanVelocity "tSpaceVector({1.0, 0.0})"')
     # ifs particles
     set_solutions_ifs_particles()
     # edit passive_particles
     os.chdir('param/solutions/passive_particles')
-    os.system('./._choose cpp_source_of_passive_particles')
+    os.system('./.cli_choose cpp_source_of_passive_particles')
     os.chdir('../../..')
     # parameters
-    # os.system('./._set_parameter param/solutions/passive_particles Rate "512.0"')
+    # os.system('./.cli_set_parameter param/solutions/passive_particles Rate "512.0"')
     # post processing
     ## input
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/.."
     # remove symbolic link
-    if is_gui:
-        os.unlink(".cli_learn")
-        os.unlink("gui_learn")
-    else:
-        os.unlink("cli_learn")
-        os.unlink(".gui_learn")
+    os.unlink("learn")
     # shutil.rmtree("param/learn")
 
 # flow
 
 def set_flow_tgv():
     os.chdir('param/flow')
-    os.system('./._choose cpp_tgv')
+    os.system('./.cli_choose cpp_tgv')
     os.chdir('../..')
-    os.system('./._set_parameter param cLength M_PI')
-    os.system('./._set_parameter param cTime M_PI')
-    os.system('./._set_parameter param cDomainSize "{2*M_PI, 2*M_PI}"')
-    os.system('./._set_parameter param cDomainIsAxisPeriodic "{true, true}"')
+    os.system('./.cli_set_parameter param cLength M_PI')
+    os.system('./.cli_set_parameter param cTime M_PI')
+    os.system('./.cli_set_parameter param cDomainSize "{2*M_PI, 2*M_PI}"')
+    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{true, true}"')
 
 def set_flow_jhtdb():
     os.chdir('param/flow')
-    os.system('./._choose cpp_jhtdb_isotropic')
+    os.system('./.cli_choose cpp_jhtdb_isotropic')
     os.chdir('../..')
     ## param
-    os.system('./._set_parameter param DIM 3')
-    os.system('./._set_parameter param cLength 0.00280')
-    os.system('./._set_parameter param cTime 0.0424')
-    os.system('./._set_parameter param cDomainSize "{1.0, 1.0, 1.0}"')
-    os.system('./._set_parameter param cDomainIsAxisPeriodic "{true, true, true}"')
+    os.system('./.cli_set_parameter param DIM 3')
+    os.system('./.cli_set_parameter param cLength 0.00280')
+    os.system('./.cli_set_parameter param cTime 0.0424')
+    os.system('./.cli_set_parameter param cDomainSize "{1.0, 1.0, 1.0}"')
+    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{true, true, true}"')
     ## run
-    os.system('./._set_parameter param/run Dt 0.002')
-    os.system('./._set_parameter param/run NTime "int(10.056/Dt)"')
-    os.system('./._set_parameter param/run NSave NTime')
+    os.system('./.cli_set_parameter param/run Dt 0.002')
+    os.system('./.cli_set_parameter param/run NTime "int(10.056/Dt)"')
+    os.system('./.cli_set_parameter param/run NSave NTime')
 
 def set_flow_point_vortices():
     os.chdir('param/flow')
-    os.system('./._choose cpp_point_vortices')
+    os.system('./.cli_choose cpp_point_vortices')
     os.chdir('../..')
     # solutions
     os.chdir('param/solutions')
-    os.system('./._create_new_equation point_vortices')
+    os.system('./.cli_create_new_equation point_vortices')
     os.chdir('point_vortices')
-    os.system('./._choose cpp_point_vortices')
+    os.system('./.cli_choose cpp_point_vortices')
     os.chdir('..')
     os.chdir('../..')
     # parameters
     ## param
-    os.system('./._set_parameter param cLength 1.0')
-    os.system('./._set_parameter param cTime 1.0')
-    os.system('./._set_parameter param cDomainSize "{1.0, 1.0}"')
-    os.system('./._set_parameter param cDomainIsAxisPeriodic "{false, false}"')
+    os.system('./.cli_set_parameter param cLength 1.0')
+    os.system('./.cli_set_parameter param cTime 1.0')
+    os.system('./.cli_set_parameter param cDomainSize "{1.0, 1.0}"')
+    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{false, false}"')
     ## run
-    os.system('./._set_parameter param/run Dt 1.0/128.0')
-    os.system('./._set_parameter param/run NTime "int(16.0/Dt)"')
-    os.system('./._set_parameter param/run NSave "NTime/16"')
+    os.system('./.cli_set_parameter param/run Dt 1.0/128.0')
+    os.system('./.cli_set_parameter param/run NTime "int(16.0/Dt)"')
+    os.system('./.cli_set_parameter param/run NSave "NTime/16"')
 
 def set_flow_point_vortices_periodic():
     os.chdir('param/flow')
-    os.system('./._choose cpp_point_vortices_periodic')
+    os.system('./.cli_choose cpp_point_vortices_periodic')
     os.chdir('../..')
     # solutions
     os.chdir('param/solutions')
     # passive particles
     os.chdir('passive_particles')
-    os.system('./._choose cpp_passive_particles_periodic')
+    os.system('./.cli_choose cpp_passive_particles_periodic')
     os.chdir('..')
     # point vortices
-    os.system('./._create_new_equation point_vortices_periodic')
+    os.system('./.cli_create_new_equation point_vortices_periodic')
     os.chdir('point_vortices_periodic')
-    os.system('./._choose cpp_point_vortices_periodic')
+    os.system('./.cli_choose cpp_point_vortices_periodic')
     os.chdir('..')
     # end solutions
     os.chdir('../..')
     # parameters
     ## param
-    os.system('./._set_parameter param cLength 1.0')
-    os.system('./._set_parameter param cTime 1.0')
-    os.system('./._set_parameter param cDomainSize "{1.0, 1.0}"')
-    os.system('./._set_parameter param cDomainIsAxisPeriodic "{true, true}"')
+    os.system('./.cli_set_parameter param cLength 1.0')
+    os.system('./.cli_set_parameter param cTime 1.0')
+    os.system('./.cli_set_parameter param cDomainSize "{1.0, 1.0}"')
+    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{true, true}"')
     ## run
-    os.system('./._set_parameter param/run Dt 1.0/128.0')
-    os.system('./._set_parameter param/run NTime "int(16.0/Dt)"')
-    os.system('./._set_parameter param/run NSave "NTime/16"')
+    os.system('./.cli_set_parameter param/run Dt 1.0/128.0')
+    os.system('./.cli_set_parameter param/run NTime "int(16.0/Dt)"')
+    os.system('./.cli_set_parameter param/run NSave "NTime/16"')
 
 def set_flow_point_vortices_dipole():
     os.chdir('param/flow')
-    os.system('./._choose cpp_point_vortices')
+    os.system('./.cli_choose cpp_point_vortices')
     os.chdir('../..')
     # solutions
     os.chdir('param/solutions')
-    os.system('./._create_new_equation point_vortices')
+    os.system('./.cli_create_new_equation point_vortices')
     os.chdir('point_vortices')
-    os.system('./._choose cpp_point_vortices_dipole')
+    os.system('./.cli_choose cpp_point_vortices_dipole')
     os.chdir('..')
     os.chdir('../..')
     # parameters
     ## param
-    os.system('./._set_parameter param cLength 1.0')
-    os.system('./._set_parameter param cTime 1.0')
-    os.system('./._set_parameter param cDomainSize "{1.0, 1.0}"')
-    os.system('./._set_parameter param cDomainIsAxisPeriodic "{false, false}"')
+    os.system('./.cli_set_parameter param cLength 1.0')
+    os.system('./.cli_set_parameter param cTime 1.0')
+    os.system('./.cli_set_parameter param cDomainSize "{1.0, 1.0}"')
+    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{false, false}"')
     ## run
-    os.system('./._set_parameter param/run Dt 1.0/128.0')
-    os.system('./._set_parameter param/run NTime "int(16.0/Dt)"')
-    os.system('./._set_parameter param/run NSave "NTime/16"')
+    os.system('./.cli_set_parameter param/run Dt 1.0/128.0')
+    os.system('./.cli_set_parameter param/run NTime "int(16.0/Dt)"')
+    os.system('./.cli_set_parameter param/run NSave "NTime/16"')
 
 def set_flow_point_vortices_jet():
     os.chdir('param/flow')
-    os.system('./._choose cpp_point_vortices')
+    os.system('./.cli_choose cpp_point_vortices')
     os.chdir('../..')
     # solutions
     os.chdir('param/solutions')
-    os.system('./._create_new_equation point_vortices -p cpp_point_vortices_jet')
+    os.system('./.cli_create_new_equation point_vortices -p cpp_point_vortices_jet')
     os.chdir('../..')
     # parameters
     ## param
-    os.system('./._set_parameter param cLength 1.0')
-    os.system('./._set_parameter param cTime 1.0')
-    os.system('./._set_parameter param cDomainSize "{2.0, 1.0}"')
-    os.system('./._set_parameter param cDomainIsAxisPeriodic "{false, false}"')
+    os.system('./.cli_set_parameter param cLength 1.0')
+    os.system('./.cli_set_parameter param cTime 1.0')
+    os.system('./.cli_set_parameter param cDomainSize "{2.0, 1.0}"')
+    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{false, false}"')
     ## run
-    os.system('./._set_parameter param/run Dt 1.0/128.0')
-    os.system('./._set_parameter param/run NTime "int(8.0/Dt)"')
-    os.system('./._set_parameter param/run NSave NTime')
+    os.system('./.cli_set_parameter param/run Dt 1.0/128.0')
+    os.system('./.cli_set_parameter param/run NTime "int(8.0/Dt)"')
+    os.system('./.cli_set_parameter param/run NSave NTime')
 
 def set_flow_point_vortices_ifs_particles():
     os.chdir('param/flow')
-    os.system('./._choose cpp_point_vortices')
+    os.system('./.cli_choose cpp_point_vortices')
     os.chdir('../..')
     # solutions
     os.chdir('param/solutions')
-    os.system('./._create_new_equation point_vortices -p cpp_point_vortices_ifs_particles')
+    os.system('./.cli_create_new_equation point_vortices -p cpp_point_vortices_ifs_particles')
     os.chdir('../..')
     # parameters
     ## param
-    os.system('./._set_parameter param cLength 1.0')
-    os.system('./._set_parameter param cTime 1.0')
-    os.system('./._set_parameter param cDomainSize "{1.0, 1.0}"')
-    os.system('./._set_parameter param cDomainIsAxisPeriodic "{false, false}"')
+    os.system('./.cli_set_parameter param cLength 1.0')
+    os.system('./.cli_set_parameter param cTime 1.0')
+    os.system('./.cli_set_parameter param cDomainSize "{1.0, 1.0}"')
+    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{false, false}"')
 
 # solutions
 
 def set_solutions_surfers(c_time, c_length):
     os.chdir('param/solutions')
-    os.system('./._create_new_equation surfers')
+    os.system('./.cli_create_new_equation surfers')
     os.chdir('surfers')
-    os.system('./._choose cpp_surfers')
+    os.system('./.cli_choose cpp_surfers')
     os.chdir('..')
     # time horizon
-    os.system('./._batch_copy_equation surfers -p TimeHorizon -f EnvParameters::cTime -v ' + " ".join([str(v) for v in np.arange(0.0, 1.0 + 0.125, 0.125)]))
-    os.system('./._remove_equation surfers')
+    os.system('./.cli_batch_copy_equation surfers -p TimeHorizon -f EnvParameters::cTime -v ' + " ".join([str(v) for v in np.arange(0.0, 1.0 + 0.125, 0.125)]))
+    os.system('./.cli_remove_equation surfers')
     # swimming velocity
     surfers = " ".join(glob.glob("surfers__*"))
     c_velocity = c_length / c_time
-    os.system('./._batch_copy_equation ' + surfers + ' -p SwimmingVelocity -f EnvParameters::cVelocity -v ' + ' '.join([str(v) for v in [0.25, 0.5, 1.0, 2.0, 4.0]]))
-    os.system('./._remove_equation ' + surfers)
+    os.system('./.cli_batch_copy_equation ' + surfers + ' -p SwimmingVelocity -f EnvParameters::cVelocity -v ' + ' '.join([str(v) for v in [0.25, 0.5, 1.0, 2.0, 4.0]]))
+    os.system('./.cli_remove_equation ' + surfers)
     os.chdir('../..')
 
 def set_solutions_rl_swimmer():
     os.chdir('param/solutions')
-    os.system('./._create_new_equation rl_swimmer')
+    os.system('./.cli_create_new_equation rl_swimmer')
     os.chdir('rl_swimmer')
-    os.system('./._choose cpp_rl_swimmer')
-    os.system('./._remove_equation passive_particles')
+    os.system('./.cli_choose cpp_rl_swimmer')
+    os.system('./.cli_remove_equation passive_particles')
     os.chdir('..')
     os.chdir('../..')
 
 def set_solutions_nn_swimmers():
     os.chdir('param/solutions')
     # nn swimmers
-    os.system('./._create_new_equation nn_swimmers')
+    os.system('./.cli_create_new_equation nn_swimmers')
     os.chdir('nn_swimmers')
-    os.system('./._choose cpp_nn_swimmers')
+    os.system('./.cli_choose cpp_nn_swimmers')
     os.chdir('..')
     # naive swimmers
-    os.system('./._create_new_equation naive_swimmers')
+    os.system('./.cli_create_new_equation naive_swimmers')
     os.chdir('naive_swimmers')
-    os.system('./._choose cpp_buoyant_particles')
+    os.system('./.cli_choose cpp_buoyant_particles')
     os.chdir('..')
     # surfers
-    os.system('./._create_new_equation surfers')
+    os.system('./.cli_create_new_equation surfers')
     os.chdir('surfers')
-    os.system('./._choose cpp_surfers')
+    os.system('./.cli_choose cpp_surfers')
     os.chdir('..')
     # back
     os.chdir('../..')
     # set surfing parameters
-    os.system('./._set_parameter param/solutions/surfers TimeHorizon "0.25*EnvParameters::cTime"')
+    os.system('./.cli_set_parameter param/solutions/surfers TimeHorizon "0.25*EnvParameters::cTime"')
 
 def set_solutions_passive_curve():
     os.chdir('param/solutions')
     # nn swimmers
-    os.system('./._create_new_equation passive_curve')
+    os.system('./.cli_create_new_equation passive_curve')
     os.chdir('passive_curve')
-    os.system('./._choose cpp_passive_curve')
+    os.system('./.cli_choose cpp_passive_curve')
     os.chdir('..')
     # back
     os.chdir('../..')
     ## run
-    os.system('./._set_parameter param/run Dt 1.0/128.0')
-    os.system('./._set_parameter param/run NTime "int(24.0/Dt)"')
-    os.system('./._set_parameter param/run NSave "NTime/4"')
+    os.system('./.cli_set_parameter param/run Dt 1.0/128.0')
+    os.system('./.cli_set_parameter param/run NTime "int(24.0/Dt)"')
+    os.system('./.cli_set_parameter param/run NSave "NTime/4"')
 
 def set_solutions_ifs_particles():
     os.chdir('param/solutions')
     # ifs swimmers
-    os.system('./._create_new_equation ifs_particles')
+    os.system('./.cli_create_new_equation ifs_particles')
     os.chdir('ifs_particles')
-    os.system('./._choose cpp_ifs_particles')
+    os.system('./.cli_choose cpp_ifs_particles')
     os.chdir('..')
     # back
     os.chdir('../..')
     # parameters
-    os.system('./._set_parameter param cGroupSize 512')
+    os.system('./.cli_set_parameter param cGroupSize 512')
     ## run
-    os.system('./._set_parameter param/run Dt 1.0/128.0')
-    os.system('./._set_parameter param/run NTime "int(4.0/Dt)"')
-    os.system('./._set_parameter param/run NSave "NTime"')
+    os.system('./.cli_set_parameter param/run Dt 1.0/128.0')
+    os.system('./.cli_set_parameter param/run NTime "int(4.0/Dt)"')
+    os.system('./.cli_set_parameter param/run NSave "NTime"')
 
 # rl
 

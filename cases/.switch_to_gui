@@ -5,21 +5,21 @@ def main():
     script_path = os.path.realpath(__file__)
     script_dir = os.path.dirname(script_path)
     script_name = os.path.basename(script_path)
-    # rename gui and cli
-    for dirpath, dirnames, filenames in os.walk(script_dir):
-        for filename in filenames:
-            if filename.startswith("cli"):
-                old_path = os.path.join(dirpath, filename)
-                new_filename = f".{filename}"
-                new_path = os.path.join(dirpath, new_filename)
-                # Rename the file
-                os.rename(old_path, new_path)
-            if filename.startswith(".gui"):
-                old_path = os.path.join(dirpath, filename)
-                new_filename = filename[1:]
-                new_path = os.path.join(dirpath, new_filename)
-                # Rename the file
-                os.rename(old_path, new_path)
+    # # rename gui and cli
+    # for dirpath, dirnames, filenames in os.walk(script_dir):
+    #     for filename in filenames:
+    #         if filename.startswith("cli"):
+    #             old_path = os.path.join(dirpath, filename)
+    #             new_filename = f".{filename}"
+    #             new_path = os.path.join(dirpath, new_filename)
+    #             # Rename the file
+    #             os.rename(old_path, new_path)
+    #         if filename.startswith(".gui"):
+    #             old_path = os.path.join(dirpath, filename)
+    #             new_filename = filename[1:]
+    #             new_path = os.path.join(dirpath, new_filename)
+    #             # Rename the file
+    #             os.rename(old_path, new_path)
     # hide self
     new_name = "." + script_name
     new_path = os.path.join(script_dir, new_name)

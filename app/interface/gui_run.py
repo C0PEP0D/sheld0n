@@ -3,10 +3,10 @@ from gooey import Gooey
 
 if __name__ == '__main__': 
     __name__ = ""
-    exec(open("._run").read())
+    exec(open(".cli_run").read())
     __name__ = "__main__"
 else:
-    exec(open("._run").read())
+    exec(open(".cli_run").read())
 
 @Gooey(
     show_success_modal=False,

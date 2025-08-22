@@ -3,10 +3,10 @@ from gooey import Gooey
 
 if __name__ == '__main__': 
     __name__ = ""
-    exec(open("._post").read())
+    exec(open(".cli_post").read())
     __name__ = "__main__"
 else:
-    exec(open("._post").read())
+    exec(open(".cli_post").read())
 
 @Gooey(
     show_success_modal=False,
