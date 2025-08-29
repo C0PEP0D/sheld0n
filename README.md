@@ -70,16 +70,16 @@ The following command will create a python virtual environment to encapsulate al
 then clone the sheld0n project and move into its directory.
 
 ```sh
-python -m venv venv-sheld0n && cd venv-sheld0n && source bin/activate && git clone https://github.com/C0PEP0D/sheld0n.git && cd sheld0n
+python -m venv venv-sheld0n && cd venv-sheld0n && git clone https://github.com/C0PEP0D/sheld0n.git && cd sheld0n
 ```
 
 Finally pull submodules and install python dependencies by executing the `install-with-gui.py` script.
 When using the code, you can use either a Command Line Interface or a Graphical User Interface (GUI).
 When first trying out the code, the usage of the GUI is advised. 
-However, if you feel like you do not need it or if the installation with gui does not work, feel free to execute `./install-without-gui.py && deactivate` instead.
+However, if you feel like you do not need it or if the installation with gui does not work, feel free to execute `./install-without-gui` instead.
 
 ```sh
-./install-with-gui.py && deactivate
+./install-with-gui
 ```
 This may take a while, especially during the operation **Building wheel for wxpython (pyproject.toml) ...**
 

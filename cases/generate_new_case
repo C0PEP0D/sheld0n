@@ -12,11 +12,10 @@ def main():
     else:
         interface = "cli"
 
-    if os.path.exists("../../bin/activate"):
+    if os.path.exists("{script_dir}/../../bin/activate".format(script_dir=script_dir)):
         os.system("bash -c 'source {script_dir}/../../bin/activate && {script_dir}/.{interface}_generate_new_case {argv}'".format(script_dir=script_dir, interface=interface, argv=" ".join(sys.argv[1:])))
     else:
-        print("WARNING: Can't find the standard sheld0n virtual environment. Trying to execute anyway.")
-        os.system("{script_dir}/.{interface}_generate_new_case {argv}".format(script_dir=script_dir, interface=interface, argv=" ".join(sys.argv[1:])))
+        print("ERROR: Can't find the standard sheld0n virtual environment.")
 
 if __name__ == '__main__':
     main()

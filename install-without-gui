@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+import sys
+import os
+
+def main():
+    script_path = __file__
+    script_dir = os.path.dirname(script_path)
+    script_name = os.path.basename(script_path)
+
+    if os.path.exists("{script_dir}/../bin/activate".format(script_dir=script_dir)):
+        os.system("bash -c 'source {script_dir}/../bin/activate && {script_dir}/.install-without-gui {argv}'".format(script_dir=script_dir, argv=" ".join(sys.argv[1:])))
+    else:
+        print("WARNING: Can't find the standard sheld0n virtual environment. Restart the installation.")
+
+if __name__ == '__main__':
+    main()
