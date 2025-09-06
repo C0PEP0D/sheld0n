@@ -61,7 +61,7 @@ sudo apt update && sudo apt install git python-is-python3 python3-venv python3-d
 
 To install those dependencies on Ubuntu, just execute the following (with **Homebrew** previously installed):
 ```sh
-brew reinstall python3 && brew install git cmake ffmpeg`
+brew reinstall python3 && brew install tbb git cmake ffmpeg`
 ```
 
 ### Installing
@@ -107,7 +107,7 @@ The solver provides a series of tools that can be used either using a command li
 
 The whole interface of the code is located in the `cases` folder.
 
-You can either use the code using its Graphical User Interface (GUI) or a Command Line Interface (CLI). If you see the file `gui_generate_new_case` in the `cases` folder, you are currently using the graphical interface. On the contrary, if the `cli_generate_new_case` is present, you are using the command line interface.
+You can either use the code using its Graphical User Interface (GUI) or a Command Line Interface (CLI). If you see the file `switch_to_cli` in the `cases` folder, you are currently using the graphical interface. Otherwise you are using the command line interface.
 
 If you start using the code, using the GUI is recommended.
 To switch from the `CLI` to the `GUI`, just execute the `switch_to_cli` command.
@@ -117,39 +117,36 @@ The following covers basic usage of the code, while the documentation is improvi
 
 #### GUI Interface
 
-Each file starting with `gui_` is a file that can be executed, for instance by double-clicking on it from your file browser. Doing so will open a window that will explain what the program does and how to use it.
+Several files of the code can be executed, for instance by double-clicking on it from your file browser. 
+Doing so will open a window that will explain what the program does and how to use it.
 
 > [!NOTE]
 > You will have to press the button **run** to run the script and 
 > you will have to press the **close** button to exit the program. 
-> If the program is still computing when you press the close button, 
-> the program will be closed at the end of its computation.
 
 #### CLI Interface
-
-Each file starting with `cli_` is a file that can be executed from you terminal.
 
 Most scripts provided by this software contain their description, explaining how to use them. One can access this description using the following:
 
 ```sh
-./cli_script -h
+./script -h
 ```
 or
 ```sh
-./cli_script --help
+./script --help
 ```
 
 ### Quick start
 
 * Go to the `cases` directory.
-* Execute the `*_generate_new_case` script and provide a name for your new case using the **name** argument. 
+* Execute the `generate_new_case` script and provide a name for your new case using the **name** argument. 
 
 You can also specify a specific case using the **case** option.
-Then navigate in the case and run the case by executing the `*_run` script.
+Then navigate in the case and run the case by executing the `run` script.
 
 > [!NOTE]
 > If it does not work, it might mean that your default compiler might not support all necessary C++ features.
-> Try specifying another C++ compiler, `cpp-14`, `g++-14` or `clang++-18` using the **compiler** option.
+> Try specifying another C++ compiler, for instance `cpp-14`, `g++-14` or `clang++-18` using the **compiler** option.
 
 * TODO: screenshot
 
@@ -170,9 +167,9 @@ Feel free to **edit this scripts** at your convenience and **create your own pos
 
 All parameters are included in the `param` directory.
 * all files `parameters.h` contain parameters that can be edited.
-* `gui_choose` scripts can be used to set `parameters.h` to a chosen default.
+* `choose` scripts can be used to set `parameters.h` to a chosen default.
 
-For instance, one may use the `param/flow/gui_choose` script to change the flow from a Taylor-Green Vortex to another type of flow. 
+For instance, one may use the `param/flow/choose` script to change the flow from a Taylor-Green Vortex to another type of flow. 
 
 If you do so, open the `parameters.h` file in the same directory to see how it has changed.
 

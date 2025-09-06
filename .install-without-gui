@@ -7,6 +7,8 @@ import os
 import glob
 # process
 import subprocess
+# platform
+import platform
 
 def run(args):
     # update submodules
@@ -20,7 +22,8 @@ def run(args):
     subprocess.run("python -m pip install numpy", cwd=".", shell=True, check=True)
     subprocess.run("python -m pip install matplotlib", cwd=".", shell=True, check=True)
     ## compiling
-    subprocess.run("python -m pip install tbb-devel", cwd=".", shell=True, check=True)
+    if platform.system() != 'Darwin':
+        subprocess.run("python -m pip install tbb-devel", cwd=".", shell=True, check=True)
     # switch to cli
     if os.path.exists("cases/switch_to_cli"):
         os.chdir('cases')
