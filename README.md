@@ -59,7 +59,7 @@ sudo apt update && sudo apt install git python-is-python3 python3-venv python3-d
 
 #### OSX
 
-To install those dependencies on Ubuntu, just execute the following (with **Homebrew** previously installed):
+To install those dependencies on MacOS, just execute the following (with **Homebrew** previously installed):
 ```sh
 brew reinstall python3 && brew install tbb git cmake ffmpeg`
 ```
