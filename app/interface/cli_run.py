@@ -7,6 +7,8 @@ import os
 import glob
 # process
 import subprocess
+# platform
+import platform
 
 def run(args):
     # cython
