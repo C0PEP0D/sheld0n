@@ -25,10 +25,15 @@ def run(args):
         if "gcc" in args.compiler:
             flags += " -DCMAKE_C_COMPILER={compiler}".format(compiler=args.compiler)
             flags += " -DCMAKE_CXX_COMPILER={compiler}".format(compiler=args.compiler.replace("gcc", "g++"))
+            if platform.system() == 'Darwin':
+                flags += ' -DCMAKE_C_FLAGS="--sysroot=$(xcrun --show-sdk-path)"'
+                flags += ' -DCMAKE_CXX_FLAGS="--sysroot=$(xcrun --show-sdk-path)"'
         elif "g++" in args.compiler:
             flags += " -DCMAKE_CXX_COMPILER={compiler}".format(compiler=args.compiler)
             flags += " -DCMAKE_C_COMPILER={compiler}".format(compiler=args.compiler.replace("g++", "gcc"))
-            print(flags)
+            if platform.system() == 'Darwin':
+                flags += ' -DCMAKE_C_FLAGS="--sysroot=$(xcrun --show-sdk-path)"'
+                flags += ' -DCMAKE_CXX_FLAGS="--sysroot=$(xcrun --show-sdk-path)"'
         else:
             flags += " -DCMAKE_CXX_COMPILER={compiler}".format(compiler=args.compiler)
     flags += " -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
