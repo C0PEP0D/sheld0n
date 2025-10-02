@@ -40,6 +40,7 @@ cdef extern from "param/parameters.h" namespace "c0p":
 		# methods
 
 		## maths
+		double norm() nogil
 		tSpaceVector normalized() nogil
 		double dot(const tSpaceVector&) nogil
 		double dot(tViewConstSpaceVector&) nogil
@@ -69,6 +70,7 @@ cdef extern from "param/parameters.h" namespace "c0p":
 		# methods
 
 		## maths
+		double norm() nogil
 		tSpaceVector normalized() nogil
 		double dot(const tSpaceVector&) nogil
 		double dot(tViewConstSpaceVector&) nogil
@@ -85,8 +87,6 @@ cdef extern from "param/parameters.h" namespace "c0p":
 		# constructor
 		## proper
 		tSpaceMatrix() nogil
-		tSpaceMatrix(const double, const double,  const double,  const double) nogil # 2D
-		tSpaceMatrix(const double, const double, const double,  const double,  const double,  const double,  const double,  const double,  const double) nogil # 3D
 		## defaults
 		@staticmethod
 		tSpaceMatrix Random() nogil
@@ -111,7 +111,7 @@ cdef extern from "param/parameters.h" namespace "c0p":
 
 		tSpaceVector operator*(tViewConstSpaceVector&) nogil
 
-		tSpaceVector operator*(const tSpaceMatrix&) nogil
+		tSpaceMatrix operator*(const tSpaceMatrix&) nogil
 		tSpaceMatrix operator+(const tSpaceMatrix&) nogil
 		tSpaceMatrix operator-(const tSpaceMatrix&) nogil
 		tSpaceMatrix& operator=(const tSpaceMatrix&) nogil
@@ -151,6 +151,7 @@ cdef extern from "param/parameters.h" namespace "c0p":
 		# methods
 
 		## maths
+		double norm() nogil
 		tSpaceVector normalized() nogil
 		double dot(const tSpaceVector&) nogil
 		double dot(tViewConstSpaceVector&) nogil
@@ -164,6 +165,7 @@ cdef extern from "core/prop.h" namespace "c0p":
 		# constructor
 		## proper
 		tMatrixDynamic() nogil
+		tMatrixDynamic(const tSpaceMatrix) nogil
 		# operators
 		double operator[](const int) nogil
 		double& operator[](const int) nogil
@@ -172,10 +174,11 @@ cdef extern from "core/prop.h" namespace "c0p":
 		double& operator()(const int, const int) nogil
 		
 		tMatrixDynamic operator*(const double) nogil
-		tMatrixDynamic operator*(const double, const tSpaceMatrix&) nogil
+		tMatrixDynamic operator*(const double, const tMatrixDynamic&) nogil
 		tMatrixDynamic operator/(const double) nogil
 
-		tMatrixDynamic operator*(const tMatrixDynamic&) nogil
+		tMatrixDynamic operator*(const tSpaceVector&) nogil
+		# tSpaceVector operator*(const tSpaceVector&) nogil
 
 		tMatrixDynamic operator*(const tMatrixDynamic&) nogil
 		tMatrixDynamic operator+(const tMatrixDynamic&) nogil
@@ -184,7 +187,9 @@ cdef extern from "core/prop.h" namespace "c0p":
 		
 		# methods
 		## maths
+		double norm() nogil
 		tMatrixDynamic transpose() nogil
+		tMatrixDynamic block(const int, const int, const int, const int) nogil
 		## data
 		double* data() nogil
 		unsigned int size() nogil
@@ -193,6 +198,15 @@ cdef extern from "core/prop.h" namespace "c0p":
 cdef extern from "core/prop.h" namespace "c0p":
 	void set(tMatrixDynamic&, const int, const int, const double) nogil
 	void set(tSpaceMatrix&, const int, const int, const double) nogil
+
+	void set(tMatrixDynamic&, const char*) nogil
+	void set(tSpaceMatrix&, const char*) nogil
+
+	void print(const tMatrixDynamic&) nogil
+	void print(const tSpaceMatrix&) nogil
+	void print(const double&) nogil
+	void print(const tSpaceVector&) nogil
+	void print(const char*) nogil
 
 # Flow
 

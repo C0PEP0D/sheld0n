@@ -7,6 +7,7 @@ from libcpp.string cimport string as string
 
 cdef extern from "<string>" namespace "std":
 	string to_string(int) nogil
+	string to_string(double) nogil
 
 cdef extern from "<cmath>" namespace "std":
 	int log10(int) nogil

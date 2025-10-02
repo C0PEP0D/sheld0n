@@ -13,7 +13,6 @@ import platform
 def run(args):
     # cython
     sources = glob.glob('param/**/parameters_*.pyx') + glob.glob('param/solutions/**/parameters_*.pyx')
-    print(sources)
     if sources:
         subprocess.run("cython -tv --cplus {sources}; exit 0".format(sources=" ".join(sources)), shell=True, check=True)
     # create build dir

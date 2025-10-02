@@ -6,6 +6,9 @@
 #include <Eigen/Dense>
 // std
 #include <random>
+#include <mutex>
+#include <charconv>   // std::from_chars
+#include <cctype>   // std::isdigit
 // lib includes
 #include "s0s/runge_kutta_fehlberg.h"
 #include "d0t/variables/vector.h"
@@ -32,6 +35,38 @@ using tSolver = s0s::SolverRungeKuttaFehlberg<tStateVectorDynamic, tView>;
 template<const int ...Args>
 void set(tMatrix<Args...>& m, const unsigned int i, const unsigned int j, const tScalar v) {
 	m(i, j) = v;
+}
+
+template<const int ...Args>
+void set(tMatrix<Args...>& m, const char* cstr) {
+	const char* ptr = cstr;
+	unsigned int index = 0;
+
+	while (not std::isdigit(*ptr) && *ptr != '.' && *ptr != '-' && *ptr != '\0') ptr++;
+	
+	while (*ptr != '\0') {
+		double value;
+		auto result = std::from_chars(ptr, ptr + std::strlen(ptr), value);
+
+		if (result.ec != std::errc()) {
+			std::cerr << "Failed to parse matrix!\n";
+			break;
+		}
+
+		m.template reshaped<Eigen::RowMajor>()[index] = value;
+		ptr = result.ptr;
+
+		while (not std::isdigit(*ptr) && *ptr != '.' && *ptr != '-' && *ptr != '\0') ptr++;
+		index++;
+	}
+}
+
+inline std::mutex printMutex;
+template <typename T>
+void print(const T& v) {
+	printMutex.lock();
+	std::cout << v << std::endl;
+	printMutex.unlock();
 }
 
 namespace rand0m {
