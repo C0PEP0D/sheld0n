@@ -54,7 +54,7 @@ The installation has been tested for ArchLinux (2025-08-21) and Ubuntu 24.04.2 L
 
 To install those dependencies on Ubuntu, just execute the following:
 ```sh
-sudo apt update && sudo apt install git python-is-python3 python3-venv python3-dev libcurl4-openssl-dev cmake ffmpeg g++
+sudo apt update && sudo apt install git python-is-python3 python3-venv python3-dev libcurl4-openssl-dev libgtk-3-dev pkg-config cmake ffmpeg g++
 ```
 
 #### OSX
@@ -176,13 +176,13 @@ If you do so, open the `parameters.h` file in the same directory to see how it h
 > [!CAUTION]
 > Using a `choice` script will override the `parameters.h` file in the same directory and all changes will be lost.
 
-* optionally the python script `set.py` can be used to set any parameter in the simulation case.
+* optionally the python script `set_parameters.py` can be used to set any parameter in the simulation case.
 
-The `set.py`script is intended to be edited by the user. 
+The `set_parameters.py`script is intended to be edited by the user. 
 The script can search for any occurrences of a parameter and edit it.
 
 > [!CAUTION]
-> Using `set.py` edits directly the `parameters.h` files in the parameter tree. 
+> Using `set_parameters.py` edits directly the `parameters.h` files in the parameter tree. 
 > If not used correctly, in case of name collision, it can completely corrupt the simulation case.
 > If you are not sure of its usage, make sure to copy and save your simulation case before executing the script.
 
@@ -198,7 +198,7 @@ Rémi Monthiller - [@rmonthil](https://gitlab.com/rmonthil) - remi.monthiller@gm
 
 ## Contributing
 
-Feel free to dive in! [Open an issue](https://github.com/rmonthil/c0pep0d/issues/new) or submit PRs.
+Feel free to dive in! [Open an issue](https://github.com/C0PEP0D/sheld0n/issues/new) or submit PRs.
 Or just propose features you would like to have implemented in the code.
 
 ## License
