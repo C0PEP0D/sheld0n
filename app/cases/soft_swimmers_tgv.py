@@ -20,7 +20,7 @@ def set_solutions_soft_swimmers():
     os.system('./.cli_choose pyx_soft_swimmers')
     os.chdir('..')
     # time horizon
-    os.system('./.cli_batch_copy_equation soft_swimmers -p stiffness -v ' + " ".join([str(v) for v in [0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]]))
+    os.system('./.cli_batch_copy_equation soft_swimmers -p stiffness -v ' + " ".join([str(v) for v in [0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0]]))
     os.system('./.cli_remove_equation soft_swimmers')
     # swimming velocity
     soft_swimmers = " ".join(glob.glob("soft_swimmers__*"))
