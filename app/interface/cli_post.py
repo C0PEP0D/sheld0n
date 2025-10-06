@@ -57,19 +57,12 @@ def main():
         # find gcc versions
         versions = []
         for line in lines:
-            if line == "gcc":
-                # unversioned gcc is usually the latest
-                versions.append(float("inf"))
-            match = re.fullmatch(r"gcc@(\d+)", line)
-            if match:
-                versions.append(int(match.group(1)))
+            _match = re.fullmatch(r"gcc@(\d+)", line)
+            if _match:
+                versions.append(int(_match.group(1)))
         if versions:
-            # Pick latest
-            if float("inf") in versions:
-                parser.add_argument('-c', '--compiler', default='g++', help='specify a custom compiler to be used')
-            else:
-                latest = max(versions)
-                parser.add_argument('-c', '--compiler', default=f"g++-{latest}", help='specify a custom compiler to be used')
+            latest = max(versions)
+            parser.add_argument('-c', '--compiler', default=f"g++-{latest}", help='specify a custom compiler to be used')
         else:
             print("WARNING : No version of GCC found using homebrew. Consider installing one if it does not compile.")
             parser.add_argument('-c', '--compiler', default='', help='specify a custom compiler to be used')
