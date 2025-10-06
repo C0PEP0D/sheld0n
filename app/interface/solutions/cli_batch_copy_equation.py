@@ -57,9 +57,13 @@ def set_parameter(dest, prop, value, factor):
     if factor:
         file_replace(dest + "/parameters.h", r"{prop} = [^\;]*;".format(prop=prop), "{prop} = {value} * {factor};".format(prop=prop, value=str(value), factor=factor))
         file_replace(dest + "/parameters.py", r"{prop} = .*$".format(prop=prop), "{prop} = {value} * {factor}".format(prop=prop, value=str(value), factor=factor))
+        for file in glob.glob(dest + "/parameters_*.pyx"):
+            file_replace(file, r"{prop} = .*$".format(prop=prop), "{prop} = {value} * {factor}".format(prop=prop, value=str(value), factor=factor))
     else:
         file_replace(dest + "/parameters.h", r"{prop} = [^\;]*;".format(prop=prop), "{prop} = {value};".format(prop=prop, value=str(value)))
         file_replace(dest + "/parameters.py", r"{prop} = .*$".format(prop=prop), "{prop} = {value}".format(prop=prop, value=str(value)))
+        for file in glob.glob(dest + "/parameters_*.pyx"):
+            file_replace(file, r"{prop} = .*$".format(prop=prop), "{prop} = {value}".format(prop=prop, value=str(value)))
 
 def run(args):
     finteger = 0
