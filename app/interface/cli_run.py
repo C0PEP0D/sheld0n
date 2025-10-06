@@ -9,6 +9,7 @@ import glob
 import subprocess
 # platform
 import platform
+import re
 
 def run(args):
     # cython
