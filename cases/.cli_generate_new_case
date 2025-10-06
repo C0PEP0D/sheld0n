@@ -29,7 +29,11 @@ def run(args):
     ### clean
     os.symlink(os.path.relpath(code_dir + "/app/interface/clean_build.py", args.name), args.name + "/clean_build")
     os.symlink(os.path.relpath(code_dir + "/app/interface/clean_time.py", args.name), args.name + "/clean_time")
-    os.symlink(os.path.relpath(code_dir + "/app/interface/clean_post_process.py", args.name + "/post_process"), args.name + "/post_process/clean")
+    os.symlink(os.path.relpath(code_dir + "/app/interface//post_process/clean_post_process.py", args.name + "/post_process"), args.name + "/post_process/clean")
+    ### post_process
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post_process/run_post_process.py", args.name + "/post_process"), args.name + "/post_process/run_post_process")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post_process/cli_run_post_process.py", args.name + "/post_process"), args.name + "/post_process/.cli_run_post_process")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/post_process/gui_run_post_process.py", args.name + "/post_process"), args.name + "/post_process/.gui_run_post_process")
     ###################### main
     ### basic
     os.symlink(os.path.relpath(code_dir + "/app/interface/_run.py", args.name), args.name + "/run")

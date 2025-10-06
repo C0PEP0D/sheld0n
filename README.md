@@ -154,14 +154,14 @@ Final data should be in the `post_process` directory.
 Further post processing is provided using python scripts in that directory.
 
 * Move to the `post_process` directory.
-* Execute `generate_trajectory_animation.py` (it may take a while).
+* Execute the `run_post_process` script and choose the `generate_trajectory_animation.py` post processing script.
 
-This should have create a `trajectory_animation.mp4` file that you can open using your video player.
+This should have created a `trajectory_animation.mp4` file that you can open using your video player.
 
-Further post processing can be done using various scripts in that directory.
+Further post processing can be done using scripts in that directory.
 Run the `--help` option of these scripts to learn how to use them.
 
-Feel free to **edit this scripts** at your convenience and **create your own post processing**.
+Feel free to **edit this scripts** at your convenience and **create your own post processing** scripts.
 
 ### Editing simulation parameters
 
