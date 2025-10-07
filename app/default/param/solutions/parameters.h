@@ -67,6 +67,7 @@ struct SolutionsParameters {
 		// FLAG: PREPARE STATIC EQUATION END
 		// FLAG: PREPARE DYNAMIC EQUATION BEGIN
 		// FLAG: PREPARE DYNAMIC EQUATION END
+		Flow::prepare(t);
 	}
 
 	// ---------------- TEMPORAL DERIVATIVE

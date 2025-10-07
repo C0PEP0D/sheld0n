@@ -40,6 +40,9 @@ struct Flow {
 	static void prepare(const double* pState, const unsigned int vortexNumber) { // called by point vortices
 		flow.prepare(pState, vortexNumber);
 	}
+
+	static void prepare(const double t) {
+	}
 	
 	static void prepareVelocity(const double* pX, const double t) {
 	}
