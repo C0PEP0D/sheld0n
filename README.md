@@ -158,10 +158,9 @@ Further post processing is provided using python scripts in that directory.
 
 This should have created a `trajectory_animation.mp4` file that you can open using your video player.
 
-Further post processing can be done using scripts in that directory.
-Run the `--help` option of these scripts to learn how to use them.
+Further post processing can be done using the others scripts in that directory.
 
-Feel free to **edit this scripts** at your convenience and **create your own post processing** scripts.
+Feel free to **edit these scripts** at your convenience and **create your own post processing** scripts.
 
 ### Editing simulation parameters
 
