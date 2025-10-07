@@ -51,15 +51,15 @@ def main():
     parser.add_argument('-d', '--debug', action='store_true', help='activates debug')
     # define default compiler on MacOS
     if platform.system() == 'Darwin':
-        # Run brew list` to get all installed packages
-        result = subprocess.run(["brew", "list"], capture_output=True, text=True, check=True)
-        lines = result.stdout.splitlines()
-        # find gcc versions
+        bin_paths = ["/usr/local/bin", "/opt/homebrew/bin"]
         versions = []
-        for line in lines:
-            _match = re.fullmatch(r"gcc@(\d+)", line)
-            if _match:
-                versions.append(int(_match.group(1)))
+        for path in bin_paths:
+            if not os.path.isdir(path):
+                continue
+            for f in os.listdir(path):
+                _match = re.fullmatch(r"g\+\+-(\d+)", f)
+                if _match:
+                    versions.append(int(_match.group(1)))
         if versions:
             latest = max(versions)
             parser.add_argument('-c', '--compiler', default=f"g++-{latest}", help='specify a custom compiler to be used')
