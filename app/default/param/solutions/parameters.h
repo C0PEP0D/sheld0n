@@ -11,20 +11,23 @@
 #include <tuple>
 // lib
 #include "d0t/equation.h"
-#include "s0ve/double.h"
+#include "s0ve/ascii/double.h"
 #include "l0ad/ascii/double.h"
+#include "s0ve/bin/save.h"
+#include "l0ad/bin/load.h"
+
 // param
 #include "param/flow/parameters.h"
 
 // FLAG: INCLUDE EQUATION BEGIN
-// #include "param/solutions/source_of_points/parameters.h"
-// #include "param/solutions/reactive_front/parameters.h"
 #include "param/solutions/passive_particles/parameters.h"
 // FLAG: INCLUDE EQUATION END
 
 namespace c0p {
 
 struct SolutionsParameters {
+
+	constexpr static const bool isSaveASCII = false;
 
 	// ---------------- INIT
 
@@ -100,87 +103,55 @@ struct SolutionsParameters {
 
 	static void save(const std::string& folder, const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize) {
 		// FLAG: SAVE STATIC EQUATION BEGIN
-		s0ve::saveDouble(folder + "/" + _PassiveParticles::tParameters::name + ".txt", pStateArray[0] + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size);
+		saveSolution(folder + "/" + _PassiveParticles::tParameters::name, pStateArray[0] + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size);
 		// FLAG: SAVE STATIC EQUATION END
 		// FLAG: SAVE DYNAMIC EQUATION BEGIN
 		// FLAG: SAVE DYNAMIC EQUATION END
 	}
 
+	static void saveSolution(const std::string& filename, const double* data, const unsigned int size) {
+		if(isSaveASCII) {
+			s0ve::ascii::saveDouble(filename + ".txt", data, size);
+		} else {
+			s0ve::bin::save(filename + ".bin", data, size);
+		}
+	}
+
 	static void load(const std::string& folder, std::vector<std::vector<double>>& stateArray) {
 		allocate(stateArray);
 		// FLAG: LOAD STATIC EQUATION BEGIN
-		l0ad::ascii::loadDouble(folder + "/" + _PassiveParticles::tParameters::name + ".txt", stateArray[0].data() + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size);
+		// l0ad::ascii::loadDouble(folder + "/" + _PassiveParticles::tParameters::name + ".txt", stateArray[0].data() + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size);
+		loadStaticSolution(folder + "/" + _PassiveParticles::tParameters::name, stateArray[0].data() + _PassiveParticles::tParameters::StateIndex, _PassiveParticles::tVariable::Size);
 		// FLAG: LOAD STATIC EQUATION END
 		// FLAG: LOAD DYNAMIC EQUATION BEGIN
 		// FLAG: LOAD DYNAMIC EQUATION END
+	}
+
+	static void loadStaticSolution(const std::string& filename, double* data, const unsigned int size) {
+		if(isSaveASCII) {
+			l0ad::ascii::loadDouble(filename + ".txt", data, size);
+		} else {
+			l0ad::bin::load(filename + ".bin", data, size);
+		}
+	}
+
+	static void loadDynamicSolution(const std::string& filename, std::vector<double>& data) {
+		if(isSaveASCII) {
+			l0ad::ascii::loadVectorDouble(filename + ".txt", data);
+		} else {
+			l0ad::bin::loadVector(filename + ".bin", data);
+		}
 	}
 
 	// ---------------- POST PROCESS
 
 	static void post(const std::string& folder, const double* const * pStateArray, const unsigned int* pStateSize, const unsigned int arraySize, const double t) {
 		// FLAG: POST STATIC EQUATION BEGIN
-		s0ve::saveMapToCsvDouble(folder + "/" + _PassiveParticles::tParameters::name + ".csv", _PassiveParticles::tParameters::post(pStateArray[0] + _PassiveParticles::tParameters::StateIndex, t), ",", "#");
+		s0ve::ascii::saveMapToCsvDouble(folder + "/" + _PassiveParticles::tParameters::name + ".csv", _PassiveParticles::tParameters::post(pStateArray[0] + _PassiveParticles::tParameters::StateIndex, t), ",", "#");
 		// FLAG: POST STATIC EQUATION END
 		// FLAG: POST DYNAMIC EQUATION BEGIN
 		// FLAG: POST DYNAMIC EQUATION END
 	}
-
-// 	// ---------------- GROUPS
-// 
-// 	// FLAG: DECLARE DYNAMIC EQUATION BEGIN
-// 	// inline static d0t::SolutionGroups<tSolver, _ReactiveFront, _ReactiveFront::tParameters::tVariable> solutionReactiveFront;
-// 	// FLAG: DECLARE DYNAMIC EQUATION END
-// 
-// 	static void stepGroups(const double dt) {
-// 		// FLAG: STEP DYNAMIC EQUATION BEGIN
-// 		// solutionReactiveFront.step(dt);
-// 		// FLAG: STEP DYNAMIC EQUATION END
-// 	}
-// 
-// 	static void saveGroups(const std::string& folder) {
-// 		// FLAG: SAVE DYNAMIC EQUATION BEGIN
-// 		// std::filesystem::create_directory(folder + "/" + _ReactiveFront::tParameters::name);
-// 		// if (not _ReactiveFront::tParameters::tVariable::cStateMeta(solutionReactiveFront.states).empty()) {
-// 		//     s0ve::saveDouble(folder + "/" + _ReactiveFront::tParameters::name + "/meta.txt", _ReactiveFront::tParameters::tVariable::cStateMeta(solutionReactiveFront.states).data(), _ReactiveFront::tParameters::tVariable::cStateMeta(solutionReactiveFront.states).size());
-// 		// }
-// 		// for(unsigned int groupIndex = 0; groupIndex < _ReactiveFront::tParameters::tVariable::groupNumber(solutionReactiveFront.states.size()); groupIndex++) {
-// 		//     if (not _ReactiveFront::tParameters::tVariable::cState(solutionReactiveFront.states, groupIndex).empty()) {
-// 		//         s0ve::saveDouble(folder + "/" + _ReactiveFront::tParameters::name + "/" + std::to_string(groupIndex) + ".txt", _ReactiveFront::tParameters::tVariable::cState(solutionReactiveFront.states, groupIndex).data(), _ReactiveFront::tParameters::tVariable::cState(solutionReactiveFront.states, groupIndex).size());
-// 		//     }
-// 		// }
-// 		// FLAG: SAVE DYNAMIC EQUATION END
-// 	}
-// 
-// 	static void loadGroups(const std::string& folder) {
-// 		// FLAG: LOAD DYNAMIC EQUATION BEGIN
-// 		// unsigned int groupIndex = 0;
-// 		// solutionReactiveFront.states.resize(1);
-// 		// if(std::filesystem::exists(folder + "/" + _ReactiveFront::tParameters::name + "/meta.txt")) {
-// 		//     l0ad::ascii::loadVectorDouble(folder + "/" + _ReactiveFront::tParameters::name + "/meta.txt", solutionReactiveFront.states.front());
-// 		// }
-// 		// while (std::filesystem::exists(folder + "/" + _ReactiveFront::tParameters::name + "/" + std::to_string(groupIndex) + ".txt")) {
-// 		//     _ReactiveFront::tParameters::tVariable::pushBackGroup(solutionReactiveFront.states);
-// 		//     l0ad::ascii::loadVectorDouble(folder + "/" + _ReactiveFront::tParameters::name + "/" + std::to_string(groupIndex) + ".txt", _ReactiveFront::tParameters::tVariable::state(solutionReactiveFront.states, groupIndex));
-// 		//     groupIndex += 1;
-// 		// }
-// 		// FLAG: LOAD DYNAMIC EQUATION END
-// 	}
-// 
-// 	// ---------------- INIT
-// 
-// 	static void initGroups() {
-// 		// FLAG: DECLARE GROUPS INIT BEGIN
-// 		// Init_ReactiveFront::set(SolutionsParameters::solutionReactiveFront.states);
-// 		// FLAG: DECLARE GROUPS INIT END
-// 	}
-// 
-// 	// ---------------- POST
-// 
-// 	static void postGroups(const double t) {
-// 		// FLAG: DECLARE GROUPS INIT BEGIN
-// 		// Init_ReactiveFront::set(SolutionsParameters::solutionReactiveFront.states);
-// 		// FLAG: DECLARE GROUPS INIT END
-// 	}
 	
 };
 

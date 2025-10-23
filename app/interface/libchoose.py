@@ -84,13 +84,13 @@ def edit_add_equation_static(name):
             print('\t\t_{Name}::tVariable::constrain(stateArray, t, _{Name}::tParameters::StateIndex);\n'.format(Name=upper_camel_name), end='')
 
         elif line == '\t\t// FLAG: SAVE STATIC EQUATION END\n':
-            print('\t\ts0ve::saveDouble(folder + "/" + _{Name}::tParameters::name + ".txt", pStateArray[0] + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size);\n'.format(Name=upper_camel_name), end='')
+            print('\t\tsaveSolution(folder + "/" + _{Name}::tParameters::name, pStateArray[0] + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size);\n'.format(Name=upper_camel_name), end='')
 
         elif line == '\t\t// FLAG: LOAD STATIC EQUATION END\n':
-            print('\t\tl0ad::ascii::loadDouble(folder + "/" + _{Name}::tParameters::name + ".txt", stateArray[0].data() + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size);\n'.format(Name=upper_camel_name), end='')
+            print('\t\tloadStaticSolution(folder + "/" + _{Name}::tParameters::name, stateArray[0].data() + _{Name}::tParameters::StateIndex, _{Name}::tVariable::Size);\n'.format(Name=upper_camel_name), end='')
 
         elif line == '\t\t// FLAG: POST STATIC EQUATION END\n':
-            print('\t\ts0ve::saveMapToCsvDouble(folder + "/" + _{Name}::tParameters::name + ".csv", _{Name}::tParameters::post(pStateArray[0] + _{Name}::tParameters::StateIndex, t), ",", "#");\n'.format(Name=upper_camel_name), end='')
+            print('\t\ts0ve::ascii::saveMapToCsvDouble(folder + "/" + _{Name}::tParameters::name + ".csv", _{Name}::tParameters::post(pStateArray[0] + _{Name}::tParameters::StateIndex, t), ",", "#");\n'.format(Name=upper_camel_name), end='')
         previous_line = line
         print(line, end='')
 
@@ -120,14 +120,14 @@ def edit_add_equation_dynamic(name):
 
         elif line == '\t\t// FLAG: SAVE DYNAMIC EQUATION END\n':
             print('\t\tif (pStateSize[_{Name}::tParameters::StateIndex] > 0) {{\n'.format(Name=upper_camel_name), end='')
-            print('\t\t\ts0ve::saveDouble(folder + "/" + _{Name}::tParameters::name + ".txt", pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
+            print('\t\t\tsaveSolution(folder + "/" + _{Name}::tParameters::name, pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
             print('\t\t}} // _{Name}::Flag\n'.format(Name=upper_camel_name), end='')
         elif line == '\t\t// FLAG: LOAD DYNAMIC EQUATION END\n':
             print('\t\tif(std::filesystem::exists(folder + "/" + _{Name}::tParameters::name + ".txt")) {{\n'.format(Name=upper_camel_name), end='')
-            print('\t\t\tl0ad::ascii::loadVectorDouble(folder + "/" + _{Name}::tParameters::name + ".txt", stateArray[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
+            print('\t\t\tloadDynamicSolution(folder + "/" + _{Name}::tParameters::name, stateArray[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
             print('\t\t}} // _{Name}::Flag\n'.format(Name=upper_camel_name), end='')
         elif line == '\t\t// FLAG: POST DYNAMIC EQUATION END\n':
-            print('\t\ts0ve::saveMapToCsvDouble(folder + "/" + _{Name}::tParameters::name + ".csv", _{Name}::tParameters::post(pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex], t), ",", "#");\n'.format(Name=upper_camel_name), end='')
+            print('\t\ts0ve::ascii::saveMapToCsvDouble(folder + "/" + _{Name}::tParameters::name + ".csv", _{Name}::tParameters::post(pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex], t), ",", "#");\n'.format(Name=upper_camel_name), end='')
         previous_line = line
         print(line, end='')
 

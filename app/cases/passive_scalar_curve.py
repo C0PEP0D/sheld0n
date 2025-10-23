@@ -33,9 +33,9 @@ def set_flow_point_vortices_periodic():
 def set_solutions_passive_curve():
     os.chdir('param/solutions')
     # nn swimmers
-    os.system('./.cli_create_new_equation passive_curve')
-    os.chdir('passive_curve')
-    os.system('./.cli_choose cpp_passive_curve')
+    os.system('./.cli_create_new_equation passive_scalar_curve')
+    os.chdir('passive_scalar_curve')
+    os.system('./.cli_choose cpp_passive_scalar_curve')
     os.chdir('..')
     # back
     os.chdir('../..')

@@ -61,9 +61,11 @@ target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/d0t/include/d0t/
 ### l0ad
 target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/l0ad/include/l0ad/ascii/load.h)
 target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/l0ad/include/l0ad/ascii/double.h)
+target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/l0ad/include/l0ad/bin/load.h)
 ### s0ve
-target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/s0ve/include/s0ve/save.h)
-target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/s0ve/include/s0ve/double.h)
+target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/s0ve/include/s0ve/ascii/save.h)
+target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/s0ve/include/s0ve/ascii/double.h)
+target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/s0ve/include/s0ve/bin/save.h)
 ### fl0w
 target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/fl0w/include/fl0w/jhtdb.h)
 ### fl0p

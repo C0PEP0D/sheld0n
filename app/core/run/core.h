@@ -12,9 +12,6 @@
 #include <iomanip> // setprecision
 // app includes
 #include "core/learn/neural_network/core.h"
-// lib includes
-#include "s0ve/double.h"
-#include "l0ad/ascii/double.h"
 
 namespace c0p {
 

@@ -116,7 +116,7 @@ class VariableCurve : public VariableGroupDynamic<_tVariableMember> {
 		
 		static unsigned int cClosestMember(const double* pState, const unsigned int stateSize, const double* pX) {
 			// input
-			const tView<tSpaceVector> x(pX);
+			const tView<const tSpaceVector> x(pX);
 			// compute
 			unsigned int minIndex = 0;
 			double minDistance = (cPosition(pState, 0) - x).norm();

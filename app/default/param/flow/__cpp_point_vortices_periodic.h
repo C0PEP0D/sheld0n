@@ -17,7 +17,7 @@ struct Flow {
 	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
 
 	using PointVortexFlow = pl0f::PointVortexFlow<DIM, tSpaceVector, tSpaceMatrix, tView>;
-	inline static PointVortexFlow flow = PointVortexFlow(step, meanVelocity, periodCenter, periodSize, isAxisPeriodic);
+	inline static PointVortexFlow flow = PointVortexFlow(dx, meanVelocity, periodCenter, periodSize, isAxisPeriodic);
 
 	// using tVorticesEquation = _PassiveParticles; // name of the vortices
 
