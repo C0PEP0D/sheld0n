@@ -31,7 +31,7 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = DIM + DIM * DIM + DIM * DIM; // x, L, Tau
 	// feel free to add parameters if you need
 	inline static const double Diffusivity = 1.0;
-	inline static const double InitMaxC = 1.0; // TODO: should be a state variable rather than a parameter (or use tau)
+	inline static const double InitMaxC = 1.0;
 	inline static const double InitW = 1.0;
 	static constexpr unsigned int Dx = 4.0;
 
@@ -67,47 +67,10 @@ struct _PassiveParticlesParameters {
 			std::vector<double>& _state = stateArray[stateIndex];
 			
 			// ---------------- CUSTOM CONSTRAIN START
-			
-			// // remove dead points
-			// for(int index = tBase::groupSize(_state.size()) - 1; index > -1; index--) {
-			// 	const double* pState = tBase::cState(_state.data(), index);
-			// 	const double tLife = *(pState + DIM);
-			// 	if (tLife < 0.0) {
-			// 		tBase::eraseMember(_state, index);
-			// 	}
-			// }
-			// // add points based on rate
-			// if (_state.empty()) {
-			// 	_spawn(_state, 1);
-			// } else {
-			// 	const double* pStateLast = tBase::cState(_state.data(), tBase::groupSize(_state.size()) - 1);
-			// 	const double tLifeLast = *(pStateLast + DIM);
-			// 	const unsigned int number = int((Lifetime - tLifeLast) * Rate);
-			// 	if (number > 0) {
-			// 		_spawn(_state, number);
-			// 	}
-			// }
-			
 			// ---------------- CUSTOM CONSTRAIN END
 			
 		}
 		
-		// static void _spawn(std::vector<double>& _state, unsigned int number) {
-		// 	for (unsigned int index = 0; index < number; index++) {
-		// 		tBase::pushBackMember(_state);
-		// 		// set initial state
-		// 		double* pState = tBase::state(_state.data(), tBase::groupSize(_state.size()) - 1);
-		// 		tView<tSpaceVector> x(pState);
-		// 		double* pTLife = pState + DIM;
-		// 		// // set
-		// 		x = tSpaceVector::Random();
-		// 		for(unsigned int index = 0; index < DIM; ++index){
-		// 			x[index] = x[index] * 0.5 * Length[index] + Center[index];
-		// 		}
-		// 		*pTLife = Lifetime;
-		// 	}
-		// }
-
 		static double c(const double* pState, const unsigned int stateSize, const double* pX) {
 			// input
 			const tView<const tSpaceVector> x(pX);

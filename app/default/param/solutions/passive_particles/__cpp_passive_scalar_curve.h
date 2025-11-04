@@ -30,7 +30,7 @@ struct _PassiveParticlesParameters {
 	// feel free to add parameters if you need
 	inline static const double Diffusivity = 1.0;
 	inline static const double InitMaxC = 1.0;
-	static constexpr unsigned int Density = 16;
+	static constexpr unsigned int Density = 32;
 	static constexpr bool IsClosed = false;
 	static constexpr unsigned int InterpolationOrder = 2;
 
@@ -155,18 +155,23 @@ struct _PassiveParticlesParameters {
 			const double* pMemberState = tVariable::cState(pState, subIndex);
 			// input
 			const tView<const tSpaceVector> x(pMemberState);
+			const double w = pMemberState[DIM];
+			const double tau = pMemberState[DIM+1];
 			// generate formated index
 			std::ostringstream ossIndex;
-			ossIndex << "passive_particles__index_" << std::setw(formatNumber) << std::setfill('0') << subIndex;
+			ossIndex << "passive_scalar_curve__index_" << std::setw(formatNumber) << std::setfill('0') << subIndex;
 			// output
 			output[ossIndex.str() + "__pos_0"] = x[0];
 			output[ossIndex.str() + "__pos_1"] = x[1];
+			output[ossIndex.str() + "__w"] = w;
+			output[ossIndex.str() + "__tau"] = tau;
+			output[ossIndex.str() + "__c"] = InitMaxC/std::sqrt(tau);
 			// compute average
 			xAverage += x;
 		}
 		xAverage /= number;
-		output["passive_particles__average_pos_0"] = xAverage[0];
-		output["passive_particles__average_pos_1"] = xAverage[1];
+		output["passive_scalar_curve__average_pos_0"] = xAverage[0];
+		output["passive_scalar_curve__average_pos_1"] = xAverage[1];
 
 		// ---------------- CUSTOM INIT END
 		return output;

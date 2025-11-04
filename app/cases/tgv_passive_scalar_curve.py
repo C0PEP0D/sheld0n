@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import shutil
 
 def set_flow_point_vortices_periodic():
     os.chdir('param/flow')
@@ -20,6 +21,7 @@ def set_flow_point_vortices_periodic():
     # end solutions
     os.chdir('../..')
     # parameters
+    os.system('./.cli_set_parameter param/solutions/point_vortices_periodic MaxCirculation "4.0/Number"')
     ## param
     os.system('./.cli_set_parameter param cLength 1.0')
     os.system('./.cli_set_parameter param cTime 1.0')
@@ -27,12 +29,12 @@ def set_flow_point_vortices_periodic():
     os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{true, true}"')
     ## run
     os.system('./.cli_set_parameter param/run Dt 1.0/128.0')
-    os.system('./.cli_set_parameter param/run NTime "int(16.0/Dt)"')
-    os.system('./.cli_set_parameter param/run NSave "NTime/16"')
+    os.system('./.cli_set_parameter param/run NTime "int(4.0/Dt)"')
+    os.system('./.cli_set_parameter param/run NSave "NTime"')
 
 def set_solutions_passive_curve():
     os.chdir('param/solutions')
-    # nn swimmers
+    # curve
     os.system('./.cli_create_new_equation passive_scalar_curve')
     os.chdir('passive_scalar_curve')
     os.system('./.cli_choose cpp_passive_scalar_curve')
@@ -41,8 +43,8 @@ def set_solutions_passive_curve():
     os.chdir('../..')
     ## run
     os.system('./.cli_set_parameter param/run Dt 1.0/128.0')
-    os.system('./.cli_set_parameter param/run NTime "int(24.0/Dt)"')
-    os.system('./.cli_set_parameter param/run NSave "NTime/4"')
+    os.system('./.cli_set_parameter param/run NTime "int(4.0/Dt)"')
+    os.system('./.cli_set_parameter param/run NSave "NTime"')
 
 def main():
     set_flow_point_vortices_periodic()
@@ -50,7 +52,12 @@ def main():
     # post processing
     ## input
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    code_dir = script_dir + "/.."
+    code_dir = script_dir + "/../.."
+    ## ops
+    os.remove("post_process/plot_average_vertical_velocity_over_time.py")
+    os.remove("post_process/generate_trajectory_animation.py")
+    shutil.copy(code_dir + "/app/post/generate_scalar_concentration_animation.py", "post_process/generate_scalar_concentration_animation.py")
+    shutil.copy(code_dir + "/app/post/generate_profile_c_animation.py", "post_process/generate_profile_c_animation.py")
     # remove symbolic link
     os.unlink("learn")
     # shutil.rmtree("param/learn")

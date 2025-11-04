@@ -11,9 +11,6 @@
 #include <filesystem>
 // app include
 #include "core/prop.h"
-// lib include
-#include "l0ad/ascii/double.h"
-#include "s0ve/double.h"
 
 namespace c0p {
 

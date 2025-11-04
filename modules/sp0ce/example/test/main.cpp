@@ -32,12 +32,24 @@ int main () {
 	}
 	std::array<int, Dim> ijk = {0, 0};
 	std::vector<std::array<int, Dim>> siblings = bin.ijkToSiblingIjk(ijk.data());
+	std::vector<std::array<int, Dim>> neighbors = bin.ijkToNeighborIjk(ijk.data());
+	// print data
+	std::cout << "\n";
+	std::cout << "ijk : " << ijk[0] << " " << ijk[1] << "\n";
+	for(auto& s : siblings) {
+		std::cout << "sibling : " << s[0] << " " << s[1] << "\n";
+	}
+	for(auto& n : neighbors) {
+		std::cout << "neighbor : " << n[0] << " " << n[1] << "\n";
+	}
+	std::cout << "\n";
+	std::cout << std::endl;
 	// binTree
 	sp0ce::BinTree<Dim> binTree(Step);
 	for(unsigned int index = 0; index < positions.size(); ++index) {
 		binTree.addIndex(index, positions[index].data());
 	}
-	// create equation and solution
+	// print data
 	std::cout << "\n";
 	std::cout << "binTree.data.size() : " << binTree.data.size() << "\n";
 	std::cout << "binTree.data.front().step : " << binTree.data.front().step << "\n";
