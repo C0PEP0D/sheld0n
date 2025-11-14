@@ -84,9 +84,10 @@ struct PointVortexFlow {
 					const tVector x = sp0ce::xPeriodic<tVector>(pState + index * VortexStateSize, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 					const double w = pState[index * VortexStateSize + Dim];
 					const double wAbs = std::abs(w);
+
+					superX += wAbs * x;
 					superW += w;
 					superWAbs += wAbs;
-					superX += wAbs * x;
 				}
 				if(superWAbs != 0.0) {
 					superX /= superWAbs;
@@ -115,10 +116,15 @@ struct PointVortexFlow {
 					for (auto const& subIjk : binTree.data[i-1].getIjkInBetween(subIjkStart.data(), subIjkEnd.data())) {
 						auto iterator = ijkToSuperIndex[i-1].find(subIjk);
 						if(iterator != ijkToSuperIndex[i-1].end()) {
-							const unsigned int subSuperIndex = iterator->second;
-							superW += superVortexStateArray[i-1][subSuperIndex * VortexStateSize + Dim];
-							superWAbs += std::abs(superVortexStateArray[i-1][subSuperIndex * VortexStateSize + Dim]);
-							superX += std::abs(superVortexStateArray[i-1][subSuperIndex * VortexStateSize + Dim]) * tView<const tVector>(&(superVortexStateArray[i-1][subSuperIndex * VortexStateSize]));
+							const unsigned int subIndex = iterator->second;
+
+							const tView<const tVector> subX(&(superVortexStateArray[i-1][subIndex * VortexStateSize]));
+							const double subW = superVortexStateArray[i-1][subIndex * VortexStateSize + Dim];
+							const double subWAbs = std::abs(subW);
+
+							superX += subWAbs * subX;
+							superW += subW;
+							superWAbs += subWAbs;
 						}
 					}
 					if(superWAbs != 0.0) {
@@ -161,7 +167,6 @@ struct PointVortexFlow {
 							}
 						}
 					}
-					
 				}
 			}
 			output *= 0.5; // 2D
@@ -204,7 +209,6 @@ struct PointVortexFlow {
 							}
 						}
 					}
-					
 				}
 			}
 			output *= 0.5; // 2D

@@ -16,8 +16,6 @@ def main():
 
     os.chdir(script_dir)
 
-    print(cases_dir + "/../../bin/activate")
-    
     if os.path.exists(cases_dir + "/../../bin/activate"):
         os.system("bash -c 'source {cases_dir}/../../bin/activate && ./.{interface}_copy_equation {argv}'".format(cases_dir=cases_dir, interface=interface, argv=" ".join(sys.argv[1:])))
     else:

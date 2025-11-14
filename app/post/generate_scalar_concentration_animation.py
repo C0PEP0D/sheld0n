@@ -18,7 +18,7 @@ import copy
 
 def parse():
     parser = argparse.ArgumentParser(description='Plots 2D trajectories of all solutions over time, assuming pos_0 as x and pos_1 as y.')
-    parser.add_argument('--passive-scalar-name', '-n', default="passive_scalar_blobs", help='name of the passive scalar')
+    parser.add_argument('--passive-scalar-list', '-n', nargs='*', default=["passive_scalar_blobs"], help='list of the passive scalars')
     parser.add_argument('--background-particles-list', '-p', nargs='*', default=["passive_particles"], help='list of the particles to be displayed in the background')
     parser.add_argument('--color-list', '-c', nargs='*', default=[], help='color for each equation')
     parser.add_argument('--begin', '-b', type=int, default=0, help='begin step')
@@ -37,7 +37,7 @@ def parse():
 def main():
     args = parse()
     # equations
-    passive_scalar_name = args.passive_scalar_name
+    passive_scalar_list = args.passive_scalar_list
     equation_name_list = args.background_particles_list
     # colors
     if args.color_list:
@@ -57,13 +57,18 @@ def main():
         pos_0_over_time[equation_name] = libpost.get_equation_property_over_time(equation_name, ".*__pos_0", time_dir_array)
         pos_1_over_time[equation_name] = libpost.get_equation_property_over_time(equation_name, ".*__pos_1", time_dir_array)
     print("INFO: Reading passive scalar property over time...", flush=True)
-    passive_scalar_pos_0_over_time = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_0", time_dir_array)
-    passive_scalar_pos_1_over_time = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_1", time_dir_array)
-    passive_scalar_c_over_time = libpost.get_equation_property_over_time(passive_scalar_name, passive_scalar_name + "__.*__c", time_dir_array)
-    # normalizing concentration start
-    c_max = np.array([x for c in passive_scalar_c_over_time for x in c]).max()
-    passive_scalar_c_over_time = [np.array(c)/c_max for c in passive_scalar_c_over_time]
-    c_min = np.array([x for c in passive_scalar_c_over_time for x in c if x > 0.0]).min()
+    passive_scalar_pos_0_over_time = {}
+    passive_scalar_pos_1_over_time = {}
+    passive_scalar_c_over_time = {}
+    c_min = 1.0
+    for passive_scalar_name in passive_scalar_list:
+        passive_scalar_pos_0_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_0", time_dir_array)
+        passive_scalar_pos_1_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_1", time_dir_array)
+        passive_scalar_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, passive_scalar_name + "__.*__c", time_dir_array)
+        # normalizing concentration start
+        c_max = np.array([x for c in passive_scalar_c_over_time[passive_scalar_name] for x in c]).max()
+        passive_scalar_c_over_time[passive_scalar_name] = [np.array(c)/c_max for c in passive_scalar_c_over_time[passive_scalar_name]]
+        c_min = min(c_min, np.array([x for c in passive_scalar_c_over_time[passive_scalar_name] for x in c if x > 0.0]).min())
     # normalizing concentration end
     print("INFO: Animating basic...", flush=True)
     art_fig, art_ax = plt.subplots()
@@ -92,20 +97,19 @@ def main():
         artists.append([])
         # trajectories
         for equation_index, equation_name in enumerate(equation_name_list):
-            # arts = art_ax.plot(pos_0_over_time[equation_name][0:time_index+1], pos_1_over_time[equation_name][0:time_index+1], color=color_list[equation_index % len(color_list)], alpha=0.5)
-            # artists[-1] += arts
             art = art_ax.scatter(np.concatenate(pos_0_over_time[equation_name][max(0, time_index-16):time_index+1]), np.concatenate(pos_1_over_time[equation_name][max(0, time_index-16):time_index+1]), s=2, color=color_list[equation_index % len(color_list)], alpha=0.25)
             artists[-1].append(art)
             art = art_ax.scatter(pos_0_over_time[equation_name][time_index], pos_1_over_time[equation_name][time_index], s=12, color=color_list[equation_index % len(color_list)])
             artists[-1].append(art)
         # passive scalar
-        art = art_ax.scatter(passive_scalar_pos_0_over_time[time_index], passive_scalar_pos_1_over_time[time_index], c=passive_scalar_c_over_time[time_index], cmap=cmap)
-        artists[-1].append(art)
+        for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
+            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap)
+            artists[-1].append(art)
     # legend
-    min_0 = min([np.concatenate(pos_0_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time).min()])
-    max_0 = max([np.concatenate(pos_0_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time).max()])
-    min_1 = min([np.concatenate(pos_1_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time).min()])
-    max_1 = max([np.concatenate(pos_1_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time).max()])
+    min_0 = min([np.concatenate(pos_0_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time[passive_scalar_name]).min() for equation in passive_scalar_list])
+    max_0 = max([np.concatenate(pos_0_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time[passive_scalar_name]).max() for equation in passive_scalar_list])
+    min_1 = min([np.concatenate(pos_1_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time[passive_scalar_name]).min() for equation in passive_scalar_list])
+    max_1 = max([np.concatenate(pos_1_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time[passive_scalar_name]).max() for equation in passive_scalar_list])
     for equation_index, equation_name in enumerate(equation_name_list):
         art_ax.text(
             max_0,
@@ -152,22 +156,19 @@ def main():
         artists.append([])
         # trajectories
         for equation_index, equation_name in enumerate(equation_name_list):
-            # arts = art_ax.plot(pos_0_over_time[equation_name][0:time_index+1], pos_1_over_time[equation_name][0:time_index+1], color=color_list[equation_index % len(color_list)], alpha=0.5)
-            # artists[-1] += arts
             art = art_ax.scatter(np.concatenate(pos_0_over_time[equation_name][max(0, time_index-16):time_index+1]), np.concatenate(pos_1_over_time[equation_name][max(0, time_index-16):time_index+1]), s=2, color=color_list[equation_index % len(color_list)], alpha=0.25)
             artists[-1].append(art)
             art = art_ax.scatter(pos_0_over_time[equation_name][time_index], pos_1_over_time[equation_name][time_index], s=12, color=color_list[equation_index % len(color_list)])
             artists[-1].append(art)
         # passive scalar
-        # arts = art_ax.plot(passive_scalar_pos_0_over_time[time_index], passive_scalar_pos_1_over_time[time_index], color=[1.0, 1.0, 0.0], alpha=1.0)
-        # artists[-1] += arts
-        art = art_ax.scatter(passive_scalar_pos_0_over_time[time_index], passive_scalar_pos_1_over_time[time_index], c=passive_scalar_c_over_time[time_index], cmap=cmap, norm=colors.LogNorm(vmin=c_min, vmax=1.0))
-        artists[-1].append(art)
+        for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
+            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap, norm=colors.LogNorm(vmin=c_min, vmax=1.0))
+            artists[-1].append(art)
     # legend
-    min_0 = min([np.concatenate(pos_0_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time).min()])
-    max_0 = max([np.concatenate(pos_0_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time).max()])
-    min_1 = min([np.concatenate(pos_1_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time).min()])
-    max_1 = max([np.concatenate(pos_1_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time).max()])
+    min_0 = min([np.concatenate(pos_0_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time[passive_scalar_name]).min() for equation in passive_scalar_list])
+    max_0 = max([np.concatenate(pos_0_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time[passive_scalar_name]).max() for equation in passive_scalar_list])
+    min_1 = min([np.concatenate(pos_1_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time[passive_scalar_name]).min() for equation in passive_scalar_list])
+    max_1 = max([np.concatenate(pos_1_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time[passive_scalar_name]).max() for equation in passive_scalar_list])
     for equation_index, equation_name in enumerate(equation_name_list):
         art_ax.text(
             max_0,
