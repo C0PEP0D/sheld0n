@@ -36,12 +36,15 @@ struct _PassiveParticlesParameters {
 
 	// splitting
 	static const bool IsSplitting = true;
-	inline static const double MergeDx = std::pow(2, -3);
-	inline static const double SplitDistance = std::sqrt(DIM) * MergeDx;
-	inline static const double SplitSize = 3.0 * SplitDistance;
+	inline static const double Dx = std::pow(2, -1);
+	inline static const double SplitSize = Dx;
+	inline static const double OverlapFactor = 4.0; // must be bigger than 2, increase to increase accuracy at the cost of computation time
+	inline static const double SplitDistance = SplitSize / OverlapFactor;
+	inline static const double MergeDx = SplitDistance / std::sqrt(DIM);
 	static const bool IsApproximatingWhithBin = true;
 	// concentration threshold (for blob deletion)
-	inline static const double Cth = std::pow(2, -16);
+	inline static const double Cth = std::pow(2, -32);
+	inline static const double Qth = Cth * std::pow(Dx, DIM);
 
 	// source
 	static const bool HasSource = true;
@@ -115,22 +118,18 @@ struct _PassiveParticlesParameters {
 					tView<tSpaceMatrix> memberS(pMemberState + DIM);
 					double& memberQ = pMemberState[DIM + DIM * DIM];
 
-					const double memberC = memberQ / (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(memberS.determinant()));
+					if(memberQ > Qth) {
+						Eigen::SelfAdjointEigenSolver<tSpaceMatrix> solver(memberS.transpose() * memberS);
+						const tSpaceVector eigenValues = solver.eigenvalues();
+						const tSpaceMatrix eigenVectors = solver.eigenvectors();
+	
+						auto itMaxEigenValue = std::max_element(eigenValues.begin(), eigenValues.end());
+	
+						const double maxVariance = std::sqrt(*itMaxEigenValue);
+						const double maxStandardDeviation = std::sqrt(maxVariance);
+						const unsigned int maxIndex = std::distance(eigenValues.begin(), itMaxEigenValue);
+						const tSpaceVector maxVarianceDirection = eigenVectors.col(maxIndex);
 					
-					// // // option 2: compute by deformation matrix
-					Eigen::SelfAdjointEigenSolver<tSpaceMatrix> solver(memberS.transpose() * memberS);
-					const tSpaceVector eigenValues = solver.eigenvalues();
-					const tSpaceMatrix eigenVectors = solver.eigenvectors();
-
-					auto itMaxEigenValue = std::max_element(eigenValues.begin(), eigenValues.end());
-
-					const double maxVariance = std::sqrt(*itMaxEigenValue);
-					const double maxStandardDeviation = std::sqrt(maxVariance);
-					const unsigned int maxIndex = std::distance(eigenValues.begin(), itMaxEigenValue);
-					const tSpaceVector maxVarianceDirection = eigenVectors.col(maxIndex);
-
-
-					if(memberC > Cth) {
 						if(maxStandardDeviation > SplitSize) {
 
 							const tSpaceVector splitX = memberX;
@@ -287,26 +286,55 @@ struct _PassiveParticlesParameters {
 			double output = 0.0;
 			// compute
 			if (IsSplitting && IsApproximatingWhithBin) {
-				// use super blobs to compute concentration
-				for(int i = binTree.data.size() - 1; i > -1; --i) {
+				std::vector<std::array<int, DIM>> childrenIjkArray;
+				for (auto [key, value] : binTree.data[binTree.data.size() - 1].ijkToIndexes) {
+				    childrenIjkArray.push_back(key);
+				}
+
+				for(unsigned int i = binTree.data.size() - 1; i > 0; --i) {
 					const std::array<int, DIM> ijk = binTree.data[i].positionToIjk(x.data());
-					// get siblingIjkArray (get all if at root)
-					std::vector<std::array<int, DIM>> siblingIjkArray;
-					if(i == binTree.data.size() - 1) {
-						for (auto [key, value] : binTree.data[i].ijkToIndexes) {
-						    siblingIjkArray.push_back(key);
-						}
-					} else {
-						siblingIjkArray = binTree.data[i].ijkToSiblingIjk(ijk.data());
-					}
+					const std::vector<std::array<int, DIM>> neighborIjkArray = binTree.data[i].ijkToNeighborIjk( ijk.data() );
+					
 					// compute
-					for(auto const& siblingIjk : siblingIjkArray) {
-						auto iterator = ijkToSuperIndex[i].find(siblingIjk);
-						if(iterator != ijkToSuperIndex[i].end()) {
+					for(auto const& childIjk : childrenIjkArray) {
+						if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
+							auto iterator = ijkToSuperIndex[i].find(childIjk);
+							if(iterator != ijkToSuperIndex[i].end()) {
+								const unsigned int superIndex = iterator->second;
+								const double* pSuperState = superStateArray[i].data() + superIndex * StateSize;
+								const tView<const tSpaceVector> superX(pSuperState);
+								const tView<const tSpaceMatrix> superS(pSuperState + DIM);
+								const double superQ = pSuperState[DIM + DIM * DIM];
+								
+								const double superC = superQ / (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(superS.determinant()));
+								
+								// compute
+								const tSpaceVector r = x - superX;
+								// concentration
+								output += superC * std::exp(-0.5 * r.transpose() * superS.inverse() * r);
+							}
+						}
+					}
+					// next
+					childrenIjkArray.clear();
+					for(const std::array<int, DIM>& neighborIjk : neighborIjkArray) {
+						const std::vector<std::array<int, DIM>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(neighborIjk.data());
+						childrenIjkArray.insert(childrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
+					}
+				}
+
+				{ // i == 0
+					const std::array<int, DIM> ijk = binTree.data[0].positionToIjk(x.data());
+					
+					// compute
+					for(auto const& childIjk : childrenIjkArray) {
+						auto iterator = ijkToSuperIndex[0].find(childIjk);
+						if(iterator != ijkToSuperIndex[0].end()) {
 							const unsigned int superIndex = iterator->second;
-							const tView<const tSpaceVector> superX(&(superStateArray[i][superIndex * StateSize]));
-							const tView<const tSpaceMatrix> superS(&(superStateArray[i][superIndex * StateSize + DIM]));
-							const double superQ = superStateArray[i][superIndex * StateSize + DIM + DIM * DIM];
+							const double* pSuperState = superStateArray[0].data() + superIndex * StateSize;
+							const tView<const tSpaceVector> superX(pSuperState);
+							const tView<const tSpaceMatrix> superS(pSuperState + DIM);
+							const double superQ = pSuperState[DIM + DIM * DIM];
 							
 							const double superC = superQ / (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(superS.determinant()));
 							
@@ -343,30 +371,60 @@ struct _PassiveParticlesParameters {
 			tSpaceVector output = tSpaceVector::Zero();
 			//compute
 			if (IsSplitting && IsApproximatingWhithBin) {
-				// use super blobs to compute concentration
-				for(int i = binTree.data.size() - 1; i > -1; --i) {
+				std::vector<std::array<int, DIM>> childrenIjkArray;
+				for (auto [key, value] : binTree.data[binTree.data.size() - 1].ijkToIndexes) {
+				    childrenIjkArray.push_back(key);
+				}
+
+				for(unsigned int i = binTree.data.size() - 1; i > 0; --i) {
 					const std::array<int, DIM> ijk = binTree.data[i].positionToIjk(x.data());
-					// get siblingIjkArray (get all if at root)
-					std::vector<std::array<int, DIM>> siblingIjkArray;
-					if(i == binTree.data.size() - 1) {
-						for (auto [key, value] : binTree.data[i].ijkToIndexes) {
-						    siblingIjkArray.push_back(key);
-						}
-					} else {
-						siblingIjkArray = binTree.data[i].ijkToSiblingIjk(ijk.data());
-					}
+					const std::vector<std::array<int, DIM>> neighborIjkArray = binTree.data[i].ijkToNeighborIjk( ijk.data() );
+					
 					// compute
-					for(auto const& siblingIjk : siblingIjkArray) {
-						auto iterator = ijkToSuperIndex[i].find(siblingIjk);
-						if(iterator != ijkToSuperIndex[i].end()) {
+					for(auto const& childIjk : childrenIjkArray) {
+						if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
+							auto iterator = ijkToSuperIndex[i].find(childIjk);
+							if(iterator != ijkToSuperIndex[i].end()) {
+								const unsigned int superIndex = iterator->second;
+								const double* pSuperState = superStateArray[i].data() + superIndex * StateSize;
+								const tView<const tSpaceVector> superX(pSuperState);
+								const tView<const tSpaceMatrix> superS(pSuperState + DIM);
+								const double superQ = pSuperState[DIM + DIM * DIM];
+								
+								const double superC = superQ / (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(superS.determinant()));
+								const tSpaceMatrix superSInverse = superS.inverse();
+								
+								// compute
+								const tSpaceVector r = x - superX;
+								// concentration
+								output += -superC * superSInverse * r * std::exp(-0.5 * r.transpose() * superSInverse * r);
+							}
+						}
+					}
+					// next
+					childrenIjkArray.clear();
+					for(const std::array<int, DIM>& neighborIjk : neighborIjkArray) {
+						const std::vector<std::array<int, DIM>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(neighborIjk.data());
+						childrenIjkArray.insert(childrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
+					}
+				}
+
+				{ // i == 0
+					const std::array<int, DIM> ijk = binTree.data[0].positionToIjk(x.data());
+					
+					// compute
+					for(auto const& childIjk : childrenIjkArray) {
+						auto iterator = ijkToSuperIndex[0].find(childIjk);
+						if(iterator != ijkToSuperIndex[0].end()) {
 							const unsigned int superIndex = iterator->second;
-							const tView<const tSpaceVector> superX(&(superStateArray[i][superIndex * StateSize]));
-							const tView<const tSpaceMatrix> superS(&(superStateArray[i][superIndex * StateSize + DIM]));
-							const double superQ = superStateArray[i][superIndex * StateSize + DIM + DIM * DIM];
+							const double* pSuperState = superStateArray[0].data() + superIndex * StateSize;
+							const tView<const tSpaceVector> superX(pSuperState);
+							const tView<const tSpaceMatrix> superS(pSuperState + DIM);
+							const double superQ = pSuperState[DIM + DIM * DIM];
 							
 							const double superC = superQ / (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(superS.determinant()));
 							const tSpaceMatrix superSInverse = superS.inverse();
-							
+															
 							// compute
 							const tSpaceVector r = x - superX;
 							// concentration
@@ -428,19 +486,13 @@ struct _PassiveParticlesParameters {
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
 			const tSpaceMatrix j = Flow::getVelocityGradients(x.data(), t);
 			// // utils
-			const tSpaceVector uD = ( Diffusivity / tGroupVariable::c(pGroupState, groupStateSize, x.data()) ) * tGroupVariable::cGradient(pGroupState, groupStateSize, x.data());
+			// const tSpaceVector uD = ( Diffusivity / tGroupVariable::c(pGroupState, groupStateSize, x.data()) ) * tGroupVariable::cGradient(pGroupState, groupStateSize, x.data());
 			// // output
 			tView<tSpaceVector> dX(dState.data());
 			tView<tSpaceMatrix> dS(dState.data() + DIM);
 			double& dQ = dState[DIM + DIM * DIM];
 
-			// // // option 1: equation isotropic
-			// dX = u + uD;
-			// dS = 2.0 * Diffusivity * tSpaceMatrix::Identity();
-			// dQ = 0.0;
-
-			// // option 2: equation anisotropic
-			dX = u + uD;
+			dX = u; // u + uD ? ;
 			dS = 2.0 * Diffusivity * tSpaceMatrix::Identity() + j * s + s * j.transpose();
 			dQ = 0.0;
 
@@ -498,7 +550,6 @@ struct _PassiveParticlesParameters {
 			unsigned int number = tVariable::groupSize(stateSize);
 			unsigned int formatNumber = int(std::log10(number)) + 1;
 			
-			tSpaceVector xAverage = tSpaceVector::Zero();
 			for(unsigned int index = 0; index < number; ++index) {
 				const double* pMemberState = tVariable::cState(pState, index);
 				// input
@@ -510,12 +561,7 @@ struct _PassiveParticlesParameters {
 				output[ossIndex.str() + "__pos_0"] = x[0];
 				output[ossIndex.str() + "__pos_1"] = x[1];
 				output[ossIndex.str() + "__c"] = tGroupVariable::c(pState, stateSize, x.data());
-				// compute average
-				xAverage += x;
 			}
-			xAverage /= number;
-			output["passive_particles__average_pos_0"] = xAverage[0];
-			output["passive_particles__average_pos_1"] = xAverage[1];
 		}
 
 		{ // profile

@@ -52,6 +52,7 @@ def main():
     os.remove("post_process/generate_trajectory_animation.py")
     shutil.copy(code_dir + "/app/post/generate_scalar_concentration_animation.py", "post_process/generate_scalar_concentration_animation.py")
     shutil.copy(code_dir + "/app/post/generate_profile_c_animation.py", "post_process/generate_profile_c_animation.py")
+    shutil.copy(code_dir + "/app/post/plot_concentration_moments_over_time.py", "post_process/plot_concentration_moments_over_time.py")
     # remove symbolic link
     os.unlink("learn")
     # shutil.rmtree("param/learn")

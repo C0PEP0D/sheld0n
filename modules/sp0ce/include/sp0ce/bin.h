@@ -91,6 +91,28 @@ class Bin {
 			}
 		}
 
+		std::array<int, Dim> ijkToParentIjk(const int* pIjk) const {
+			std::array<int, Dim> ijkParent;
+			for(unsigned int i = 0; i < Dim; ++i) {
+				if(pIjk[i] < 0) {
+					ijkParent[i] = (pIjk[i] - 1) / 2;
+				} else {
+					ijkParent[i] = pIjk[i] / 2;
+				}
+			}
+			return ijkParent;
+		}
+
+		std::vector<std::array<int, Dim>> ijkToChildrenIjk(const int* pIjk) const {
+			std::array<int, Dim> ijkStart;
+			std::array<int, Dim> ijkEnd;
+			for(unsigned int j = 0; j < Dim; ++j) {
+				ijkStart[j] = pIjk[j] * 2;
+				ijkEnd[j] = (pIjk[j] + 1) * 2;
+			}
+			return getIjkInBetween(ijkStart.data(), ijkEnd.data());
+		}
+
 		std::vector<std::array<int, Dim>> ijkToSiblingIjk(const int* pIjk) const {
 			std::array<int, Dim> ijkStart;
 			std::array<int, Dim> ijkEnd;

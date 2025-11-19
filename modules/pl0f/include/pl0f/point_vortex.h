@@ -151,7 +151,7 @@ struct PointVortexFlow {
 				}
 				// compute
 				for(auto const& siblingIjk : siblingIjkArray) {
-					if(siblingIjk != ijk) {
+					if(i == 0 || siblingIjk != ijk) {
 						auto iterator = ijkToSuperIndex[i].find(siblingIjk);
 						if(iterator != ijkToSuperIndex[i].end()) {
 							const unsigned int superIndex = iterator->second;
@@ -189,7 +189,7 @@ struct PointVortexFlow {
 				}
 				// compute
 				for(auto const& siblingIjk : siblingIjkArray) {
-					if(siblingIjk != ijk) {
+					if(i == 0 || siblingIjk != ijk) {
 						auto iterator = ijkToSuperIndex[i].find(siblingIjk);
 						if(iterator != ijkToSuperIndex[i].end()) {
 							const unsigned int superIndex = iterator->second;
