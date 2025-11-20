@@ -31,7 +31,7 @@ struct PointVortexFlow {
 		sp0ce::BinTree<Dim> binTree;
 		// super
 		std::vector<std::map<std::array<int, Dim>, unsigned int>> ijkToSuperIndex;
-		std::vector<std::vector<double>> superVortexStateArray;
+		std::vector<std::vector<double>> superStateArray;
 
 	public:
 		PointVortexFlow(
@@ -68,17 +68,17 @@ struct PointVortexFlow {
 			}
 			// super
 			ijkToSuperIndex.clear();
-			superVortexStateArray.clear();
+			superStateArray.clear();
 			// 0
 			ijkToSuperIndex.emplace_back();
-			superVortexStateArray.emplace_back();
+			superStateArray.emplace_back();
 			for (auto const& [ijk, indexes] : binTree.data[0].ijkToIndexes) {
 				// init
 				ijkToSuperIndex[0][ijk] = ijkToSuperIndex[0].size();
-				superVortexStateArray[0].resize(ijkToSuperIndex[0].size() * VortexStateSize, 0.0);
+				superStateArray[0].resize(ijkToSuperIndex[0].size() * VortexStateSize, 0.0);
 				// process
-				tView<tVector> superX(&(superVortexStateArray[0][superVortexStateArray[0].size() - VortexStateSize]));
-				double& superW = superVortexStateArray[0].back();
+				tView<tVector> superX(&(superStateArray[0][superStateArray[0].size() - VortexStateSize]));
+				double& superW = superStateArray[0].back();
 				double superWAbs = 0.0;
 				for (auto const& index : indexes) {
 					const tVector x = sp0ce::xPeriodic<tVector>(pState + index * VortexStateSize, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
@@ -96,15 +96,15 @@ struct PointVortexFlow {
 			// others
 			for(unsigned int i = 1; i < binTree.data.size(); ++i) {
 				ijkToSuperIndex.emplace_back();
-				superVortexStateArray.emplace_back();
+				superStateArray.emplace_back();
 				for (auto const& [ijk, indexes] : binTree.data[i].ijkToIndexes) {
 					// init
 					ijkToSuperIndex[i][ijk] = ijkToSuperIndex[i].size();
-					superVortexStateArray[i].resize(ijkToSuperIndex[i].size() * VortexStateSize, 0.0);
+					superStateArray[i].resize(ijkToSuperIndex[i].size() * VortexStateSize, 0.0);
 					
 					// process
-					tView<tVector> superX(&(superVortexStateArray[i][superVortexStateArray[i].size() - VortexStateSize]));
-					double& superW = superVortexStateArray[i].back();
+					tView<tVector> superX(&(superStateArray[i][superStateArray[i].size() - VortexStateSize]));
+					double& superW = superStateArray[i].back();
 					double superWAbs = 0.0;
 					// sub
 					std::array<int, Dim> subIjkStart;
@@ -118,8 +118,8 @@ struct PointVortexFlow {
 						if(iterator != ijkToSuperIndex[i-1].end()) {
 							const unsigned int subIndex = iterator->second;
 
-							const tView<const tVector> subX(&(superVortexStateArray[i-1][subIndex * VortexStateSize]));
-							const double subW = superVortexStateArray[i-1][subIndex * VortexStateSize + Dim];
+							const tView<const tVector> subX(&(superStateArray[i-1][subIndex * VortexStateSize]));
+							const double subW = superStateArray[i-1][subIndex * VortexStateSize + Dim];
 							const double subWAbs = std::abs(subW);
 
 							superX += subWAbs * subX;
@@ -138,25 +138,23 @@ struct PointVortexFlow {
 		tVector getVelocity(const double* pX) const {
 			tVector output = tVector::Zero();
 			const tVector x = sp0ce::xPeriodic<tVector>(pX, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
-			for(int i = binTree.data.size() - 1; i > -1; --i) {
+
+			std::vector<std::array<int, Dim>> childrenIjkArray;
+			for (auto [key, value] : binTree.data[binTree.data.size() - 1].ijkToIndexes) {
+			    childrenIjkArray.push_back(key);
+			}
+
+			for(unsigned int i = binTree.data.size() - 1; i > 0; --i) {
 				const std::array<int, Dim> ijk = binTree.data[i].positionToIjk(x.data());
-				// get siblingIjkArray (get all if at root)
-				std::vector<std::array<int, Dim>> siblingIjkArray;
-				if(i == binTree.data.size() - 1) {
-					for (auto [key, value] : binTree.data[i].ijkToIndexes) {
-					    siblingIjkArray.push_back(key);
-					}
-				} else {
-					siblingIjkArray = binTree.data[i].ijkToSiblingIjk(ijk.data());
-				}
+				const std::vector<std::array<int, Dim>> neighborIjkArray = binTree.data[i].ijkToNeighborIjk( ijk.data() );
 				// compute
-				for(auto const& siblingIjk : siblingIjkArray) {
-					if(i == 0 || siblingIjk != ijk) {
-						auto iterator = ijkToSuperIndex[i].find(siblingIjk);
+				for(auto const& childIjk : childrenIjkArray) {
+					if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
+						auto iterator = ijkToSuperIndex[i].find(childIjk);
 						if(iterator != ijkToSuperIndex[i].end()) {
 							const unsigned int superIndex = iterator->second;
-							const tView<const tVector> superX(&(superVortexStateArray[i][superIndex * VortexStateSize]));
-							const double superW = superVortexStateArray[i][superIndex * VortexStateSize + Dim];
+							const tView<const tVector> superX(&(superStateArray[i][superIndex * VortexStateSize]));
+							const double superW = superStateArray[i][superIndex * VortexStateSize + Dim];
 
 							const tVector r = sp0ce::abPeriodic<tVector, tView>(superX.data(), x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 							const double rNorm = r.norm();
@@ -168,33 +166,60 @@ struct PointVortexFlow {
 						}
 					}
 				}
+				// next
+				childrenIjkArray.clear();
+				for(const std::array<int, Dim>& neighborIjk : neighborIjkArray) {
+					const std::vector<std::array<int, Dim>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(neighborIjk.data());
+					childrenIjkArray.insert(childrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
+				}
+			}
+
+			{ // i == 0
+				const std::array<int, Dim> ijk = binTree.data[0].positionToIjk(x.data());
+				
+				// compute
+				for(auto const& childIjk : childrenIjkArray) {
+					auto iterator = ijkToSuperIndex[0].find(childIjk);
+					if(iterator != ijkToSuperIndex[0].end()) {
+						const unsigned int superIndex = iterator->second;
+						const tView<const tVector> superX(&(superStateArray[0][superIndex * VortexStateSize]));
+						const double superW = superStateArray[0][superIndex * VortexStateSize + Dim];
+
+						const tVector r = sp0ce::abPeriodic<tVector, tView>(superX.data(), x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
+						const double rNorm = r.norm();
+						if(rNorm > sigma) {
+							output += sp0ce::cross2d<tVector>(superW, r.data()) * std::pow(1.0/rNorm, 2); // 2D
+						} else {
+							output += sp0ce::cross2d<tVector>(superW, r.data()) * std::pow(1.0/sigma, 2);
+						}
+					}
+				}
 			}
 			output *= 0.5; // 2D
+			
 			return meanVelocity + output;
 		};
 
 		tMatrix getVelocityGradients(const double* pX) const {
 			tMatrix output = tMatrix::Zero();
 			const tVector x = sp0ce::xPeriodic<tVector>(pX, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
-			for(int i = binTree.data.size() - 1; i > -1; --i) {
+			
+			std::vector<std::array<int, Dim>> childrenIjkArray;
+			for (auto [key, value] : binTree.data[binTree.data.size() - 1].ijkToIndexes) {
+			    childrenIjkArray.push_back(key);
+			}
+
+			for(unsigned int i = binTree.data.size() - 1; i > 0; --i) {
 				const std::array<int, Dim> ijk = binTree.data[i].positionToIjk(x.data());
-				// get siblingIjkArray (get all if at root)
-				std::vector<std::array<int, Dim>> siblingIjkArray;
-				if(i == binTree.data.size() - 1) {
-					for (auto [key, value] : binTree.data[i].ijkToIndexes) {
-					    siblingIjkArray.push_back(key);
-					}
-				} else {
-					siblingIjkArray = binTree.data[i].ijkToSiblingIjk(ijk.data());
-				}
+				const std::vector<std::array<int, Dim>> neighborIjkArray = binTree.data[i].ijkToNeighborIjk( ijk.data() );
 				// compute
-				for(auto const& siblingIjk : siblingIjkArray) {
-					if(i == 0 || siblingIjk != ijk) {
-						auto iterator = ijkToSuperIndex[i].find(siblingIjk);
+				for(auto const& childIjk : childrenIjkArray) {
+					if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
+						auto iterator = ijkToSuperIndex[i].find(childIjk);
 						if(iterator != ijkToSuperIndex[i].end()) {
 							const unsigned int superIndex = iterator->second;
-							const tView<const tVector> superX(&(superVortexStateArray[i][superIndex * VortexStateSize]));
-							const double superW = superVortexStateArray[i][superIndex * VortexStateSize + Dim];
+							const tView<const tVector> superX(&(superStateArray[i][superIndex * VortexStateSize]));
+							const double superW = superStateArray[i][superIndex * VortexStateSize + Dim];
 
 							tMatrix skewSuperW;
 							skewSuperW << 0.0, superW,
@@ -207,6 +232,38 @@ struct PointVortexFlow {
 							} else {
 								output += sp0ce::cross2d<tVector>(superW, r.data()) * r.transpose() * std::pow(1.0/sigma, 2);
 							}
+						}
+					}
+				}
+				// next
+				childrenIjkArray.clear();
+				for(const std::array<int, Dim>& neighborIjk : neighborIjkArray) {
+					const std::vector<std::array<int, Dim>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(neighborIjk.data());
+					childrenIjkArray.insert(childrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
+				}
+			}
+
+			{ // i == 0
+				const std::array<int, Dim> ijk = binTree.data[0].positionToIjk(x.data());
+				
+				// compute
+				for(auto const& childIjk : childrenIjkArray) {
+					auto iterator = ijkToSuperIndex[0].find(childIjk);
+					if(iterator != ijkToSuperIndex[0].end()) {
+						const unsigned int superIndex = iterator->second;
+						const tView<const tVector> superX(&(superStateArray[0][superIndex * VortexStateSize]));
+						const double superW = superStateArray[0][superIndex * VortexStateSize + Dim];
+
+						tMatrix skewSuperW;
+						skewSuperW << 0.0, superW,
+						              -superW,  0.0;
+						
+						const tVector r = sp0ce::abPeriodic<tVector, tView>(superX.data(), x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
+						const double rNorm = r.norm();
+						if(rNorm > sigma) {
+							output += std::pow(1.0/rNorm, 4) * (sp0ce::cross2d<tVector>(superW, r.data()) * r.transpose()); // 2D
+						} else {
+							output += sp0ce::cross2d<tVector>(superW, r.data()) * r.transpose() * std::pow(1.0/sigma, 2);
 						}
 					}
 				}

@@ -11,20 +11,28 @@ import libpost
 # plotting
 import matplotlib.pyplot as plt
 
+# parameters
+
+default_equation_list = []
+default_color_list = []
+swimming_velocity = 1.0
+
+# core
+
 def parse():
     parser = argparse.ArgumentParser(description='Plots 2D trajectories of all solutions over time, assuming pos_0 as x and pos_1 as y.')
-    parser.add_argument('--equation-list', '-e', nargs='*', default=[], help='equations for which to plot trajectorys')
-    parser.add_argument('--color-list', '-c', nargs='*', default=[], help='color for each equation')
+    parser.add_argument('--equation-list', '-e', nargs='*', default=default_equation_list, help='equations for which to plot trajectorys')
+    parser.add_argument('--color-list', '-c', nargs='*', default=default_color_list, help='color for each equation')
     return parser.parse_args()
 
 def main(input_equation_list, input_color_list):
-    swimming_vlocity = 1.0
     # equations
-    if input_equation_list:
-        equation_name_list = input_equation_list
-    else:
-        print("INFO: Reading equation names...", flush=True)
-        equation_name_list = libpost.get_equation_names()
+    print("INFO: Reading equation names...", flush=True)
+    equation_names = libpost.get_equation_names()
+    print("INFO: Ubpdating equation lists...", flush=True)
+    equation_name_list = [tmp for tmp in input_equation_list if tmp in equation_names]
+    if not equation_name_list:
+        equation_name_list = equation_names
     print("INFO: Reading time...", flush=True)
     time_dir_array, time_array = libpost.get_time()
     print("INFO: Reading equation property over time...", flush=True)
@@ -71,8 +79,8 @@ def main(input_equation_list, input_color_list):
     for mass in sorted(average_performance_sorted):
         plt.fill_between(
             average_performance_sorted[mass][:, 0],
-            (average_performance_sorted[mass][:, 1] - 0.5 * ci_performance_sorted[mass][:, 1]) / swimming_vlocity, 
-            (average_performance_sorted[mass][:, 1] + 0.5 * ci_performance_sorted[mass][:, 1]) / swimming_vlocity,
+            (average_performance_sorted[mass][:, 1] - 0.5 * ci_performance_sorted[mass][:, 1]) / swimming_velocity, 
+            (average_performance_sorted[mass][:, 1] + 0.5 * ci_performance_sorted[mass][:, 1]) / swimming_velocity,
             linewidth=0.0,
             color=color_list[plot_index],
             alpha = 0.25
@@ -82,7 +90,7 @@ def main(input_equation_list, input_color_list):
     for mass in sorted(average_performance_sorted):
         plt.plot(
             average_performance_sorted[mass][:, 0], 
-            average_performance_sorted[mass][:, 1] / swimming_vlocity, 
+            average_performance_sorted[mass][:, 1] / swimming_velocity, 
             color=color_list[plot_index], 
             label=r'$m_s = ' + str(mass) + r'$', 
             marker=marker_list[plot_index % len(marker_list)]

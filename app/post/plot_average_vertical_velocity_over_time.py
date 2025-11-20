@@ -13,10 +13,17 @@ import libpost
 # plotting
 import matplotlib.pyplot as plt
 
+# parameters
+
+default_equation_list = []
+default_color_list = []
+
+# core
+
 def parse():
     parser = argparse.ArgumentParser(description='Plots 2D trajectories of all solutions over time, assuming pos_0 as x and pos_1 as y.')
-    parser.add_argument('--equation-list', '-e', nargs='*', default=[], help='equations for which to plot trajectorys')
-    parser.add_argument('--color-list', '-c', nargs='*', default=[], help='color for each equation')
+    parser.add_argument('--equation-list', '-e', nargs='*', default=default_equation_list, help='equations for which to plot trajectorys')
+    parser.add_argument('--color-list', '-c', nargs='*', default=default_color_list, help='color for each equation')
     return parser.parse_args()
 
 # INFO : UNCOMENT THE FOLLOWING IF YOU WANT TO USE THE CUSTOMIZATION GUI OF THE SCRIPT
@@ -27,16 +34,17 @@ def parse():
 # )
 def main(input_equation_list, input_color_list):
     # equations
-    if input_equation_list:
-        equation_name_list = input_equation_list
-    else:
-        print("INFO: Reading equation names...", flush=True)
-        equation_name_list = libpost.get_equation_names()
+    print("INFO: Reading equation names...", flush=True)
+    equation_names = libpost.get_equation_names()
+    print("INFO: Ubpdating equation lists...", flush=True)
+    equation_name_list = [tmp for tmp in input_equation_list if tmp in equation_names]
+    if not equation_name_list:
+        equation_name_list = equation_names
     # colors
     if input_color_list:
         color_list = input_color_list
     else:
-        cmap = plt.get_cmap("plasma", len(equation_name_list))
+        cmap = plt.get_cmap("rainbow", len(equation_name_list))
         color_list = [cmap(index) for index in range(len(equation_name_list))]
     # markers
     marker_list = ["o", "^", "s", "P", "*"]

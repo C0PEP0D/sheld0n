@@ -71,6 +71,7 @@ target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/fl0w/include/fl0
 ### fl0p
 ### pl0f
 target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/pl0f/include/pl0f/point_vortex.h)
+target_precompile_headers(run PUBLIC ${C0P_PROJECT_DIR}/modules/pl0f/include/pl0f/scalar_field.h)
 
 
 ## Include

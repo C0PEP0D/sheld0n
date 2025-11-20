@@ -14,15 +14,27 @@ import matplotlib.animation as animation
 # copy
 import copy
 
+# parameters
+
+default_equation_list = []
+default_color_list = []
+default_begin = 0
+default_end = -1
+default_step = 1
+default_xlim = []
+default_ylim = []
+
+# core
+
 def parse():
     parser = argparse.ArgumentParser(description='Plots 2D trajectories of all solutions over time, assuming pos_0 as x and pos_1 as y.')
-    parser.add_argument('--equation-list', '-e', nargs='*', default=[], help='equations for which to plot trajectories')
-    parser.add_argument('--color-list', '-c', nargs='*', default=[], help='color for each equation')
-    parser.add_argument('--begin', '-b', type=int, default=0, help='begin step')
-    parser.add_argument('--end', '-d', type=int, default=-1, help='end step')
-    parser.add_argument('--step', '-s', type=int, default=1, help='animation frame step')
-    parser.add_argument('--xlim', '-x', type=float, nargs=2, default=[], help='axis x lim')
-    parser.add_argument('--ylim', '-y', type=float, nargs=2, default=[], help='axis y lim')
+    parser.add_argument('--equation-list', '-e', nargs='*', default=default_equation_list, help='equations for which to plot trajectories')
+    parser.add_argument('--color-list', '-c', nargs='*', default=default_color_list, help='color for each equation')
+    parser.add_argument('--begin', '-b', type=int, default=default_begin, help='begin step')
+    parser.add_argument('--end', '-d', type=int, default=default_end, help='end step')
+    parser.add_argument('--step', '-s', type=int, default=default_step, help='animation frame step')
+    parser.add_argument('--xlim', '-x', type=float, nargs=2, default=default_xlim, help='axis x lim')
+    parser.add_argument('--ylim', '-y', type=float, nargs=2, default=default_ylim, help='axis y lim')
     return parser.parse_args()
 
 # INFO : UNCOMENT THE FOLLOWING IF YOU WANT TO USE THE CUSTOMIZATION GUI OF THE SCRIPT
@@ -33,12 +45,13 @@ def parse():
 # )
 def main():
     args = parse()
+    print("INFO: Reading equation names...", flush=True)
+    equation_names = libpost.get_equation_names()
+    print("INFO: Ubpdating equation lists...", flush=True)
+    equation_name_list = [tmp for tmp in args.equation_list if tmp in equation_names]
     # equations
-    if args.equation_list:
-        equation_name_list = args.equation_list
-    else:
-        print("INFO: Reading equation names...", flush=True)
-        equation_name_list = libpost.get_equation_names()
+    if not equation_name_list:
+        equation_name_list = equation_names
     # colors
     if args.color_list:
         color_list = args.color_list

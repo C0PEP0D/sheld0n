@@ -16,16 +16,29 @@ import matplotlib.cm as cm
 # copy
 import copy
 
+# parameters
+
+default_passive_scalar_list = ["passive_scalar_blobs"]
+default_background_particles_list = ["passive_particles"]
+default_color_list = []
+default_begin = 0
+default_end = -1
+default_step = 1
+default_xlim = []
+default_ylim = []
+
+# core
+
 def parse():
-    parser = argparse.ArgumentParser(description='Plots 2D trajectories of all solutions over time, assuming pos_0 as x and pos_1 as y.')
-    parser.add_argument('--passive-scalar-list', '-n', nargs='*', default=["passive_scalar_blobs"], help='list of the passive scalars')
-    parser.add_argument('--background-particles-list', '-p', nargs='*', default=["passive_particles"], help='list of the particles to be displayed in the background')
-    parser.add_argument('--color-list', '-c', nargs='*', default=[], help='color for each equation')
-    parser.add_argument('--begin', '-b', type=int, default=0, help='begin step')
-    parser.add_argument('--end', '-d', type=int, default=-1, help='end step')
-    parser.add_argument('--step', '-s', type=int, default=1, help='animation frame step')
-    parser.add_argument('--xlim', '-x', type=float, nargs=2, default=[], help='axis x lim')
-    parser.add_argument('--ylim', '-y', type=float, nargs=2, default=[], help='axis y lim')
+    parser = argparse.ArgumentParser(description='Plots 2D scalar concentration as a scatter plot.')
+    parser.add_argument('--passive-scalar-list', '-n', nargs='*', default=default_passive_scalar_list, help='list of the passive scalars')
+    parser.add_argument('--background-particles-list', '-p', nargs='*', default=default_background_particles_list, help='list of the particles to be displayed in the background')
+    parser.add_argument('--color-list', '-c', nargs='*', default=default_color_list, help='color for each equation')
+    parser.add_argument('--begin', '-b', type=int, default=default_begin, help='begin step')
+    parser.add_argument('--end', '-d', type=int, default=default_end, help='end step')
+    parser.add_argument('--step', '-s', type=int, default=default_step, help='animation frame step')
+    parser.add_argument('--xlim', '-x', type=float, nargs=2, default=default_xlim, help='axis x lim')
+    parser.add_argument('--ylim', '-y', type=float, nargs=2, default=default_ylim, help='axis y lim')
     return parser.parse_args()
 
 # INFO : UNCOMENT THE FOLLOWING IF YOU WANT TO USE THE CUSTOMIZATION GUI OF THE SCRIPT
@@ -36,9 +49,11 @@ def parse():
 # )
 def main():
     args = parse()
-    # equations
-    passive_scalar_list = args.passive_scalar_list
-    equation_name_list = args.background_particles_list
+    print("INFO: Reading equation names...", flush=True)
+    equation_names = libpost.get_equation_names()
+    print("INFO: Ubpdating equation lists...", flush=True)
+    passive_scalar_list = [tmp for tmp in args.passive_scalar_list if tmp in equation_names]
+    equation_name_list = [tmp for tmp in args.background_particles_list if tmp in equation_names]
     # colors
     if args.color_list:
         color_list = args.color_list
@@ -61,15 +76,18 @@ def main():
     passive_scalar_pos_1_over_time = {}
     passive_scalar_c_over_time = {}
     c_min = 1.0
+    c_max = 0.0
     for passive_scalar_name in passive_scalar_list:
         passive_scalar_pos_0_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_0", time_dir_array)
         passive_scalar_pos_1_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_1", time_dir_array)
         passive_scalar_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, passive_scalar_name + "__.*__c", time_dir_array)
-        # normalizing concentration start
-        c_max = np.array([x for c in passive_scalar_c_over_time[passive_scalar_name] for x in c]).max()
-        passive_scalar_c_over_time[passive_scalar_name] = [np.array(c)/c_max for c in passive_scalar_c_over_time[passive_scalar_name]]
+        # c_max, c_min
+        c_max = max(c_max, np.array([x for c in passive_scalar_c_over_time[passive_scalar_name] for x in c]).max())
         c_min = min(c_min, np.array([x for c in passive_scalar_c_over_time[passive_scalar_name] for x in c if x > 0.0]).min())
-    # normalizing concentration end
+    # normalize
+    for passive_scalar_name in passive_scalar_list:
+        passive_scalar_c_over_time[passive_scalar_name] = [np.array(c)/c_max for c in passive_scalar_c_over_time[passive_scalar_name]]
+    c_min /= c_max
     print("INFO: Animating basic...", flush=True)
     art_fig, art_ax = plt.subplots()
     art_ax.set_aspect('equal', 'box')
@@ -103,7 +121,7 @@ def main():
             artists[-1].append(art)
         # passive scalar
         for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
-            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap)
+            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap, norm=colors.Normalize(vmin=c_min, vmax=1.0))
             artists[-1].append(art)
     # legend
     min_0 = min([np.concatenate(pos_0_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time[passive_scalar_name]).min() for equation in passive_scalar_list])
@@ -120,7 +138,7 @@ def main():
             backgroundcolor=color_list[equation_index % len(color_list)]
         )
     # color bar
-    cbar = art_fig.colorbar(cm.ScalarMappable(norm=colors.Normalize(vmin=0.0, vmax=1.0), cmap=cmap), ax=art_ax)
+    cbar = art_fig.colorbar(cm.ScalarMappable(norm=colors.Normalize(vmin=c_min, vmax=1.0), cmap=cmap), ax=art_ax)
     # cbar.outline.set_color('white')
     cbar.ax.tick_params(axis='y', colors='white')
     cbar.ax.set_yticklabels(cbar.ax.get_yticklabels(), color='white')

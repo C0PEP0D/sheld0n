@@ -13,10 +13,17 @@ import libpost
 # plotting
 import matplotlib.pyplot as plt
 
+# parameters
+
+default_equation_list = ["reference", "passive_scalar_blobs"]
+default_color_list = []
+
+# core
+
 def parse():
     parser = argparse.ArgumentParser(description='Plots 2D trajectories of all solutions over time, assuming pos_0 as x and pos_1 as y.')
-    parser.add_argument('--equation-list', '-e', nargs='*', default=["reference", "passive_scalar_blobs", "passive_scalar_blobs_test"], help='equations for which to plot')
-    parser.add_argument('--color-list', '-c', nargs='*', default=[], help='color for each equation')
+    parser.add_argument('--equation-list', '-e', nargs='*', default=default_equation_list, help='equations for which to plot')
+    parser.add_argument('--color-list', '-c', nargs='*', default=default_color_list, help='color for each equation')
     return parser.parse_args()
 
 # INFO : UNCOMENT THE FOLLOWING IF YOU WANT TO USE THE CUSTOMIZATION GUI OF THE SCRIPT
@@ -26,11 +33,16 @@ def parse():
 #     show_restart_button=False
 # )
 def main(passive_scalar_list, input_color_list):
+    # equations
+    print("INFO: Reading equation names...", flush=True)
+    equation_names = libpost.get_equation_names()
+    print("INFO: Ubpdating equation lists...", flush=True)
+    passive_scalar_list = [tmp for tmp in passive_scalar_list if tmp in equation_names]
     # colors
     if input_color_list:
         color_list = input_color_list
     else:
-        cmap = plt.get_cmap("plasma", len(passive_scalar_list))
+        cmap = plt.get_cmap("rainbow", len(passive_scalar_list))
         color_list = [cmap(index) for index in range(len(passive_scalar_list))]
     # markers
     marker_list = ["o", "^", "s", "P", "*"]

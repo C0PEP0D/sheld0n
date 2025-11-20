@@ -12,16 +12,28 @@ import matplotlib.animation as animation
 # copy
 import copy
 
+# parameters
+
+default_passive_scalar_list = ["reference", "passive_scalar_blobs"]
+default_color_list = []
+default_begin = 0
+default_end = -1
+
+# core
+
 def parse():
-    parser = argparse.ArgumentParser(description='Plots profile of concentration.')
-    parser.add_argument('--passive-scalar-list', '-n', nargs='*', default=["passive_scalar_blobs"], help='list of the passive scalars')
-    parser.add_argument('--color-list', '-c', nargs='*', default=[], help='color for each equation')
-    parser.add_argument('--begin', '-b', type=int, default=0, help='begin step')
-    parser.add_argument('--end', '-d', type=int, default=-1, help='end step')
+    parser = argparse.ArgumentParser(description='Plots concentration profile for passive scalar equations.')
+    parser.add_argument('--passive-scalar-list', '-n', nargs='*', default=default_passive_scalar_list, help='list of the passive scalars')
+    parser.add_argument('--color-list', '-c', nargs='*', default=default_color_list, help='color for each equation')
+    parser.add_argument('--begin', '-b', type=int, default=default_begin, help='begin step')
+    parser.add_argument('--end', '-d', type=int, default=default_end, help='end step')
     return parser.parse_args()
 
 def main(input_begin, input_end):
-    passive_scalar_list = args.passive_scalar_list
+    print("INFO: Reading equation names...", flush=True)
+    equation_names = libpost.get_equation_names()
+    print("INFO: Ubpdating equation lists...", flush=True)
+    passive_scalar_list = [tmp for tmp in args.passive_scalar_list if tmp in equation_names]
     # colors
     if args.color_list:
         color_list = args.color_list
