@@ -69,11 +69,11 @@ def main():
     for equation_name in equation_name_list:
         pos_0_over_time[equation_name] = libpost.get_equation_property_over_time(equation_name, ".*__pos_0", time_dir_array)
         pos_1_over_time[equation_name] = libpost.get_equation_property_over_time(equation_name, ".*__pos_1", time_dir_array)
-    print("INFO: Animating...", flush=True)
+    print("INFO: Start...", flush=True)
+    # create figure
     art_fig, art_ax = plt.subplots()
     art_ax.set_aspect('equal', 'box')
-    # art_ax.grid(False)
-    # art_ax.axis('off')
+    # adjust colors
     art_ax.set_facecolor("black")
     art_fig.set_facecolor("black")
     art_ax.spines["bottom"].set_color("white")
@@ -86,36 +86,29 @@ def main():
     art_ax.tick_params(axis='y', colors='white')
     art_ax.grid(which='major', color='gray')
     art_ax.grid(which='minor', color='gray')
+    # set limits
     if args.xlim:
         art_ax.set_xlim(args.xlim[0], args.xlim[1])
     if args.ylim:
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
+    # plot the data
+    print("INFO: Plotting...", flush=True)
     trajectories = {}
     artists = []
+    legend_handles = []
     for time_index, time in enumerate(time_array):
         artists.append([])
+        legend_handles.clear()
         for equation_index, equation_name in enumerate(equation_name_list):
-            # arts = art_ax.plot(pos_0_over_time[equation_name][0:time_index+1], pos_1_over_time[equation_name][0:time_index+1], color=color_list[equation_index % len(color_list)], alpha=0.5)
-            # artists[-1] += arts
             art = art_ax.scatter(np.concatenate(pos_0_over_time[equation_name][max(0, time_index-16):time_index+1]), np.concatenate(pos_1_over_time[equation_name][max(0, time_index-16):time_index+1]), s=2, color=color_list[equation_index % len(color_list)], alpha=0.25)
             artists[-1].append(art)
-            art = art_ax.scatter(pos_0_over_time[equation_name][time_index], pos_1_over_time[equation_name][time_index], s=12, color=color_list[equation_index % len(color_list)])
+            art = art_ax.scatter(pos_0_over_time[equation_name][time_index], pos_1_over_time[equation_name][time_index], s=12, color=color_list[equation_index % len(color_list)], label=equation_name)
             artists[-1].append(art)
+            legend_handles.append(art)
     # legend
-    min_0 = min([np.concatenate(pos_0_over_time[equation_name]).min() for equation in equation_name_list])
-    max_0 = max([np.concatenate(pos_0_over_time[equation_name]).max() for equation in equation_name_list])
-    min_1 = min([np.concatenate(pos_1_over_time[equation_name]).min() for equation in equation_name_list])
-    max_1 = max([np.concatenate(pos_1_over_time[equation_name]).max() for equation in equation_name_list])
-    for equation_index, equation_name in enumerate(equation_name_list):
-        art_ax.text(
-            max_0,
-            max_1 - equation_index * (max_1 - min_1) / (len(equation_name_list) - 1),
-            equation_name, 
-            fontsize=8,
-            #color=color_list[equation_index % len(color_list)],
-            backgroundcolor=color_list[equation_index % len(color_list)]
-        )
+    art_ax.legend(handles=legend_handles, loc='upper right', labelcolor='white', facecolor='black', edgecolor='black')
     # anim
+    print("INFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
     anim.save("trajectory_animation.mp4")
 

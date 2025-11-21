@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 
 import os
-import glob
 import shutil
 
-def set_flow_tgv():
+def set_flow():
     os.chdir('param/flow')
-    os.system('./.cli_choose cpp_none')
+    os.system('./.cli_choose cpp_linear3d')
     os.chdir('../..')
+    ## param
+    os.system('./.cli_set_parameter param DIM 3')
     os.system('./.cli_set_parameter param cLength 1.0')
     os.system('./.cli_set_parameter param cTime 1.0')
-    os.system('./.cli_set_parameter param cDomainSize "{2.0, 2.0}"')
-    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{false, false}"')
+    os.system('./.cli_set_parameter param cDomainSize "{2.0, 2.0, 2.0}"')
+    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{false, false, false}"')
 
-def set_solutions_passive_scalar_blobs():
+def set_solutions():
     os.chdir('param/solutions')
     # passive scalar blobs
     os.system('./.cli_create_new_equation passive_scalar_blobs')
@@ -33,8 +34,8 @@ def set_solutions_passive_scalar_blobs():
     os.system('./.cli_set_parameter param/solutions/reference IsSplitting false')
 
 def main():
-    set_flow_tgv()
-    set_solutions_passive_scalar_blobs()
+    set_flow()
+    set_solutions()
     # param
     os.system('./.cli_set_parameter param cGroupSize 256')
     # run
@@ -48,11 +49,9 @@ def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/../.."
     ## copy
-    os.remove("post_process/plot_average_vertical_velocity_over_time.py")
-    os.remove("post_process/generate_trajectory_animation.py")
-    shutil.copy(code_dir + "/app/post/generate_scalar_concentration_animation.py", "post_process/generate_scalar_concentration_animation.py")
+    shutil.copy(code_dir + "/app/post/generate_scalar_concentration_animation_3d.py", "post_process/generate_scalar_concentration_animation_3d.py")
     shutil.copy(code_dir + "/app/post/generate_profile_c_animation.py", "post_process/generate_profile_c_animation.py")
-    shutil.copy(code_dir + "/app/post/plot_concentration_moments_over_time.py", "post_process/plot_concentration_moments_over_time.py")
+    shutil.copy(code_dir + "/app/post/plot_profile_c_moments_over_time.py", "post_process/plot_profile_c_moments_over_time.py")
     # remove symbolic link
     os.unlink("learn")
     # shutil.rmtree("param/learn")

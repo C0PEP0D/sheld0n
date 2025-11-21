@@ -29,24 +29,24 @@ struct _PassiveParticlesParameters {
 	// ---------------- CUSTOM EQUATION PARAMETERS START
 	static const unsigned StateSize = DIM + DIM * DIM + 1; // x, s, q
 	// feel free to add parameters if you need
-	inline static const double Diffusivity = std::pow(2, -6);
-	inline static const tSpaceVector InitX = tSpaceVector({0.0, 0.0});
+	inline static const double Diffusivity = std::pow(10, -2);
+	inline static const tSpaceVector InitX = tSpaceVector::Zero();
 	inline static const double InitC = 1.0;
-	inline static const double InitS = std::pow(2, -3);
+	inline static const double InitS = 0.125;
 
 	// splitting
 	static const bool IsSplitting = true;
-	inline static const double Dx = std::pow(2, -1);
+	inline static const double Dx = 0.3;
 	inline static const double SplitSize = Dx;
-	inline static const double OverlapFactor = 4.0; // must be bigger than 2, increase to increase accuracy at the cost of computation time
+	inline static const double OverlapFactor = 2.5; // must be bigger than 2, increase to increase accuracy at the cost of computation time
 	inline static const double SplitDistance = SplitSize / OverlapFactor;
 	inline static const double MergeDx = SplitDistance / std::sqrt(DIM);
 	// concentration threshold (for blob deletion)
-	inline static const double Cth = std::pow(2, -32);
+	inline static const double Cth = std::pow(10, -6);
 	inline static const double Qth = Cth * std::pow(Dx, DIM);
 
 	// source
-	static const bool HasSource = true;
+	static const bool HasSource = false;
 	inline static const tSpaceVector SourceX = InitX;
 	inline static const double SourceC = InitC;
 	inline static const double SourceS = InitS;
@@ -264,7 +264,6 @@ struct _PassiveParticlesParameters {
 			double& q = pState[DIM + DIM * DIM];
 			// set
 			x = tSpaceVector::Zero();
-			// x = tSpaceVector({1.0, 0.0});
 			s = tSpaceMatrix::Identity() * InitS;
 			q = InitC * (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(std::pow(InitS, DIM)));
 		}
@@ -289,8 +288,9 @@ struct _PassiveParticlesParameters {
 				std::ostringstream ossIndex;
 				ossIndex << "passive_particles__index_" << std::setw(formatNumber) << std::setfill('0') << index;
 				// output
-				output[ossIndex.str() + "__pos_0"] = x[0];
-				output[ossIndex.str() + "__pos_1"] = x[1];
+				for(unsigned int i = 0; i < DIM; ++i) {
+					output[ossIndex.str() + "__pos_" + std::to_string(i)] = x[i];
+				}
 				output[ossIndex.str() + "__c"] = tGroupVariable::c(pState, stateSize, x.data());
 			}
 		}
@@ -300,7 +300,8 @@ struct _PassiveParticlesParameters {
 			unsigned int formatNumber = int(std::log10(number)) + 1;
 			
 			for(unsigned int index = 0; index < number; ++index) {
-				const tSpaceVector x({(-0.5 * number + index) * MergeDx, 0.0});
+				tSpaceVector x = tSpaceVector::Zero();
+				x[0] = (-0.5 * number + index) * MergeDx;
 				// generate formated index
 				std::ostringstream ossIndex;
 				ossIndex << "profile_c__index_" << std::setw(formatNumber) << std::setfill('0') << index;

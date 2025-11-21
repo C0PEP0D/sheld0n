@@ -10,7 +10,7 @@ namespace c0p {
 struct Flow {
 
 	static constexpr std::array<double, DIM> Velocity0 = {
-		1.0, 
+		0.0, 
 		0.0
 	};
 	static constexpr std::array<double, DIM * DIM> Gradient = {

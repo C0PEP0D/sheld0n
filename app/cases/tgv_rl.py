@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import shutil
 
 def set_flow_tgv():
     os.chdir('param/flow')

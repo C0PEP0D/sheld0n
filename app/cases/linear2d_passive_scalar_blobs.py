@@ -1,34 +1,44 @@
 #!/usr/bin/env python3
 
 import os
-import glob
 import shutil
 
-def set_flow_tgv():
+def set_flow():
     os.chdir('param/flow')
-    os.system('./.cli_choose cpp_tgv')
+    os.system('./.cli_choose cpp_linear2d')
     os.chdir('../..')
-    os.system('./.cli_set_parameter param cLength M_PI')
-    os.system('./.cli_set_parameter param cTime M_PI')
-    os.system('./.cli_set_parameter param cDomainSize "{2*M_PI, 2*M_PI}"')
-    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{true, true}"')
+    os.system('./.cli_set_parameter param cLength 1.0')
+    os.system('./.cli_set_parameter param cTime 1.0')
+    os.system('./.cli_set_parameter param cDomainSize "{2.0, 2.0}"')
+    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{false, false}"')
 
-def set_solutions_passive_scalar_blobs():
+def set_solutions():
     os.chdir('param/solutions')
+    # passive scalar blobs
     os.system('./.cli_create_new_equation passive_scalar_blobs')
     os.chdir('passive_scalar_blobs')
     os.system('./.cli_choose cpp_passive_scalar_blobs')
     os.chdir('..')
+    # reference
+    os.system('./.cli_create_new_equation reference')
+    os.chdir('reference')
+    os.system('./.cli_choose cpp_passive_scalar_blobs')
+    os.chdir('..')
     os.chdir('../..')
+    # removing sources
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs HasSource false')
+    os.system('./.cli_set_parameter param/solutions/reference HasSource false')
+    # removing splitting for the reference
+    os.system('./.cli_set_parameter param/solutions/reference IsSplitting false')
 
 def main():
-    set_flow_tgv()
-    set_solutions_passive_scalar_blobs()
+    set_flow()
+    set_solutions()
     # param
     os.system('./.cli_set_parameter param cGroupSize 256')
     # run
     os.system('./.cli_set_parameter param/run Dt "1.0/128.0"')
-    os.system('./.cli_set_parameter param/run NTime "8.0 * M_PI / Dt"')
+    os.system('./.cli_set_parameter param/run NTime "16.0 / Dt"')
     os.system('./.cli_set_parameter param/run NSave "NTime/16"')
     # post
     os.system('./.cli_set_parameter param/run Number 0')

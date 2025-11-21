@@ -244,7 +244,6 @@ struct _PassiveParticlesParameters {
 
 		unsigned int number = tVariable::groupSize(stateSize);
 		unsigned int formatNumber = int(std::log10(number)) + 1;
-		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < number; ++subIndex) {
 			const double* pMemberState = tVariable::cState(pState, subIndex);
 			// input
@@ -253,15 +252,11 @@ struct _PassiveParticlesParameters {
 			std::ostringstream ossIndex;
 			ossIndex << "passive_particles__index_" << std::setw(formatNumber) << std::setfill('0') << subIndex;
 			// output
-			output[ossIndex.str() + "__pos_0"] = x[0];
-			output[ossIndex.str() + "__pos_1"] = x[1];
+			for(unsigned int i = 0; i < DIM; ++i) {
+				output[ossIndex.str() + "__pos_" + std::to_string(i)] = x[i];
+			}
 			output[ossIndex.str() + "__c"] = tGroupVariable::c(pState, stateSize, x.data());
-			// compute average
-			xAverage += x;
 		}
-		xAverage /= number;
-		output["passive_particles__average_pos_0"] = xAverage[0];
-		output["passive_particles__average_pos_1"] = xAverage[1];
 
 		// ---------------- CUSTOM INIT END
 		return output;

@@ -116,8 +116,9 @@ struct _PassiveParticlesParameters {
 		// ---------------- CUSTOM POST START
 
 		const tView<const tSpaceVector> x(pState);
-		output["passive_particles__pos_0"] = x[0];
-		output["passive_particles__pos_1"] = x[1];
+		for(unsigned int i = 0; i < DIM; ++i) {
+			output["passive_particles__pos_" + std::to_string(i)] = x[i];
+		}
 
 		// ---------------- CUSTOM POST END
 

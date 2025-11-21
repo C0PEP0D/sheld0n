@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.colors as colors
 import matplotlib.cm as cm
+import matplotlib.ticker as ticker
 # copy
 import copy
 
@@ -40,6 +41,9 @@ def parse():
     parser.add_argument('--xlim', '-x', type=float, nargs=2, default=default_xlim, help='axis x lim')
     parser.add_argument('--ylim', '-y', type=float, nargs=2, default=default_ylim, help='axis y lim')
     return parser.parse_args()
+
+def log_tick_formatter(val, pos=None):
+    return f"$10^{{{int(val)}}}$"
 
 # INFO : UNCOMENT THE FOLLOWING IF YOU WANT TO USE THE CUSTOMIZATION GUI OF THE SCRIPT
 # from gooey import Gooey
@@ -88,12 +92,24 @@ def main():
     for passive_scalar_name in passive_scalar_list:
         passive_scalar_c_over_time[passive_scalar_name] = [np.array(c)/c_max for c in passive_scalar_c_over_time[passive_scalar_name]]
     c_min /= c_max
+
+
+
+
+    
     print("INFO: Animating basic...", flush=True)
-    art_fig, art_ax = plt.subplots()
-    art_ax.set_aspect('equal', 'box')
-    # art_ax.grid(False)
-    # art_ax.axis('off')
+    # create figure
+    art_fig = plt.figure()
+    art_ax = art_fig.add_subplot(projection='3d')
+    art_ax.set_aspect('equal', adjustable='box')
+    art_ax.set_xlabel(r'$x$', color='white')
+    art_ax.set_ylabel(r'$y$', color='white')
+    art_ax.set_zlabel(r"$c / c_{\mathrm{max}}$", color='white')
+    # set colors
     art_ax.set_facecolor("black")
+    art_ax.xaxis.set_pane_color("black")
+    art_ax.yaxis.set_pane_color("black")
+    art_ax.zaxis.set_pane_color("black")
     art_fig.set_facecolor("black")
     art_ax.spines["bottom"].set_color("white")
     art_ax.spines["top"].set_color("white")
@@ -101,58 +117,66 @@ def main():
     art_ax.spines["right"].set_color("white")
     art_ax.xaxis.label.set_color('white')
     art_ax.yaxis.label.set_color('white')
+    art_ax.zaxis.label.set_color('white')
     art_ax.tick_params(axis='x', colors='white')
     art_ax.tick_params(axis='y', colors='white')
+    art_ax.tick_params(axis='z', colors='white')
     art_ax.grid(which='major', color='gray')
     art_ax.grid(which='minor', color='gray')
+    # set axis limits
     if args.xlim:
         art_ax.set_xlim(args.xlim[0], args.xlim[1])
     if args.ylim:
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
+    # plot the data
+    print("\tINFO: Plotting...", flush=True)
     trajectories = {}
     artists = []
+    legend_handles = []
     for time_index, time in enumerate(time_array):
         artists.append([])
+        legend_handles.clear()
         # trajectories
         for equation_index, equation_name in enumerate(equation_name_list):
             art = art_ax.scatter(np.concatenate(pos_0_over_time[equation_name][max(0, time_index-16):time_index+1]), np.concatenate(pos_1_over_time[equation_name][max(0, time_index-16):time_index+1]), s=2, color=color_list[equation_index % len(color_list)], alpha=0.25)
             artists[-1].append(art)
-            art = art_ax.scatter(pos_0_over_time[equation_name][time_index], pos_1_over_time[equation_name][time_index], s=12, color=color_list[equation_index % len(color_list)])
+            art = art_ax.scatter(pos_0_over_time[equation_name][time_index], pos_1_over_time[equation_name][time_index], s=12, color=color_list[equation_index % len(color_list)], label=equation_name)
             artists[-1].append(art)
+            legend_handles.append(art)
         # passive scalar
         for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
-            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap, norm=colors.Normalize(vmin=c_min, vmax=1.0))
+            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], passive_scalar_c_over_time[passive_scalar_name][time_index], c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap, norm=colors.Normalize(vmin=c_min, vmax=1.0), label=passive_scalar_name)
             artists[-1].append(art)
-    # legend
-    min_0 = min([np.concatenate(pos_0_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time[passive_scalar_name]).min() for equation in passive_scalar_list])
-    max_0 = max([np.concatenate(pos_0_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time[passive_scalar_name]).max() for equation in passive_scalar_list])
-    min_1 = min([np.concatenate(pos_1_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time[passive_scalar_name]).min() for equation in passive_scalar_list])
-    max_1 = max([np.concatenate(pos_1_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time[passive_scalar_name]).max() for equation in passive_scalar_list])
-    for equation_index, equation_name in enumerate(equation_name_list):
-        art_ax.text(
-            max_0,
-            max_1 - equation_index * (max_1 - min_1) / (len(equation_name_list) - 1),
-            equation_name, 
-            fontsize=8,
-            #color=color_list[equation_index % len(color_list)],
-            backgroundcolor=color_list[equation_index % len(color_list)]
-        )
-    # color bar
+            legend_handles.append(art)
+    # adjust the legend
+    art_ax.legend(handles=legend_handles, loc='upper right', labelcolor='white', facecolor='black', edgecolor='black')
+    # adjust the color bar
     cbar = art_fig.colorbar(cm.ScalarMappable(norm=colors.Normalize(vmin=c_min, vmax=1.0), cmap=cmap), ax=art_ax)
-    # cbar.outline.set_color('white')
     cbar.ax.tick_params(axis='y', colors='white')
     cbar.ax.set_yticklabels(cbar.ax.get_yticklabels(), color='white')
     cbar.set_label(r"$c / c_{\mathrm{max}}$", color='white')
-    # anim
+    # start animating
+    print("\tINFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
     anim.save("scalar_concentration_animation.mp4")
 
+
+
+    
+
     print("INFO: Animating log scale...", flush=True)
-    art_fig, art_ax = plt.subplots()
-    art_ax.set_aspect('equal', 'box')
-    # art_ax.grid(False)
-    # art_ax.axis('off')
+    # create figure
+    art_fig = plt.figure()
+    art_ax = art_fig.add_subplot(projection='3d')
+    art_ax.set_aspect('equal', adjustable='box')
+    art_ax.set_xlabel(r'$x$', color='white')
+    art_ax.set_ylabel(r'$y$', color='white')
+    art_ax.set_zlabel(r"$c / c_{\mathrm{max}}$", color='white')
+    # adjust colors
     art_ax.set_facecolor("black")
+    art_ax.xaxis.set_pane_color("black")
+    art_ax.yaxis.set_pane_color("black")
+    art_ax.zaxis.set_pane_color("black")
     art_fig.set_facecolor("black")
     art_ax.spines["bottom"].set_color("white")
     art_ax.spines["top"].set_color("white")
@@ -160,49 +184,41 @@ def main():
     art_ax.spines["right"].set_color("white")
     art_ax.xaxis.label.set_color('white')
     art_ax.yaxis.label.set_color('white')
+    art_ax.zaxis.label.set_color('white')
     art_ax.tick_params(axis='x', colors='white')
     art_ax.tick_params(axis='y', colors='white')
+    art_ax.tick_params(axis='z', colors='white')
     art_ax.grid(which='major', color='gray')
     art_ax.grid(which='minor', color='gray')
+    # set limits
     if args.xlim:
         art_ax.set_xlim(args.xlim[0], args.xlim[1])
     if args.ylim:
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
+    # plot data
+    print("\tINFO: Plotting...", flush=True)
     trajectories = {}
     artists = []
+    legend_handles = []
     for time_index, time in enumerate(time_array):
         artists.append([])
-        # trajectories
-        for equation_index, equation_name in enumerate(equation_name_list):
-            art = art_ax.scatter(np.concatenate(pos_0_over_time[equation_name][max(0, time_index-16):time_index+1]), np.concatenate(pos_1_over_time[equation_name][max(0, time_index-16):time_index+1]), s=2, color=color_list[equation_index % len(color_list)], alpha=0.25)
-            artists[-1].append(art)
-            art = art_ax.scatter(pos_0_over_time[equation_name][time_index], pos_1_over_time[equation_name][time_index], s=12, color=color_list[equation_index % len(color_list)])
-            artists[-1].append(art)
+        legend_handles.clear()
         # passive scalar
         for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
-            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap, norm=colors.LogNorm(vmin=c_min, vmax=1.0))
+            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], np.log10(passive_scalar_c_over_time[passive_scalar_name][time_index]), c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap, norm=colors.LogNorm(vmin=c_min, vmax=1.0), label=passive_scalar_name)
             artists[-1].append(art)
-    # legend
-    min_0 = min([np.concatenate(pos_0_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time[passive_scalar_name]).min() for equation in passive_scalar_list])
-    max_0 = max([np.concatenate(pos_0_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_0_over_time[passive_scalar_name]).max() for equation in passive_scalar_list])
-    min_1 = min([np.concatenate(pos_1_over_time[equation_name]).min() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time[passive_scalar_name]).min() for equation in passive_scalar_list])
-    max_1 = max([np.concatenate(pos_1_over_time[equation_name]).max() for equation in equation_name_list] + [np.concatenate(passive_scalar_pos_1_over_time[passive_scalar_name]).max() for equation in passive_scalar_list])
-    for equation_index, equation_name in enumerate(equation_name_list):
-        art_ax.text(
-            max_0,
-            max_1 - equation_index * (max_1 - min_1) / (len(equation_name_list) - 1),
-            equation_name, 
-            fontsize=8,
-            #color=color_list[equation_index % len(color_list)],
-            backgroundcolor=color_list[equation_index % len(color_list)]
-        )
-    # color bar
+            legend_handles.append(art)
+    # adjust ax
+    art_ax.zaxis.set_major_formatter(ticker.FuncFormatter(log_tick_formatter))
+    art_ax.zaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+    art_ax.legend(handles=legend_handles, loc='upper right', labelcolor='white', facecolor='black', edgecolor='black')
+    # adjust color bar
     cbar = art_fig.colorbar(cm.ScalarMappable(norm=colors.LogNorm(vmin=c_min, vmax=1.0), cmap=cmap), ax=art_ax)
-    # cbar.outline.set_color('white')
     cbar.ax.tick_params(axis='y', colors='white')
     cbar.ax.set_yticklabels(cbar.ax.get_yticklabels(), color='white')
     cbar.set_label(r"$c / c_{\mathrm{max}}$", color='white')
-    # anim
+    # start animating
+    print("\tINFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
     anim.save("scalar_concentration_animation_log_scale.mp4")
 

@@ -125,8 +125,9 @@ struct _PassiveParticlesParameters {
 			std::ostringstream ossIndex;
 			ossIndex << "passive_particles__index_" << std::setw(FormatNumber) << std::setfill('0') << subIndex;
 			// output
-			output[ossIndex.str() + "__pos_0"] = x[0];
-			output[ossIndex.str() + "__pos_1"] = x[1];
+			for(unsigned int i = 0; i < DIM; ++i) {
+				output[ossIndex.str() + "__pos_" + std::to_string(i)] = x[i];
+			}
 			// compute average
 			xAverage += x;
 		}

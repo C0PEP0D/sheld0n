@@ -18,24 +18,33 @@ def parse():
 def find_replace(file_pattern, text, replacement):
     files = glob.glob(file_pattern, recursive=True)
     if files:
-        for file in files:
-            lineno = 1
-            data_array = []
-            for line in fileinput.FileInput(file, inplace=True):
-                text_match = re.search(text, line)
-                if text_match:
-                    print(re.sub(text, replacement, line), end='')
-                    data_array.append({
-                        "text":text_match[0], 
-                        "replacement":replacement,
-                        "lineno":lineno
-                    })
-                else:
-                    print(line, end='')
-                lineno += 1
-            if data_array:
-                for data in data_array:
-                    print("INFO: {file}:{lineno}: {text} ---> {replacement}".format(file=file, **data))
+        for file_name in files:
+            content = ""
+            with open(file_name, 'r') as file:
+                content = file.read()
+            text_match = re.search(text, content)
+            if text_match:
+                print("INFO: {file}: {text} ---> {replacement}".format(file=file_name, text=text_match[0], replacement=replacement))
+            content = re.sub(text, replacement, content)
+            with open(file_name, 'w') as file:
+                file.write(content)
+            # lineno = 1
+            # data_array = []
+            # for line in fileinput.FileInput(file, inplace=True):
+            #     text_match = re.search(text, line)
+            #     if text_match:
+            #         print(re.sub(text, replacement, line), end='')
+            #         data_array.append({
+            #             "text":text_match[0], 
+            #             "replacement":replacement,
+            #             "lineno":lineno
+            #         })
+            #     else:
+            #         print(line, end='')
+            #     lineno += 1
+            # if data_array:
+            #     for data in data_array:
+            #         print("INFO: {file}:{lineno}: {text} ---> {replacement}".format(file=file, **data))
             # else:
             #     print("WARNING: " + text + " not found in " + file)
     # else:
