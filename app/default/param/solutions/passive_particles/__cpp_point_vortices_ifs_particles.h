@@ -13,7 +13,9 @@
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
 
+// FLAG: INCLUDE OTHER SOLUTION START
 #include "param/solutions/ifs_particles/parameters.h"
+// FLAG: INCLUDE OTHER SOLUTION END
 #include "param/run/parameters.h"
 
 // FLAG: DYNAMIC
@@ -193,7 +195,7 @@ struct _PassiveParticlesParameters {
 	static std::map<std::string, tScalar> post(const double* pState, const unsigned int stateSize, const double t) {
 		std::map<std::string, double> output;
 
-		// ---------------- CUSTOM INIT START
+		// ---------------- CUSTOM POST START
 
 		unsigned int number = tVariable::groupSize(stateSize);
 		unsigned int formatNumber = int(std::log10(number)) + 1;
@@ -217,7 +219,8 @@ struct _PassiveParticlesParameters {
 			output["passive_particles__average_pos_" + std::to_string(i)] = xAverage[i];
 		}
 
-		// ---------------- CUSTOM INIT END
+		// ---------------- CUSTOM POST END
+		
 		return output;
 	}
 };

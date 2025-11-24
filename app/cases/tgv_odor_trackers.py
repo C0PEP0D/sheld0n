@@ -15,13 +15,20 @@ def set_flow_tgv():
 
 def set_solutions_passive_scalar_blobs():
     os.chdir('param/solutions')
+    # passive scalar blobs
     os.system('./.cli_create_new_equation passive_scalar_blobs')
     os.chdir('passive_scalar_blobs')
     os.system('./.cli_choose cpp_passive_scalar_blobs')
     os.chdir('..')
+    # odor trackers
+    os.system('./.cli_create_new_equation odor_trackers_gradient')
+    os.chdir('odor_trackers_gradient')
+    os.system('./.cli_choose cpp_odor_trackers_gradient')
+    os.chdir('..')
     os.chdir('../..')
     # set parameters
-    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingProfile true') # activate profile post processing
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs HasSource true') # add source of scalar
+    os.system('./.cli_set_parameter param/solutions/odor_trackers_gradient Number "EnvParameters::cGroupSize/16"') # reduce number of trackers
 
 def main():
     set_flow_tgv()
@@ -40,8 +47,7 @@ def main():
     code_dir = script_dir + "/../.."
     ## copy
     shutil.copy(code_dir + "/app/post/generate_scalar_concentration_animation_2d.py", "post_process/generate_scalar_concentration_animation_2d.py")
-    shutil.copy(code_dir + "/app/post/generate_profile_c_animation.py", "post_process/generate_profile_c_animation.py")
-    shutil.copy(code_dir + "/app/post/plot_profile_c_moments_over_time.py", "post_process/plot_profile_c_moments_over_time.py")
+    shutil.copy(code_dir + "/app/post/generate_trajectory_animation_2d.py", "post_process/generate_trajectory_animation_2d.py")
     # remove symbolic link
     os.unlink("learn")
     # shutil.rmtree("param/learn")

@@ -48,17 +48,20 @@ def main(input_begin, input_end):
     print("INFO: Reading equation property over time...", flush=True)
     profile_c_x_over_time = {}
     profile_c_c_over_time = {}
+    profile_c_c_grad_over_time = {}
     c_max = 0.0
     for passive_scalar_name in passive_scalar_list:
         profile_c_x_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "profile_c__.*__x", time_dir_array)
         profile_c_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "profile_c__.*__c", time_dir_array)
+        profile_c_c_grad_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "profile_c__.*__cGradient", time_dir_array)
         # c_max
         c_max = max(c_max, np.array([x for c in np.nan_to_num(profile_c_c_over_time[passive_scalar_name]) for x in c]).max())
     # normalizing by c_max
     for passive_scalar_name in passive_scalar_list:
         profile_c_c_over_time[passive_scalar_name] = [np.array(c)/c_max for c in profile_c_c_over_time[passive_scalar_name]]
+        profile_c_c_grad_over_time[passive_scalar_name] = [np.array(c)/c_max for c in profile_c_c_grad_over_time[passive_scalar_name]]
 
-    print("INFO: Animating basic...", flush=True)
+    print("INFO: Animating c...", flush=True)
     art_fig, art_ax = plt.subplots()
     art_ax.set_xlabel(r'$x$')
     art_ax.set_ylabel(r'$c / c_{\mathrm{max}}$')
@@ -77,8 +80,29 @@ def main(input_begin, input_end):
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
     anim.save("profile_c_animation.mp4")
 
+    print("INFO: Animating grad...", flush=True)
+    art_fig, art_ax = plt.subplots()
+    art_ax.set_xlabel(r'$x$')
+    art_ax.set_ylabel(r'$\left ( \nabla c \right)_x / c_{\mathrm{max}}$')
+    artists = []
+    for time_index, time in enumerate(time_array):
+        # init
+        artists.append([])
+        # passive scalar
+        for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
+            if profile_c_x_over_time[passive_scalar_name][time_index].size > 0:
+                arts = art_ax.plot(profile_c_x_over_time[passive_scalar_name][time_index], profile_c_c_grad_over_time[passive_scalar_name][time_index], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
+                artists[-1] += arts
+                # arts = art_ax.plot(profile_c_x_over_time[passive_scalar_name][time_index], np.gradient(profile_c_c_over_time[passive_scalar_name][time_index], profile_c_x_over_time[passive_scalar_name][time_index]), marker=marker_list[passive_scalar_index % len(marker_list)], color="black", label=passive_scalar_name)
+                # artists[-1] += arts
+    # legend
+    art_ax.legend(handles=artists[-1], loc='upper right')
+    # anim
+    anim = animation.ArtistAnimation(art_fig, artists, interval=33)
+    anim.save("profile_grad_animation.mp4")
 
-    print("INFO: Animating log...", flush=True)
+
+    print("INFO: Animating c log...", flush=True)
     art_fig, art_ax = plt.subplots()
     art_ax.set_yscale('log')
     art_ax.set_xlabel(r'$x$')
