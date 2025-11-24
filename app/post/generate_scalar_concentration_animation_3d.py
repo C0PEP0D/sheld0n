@@ -130,7 +130,7 @@ def main():
     if args.ylim:
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
     # plot the data
-    print("\tINFO: Plotting...", flush=True)
+    print("INFO: Plotting...", flush=True)
     trajectories = {}
     artists = []
     legend_handles = []
@@ -157,7 +157,7 @@ def main():
     cbar.ax.set_yticklabels(cbar.ax.get_yticklabels(), color='white')
     cbar.set_label(r"$c / c_{\mathrm{max}}$", color='white')
     # start animating
-    print("\tINFO: Animating and Saving...", flush=True)
+    print("INFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
     anim.save("scalar_concentration_animation.mp4")
 
@@ -197,7 +197,7 @@ def main():
     if args.ylim:
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
     # plot data
-    print("\tINFO: Plotting...", flush=True)
+    print("INFO: Plotting...", flush=True)
     trajectories = {}
     artists = []
     legend_handles = []
@@ -224,7 +224,7 @@ def main():
     cbar.ax.set_yticklabels(cbar.ax.get_yticklabels(), color='white')
     cbar.set_label(r"$c / c_{\mathrm{max}}$", color='white')
     # start animating
-    print("\tINFO: Animating and Saving...", flush=True)
+    print("INFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
     anim.save("scalar_concentration_animation_log_scale.mp4")
 

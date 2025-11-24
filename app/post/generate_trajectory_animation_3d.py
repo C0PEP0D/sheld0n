@@ -102,7 +102,7 @@ def main():
     if args.ylim:
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
     # plot the data
-    print("\tINFO: Plotting...", flush=True)
+    print("INFO: Plotting...", flush=True)
     trajectories = {}
     artists = []
     legend_handles = []
@@ -119,7 +119,7 @@ def main():
     art_ax.set_aspect('equal', adjustable='box')
     art_ax.legend(handles=legend_handles, loc='upper right', labelcolor='white', facecolor='black', edgecolor='black')
     # start animating
-    print("\tINFO: Animating and Saving...", flush=True)
+    print("INFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
     anim.save("trajectory_animation.mp4")
 
