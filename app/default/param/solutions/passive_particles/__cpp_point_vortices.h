@@ -237,7 +237,7 @@ struct _PassiveParticlesParameters {
 
 	static const unsigned int InitNumber = EnvParameters::cGroupSize;
 	static constexpr double InitCirculation = 1.0/InitNumber;
-	inline static const tSpaceVector InitCenter = EnvParameters::cDomainCenter;
+	inline static const tSpaceVector InitCenter = EnvParameters::cDomainCenter - tSpaceVector({0.5 * EnvParameters::cDomainSize[0], 0.0});
 	static const bool IsInitRandomInDomain = true;
 	inline static const tSpaceVector InitSize = EnvParameters::cDomainSize;
 	static const bool IsInitDipole = false;
