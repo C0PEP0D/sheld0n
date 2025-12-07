@@ -6,6 +6,9 @@
 #include <map>
 #include <iomanip>
 
+// lib includes
+#include "sp0ce/operators.h"
+
 // app includes
 #include "core/solutions/core.h"
 #include "param/flow/parameters.h"
@@ -24,18 +27,23 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = DIM; // dimension of the state variable 
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
+	// periodicity
+	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
+	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
+	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
 
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// variable
-	
 	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
 	
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
 			// input
 			double* pState = stateArray[0].data() + memberStateIndex;
-
 			// ---------------- CUSTOM CONSTRAIN START
+
+			tView<tSpaceVector> x(pState);
+			x = sp0ce::xPeriodic<tSpaceVector>(x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 
 			// ---------------- CUSTOM CONSTRAIN END
 		}
@@ -45,11 +53,9 @@ struct _PassiveParticlesParameters {
 	using tVariable = tGroupVariable;
 
 	// equation
-
 	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
-
 			// ---------------- CUSTOM PREPARATION START
 
 			const tView<const tSpaceVector> cX(pState);
@@ -74,53 +80,52 @@ struct _PassiveParticlesParameters {
 			// output
 			tView<tSpaceVector> dX(dState.data());
 			dX = u;
-			
+
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
 			return dState;
 		}
-
 	};
 	using tGroupEquation = d0t::EquationGroupStatic<tGroupVariable, tMemberEquation>;
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
-
 	inline static const tSpaceVector BoxCenter = EnvParameters::cDomainCenter;
 	inline static const tSpaceVector BoxSize = EnvParameters::cDomainSize;
-
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {
 		// ---------------- CUSTOM INIT START
+
 		// interpret BoxCenter and BoxSize as vectors
 		const tSpaceVector boxCenter = tView<const tSpaceVector>(BoxCenter.data());
 		const tSpaceVector boxSize = tView<const tSpaceVector>(BoxSize.data());
 		// loop over each member of the variable group
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
 			// get the state variable of the subIndex member of the group
-			double* pMemberState = tVariable::state(pState, subIndex);
+			double* pSubState = tVariable::state(pState, subIndex);
 			// interpret subState as a tSpaceVector
-			tView<tSpaceVector> x(pMemberState);
+			tView<tSpaceVector> x(pSubState);
 			// set the initial position of this member
 			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
 		}
+
 		// ---------------- CUSTOM INIT END
 	}
 
-	inline static unsigned int FormatNumber = int(std::log10(Number)) + 1;
+	inline static const unsigned int FormatNumber = int(std::log10(Number)) + 1;
 
 	static std::map<std::string, tScalar> post(const double* pState, const double t) {
 		std::map<std::string, double> output;
 
-		// ---------------- CUSTOM INIT START
+		// ---------------- CUSTOM POST START
 
 		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
-			const double* pMemberState = tVariable::cState(pState, subIndex);
+			const double* pSubState = tVariable::cState(pState, subIndex);
 			// input
-			const tView<const tSpaceVector> x(pMemberState);
+			const tView<const tSpaceVector> x(pSubState);
 			// generate formated index
 			std::ostringstream ossIndex;
 			ossIndex << "passive_particles__index_" << std::setw(FormatNumber) << std::setfill('0') << subIndex;
@@ -132,10 +137,11 @@ struct _PassiveParticlesParameters {
 			xAverage += x;
 		}
 		xAverage /= Number;
-		output["passive_particles__average_pos_0"] = xAverage[0];
-		output["passive_particles__average_pos_1"] = xAverage[1];
+		for(unsigned int i = 0; i < DIM; ++i) {
+			output["passive_particles__average_pos_" + std::to_string(i)] = xAverage[i];
+		}
 
-		// ---------------- CUSTOM INIT END
+		// ---------------- CUSTOM POST END
 		return output;
 	}
 };

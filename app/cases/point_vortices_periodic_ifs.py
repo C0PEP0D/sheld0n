@@ -3,22 +3,26 @@
 import os
 import shutil
 
-def set_flow_point_vortices_ifs_particles():
+def set_flow_point_vortices():
     os.chdir('param/flow')
     os.system('./.cli_choose cpp_point_vortices')
     os.chdir('../..')
     # solutions
     os.chdir('param/solutions')
-    os.system('./.cli_create_new_equation point_vortices -p cpp_point_vortices_ifs_particles')
+    os.system('./.cli_create_new_equation point_vortices -p cpp_point_vortices')
     os.chdir('../..')
-    # parameters
+    # parameters flow
+    os.system('./.cli_set_parameter param/flow meanVelocity "{1.0, 0.0}"')
+    # parameters solutions
+    os.system('./.cli_set_parameter param/solutions/point_vortices IsInitRandomInDomain false')
+    os.system('./.cli_set_parameter param/solutions/point_vortices IsInitDipole false')
     ## param
     os.system('./.cli_set_parameter param cLength 1.0')
     os.system('./.cli_set_parameter param cTime 1.0')
     os.system('./.cli_set_parameter param cDomainSize "{1.0, 1.0}"')
-    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{false, false}"')
+    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{true, true}"')
 
-def set_solutions_ifs_particles():
+def set_solutions():
     os.chdir('param/solutions')
     # ifs swimmers
     os.system('./.cli_create_new_equation ifs_particles')
@@ -35,11 +39,11 @@ def set_solutions_ifs_particles():
     os.system('./.cli_set_parameter param/run NSave "NTime"')
 
 def main():
-    set_flow_point_vortices_ifs_particles()
+    set_flow_point_vortices()
     # edit meanVelocity
     os.system('./.cli_set_parameter param/flow meanVelocity "tSpaceVector({1.0, 0.0})"')
     # ifs particles
-    set_solutions_ifs_particles()
+    set_solutions()
     # edit passive_particles
     os.chdir('param/solutions/passive_particles')
     os.system('./.cli_choose cpp_source_of_passive_particles')

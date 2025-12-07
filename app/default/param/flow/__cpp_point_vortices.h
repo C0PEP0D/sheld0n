@@ -3,8 +3,7 @@
 #pragma once
 
 #include "pl0f/point_vortex.h"
-// #include "core/solutions/core.h"
-// #include "param/solutions/parameters.h"
+#include "param/parameters.h"
 
 namespace c0p {
 
@@ -12,9 +11,13 @@ struct Flow {
 
 	inline static const double dx = std::pow(2, -4); // basically the spatial resolution of the flow, should be the inverse of the density of points
 	inline static const tSpaceVector meanVelocity = tSpaceVector::Zero();
+	// periodicity
+	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
+	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
+	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
 
 	using PointVortexFlow = pl0f::PointVortexFlow<DIM, tSpaceVector, tSpaceMatrix, tView>;
-	inline static PointVortexFlow flow = PointVortexFlow(dx, meanVelocity);
+	inline static PointVortexFlow flow = PointVortexFlow(dx, meanVelocity, periodCenter, periodSize, isAxisPeriodic);
 
 	// using tVorticesEquation = _PassiveParticles; // name of the vortices
 

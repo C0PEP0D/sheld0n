@@ -24,6 +24,10 @@ struct _PassiveParticlesParameters {
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
 	static constexpr double ReactionTime = 1.0;
+	// periodicity
+	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
+	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
+	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
@@ -33,6 +37,9 @@ struct _PassiveParticlesParameters {
 			double* pState = stateArray[0].data() + memberStateIndex;
 
 			// ---------------- CUSTOM CONSTRAIN START
+
+			tView<tSpaceVector> x(pState);
+			x = sp0ce::xPeriodic<tSpaceVector>(x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 
 			// ---------------- CUSTOM CONSTRAIN END
 		}

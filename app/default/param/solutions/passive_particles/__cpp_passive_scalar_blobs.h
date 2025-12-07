@@ -53,7 +53,7 @@ struct _PassiveParticlesParameters {
 	inline static const double SourceS = InitS;
 	inline static const double SourceReactionTime = 1.0;
 
-	// periodicity (if activated)
+	// periodicity
 	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
 	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
 	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
@@ -66,8 +66,7 @@ struct _PassiveParticlesParameters {
 
 	// scalar field
 	using ScalarField = pl0f::ScalarField<DIM, tSpaceVector, tSpaceMatrix, tView>;
-	inline static ScalarField scalarField = ScalarField(MergeDx, IsSplitting); // swap comments to activate periodicity
-	// inline static ScalarField scalarField = ScalarField(MergeDx, IsSplitting, periodCenter, periodSize, isAxisPeriodic); // swap comments to deactivate periodicity
+	inline static ScalarField scalarField = ScalarField(MergeDx, IsSplitting, periodCenter, periodSize, isAxisPeriodic);
 
 	// variable
 
@@ -78,6 +77,9 @@ struct _PassiveParticlesParameters {
 			double* pState = stateArray[StateIndex].data() + memberStateIndex;
 
 			// ---------------- CUSTOM CONSTRAIN START
+
+			tView<tSpaceVector> x(pState);
+			x = sp0ce::xPeriodic<tSpaceVector>(x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 
 			// ---------------- CUSTOM CONSTRAIN END
 		}
@@ -362,7 +364,7 @@ struct _PassiveParticlesParameters {
 		}
 
 		if(IsPostProcessingConcentrationProfile) { // profile
-			unsigned int number = std::round(4.0 * M_PI/MergeDx);
+			unsigned int number = std::round(EnvParameters::cDomainSize[0]/MergeDx);
 			unsigned int formatNumber = int(std::log10(number)) + 1;
 			
 			for(unsigned int index = 0; index < number; ++index) {

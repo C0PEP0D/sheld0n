@@ -13,8 +13,10 @@
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
 
-// #include "param/solutions/point_vortices/parameters.h"
-// #include "param/run/parameters.h"
+// ---------------- INCLUDE OTHER PARAM START
+#include "param/solutions/point_vortices/parameters.h"
+#include "param/run/parameters.h"
+// ---------------- INCLUDE OTHER PARAM END
 
 namespace c0p {
 
@@ -29,6 +31,10 @@ struct _PassiveParticlesParameters {
 	static const unsigned Number = 16;// EnvParameters::cGroupSize; // number of members in the group
 	static constexpr double ReactionLength = 1.0;
 	static constexpr double Width = std::pow(2, -3);
+	// periodicity
+	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
+	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
+	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
 
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
@@ -40,6 +46,23 @@ struct _PassiveParticlesParameters {
 			
 			// ---------------- CUSTOM CONSTRAIN START
 
+			// input
+
+			tView<tSpaceVector> x(pState);
+
+			// periodicity
+			
+			x = sp0ce::xPeriodic<tSpaceVector>(x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
+
+			// flow coupling
+
+			using PointVorticesParameters = _PointVorticesParameters;
+			
+			const tView<const tSpaceVector> v(pState + DIM);
+			const tSpaceVector u = Flow::getVelocity(x.data(), t);
+	
+			const tSpaceVector dVelocity = -(u - v) * (u - v).norm() / Width * RunParameters::Dt;
+			PointVorticesParameters::tGroupVariable::addVelocity(x.data(), dVelocity.data(), Width);
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 

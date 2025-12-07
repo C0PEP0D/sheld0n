@@ -9,9 +9,14 @@ def set_flow_point_vortices_jet():
     os.chdir('../..')
     # solutions
     os.chdir('param/solutions')
-    os.system('./.cli_create_new_equation point_vortices -p cpp_point_vortices_jet')
+    os.system('./.cli_create_new_equation point_vortices -p cpp_point_vortices')
     os.chdir('../..')
     # parameters
+    ## point vortices
+    os.system('./.cli_set_parameter param/solutions/point_vortices HasJetSource true')
+    os.system('./.cli_set_parameter param/solutions/point_vortices IsMergingNeighborPoints true')
+    os.system('./.cli_set_parameter param/solutions/point_vortices IsInitRandomInDomain false')
+    os.system('./.cli_set_parameter param/solutions/point_vortices IsInitDipole false')
     ## param
     os.system('./.cli_set_parameter param cLength 1.0')
     os.system('./.cli_set_parameter param cTime 1.0')

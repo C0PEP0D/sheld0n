@@ -3,7 +3,7 @@
 import os
 import shutil
 
-def set_flow_point_vortices():
+def set_flow_point_vortices_periodic():
     os.chdir('param/flow')
     os.system('./.cli_choose cpp_point_vortices')
     os.chdir('../..')
@@ -31,8 +31,21 @@ def set_flow_point_vortices():
     os.system('./.cli_set_parameter param/run NTime "int(16.0/Dt)"')
     os.system('./.cli_set_parameter param/run NSave "NTime/16"')
 
+def set_solutions():
+    os.chdir('param/solutions')
+    # passive scalar blobs
+    os.system('./.cli_create_new_equation passive_scalar_blobs')
+    os.chdir('passive_scalar_blobs')
+    os.system('./.cli_choose cpp_passive_scalar_blobs')
+    os.chdir('..')
+    # back
+    os.chdir('../..')
+    # set parameters
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingConcentrationProfile true') # activate profile post processing
+
 def main():
-    set_flow_point_vortices()
+    set_flow_point_vortices_periodic()
+    set_solutions()
     # post processing
     ## input
     script_dir = os.path.dirname(os.path.realpath(__file__))

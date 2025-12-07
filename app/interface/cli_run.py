@@ -23,6 +23,7 @@ def run(args):
     flags = "-DCMAKE_BUILD_TYPE=Release"
     if args.debug:
         flags = "-DCMAKE_BUILD_TYPE=Debug"
+        # flags = "-DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=-pg -DCMAKE_CXX_FLAGS=-pg"
     if args.compiler:
         if "gcc" in args.compiler:
             flags += " -DCMAKE_C_COMPILER={compiler}".format(compiler=args.compiler)

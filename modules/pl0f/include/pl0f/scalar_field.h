@@ -175,10 +175,13 @@ struct ScalarField {
 					const std::vector<std::array<int, Dim>> neighborIjkArray = binTree.data[i].ijkToNeighborIjk( ijk.data() );
 					
 					// compute
+					std::vector<std::array<int, Dim>> newChildrenIjkArray;
+					newChildrenIjkArray.reserve(childrenIjkArray.size());
+					
 					for(auto const& childIjk : childrenIjkArray) {
-						if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
-							auto iterator = ijkToSuperIndex[i].find(childIjk);
-							if(iterator != ijkToSuperIndex[i].end()) {
+						auto iterator = ijkToSuperIndex[i].find(childIjk);
+						if(iterator != ijkToSuperIndex[i].end()) {
+							if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
 								const unsigned int superIndex = iterator->second;
 								const double* pSuperState = superStateArray[i].data() + superIndex * BlobStateSize;
 								const tView<const tVector> superX(pSuperState);
@@ -191,15 +194,13 @@ struct ScalarField {
 								const tVector r = sp0ce::abPeriodic<tVector, tView>(superX.data(), x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 								// concentration
 								output += superC * std::exp(-0.5 * r.transpose() * superS.inverse() * r);
+							} else {
+								const std::vector<std::array<int, Dim>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(childIjk.data());
+								newChildrenIjkArray.insert(newChildrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
 							}
 						}
 					}
-					// next
-					childrenIjkArray.clear();
-					for(const std::array<int, Dim>& neighborIjk : neighborIjkArray) {
-						const std::vector<std::array<int, Dim>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(neighborIjk.data());
-						childrenIjkArray.insert(childrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
-					}
+					newChildrenIjkArray = newChildrenIjkArray;
 				}
 
 				{ // i == 0
@@ -260,10 +261,13 @@ struct ScalarField {
 					const std::vector<std::array<int, Dim>> neighborIjkArray = binTree.data[i].ijkToNeighborIjk( ijk.data() );
 					
 					// compute
+					std::vector<std::array<int, Dim>> newChildrenIjkArray;
+					newChildrenIjkArray.reserve(childrenIjkArray.size());
+					
 					for(auto const& childIjk : childrenIjkArray) {
-						if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
-							auto iterator = ijkToSuperIndex[i].find(childIjk);
-							if(iterator != ijkToSuperIndex[i].end()) {
+						auto iterator = ijkToSuperIndex[i].find(childIjk);
+						if(iterator != ijkToSuperIndex[i].end()) {
+							if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
 								const unsigned int superIndex = iterator->second;
 								const double* pSuperState = superStateArray[i].data() + superIndex * BlobStateSize;
 								const tView<const tVector> superX(pSuperState);
@@ -277,15 +281,13 @@ struct ScalarField {
 								const tVector r = sp0ce::abPeriodic<tVector, tView>(superX.data(), x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 								// concentration
 								output += -superC * superSInverse * r * std::exp(-0.5 * r.transpose() * superSInverse * r);
+							} else {
+								const std::vector<std::array<int, Dim>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(childIjk.data());
+								newChildrenIjkArray.insert(newChildrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
 							}
 						}
 					}
-					// next
-					childrenIjkArray.clear();
-					for(const std::array<int, Dim>& neighborIjk : neighborIjkArray) {
-						const std::vector<std::array<int, Dim>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(neighborIjk.data());
-						childrenIjkArray.insert(childrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
-					}
+					newChildrenIjkArray = newChildrenIjkArray;
 				}
 
 				{ // i == 0

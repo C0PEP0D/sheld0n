@@ -3,7 +3,7 @@
 import os
 import shutil
 
-def set_flow_point_vortices_dipole():
+def set_flow_point_vortices():
     os.chdir('param/flow')
     os.system('./.cli_choose cpp_point_vortices')
     os.chdir('../..')
@@ -11,10 +11,13 @@ def set_flow_point_vortices_dipole():
     os.chdir('param/solutions')
     os.system('./.cli_create_new_equation point_vortices')
     os.chdir('point_vortices')
-    os.system('./.cli_choose cpp_point_vortices_dipole')
+    os.system('./.cli_choose cpp_point_vortices')
     os.chdir('..')
     os.chdir('../..')
     # parameters
+    ## point vortices
+    os.system('./.cli_set_parameter param/solutions/point_vortices IsInitRandomInDomain false')
+    os.system('./.cli_set_parameter param/solutions/point_vortices IsInitDipole true')
     ## param
     os.system('./.cli_set_parameter param cLength 1.0')
     os.system('./.cli_set_parameter param cTime 1.0')
@@ -26,7 +29,7 @@ def set_flow_point_vortices_dipole():
     os.system('./.cli_set_parameter param/run NSave "NTime/16"')
 
 def main():
-    set_flow_point_vortices_dipole()
+    set_flow_point_vortices()
     # post processing
     ## input
     script_dir = os.path.dirname(os.path.realpath(__file__))

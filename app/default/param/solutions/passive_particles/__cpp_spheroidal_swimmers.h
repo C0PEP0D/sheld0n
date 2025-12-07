@@ -27,6 +27,10 @@ struct _PassiveParticlesParameters {
 	static constexpr double AspectRatio = 1.0; // aspect ratio of the spheroidal particles
 	static constexpr double Factor = (AspectRatio*AspectRatio - 1.0) / (AspectRatio*AspectRatio + 1.0); // factor used in the equation
 	static constexpr float SwimmingVelocity = 0.5;
+	// periodicity
+	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
+	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
+	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
 
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
@@ -37,6 +41,13 @@ struct _PassiveParticlesParameters {
 			double* pState = stateArray[0].data() + memberStateIndex;
 
 			// ---------------- CUSTOM CONSTRAIN START
+
+			// periodicity
+
+			tView<tSpaceVector> x(pState);
+			x = sp0ce::xPeriodic<tSpaceVector>(x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
+
+			// p normalization
 
 			tView<tSpaceVector> p(pState + DIM);
 			p.normalize();

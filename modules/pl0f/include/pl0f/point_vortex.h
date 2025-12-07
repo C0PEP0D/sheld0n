@@ -64,6 +64,7 @@ struct PointVortexFlow {
 			for(unsigned int index = 0; index < number; ++index) {
 				const tVector x = sp0ce::xPeriodic<tVector>(pState + index * VortexStateSize, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 				const double& w = pState[index * VortexStateSize + Dim];
+				
 				binTree.addIndex(index, x.data());
 			}
 			// super
@@ -137,6 +138,7 @@ struct PointVortexFlow {
 	public:
 		tVector getVelocity(const double* pX) const {
 			tVector output = tVector::Zero();
+
 			const tVector x = sp0ce::xPeriodic<tVector>(pX, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 
 			std::vector<std::array<int, Dim>> childrenIjkArray;
@@ -147,11 +149,15 @@ struct PointVortexFlow {
 			for(unsigned int i = binTree.data.size() - 1; i > 0; --i) {
 				const std::array<int, Dim> ijk = binTree.data[i].positionToIjk(x.data());
 				const std::vector<std::array<int, Dim>> neighborIjkArray = binTree.data[i].ijkToNeighborIjk( ijk.data() );
+
 				// compute
+				std::vector<std::array<int, Dim>> newChildrenIjkArray;
+				newChildrenIjkArray.reserve(childrenIjkArray.size());
+				
 				for(auto const& childIjk : childrenIjkArray) {
-					if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
-						auto iterator = ijkToSuperIndex[i].find(childIjk);
-						if(iterator != ijkToSuperIndex[i].end()) {
+					auto iterator = ijkToSuperIndex[i].find(childIjk);
+					if(iterator != ijkToSuperIndex[i].end()) {
+						if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
 							const unsigned int superIndex = iterator->second;
 							const tView<const tVector> superX(&(superStateArray[i][superIndex * VortexStateSize]));
 							const double superW = superStateArray[i][superIndex * VortexStateSize + Dim];
@@ -163,15 +169,13 @@ struct PointVortexFlow {
 							} else {
 								output += sp0ce::cross2d<tVector>(superW, r.data()) * std::pow(1.0/sigma, 2);
 							}
+						} else {
+							const std::vector<std::array<int, Dim>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(childIjk.data());
+							newChildrenIjkArray.insert(newChildrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
 						}
 					}
 				}
-				// next
-				childrenIjkArray.clear();
-				for(const std::array<int, Dim>& neighborIjk : neighborIjkArray) {
-					const std::vector<std::array<int, Dim>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(neighborIjk.data());
-					childrenIjkArray.insert(childrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
-				}
+				childrenIjkArray = newChildrenIjkArray;
 			}
 
 			{ // i == 0
@@ -195,8 +199,9 @@ struct PointVortexFlow {
 					}
 				}
 			}
-			output *= 0.5; // 2D
 			
+			output *= 0.5; // 2D
+
 			return meanVelocity + output;
 		};
 
@@ -212,11 +217,15 @@ struct PointVortexFlow {
 			for(unsigned int i = binTree.data.size() - 1; i > 0; --i) {
 				const std::array<int, Dim> ijk = binTree.data[i].positionToIjk(x.data());
 				const std::vector<std::array<int, Dim>> neighborIjkArray = binTree.data[i].ijkToNeighborIjk( ijk.data() );
+
 				// compute
+				std::vector<std::array<int, Dim>> newChildrenIjkArray;
+				newChildrenIjkArray.reserve(childrenIjkArray.size());
+
 				for(auto const& childIjk : childrenIjkArray) {
-					if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
-						auto iterator = ijkToSuperIndex[i].find(childIjk);
-						if(iterator != ijkToSuperIndex[i].end()) {
+					auto iterator = ijkToSuperIndex[i].find(childIjk);
+					if(iterator != ijkToSuperIndex[i].end()) {
+						if(std::find(neighborIjkArray.begin(), neighborIjkArray.end(), childIjk) == neighborIjkArray.end()) {
 							const unsigned int superIndex = iterator->second;
 							const tView<const tVector> superX(&(superStateArray[i][superIndex * VortexStateSize]));
 							const double superW = superStateArray[i][superIndex * VortexStateSize + Dim];
@@ -232,15 +241,13 @@ struct PointVortexFlow {
 							} else {
 								output += sp0ce::cross2d<tVector>(superW, r.data()) * r.transpose() * std::pow(1.0/sigma, 2);
 							}
+						} else {
+							const std::vector<std::array<int, Dim>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(childIjk.data());
+							newChildrenIjkArray.insert(newChildrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
 						}
 					}
 				}
-				// next
-				childrenIjkArray.clear();
-				for(const std::array<int, Dim>& neighborIjk : neighborIjkArray) {
-					const std::vector<std::array<int, Dim>>& neighborChildren = binTree.data[i].ijkToChildrenIjk(neighborIjk.data());
-					childrenIjkArray.insert(childrenIjkArray.end(), neighborChildren.begin(), neighborChildren.end());
-				}
+				childrenIjkArray = newChildrenIjkArray;
 			}
 
 			{ // i == 0

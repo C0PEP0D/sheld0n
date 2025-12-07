@@ -6,6 +6,9 @@
 #include <map>
 #include <iomanip>
 
+// eigen includes
+#include <unsupported/Eigen/MatrixFunctions>
+
 // app includes
 #include "core/solutions/core.h"
 #include "param/flow/parameters.h"
@@ -26,11 +29,15 @@ struct _PassiveParticlesParameters {
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
 
-	static const unsigned StateSize = DIM + DIM; // dimension of the state variable
+	static const unsigned StateSize = DIM; // dimension of the state variable
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
 	static constexpr double SwimmingVelocity = 0.5;
-	static constexpr double ReactionTime = 1.0/128.0;
+	static constexpr double TimeHorizon = 0.5;
+	// periodicity
+	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
+	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
+	inline static const std::array<bool, DIM> isAxisPeriodic = EnvParameters::cDomainIsAxisPeriodic;
 
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
@@ -45,9 +52,7 @@ struct _PassiveParticlesParameters {
 			// ---------------- CUSTOM CONSTRAIN START
 
 			tView<tSpaceVector> x(pState);
-			tView<tSpaceVector> p(pState + DIM);
-
-			p = p.normalized();
+			x = sp0ce::xPeriodic<tSpaceVector>(x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 
 			// ---------------- CUSTOM CONSTRAIN END
 		}
@@ -66,6 +71,7 @@ struct _PassiveParticlesParameters {
 
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
+			Flow::prepareVelocityGradients(cX.data(), t);
 
 			// ---------------- CUSTOM PREPARATION END
 		}
@@ -81,9 +87,9 @@ struct _PassiveParticlesParameters {
 
 			// input
 			const tView<const tSpaceVector> x(pState);
-			const tView<const tSpaceVector> p(pState + DIM);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
+			const tSpaceMatrix j = Flow::getVelocityGradients(x.data(), t);
 			// odor
 			using PassiveScalarBlobsParameters = _PassiveScalarBlobsParameters;
 			const double* pPassiveScalarBlobsState  = pStateArray[PassiveScalarBlobsParameters::StateIndex];
@@ -93,14 +99,12 @@ struct _PassiveParticlesParameters {
 			const double cGradientNorm = cGradient.norm();
 			// output
 			tView<tSpaceVector> dX(dState.data());
-			tView<tSpaceVector> dP(dState.data() + DIM);
 			// equation
-			dX = u + p.normalized() * SwimmingVelocity;
 			if(cGradientNorm > 0.0) {
-				const tSpaceVector cGradientNormalized = cGradient / cGradientNorm;
-				dP = (cGradientNormalized - p) * cGradientNorm / ReactionTime;
+				// const tSpaceVector cGradientNormalized = cGradient / cGradientNorm;
+				dX = u + SwimmingVelocity *  ( (j * TimeHorizon).exp().transpose() * cGradient ).normalized();
 			} else {
-				dP = tSpaceVector::Zero();
+				dX = u;
 			}
 
 			// ---------------- CUSTOM EQUATION END
@@ -129,10 +133,8 @@ struct _PassiveParticlesParameters {
 			double* pMemberState = tVariable::state(pState, subIndex);
 			// interpret subState as a tSpaceVector
 			tView<tSpaceVector> x(pMemberState);
-			tView<tSpaceVector> p(pMemberState + DIM);
 			// set the initial position of this member
 			x = BoxCenter + 0.5 * BoxSize.asDiagonal() * tSpaceVector::Random();
-			p = tSpaceVector::Random().normalized();
 		}
 
 		// ---------------- CUSTOM INIT END
