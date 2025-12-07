@@ -115,6 +115,7 @@ struct _PassiveParticlesParameters {
 			}
 
 			if(IsMergingNeighborPoints) {
+				Flow::prepare(_state.data(), tBase::groupSize(_state.size()));
 				_state = Flow::flow.superStateArray[0];
 			}
 
@@ -227,7 +228,7 @@ struct _PassiveParticlesParameters {
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
 			tBase::prepare(pState, stateSize, t);
 			// prepare flow
-			Flow::prepare(pState, stateSize/StateSize);
+			Flow::prepare(pState, tGroupVariable::groupSize(stateSize));
 		}
 	};
 	using tEquation = tGroupEquation;
