@@ -29,21 +29,21 @@ struct _PassiveParticlesParameters {
 	// ---------------- CUSTOM EQUATION PARAMETERS START
 	static const unsigned StateSize = DIM + DIM * DIM + 1; // x, s, q
 	// feel free to add parameters if you need
-	inline static const double Diffusivity = std::pow(10, -2);
+	inline static const double Diffusivity = 1.0e-2;
 	inline static const tSpaceVector InitX = tSpaceVector::Zero();
 	inline static const double InitC = 1.0;
-	inline static const double InitS = 0.125;
+	inline static const double InitS = 1.0e-1;
 
 	// splitting
 	static const bool IsSplitting = true;
 	inline static const double OverlapFactor = 2.5; // must be bigger than 2 to avoid concentration increase when splitting, increase to increase accuracy at the cost of computation time
 	inline static const double MinDx = 2.0 * std::sqrt(Diffusivity * RunParameters::Dt) * OverlapFactor;
-	inline static const double Dx = std::max(0.4, MinDx);
+	inline static const double Dx = std::max(4.0e-1, MinDx);
 	inline static const double SplitSize = Dx;
 	inline static const double SplitDistance = SplitSize / OverlapFactor;
 	inline static const double MergeDx = SplitDistance / std::sqrt(DIM);
 	// concentration threshold (for blob deletion)
-	inline static const double Cth = std::pow(10, -6);
+	inline static const double Cth = 1.0e-6;
 	inline static const double Qth = Cth * std::pow(Dx, DIM);
 
 	// source
@@ -126,7 +126,7 @@ struct _PassiveParticlesParameters {
 
 					if(memberQ > Qth) {
 
-						Eigen::SelfAdjointEigenSolver<tSpaceMatrix> solver(memberS.transpose() * memberS);
+						Eigen::SelfAdjointEigenSolver<tSpaceMatrix> solver(memberS);
 						const tSpaceVector eigenValues = solver.eigenvalues();
 						const tSpaceMatrix eigenVectors = solver.eigenvectors();
 
@@ -144,7 +144,7 @@ struct _PassiveParticlesParameters {
 						newQ = memberQ;
 	
 						for(unsigned int i = 0; i < DIM; ++i) {
-							double variance = std::sqrt(eigenValues[i]);
+							double variance = eigenValues[i];
 							double standardDeviation = std::sqrt(variance);
 							const tSpaceVector varianceDirection = eigenVectors.col(i);
 

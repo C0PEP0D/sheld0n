@@ -200,7 +200,7 @@ struct ScalarField {
 							}
 						}
 					}
-					newChildrenIjkArray = newChildrenIjkArray;
+					childrenIjkArray = newChildrenIjkArray;
 				}
 
 				{ // i == 0
@@ -287,7 +287,7 @@ struct ScalarField {
 							}
 						}
 					}
-					newChildrenIjkArray = newChildrenIjkArray;
+					childrenIjkArray = newChildrenIjkArray;
 				}
 
 				{ // i == 0

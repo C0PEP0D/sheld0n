@@ -10,7 +10,7 @@ def set_flow_tgv():
     os.chdir('../..')
     os.system('./.cli_set_parameter param cLength M_PI')
     os.system('./.cli_set_parameter param cTime M_PI')
-    os.system('./.cli_set_parameter param cDomainSize "{2*M_PI, 2*M_PI}"')
+    os.system('./.cli_set_parameter param cDomainSize "{4*M_PI, 4*M_PI}"')
     os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{true, true}"')
 
 def set_solutions_passive_scalar_blobs():
@@ -21,7 +21,7 @@ def set_solutions_passive_scalar_blobs():
     os.chdir('..')
     os.chdir('../..')
     # set parameters
-    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingProfile true') # activate profile post processing
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingConcentrationProfile true') # activate profile post processing
 
 def main():
     set_flow_tgv()
@@ -39,6 +39,7 @@ def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     code_dir = script_dir + "/../.."
     ## copy
+    shutil.copy(code_dir + "/app/post/plot_cmax_over_time.py", "post_process/plot_cmax_over_time.py")
     shutil.copy(code_dir + "/app/post/generate_scalar_concentration_animation_2d.py", "post_process/generate_scalar_concentration_animation_2d.py")
     shutil.copy(code_dir + "/app/post/generate_profile_c_animation.py", "post_process/generate_profile_c_animation.py")
     shutil.copy(code_dir + "/app/post/plot_profile_c_moments_over_time.py", "post_process/plot_profile_c_moments_over_time.py")

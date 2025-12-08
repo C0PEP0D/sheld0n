@@ -19,7 +19,7 @@ import copy
 
 # parameters
 
-default_passive_scalar_list = ["passive_scalar_blobs"]
+default_passive_scalar_list = ["reference", "passive_scalar_blobs"]
 default_background_particles_list = ["passive_particles"]
 default_color_list = []
 default_begin = 0
@@ -85,7 +85,7 @@ def main():
         passive_scalar_pos_0_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_0", time_dir_array)
         passive_scalar_pos_1_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_1", time_dir_array)
         passive_scalar_pos_2_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_2", time_dir_array)
-        passive_scalar_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, passive_scalar_name + "__.*__c", time_dir_array)
+        passive_scalar_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, passive_scalar_name + ".*__c", time_dir_array)
         # c_max, c_min
         c_max = max(c_max, np.array([x for c in passive_scalar_c_over_time[passive_scalar_name] for x in c]).max())
         c_min = min(c_min, np.array([x for c in passive_scalar_c_over_time[passive_scalar_name] for x in c if x > 0.0]).min())

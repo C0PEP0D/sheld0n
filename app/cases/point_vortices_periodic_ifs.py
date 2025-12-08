@@ -14,6 +14,7 @@ def set_flow_point_vortices():
     # parameters flow
     os.system('./.cli_set_parameter param/flow meanVelocity "{1.0, 0.0}"')
     # parameters solutions
+    os.system('./.cli_set_parameter param/solutions/point_vortices IsMergingNeighborPoints true')
     os.system('./.cli_set_parameter param/solutions/point_vortices IsInitRandomInDomain false')
     os.system('./.cli_set_parameter param/solutions/point_vortices IsInitDipole false')
     ## param
@@ -44,10 +45,6 @@ def main():
     os.system('./.cli_set_parameter param/flow meanVelocity "tSpaceVector({1.0, 0.0})"')
     # ifs particles
     set_solutions()
-    # edit passive_particles
-    os.chdir('param/solutions/passive_particles')
-    os.system('./.cli_choose cpp_source_of_passive_particles')
-    os.chdir('../../..')
     # parameters
     # os.system('./.cli_set_parameter param/solutions/passive_particles Rate "512.0"')
     # post processing

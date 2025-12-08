@@ -18,12 +18,6 @@
 #include "param/parameters.h"
 #include "param/run/parameters.h"
 
-// // ---------------- INCLUDE OTHER SOLUTION START
-
-// #include "param/solutions/ifs_particles/parameters.h"
-
-// // ---------------- INCLUDE OTHER SOLUTION END
-
 // FLAG: DYNAMIC
 
 namespace c0p {
@@ -118,25 +112,6 @@ struct _PassiveParticlesParameters {
 				Flow::prepare(_state.data(), tBase::groupSize(_state.size()));
 				_state = Flow::flow.superStateArray[0];
 			}
-
-// 			using IfsParticlesParameters = _IfsParticlesParameters;
-// 			const double* pIfsParticlesState = stateArray[0].data() + IfsParticlesParameters::StateIndex;
-// 			
-// 			for(unsigned int index = 0; index < IfsParticlesParameters::Number; ++index) {
-// 			
-// 				const double* pState = IfsParticlesParameters::tGroupVariable::cState(pIfsParticlesState, index);
-// 
-// 				// input
-// 				const tView<const tSpaceVector> x(pState);
-// 				const tView<const tSpaceVector> v(pState + DIM);
-// 				// flow
-// 				const tSpaceVector u = Flow::getVelocity(x.data(), t);
-// 	
-// 				// apply "force" on flow
-// 				const tSpaceVector dVelocity = -(u - v) * (u - v).norm() / IfsParticlesParameters::Width * RunParameters::Dt;
-// 				_addVelocity(_state, x.data(), dVelocity.data(), IfsParticlesParameters::Width);
-// 				
-// 			}
 
 			// ---------------- CUSTOM CONSTRAIN END
 		}
