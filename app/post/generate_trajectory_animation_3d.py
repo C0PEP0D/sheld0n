@@ -36,6 +36,7 @@ default_end = -1
 default_step = 1
 default_xlim = []
 default_ylim = []
+default_zlim = []
 
 # core
 
@@ -48,6 +49,7 @@ def parse():
     parser.add_argument('--step', '-s', type=int, default=default_step, help='animation frame step')
     parser.add_argument('--xlim', '-x', type=float, nargs=2, default=default_xlim, help='axis x lim')
     parser.add_argument('--ylim', '-y', type=float, nargs=2, default=default_ylim, help='axis y lim')
+    parser.add_argument('--zlim', '-z', type=float, nargs=2, default=default_zlim, help='axis z lim')
     return parser.parse_args()
 
 # INFO : UNCOMENT THE FOLLOWING IF YOU WANT TO USE THE CUSTOMIZATION GUI OF THE SCRIPT
@@ -96,6 +98,8 @@ def main():
         art_ax.set_xlim(args.xlim[0], args.xlim[1])
     if args.ylim:
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
+    if args.zlim:
+        art_ax.set_ylim(args.zlim[0], args.zlim[1])
     # plot the data
     print("INFO: Plotting...", flush=True)
     trajectories = {}
