@@ -10,8 +10,8 @@ def set_flow_tgv():
     os.chdir('../..')
     os.system('./.cli_set_parameter param cLength M_PI')
     os.system('./.cli_set_parameter param cTime M_PI')
-    os.system('./.cli_set_parameter param cDomainSize "{4*M_PI, 4*M_PI}"')
-    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{true, true}"')
+    os.system('./.cli_set_parameter param cDomainSize "{6*M_PI, 6*M_PI}"')
+    os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{false, false}"')
 
 def set_solutions_passive_scalar_blobs():
     os.chdir('param/solutions')

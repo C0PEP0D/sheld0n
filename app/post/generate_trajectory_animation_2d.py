@@ -8,11 +8,24 @@ import sys
 import numpy as np
 # internal modules
 import libpost
+# copy
+import copy
 # plotting
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-# copy
-import copy
+from matplotlib import rcParams
+rcParams.update({
+    # "text.usetex": True,
+    "font.family": "serif",
+    # "font.serif": ["Computer Modern Roman"],
+    "axes.labelsize": 10,
+    "font.size": 10,
+    "legend.fontsize": 9,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
+    "axes.linewidth": 1.0,
+    "lines.linewidth": 1.1,
+})
 
 # parameters
 
@@ -73,19 +86,8 @@ def main():
     # create figure
     art_fig, art_ax = plt.subplots()
     art_ax.set_aspect('equal', 'box')
-    # adjust colors
-    art_ax.set_facecolor("black")
-    art_fig.set_facecolor("black")
-    art_ax.spines["bottom"].set_color("white")
-    art_ax.spines["top"].set_color("white")
-    art_ax.spines["left"].set_color("white")
-    art_ax.spines["right"].set_color("white")
-    art_ax.xaxis.label.set_color('white')
-    art_ax.yaxis.label.set_color('white')
-    art_ax.tick_params(axis='x', colors='white')
-    art_ax.tick_params(axis='y', colors='white')
-    art_ax.grid(which='major', color='gray')
-    art_ax.grid(which='minor', color='gray')
+    art_ax.set_xlabel(r'$x$')
+    art_ax.set_ylabel(r'$y$')
     # set limits
     if args.xlim:
         art_ax.set_xlim(args.xlim[0], args.xlim[1])
@@ -106,7 +108,8 @@ def main():
             artists[-1].append(art)
             legend_handles.append(art)
     # legend
-    art_ax.legend(handles=legend_handles, loc='upper right', labelcolor='white', facecolor='black', edgecolor='black')
+    art_ax.legend(handles=legend_handles, loc='upper right', frameon=True)
+    art_fig.tight_layout()
     # anim
     print("INFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)

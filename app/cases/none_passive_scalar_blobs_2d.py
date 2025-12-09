@@ -9,7 +9,7 @@ def set_flow():
     os.chdir('../..')
     os.system('./.cli_set_parameter param cLength 1.0')
     os.system('./.cli_set_parameter param cTime 1.0')
-    os.system('./.cli_set_parameter param cDomainSize "{2.0, 2.0}"')
+    os.system('./.cli_set_parameter param cDomainSize "{4.0, 4.0}"')
     os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{false, false}"')
 
 def set_solutions():

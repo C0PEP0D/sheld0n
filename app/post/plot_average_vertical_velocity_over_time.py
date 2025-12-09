@@ -12,6 +12,19 @@ import numpy as np
 import libpost
 # plotting
 import matplotlib.pyplot as plt
+from matplotlib import rcParams
+rcParams.update({
+    # "text.usetex": True,
+    "font.family": "serif",
+    # "font.serif": ["Computer Modern Roman"],
+    "axes.labelsize": 10,
+    "font.size": 10,
+    "legend.fontsize": 9,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
+    "axes.linewidth": 1.0,
+    "lines.linewidth": 1.1,
+})
 
 # parameters
 
@@ -55,8 +68,9 @@ def main(input_equation_list, input_color_list):
     for equation_name in equation_name_list:
         pos_1_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__pos_1", time_dir_array))
     print("INFO: Plotting average vertical velocity over time ...", flush=True)
+    plt.figure(figsize=(3.4, 2.6))
     for equation_index, equation_name in enumerate(equation_name_list):
-        plt.plot(
+        plt.scatter(
             time_array[1:], 
             (pos_1_over_time[equation_name] - pos_1_over_time[equation_name][0]).mean(1)[1:] / time_array[1:], 
             color=color_list[equation_index], 
@@ -65,8 +79,9 @@ def main(input_equation_list, input_color_list):
         )
     plt.xlabel('$t$')
     plt.ylabel(r'$\langle V_{\mathrm{eff.}} \rangle$')
-    plt.legend()
-    plt.show()
+    plt.legend(frameon=True)
+    plt.tight_layout()
+    plt.savefig("average_vertical_velocity_over_time.pdf") 
 
 if __name__ == '__main__':
     args = parse()

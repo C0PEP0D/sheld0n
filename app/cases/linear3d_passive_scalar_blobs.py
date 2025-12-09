@@ -29,8 +29,8 @@ def set_solutions():
     os.chdir('../..')
     # set parameters
     os.system('./.cli_set_parameter param/solutions/reference IsSplitting false') # removing splitting for the reference
-    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingProfile true') # activate profile post processing
-    os.system('./.cli_set_parameter param/solutions/reference IsPostProcessingProfile true') # activate profile post processing
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingConcentrationProfile true') # activate profile post processing
+    os.system('./.cli_set_parameter param/solutions/reference IsPostProcessingConcentrationProfile true') # activate profile post processing
 
 def main():
     set_flow()

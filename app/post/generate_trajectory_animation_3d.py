@@ -8,11 +8,24 @@ import sys
 import numpy as np
 # internal modules
 import libpost
+# copy
+import copy
 # plotting
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-# copy
-import copy
+from matplotlib import rcParams
+rcParams.update({
+    # "text.usetex": True,
+    "font.family": "serif",
+    # "font.serif": ["Computer Modern Roman"],
+    "axes.labelsize": 10,
+    "font.size": 10,
+    "legend.fontsize": 9,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
+    "axes.linewidth": 1.0,
+    "lines.linewidth": 1.1,
+})
 
 # parameters
 
@@ -74,28 +87,10 @@ def main():
     print("INFO: Animating...", flush=True)
     # create figure
     art_fig = plt.figure()
-    art_ax = art_fig.add_subplot(projection='3d')
-    art_ax.set_xlabel(r'$x$', color='white')
-    art_ax.set_ylabel(r'$y$', color='white')
-    art_ax.set_zlabel(r"$z$", color='white')
-    # set colors
-    art_ax.set_facecolor("black")
-    art_ax.xaxis.set_pane_color("black")
-    art_ax.yaxis.set_pane_color("black")
-    art_ax.zaxis.set_pane_color("black")
-    art_fig.set_facecolor("black")
-    art_ax.spines["bottom"].set_color("white")
-    art_ax.spines["top"].set_color("white")
-    art_ax.spines["left"].set_color("white")
-    art_ax.spines["right"].set_color("white")
-    art_ax.xaxis.label.set_color('white')
-    art_ax.yaxis.label.set_color('white')
-    art_ax.zaxis.label.set_color('white')
-    art_ax.tick_params(axis='x', colors='white')
-    art_ax.tick_params(axis='y', colors='white')
-    art_ax.tick_params(axis='z', colors='white')
-    art_ax.grid(which='major', color='gray')
-    art_ax.grid(which='minor', color='gray')
+    art_ax = art_fig.add_subplot(projection='3d', proj_type = 'ortho')
+    art_ax.set_xlabel(r'$x$')
+    art_ax.set_ylabel(r'$y$')
+    art_ax.set_zlabel(r"$z$")
     # set axis limits
     if args.xlim:
         art_ax.set_xlim(args.xlim[0], args.xlim[1])
@@ -117,7 +112,8 @@ def main():
             legend_handles.append(art)
     # adjust the axis
     art_ax.set_aspect('equal', adjustable='box')
-    art_ax.legend(handles=legend_handles, loc='upper right', labelcolor='white', facecolor='black', edgecolor='black')
+    art_ax.legend(handles=legend_handles, loc='upper right', frameon=True)
+    art_fig.tight_layout()
     # start animating
     print("INFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)

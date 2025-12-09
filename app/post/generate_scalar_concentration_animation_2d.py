@@ -8,18 +8,31 @@ import sys
 import numpy as np
 # internal modules
 import libpost
+# copy
+import copy
 # plotting
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.colors as colors
 import matplotlib.cm as cm
 import matplotlib.ticker as ticker
-# copy
-import copy
+from matplotlib import rcParams
+rcParams.update({
+    # "text.usetex": True,
+    "font.family": "serif",
+    # "font.serif": ["Computer Modern Roman"],
+    "axes.labelsize": 10,
+    "font.size": 10,
+    "legend.fontsize": 9,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
+    "axes.linewidth": 1.0,
+    "lines.linewidth": 1.1,
+})
 
 # parameters
 
-default_passive_scalar_list = ["reference", "passive_scalar_blobs"]
+default_passive_scalar_list = ["passive_scalar_blobs"]
 default_background_particles_list = ["passive_particles"]
 default_color_list = []
 default_begin = 0
@@ -65,7 +78,7 @@ def main():
     else:
         cmap_background = plt.get_cmap("rainbow", len(equation_name_list))
         color_list = [cmap_background(index) for index in range(len(equation_name_list))]
-    cmap = colors.LinearSegmentedColormap.from_list("", [(0.0, 0.0, 0.0), (1.0, 0.5, 0.5)])
+    cmap = colors.LinearSegmentedColormap.from_list("", [(1.0, 1.0, 1.0), (1.0, 0.0, 0.0)])
     # process
     print("INFO: Reading time...", flush=True)
     time_dir_array, time_array = libpost.get_time()
@@ -101,29 +114,11 @@ def main():
     print("INFO: Animating basic...", flush=True)
     # create figure
     art_fig = plt.figure()
-    art_ax = art_fig.add_subplot(projection='3d')
+    art_ax = art_fig.add_subplot(projection='3d', proj_type = 'ortho')
     art_ax.set_aspect('equal', adjustable='box')
-    art_ax.set_xlabel(r'$x$', color='white')
-    art_ax.set_ylabel(r'$y$', color='white')
-    art_ax.set_zlabel(r"$c / c_{\mathrm{max}}$", color='white')
-    # set colors
-    art_ax.set_facecolor("black")
-    art_ax.xaxis.set_pane_color("black")
-    art_ax.yaxis.set_pane_color("black")
-    art_ax.zaxis.set_pane_color("black")
-    art_fig.set_facecolor("black")
-    art_ax.spines["bottom"].set_color("white")
-    art_ax.spines["top"].set_color("white")
-    art_ax.spines["left"].set_color("white")
-    art_ax.spines["right"].set_color("white")
-    art_ax.xaxis.label.set_color('white')
-    art_ax.yaxis.label.set_color('white')
-    art_ax.zaxis.label.set_color('white')
-    art_ax.tick_params(axis='x', colors='white')
-    art_ax.tick_params(axis='y', colors='white')
-    art_ax.tick_params(axis='z', colors='white')
-    art_ax.grid(which='major', color='gray')
-    art_ax.grid(which='minor', color='gray')
+    art_ax.set_xlabel(r'$x$')
+    art_ax.set_ylabel(r'$y$')
+    art_ax.set_zlabel(r"$c / c_{\mathrm{max}}$")
     # set axis limits
     if args.xlim:
         art_ax.set_xlim(args.xlim[0], args.xlim[1])
@@ -153,16 +148,24 @@ def main():
     if args.flat:
         art_ax.view_init(90, -90)
     # adjust the legend
-    art_ax.legend(handles=legend_handles, loc='upper right', labelcolor='white', facecolor='black', edgecolor='black')
+    art_ax.legend(handles=legend_handles, loc='upper right', frameon=True)
     # adjust the color bar
     cbar = art_fig.colorbar(cm.ScalarMappable(norm=colors.Normalize(vmin=c_min, vmax=1.0), cmap=cmap), ax=art_ax)
-    cbar.ax.tick_params(axis='y', colors='white')
-    cbar.ax.set_yticklabels(cbar.ax.get_yticklabels(), color='white')
-    cbar.set_label(r"$c / c_{\mathrm{max}}$", color='white')
+    cbar.ax.tick_params(axis='y')
+    cbar.ax.set_yticklabels(cbar.ax.get_yticklabels())
+    cbar.set_label(r"$c / c_{\mathrm{max}}$")
     # start animating
+    art_fig.tight_layout()
     print("INFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
-    anim.save("scalar_concentration_animation.mp4")
+    if args.flat:
+        anim.save("scalar_concentration_animation_flat.mp4")
+        # figure
+        art_fig.savefig("scalar_concentration_flat__t_{}.pdf".format(str(time_array[-1]).replace(".", "o"))) 
+    else:
+        anim.save("scalar_concentration_animation.mp4")
+        # figure
+        art_fig.savefig("scalar_concentration__t_{}.pdf".format(str(time_array[-1]).replace(".", "o")))  
 
 
 
@@ -171,29 +174,11 @@ def main():
     print("INFO: Animating log scale...", flush=True)
     # create figure
     art_fig = plt.figure()
-    art_ax = art_fig.add_subplot(projection='3d')
+    art_ax = art_fig.add_subplot(projection='3d', proj_type = 'ortho')
     art_ax.set_aspect('equal', adjustable='box')
-    art_ax.set_xlabel(r'$x$', color='white')
-    art_ax.set_ylabel(r'$y$', color='white')
-    art_ax.set_zlabel(r"$c / c_{\mathrm{max}}$", color='white')
-    # adjust colors
-    art_ax.set_facecolor("black")
-    art_ax.xaxis.set_pane_color("black")
-    art_ax.yaxis.set_pane_color("black")
-    art_ax.zaxis.set_pane_color("black")
-    art_fig.set_facecolor("black")
-    art_ax.spines["bottom"].set_color("white")
-    art_ax.spines["top"].set_color("white")
-    art_ax.spines["left"].set_color("white")
-    art_ax.spines["right"].set_color("white")
-    art_ax.xaxis.label.set_color('white')
-    art_ax.yaxis.label.set_color('white')
-    art_ax.zaxis.label.set_color('white')
-    art_ax.tick_params(axis='x', colors='white')
-    art_ax.tick_params(axis='y', colors='white')
-    art_ax.tick_params(axis='z', colors='white')
-    art_ax.grid(which='major', color='gray')
-    art_ax.grid(which='minor', color='gray')
+    art_ax.set_xlabel(r'$x$')
+    art_ax.set_ylabel(r'$y$')
+    art_ax.set_zlabel(r"$c / c_{\mathrm{max}}$")
     # set limits
     if args.xlim:
         art_ax.set_xlim(args.xlim[0], args.xlim[1])
@@ -225,16 +210,24 @@ def main():
     # adjust ax
     art_ax.zaxis.set_major_formatter(ticker.FuncFormatter(log_tick_formatter))
     art_ax.zaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-    art_ax.legend(handles=legend_handles, loc='upper right', labelcolor='white', facecolor='black', edgecolor='black')
+    art_ax.legend(handles=legend_handles, loc='upper right', frameon=True)
     # adjust color bar
     cbar = art_fig.colorbar(cm.ScalarMappable(norm=colors.LogNorm(vmin=c_min, vmax=1.0), cmap=cmap), ax=art_ax)
-    cbar.ax.tick_params(axis='y', colors='white')
-    cbar.ax.set_yticklabels(cbar.ax.get_yticklabels(), color='white')
-    cbar.set_label(r"$c / c_{\mathrm{max}}$", color='white')
+    cbar.ax.tick_params(axis='y')
+    cbar.ax.set_yticklabels(cbar.ax.get_yticklabels())
+    cbar.set_label(r"$c / c_{\mathrm{max}}$")
     # start animating
+    art_fig.tight_layout()
     print("INFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
-    anim.save("scalar_concentration_animation_log_scale.mp4")
+    if args.flat:
+        anim.save("scalar_concentration_animation_log_scale_flat.mp4")
+        # figure
+        art_fig.savefig("scalar_concentration_log_flat__t_{}.pdf".format(str(time_array[-1]).replace(".", "o")))
+    else:
+        anim.save("scalar_concentration_animation_log_scale.mp4")
+        # figure
+        art_fig.savefig("scalar_concentration_log__t_{}.pdf".format(str(time_array[-1]).replace(".", "o")))
 
 if __name__ == '__main__':
     main()

@@ -10,6 +10,19 @@ import numpy as np
 import libpost
 # plotting
 import matplotlib.pyplot as plt
+from matplotlib import rcParams
+rcParams.update({
+    # "text.usetex": True,
+    "font.family": "serif",
+    # "font.serif": ["Computer Modern Roman"],
+    "axes.labelsize": 10,
+    "font.size": 10,
+    "legend.fontsize": 9,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
+    "axes.linewidth": 1.0,
+    "lines.linewidth": 1.1,
+})
 
 # parameters
 
@@ -74,6 +87,7 @@ def main(input_equation_list, input_color_list):
         color_list = [cmap(index) for index in range(len(average_performance_sorted))]
     marker_list = ["o", "^", "s", "P", "*"]
     # plot
+    plt.figure(figsize=(3.4, 2.6))
     plot_index = 0
     for swimming_velocity in sorted(average_performance_sorted):
         plt.fill_between(
@@ -87,7 +101,7 @@ def main(input_equation_list, input_color_list):
         plot_index += 1
     plot_index = 0
     for swimming_velocity in sorted(average_performance_sorted):
-        plt.plot(
+        plt.scatter(
             average_performance_sorted[swimming_velocity][:, 0], 
             average_performance_sorted[swimming_velocity][:, 1] / swimming_velocity, 
             color=color_list[plot_index], 
@@ -97,8 +111,9 @@ def main(input_equation_list, input_color_list):
         plot_index += 1
     plt.xlabel(r'$\tau / \pi$')
     plt.ylabel(r'$\langle V_{\mathrm{eff.}} \rangle / V_{\mathrm{swim}}$')
-    plt.legend()
-    plt.show()
+    plt.legend(frameon=True)
+    plt.tight_layout()
+    plt.savefig("average_performance_over_time_horizon.pdf") 
     
 
 if __name__ == '__main__':

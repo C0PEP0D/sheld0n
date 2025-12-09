@@ -6,11 +6,24 @@ import argparse
 import numpy as np
 # internal modules
 import libpost
+# copy
+import copy
 # plotting
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-# copy
-import copy
+from matplotlib import rcParams
+rcParams.update({
+    # "text.usetex": True,
+    "font.family": "serif",
+    # "font.serif": ["Computer Modern Roman"],
+    "axes.labelsize": 10,
+    "font.size": 10,
+    "legend.fontsize": 9,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
+    "axes.linewidth": 1.0,
+    "lines.linewidth": 1.1,
+})
 
 # parameters
 
@@ -62,7 +75,7 @@ def main(input_begin, input_end):
         profile_c_c_grad_over_time[passive_scalar_name] = [np.array(c)/c_max for c in profile_c_c_grad_over_time[passive_scalar_name]]
 
     print("INFO: Animating c...", flush=True)
-    art_fig, art_ax = plt.subplots()
+    art_fig, art_ax = plt.subplots(figsize=(3.4, 2.6))
     art_ax.set_xlabel(r'$x$')
     art_ax.set_ylabel(r'$c / c_{\mathrm{max}}$')
     artists = []
@@ -72,16 +85,19 @@ def main(input_begin, input_end):
         # passive scalar
         for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
             if profile_c_x_over_time[passive_scalar_name][time_index].size > 0:
-                arts = art_ax.plot(profile_c_x_over_time[passive_scalar_name][time_index], profile_c_c_over_time[passive_scalar_name][time_index], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
-                artists[-1] += arts
+                arts = art_ax.scatter(profile_c_x_over_time[passive_scalar_name][time_index], profile_c_c_over_time[passive_scalar_name][time_index], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
+                artists[-1].append(arts)
     # legend
-    art_ax.legend(handles=artists[-1], loc='upper right')
+    art_ax.legend(handles=artists[-1], loc='upper right', frameon=True)
+    art_fig.tight_layout()
     # anim
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
     anim.save("profile_c_animation.mp4")
+    # figure
+    art_fig.savefig("profile_c__t_{}.pdf".format(str(time_array[-1]).replace(".", "o"))) 
 
     print("INFO: Animating grad...", flush=True)
-    art_fig, art_ax = plt.subplots()
+    art_fig, art_ax = plt.subplots(figsize=(3.4, 2.6))
     art_ax.set_xlabel(r'$x$')
     art_ax.set_ylabel(r'$\left ( \nabla c \right)_x / c_{\mathrm{max}}$')
     artists = []
@@ -91,19 +107,22 @@ def main(input_begin, input_end):
         # passive scalar
         for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
             if profile_c_x_over_time[passive_scalar_name][time_index].size > 0:
-                arts = art_ax.plot(profile_c_x_over_time[passive_scalar_name][time_index], profile_c_c_grad_over_time[passive_scalar_name][time_index], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
-                artists[-1] += arts
+                arts = art_ax.scatter(profile_c_x_over_time[passive_scalar_name][time_index], profile_c_c_grad_over_time[passive_scalar_name][time_index], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
+                artists[-1].append(arts)
                 # arts = art_ax.plot(profile_c_x_over_time[passive_scalar_name][time_index], np.gradient(profile_c_c_over_time[passive_scalar_name][time_index], profile_c_x_over_time[passive_scalar_name][time_index]), marker=marker_list[passive_scalar_index % len(marker_list)], color="black", label=passive_scalar_name)
                 # artists[-1] += arts
     # legend
-    art_ax.legend(handles=artists[-1], loc='upper right')
+    art_ax.legend(handles=artists[-1], loc='upper right', frameon=True)
+    art_fig.tight_layout()
     # anim
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
     anim.save("profile_grad_animation.mp4")
+    # figure
+    art_fig.savefig("profile_grad__t_{}.pdf".format(str(time_array[-1]).replace(".", "o"))) 
 
 
     print("INFO: Animating c log...", flush=True)
-    art_fig, art_ax = plt.subplots()
+    art_fig, art_ax = plt.subplots(figsize=(3.4, 2.6))
     art_ax.set_yscale('log')
     art_ax.set_xlabel(r'$x$')
     art_ax.set_ylabel(r'$c / c_{\mathrm{max}}$')
@@ -114,13 +133,16 @@ def main(input_begin, input_end):
         # passive scalar
         for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
             if profile_c_x_over_time[passive_scalar_name][time_index].size > 0:
-                arts = art_ax.plot(profile_c_x_over_time[passive_scalar_name][time_index], profile_c_c_over_time[passive_scalar_name][time_index], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
-                artists[-1] += arts
+                arts = art_ax.scatter(profile_c_x_over_time[passive_scalar_name][time_index], profile_c_c_over_time[passive_scalar_name][time_index], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
+                artists[-1].append(arts)
     # legend
-    art_ax.legend(handles=artists[-1], loc='upper right')
+    art_ax.legend(handles=artists[-1], loc='lower right', frameon=True)
+    art_fig.tight_layout()
     # anim
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
     anim.save("profile_c_animation_log_scale.mp4")
+    # figure
+    art_fig.savefig("profile_c_log__t_{}.pdf".format(str(time_array[-1]).replace(".", "o"))) 
 
 if __name__ == '__main__':
     args = parse()
