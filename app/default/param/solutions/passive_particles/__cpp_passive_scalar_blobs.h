@@ -32,7 +32,7 @@ struct _PassiveParticlesParameters {
 	inline static const double Diffusivity = 1.0e-2;
 	inline static const tSpaceVector InitX = tSpaceVector::Zero();
 	inline static const double InitC = 1.0;
-	inline static const double InitS = 1.0e-1;
+	inline static const tSpaceMatrix InitS = tSpaceVector({1.0e-1, 1.0e-1}).asDiagonal();
 
 	// splitting
 	static const bool IsSplitting = true;
@@ -50,7 +50,7 @@ struct _PassiveParticlesParameters {
 	static const bool HasSource = false;
 	inline static const tSpaceVector SourceX = InitX;
 	inline static const double SourceC = InitC;
-	inline static const double SourceS = InitS;
+	inline static const tSpaceMatrix SourceS = InitS;
 	inline static const double SourceReactionTime = 1.0;
 
 	// periodicity
@@ -67,6 +67,10 @@ struct _PassiveParticlesParameters {
 	// scalar field
 	using ScalarField = pl0f::ScalarField<DIM, tSpaceVector, tSpaceMatrix, tView>;
 	inline static ScalarField scalarField = ScalarField(MergeDx, IsSplitting, periodCenter, periodSize, isAxisPeriodic);
+
+	// added scalar
+	inline static std::mutex _addedQMutex;
+	inline static std::vector<double> _addedQ;
 
 	// variable
 
@@ -95,23 +99,25 @@ struct _PassiveParticlesParameters {
 
 			// ---------------- CUSTOM CONSTRAIN START
 
+			// physics
+
 			if (HasSource) {
 				const double c = tGroupVariable::c(_state.data(), _state.size(), SourceX.data());
-
 				if((SourceC - c) > Cth) {
-					tBase::pushBackMember(_state);
-					
-					double* pNewState = tBase::state(_state.data(), tBase::groupSize(_state.size()) - 1);
-
-					tView<tSpaceVector> newX(pNewState);
-					tView<tSpaceMatrix> newS(pNewState + DIM);
-					double& newQ = pNewState[DIM + DIM * DIM];
-
-					newX = SourceX;
-					newS = tSpaceMatrix::Identity() * SourceS;
-					newQ = (SourceC - c) * std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(std::pow(SourceS, DIM)) / SourceReactionTime;
+					addQ(SourceX.data(), SourceS.data(), (SourceC - c) * std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(SourceS.determinant()) * RunParameters::Dt / SourceReactionTime);
 				}
 			}
+
+			if (not _addedQ.empty()) { // addQ
+				_addedQMutex.lock();
+
+				_state.insert(_state.end(), _addedQ.begin(), _addedQ.end());
+				_addedQ.clear();
+				
+				_addedQMutex.unlock();
+			}
+
+			// numerics
 
 			if (IsSplitting) {
 				std::vector<double> newState;
@@ -228,6 +234,32 @@ struct _PassiveParticlesParameters {
 			
 		}
 
+		static void addQ(const double* pPosition, const double* pS, const double dQ) {
+			// input
+			const tView<const tSpaceVector> position(pPosition);
+			const tView<const tSpaceMatrix> s(pS);
+			// q
+			if(dQ != 0.0) {
+				_addedQMutex.lock();
+
+				tBase::pushBackMember(_addedQ);
+
+				// set initial state
+				double* pNewState = tBase::state(_addedQ.data(), tBase::groupSize(_addedQ.size()) - 1);
+				
+				tView<tSpaceVector> newX(pNewState);
+				tView<tSpaceMatrix> newS(pNewState + DIM);
+				double& newQ = pNewState[DIM + DIM * DIM];
+				
+				// // set
+				newX = position;
+				newS = s;
+				newQ = dQ;
+
+				_addedQMutex.unlock();
+			}
+		}
+
 		static double c(const double* pState, const unsigned int stateSize, const double* pX) {
 			return scalarField.getScalar(tBase::cState(pState, 0), tBase::groupSize(stateSize), pX);
 		}
@@ -323,8 +355,8 @@ struct _PassiveParticlesParameters {
 			double& q = pState[DIM + DIM * DIM];
 			// set
 			x = tSpaceVector::Zero();
-			s = tSpaceMatrix::Identity() * InitS;
-			q = InitC * (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(std::pow(InitS, DIM)));
+			s = InitS;
+			q = InitC * (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(s.determinant()));
 		}
 		
 		// ---------------- CUSTOM INIT END

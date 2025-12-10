@@ -90,7 +90,7 @@ struct PointVortexFlow {
 					superW += w;
 					superWAbs += wAbs;
 				}
-				if(superWAbs != 0.0) {
+				if(superWAbs > 0.0) {
 					superX /= superWAbs;
 				}
 			}
@@ -128,7 +128,7 @@ struct PointVortexFlow {
 							superWAbs += subWAbs;
 						}
 					}
-					if(superWAbs != 0.0) {
+					if(superWAbs > 0.0) {
 						superX /= superWAbs;
 					}
 				}

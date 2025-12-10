@@ -70,6 +70,7 @@ struct ScalarField {
 				tView<tVector> superX(pSuperState);
 				tView<tMatrix> superS(pSuperState + Dim);
 				double& superQ = pSuperState[Dim + Dim * Dim];
+				double superQAbs = 0.0;
 				
 				// x
 				for (auto const& index : indexes) {
@@ -80,11 +81,15 @@ struct ScalarField {
 					const tVector memberXPeriodic = sp0ce::xPeriodic<tVector>(memberX.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 					const tView<const tMatrix> memberS(pMemberState + Dim);
 					const double memberQ = pMemberState[Dim + Dim * Dim];
+					const double memberQAbs = std::abs(memberQ);
 
-					superX += memberQ * memberXPeriodic;
+					superX += memberQAbs * memberXPeriodic;
 					superQ += memberQ;
+					superQAbs += memberQAbs;
 				}
-				superX /= superQ;
+				if(superQAbs > 0.0) {
+					superX /= superQAbs;
+				}
 				// s
 				for (auto const& index : indexes) {
 					const double* pMemberState = pState + BlobStateSize * index;
@@ -93,11 +98,14 @@ struct ScalarField {
 					const tVector memberXPeriodic = sp0ce::xPeriodic<tVector>(memberX.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 					const tView<const tMatrix> memberS(pMemberState + Dim);
 					const double memberQ = pMemberState[Dim + Dim * Dim];
+					const double memberQAbs = std::abs(memberQ);
 
 					const tVector r = memberXPeriodic - superX;
-					superS += memberQ * (memberS + r * r.transpose());
+					superS += memberQAbs * (memberS + r * r.transpose());
 				}
-				superS /= superQ;
+				if(superQAbs > 0.0) {
+					superS /= superQAbs;
+				};
 			}
 			if(IsApproximatingWithBin) {
 				// others
@@ -114,6 +122,7 @@ struct ScalarField {
 						tView<tVector> superX(pSuperState);
 						tView<tMatrix> superS(pSuperState + Dim);
 						double& superQ = pSuperState[Dim + Dim * Dim];
+						double superQAbs = 0.0;
 						
 						// sub
 						std::array<int, Dim> subIjkStart;
@@ -131,12 +140,16 @@ struct ScalarField {
 								const tView<const tVector> subX(pSubState);
 								const tView<const tMatrix> subS(pSubState + Dim);
 								const double subQ = pSubState[Dim + Dim * Dim];
+								const double subQAbs = std::abs(subQ);
 
-								superX += subQ * subX;
+								superX += subQAbs * subX;
 								superQ += subQ;
+								superQAbs += subQAbs;
 							}
 						}
-						superX /= superQ;
+						if(superQAbs > 0.0) {
+							superX /= superQAbs;
+						}
 						// s
 						for (auto const& subIjk : binTree.data[i-1].getIjkInBetween(subIjkStart.data(), subIjkEnd.data())) {
 							auto iterator = ijkToSuperIndex[i-1].find(subIjk);
@@ -146,12 +159,15 @@ struct ScalarField {
 								const tView<const tVector> subX(pSubState);
 								const tView<const tMatrix> subS(pSubState + Dim);
 								const double subQ = pSubState[Dim + Dim * Dim];
+								const double subQAbs = std::abs(subQ);
 
 								const tVector r = subX - superX;
-								superS += subQ * (subS + r * r.transpose());
+								superS += subQAbs * (subS + r * r.transpose());
 							}
 						}
-						superS /= superQ;
+						if(superQAbs > 0.0) {
+							superS /= superQAbs;
+						};
 					}
 				}
 			}

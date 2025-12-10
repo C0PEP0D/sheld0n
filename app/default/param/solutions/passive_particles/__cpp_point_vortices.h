@@ -84,7 +84,7 @@ struct _PassiveParticlesParameters {
 				}
 			}
 
-			if (not _addedVelocity.empty()) { // ifs
+			if (not _addedVelocity.empty()) { // addVelocity
 				_addedVelocityMutex.lock();
 
 				_state.insert(_state.end(), _addedVelocity.begin(), _addedVelocity.end());
@@ -131,7 +131,6 @@ struct _PassiveParticlesParameters {
 
 					tBase::pushBackMember(_addedVelocity);
 
-					_addedVelocityMutex.unlock();
 					// set initial state
 					double* pState = tBase::state(_addedVelocity.data(), tBase::groupSize(_addedVelocity.size()) - 1);
 					tView<tSpaceVector> x(pState);
@@ -139,13 +138,14 @@ struct _PassiveParticlesParameters {
 					// // set
 					x = position + 0.5 * spacing * dVelocityOrthogonal;
 					*pCirculation = dCirculation;
+
+					_addedVelocityMutex.unlock();
 				}
 				{ // negative
 					_addedVelocityMutex.lock();
 
 					tBase::pushBackMember(_addedVelocity);
 
-					_addedVelocityMutex.unlock();
 					// set initial state
 					double* pState = tBase::state(_addedVelocity.data(), tBase::groupSize(_addedVelocity.size()) - 1);
 					tView<tSpaceVector> x(pState);
@@ -153,6 +153,8 @@ struct _PassiveParticlesParameters {
 					// // set
 					x = position - 0.5 * spacing * dVelocityOrthogonal;
 					*pCirculation = -dCirculation;
+
+					_addedVelocityMutex.unlock();
 				}
 			}
 		}

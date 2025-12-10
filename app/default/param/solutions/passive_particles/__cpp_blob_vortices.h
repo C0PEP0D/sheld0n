@@ -32,7 +32,7 @@ struct _PassiveParticlesParameters {
 	inline static const double Diffusivity = 1.0e-2;
 	inline static const tSpaceVector InitX = tSpaceVector::Zero();
 	inline static const double InitW = 1.0;
-	inline static const double InitS = 1.0e-1;
+	inline static const tSpaceMatrix InitS = tSpaceVector({1.0e-1, 1.0e-1}).asDiagonal();
 
 	// splitting
 	static const bool IsSplitting = true;
@@ -43,14 +43,14 @@ struct _PassiveParticlesParameters {
 	inline static const double SplitDistance = SplitSize / OverlapFactor;
 	inline static const double MergeDx = SplitDistance / std::sqrt(DIM);
 	// concentration threshold (for blob deletion)
-	inline static const double Cth = 1.0e-6;
-	inline static const double Qth = Cth * std::pow(Dx, DIM);
+	inline static const double Wth = 1.0e-6;
+	inline static const double Qth = Wth * std::pow(Dx, DIM);
 
 	// source
 	static const bool HasSource = false;
 	inline static const tSpaceVector SourceX = InitX;
 	inline static const double SourceW = InitW;
-	inline static const double SourceS = InitS;
+	inline static const double SourceS = 1.0e-1;
 	inline static const double SourceReactionTime = 1.0;
 
 	// periodicity
@@ -66,7 +66,7 @@ struct _PassiveParticlesParameters {
 
 	// scalar field
 	using ScalarField = pl0f::ScalarField<DIM, tSpaceVector, tSpaceMatrix, tView>;
-	inline static ScalarField circulationField = ScalarField(MergeDx, IsSplitting, periodCenter, periodSize, isAxisPeriodic);
+	inline static ScalarField vorticityField = ScalarField(MergeDx, IsSplitting, periodCenter, periodSize, isAxisPeriodic);
 
 	// variable
 
@@ -96,9 +96,9 @@ struct _PassiveParticlesParameters {
 			// ---------------- CUSTOM CONSTRAIN START
 
 			if (HasSource) {
-				const double w = tGroupVariable::circulation(_state.data(), _state.size(), SourceX.data());
+				const double w = tGroupVariable::vorticity(_state.data(), _state.size(), SourceX.data());
 
-				if((SourceW - w) > Cth) {
+				if((SourceW - w) > Wth) {
 					tBase::pushBackMember(_state);
 					
 					double* pNewState = tBase::state(_state.data(), tBase::groupSize(_state.size()) - 1);
@@ -124,7 +124,7 @@ struct _PassiveParticlesParameters {
 					tView<tSpaceMatrix> memberS(pMemberState + DIM);
 					double& memberQ = pMemberState[DIM + DIM * DIM];
 
-					if(memberQ > Qth) {
+					if(memberQ > std::abs(Qth)) {
 
 						Eigen::SelfAdjointEigenSolver<tSpaceMatrix> solver(memberS);
 						const tSpaceVector eigenValues = solver.eigenvalues();
@@ -220,20 +220,20 @@ struct _PassiveParticlesParameters {
 
 				// merge
 
-				circulationField.prepare(tBase::cState(_state.data(), 0), tBase::groupSize(_state.size()));
-				_state = circulationField.superStateArray[0];
+				vorticityField.prepare(tBase::cState(_state.data(), 0), tBase::groupSize(_state.size()));
+				_state = vorticityField.superStateArray[0];
 			}
 			
 			// ---------------- CUSTOM CONSTRAIN END
 			
 		}
 
-		static double circulation(const double* pState, const unsigned int stateSize, const double* pX) {
-			return circulationField.getScalar(tBase::cState(pState, 0), tBase::groupSize(stateSize), pX);
+		static double vorticity(const double* pState, const unsigned int stateSize, const double* pX) {
+			return vorticityField.getScalar(tBase::cState(pState, 0), tBase::groupSize(stateSize), pX);
 		}
 
-		static tSpaceVector circulationGradient(const double* pState, const unsigned int stateSize, const double* pX) {
-			return circulationField.getGradient(tBase::cState(pState, 0), tBase::groupSize(stateSize), pX);
+		static tSpaceVector vorticityGradient(const double* pState, const unsigned int stateSize, const double* pX) {
+			return vorticityField.getGradient(tBase::cState(pState, 0), tBase::groupSize(stateSize), pX);
 		}
 	};
 	using tVariable = tGroupVariable;
@@ -292,7 +292,7 @@ struct _PassiveParticlesParameters {
 
 			// ---------------- CUSTOM PREPARATION START
 
-			circulationField.prepare(tGroupVariable::cState(pState, 0), tGroupVariable::groupSize(stateSize));
+			vorticityField.prepare(tGroupVariable::cState(pState, 0), tGroupVariable::groupSize(stateSize));
 
 			// ---------------- CUSTOM PREPARATION END
 		}
@@ -321,12 +321,12 @@ struct _PassiveParticlesParameters {
 			double& q = pState[DIM + DIM * DIM];
 			// set
 			x = tSpaceVector::Zero();
-			s = tSpaceMatrix::Identity() * InitS;
-			q = InitW * (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(std::pow(InitS, DIM)));
+			s = InitS;
+			q = InitW * (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(InitS.determinant()));
 		}
 
-		circulationField.prepare(tGroupVariable::cState(state.data(), 0), tGroupVariable::groupSize(state.size()));
-		Flow::flow.prepare(&circulationField);
+		vorticityField.prepare(tGroupVariable::cState(state.data(), 0), tGroupVariable::groupSize(state.size()));
+		Flow::flow.prepare(&vorticityField);
 		
 		// ---------------- CUSTOM INIT END
 	}
@@ -341,7 +341,7 @@ struct _PassiveParticlesParameters {
 	static std::map<std::string, tScalar> post(const double* pState, const unsigned int stateSize, const double t) {
 		std::map<std::string, double> output;
 		// ---------------- CUSTOM INIT START
-		circulationField.prepare(tGroupVariable::cState(pState, 0), tGroupVariable::groupSize(stateSize));
+		vorticityField.prepare(tGroupVariable::cState(pState, 0), tGroupVariable::groupSize(stateSize));
 
 		{ // particles
 			unsigned int number = tVariable::groupSize(stateSize);
@@ -359,7 +359,7 @@ struct _PassiveParticlesParameters {
 					output[ossIndex.str() + "__pos_" + std::to_string(i)] = x[i];
 				}
 				if(IsPostProcessingConcentration) {
-					output[ossIndex.str() + "__c"] = tGroupVariable::circulation(pState, stateSize, x.data());
+					output[ossIndex.str() + "__c"] = tGroupVariable::vorticity(pState, stateSize, x.data());
 				}
 			}
 		}
@@ -376,7 +376,7 @@ struct _PassiveParticlesParameters {
 				ossIndex << "profile_c__index_" << std::setw(formatNumber) << std::setfill('0') << index;
 				// output
 				output[ossIndex.str() + "__x"] = x[0];
-				output[ossIndex.str() + "__c"] = tGroupVariable::circulation(pState, stateSize, x.data());
+				output[ossIndex.str() + "__c"] = tGroupVariable::vorticity(pState, stateSize, x.data());
 			}
 		}
 		
