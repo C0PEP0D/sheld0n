@@ -70,8 +70,9 @@ def main(passive_scalar_list, input_color_list, step):
     for passive_scalar_name in passive_scalar_list:
         passive_scalar_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, passive_scalar_name + ".*__c", time_dir_array)
         # c_max, c_min
-        c_max = max(c_max, np.array([x for c in passive_scalar_c_over_time[passive_scalar_name] for x in c if x >= 0.0]).max())
-        c_min = min(c_min, np.array([x for c in passive_scalar_c_over_time[passive_scalar_name] for x in c if x >= 0.0]).min())
+        c = [_c for cc in passive_scalar_c_over_time[passive_scalar_name] for _c in cc if _c > 0.0]
+        c_max = max(c_max, np.array(c).max())
+        c_min = min(c_min, np.array(c).min())
     # normalize
     for passive_scalar_name in passive_scalar_list:
         passive_scalar_c_over_time[passive_scalar_name] = [np.array(c)/c_max for c in passive_scalar_c_over_time[passive_scalar_name]]

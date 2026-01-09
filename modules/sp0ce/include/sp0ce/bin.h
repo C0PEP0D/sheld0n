@@ -32,8 +32,10 @@ class Bin {
 		}
 	public:
 		void addIndex(const unsigned int index, const double* pPosition) {
-			// compute ijk
-			std::array<int, Dim> ijk = positionToIjk(pPosition);
+			addIndex(index, positionToIjk(pPosition));
+		}
+
+		void addIndex(const unsigned int index, const std::array<int, Dim>& ijk) {
 			// update data
 			auto itIjkToIndexes = ijkToIndexes.find(ijk);
 			if(itIjkToIndexes != ijkToIndexes.end()) {
@@ -42,6 +44,18 @@ class Bin {
 				ijkToIndexes.emplace(ijk, std::vector<unsigned int>({ index }));
 			}
 			indexToIjk.emplace(index, ijk);
+		}
+
+		void addNone(const double* pPosition) {
+			addNone(positionToIjk(pPosition));
+		}
+
+		void addNone(const std::array<int, Dim>& ijk) {
+			// update data
+			auto itIjkToIndexes = ijkToIndexes.find(ijk);
+			if(itIjkToIndexes == ijkToIndexes.end()) {
+				ijkToIndexes.emplace(ijk, std::vector<unsigned int>());
+			}
 		}
 
 		void clear() {
@@ -169,8 +183,9 @@ class BinTree {
 		}
 		void addIndex(const unsigned int index, const double* pPosition) {
 			// add in data
-			for(unsigned int i = 0; i < data.size(); ++i) {
-				data[i].addIndex(index, pPosition);
+			data[0].addIndex(index, pPosition);
+			for(unsigned int i = 1; i < data.size(); ++i) {
+				data[i].addNone(pPosition);
 			}
 			// push_back data
 			while(data.back().ijkToIndexes.size() > std::pow(2, Dim)) {
@@ -184,15 +199,7 @@ class BinTree {
 							newIjk[i] = newIjk[i] / 2;
 						}
 					}
-					auto itIjkToIndexes = data.back().ijkToIndexes.find(newIjk);
-					if(itIjkToIndexes != data.back().ijkToIndexes.end()) {
-				    	itIjkToIndexes->second.insert(itIjkToIndexes->second.begin(), indexes.begin(), indexes.end());
-				    } else {
-				    	data.back().ijkToIndexes.emplace(newIjk, indexes);
-				    }
-				    for (auto const& _index : indexes) {
-				    	data.back().indexToIjk.emplace(_index, newIjk);
-				    }
+					data.back().addNone(newIjk);
 				}
 			}
 		}

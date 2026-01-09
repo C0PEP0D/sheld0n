@@ -30,6 +30,9 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = DIM + DIM * DIM + 1; // x, s, q
 	// feel free to add parameters if you need
 	inline static const double Diffusivity = 1.0e-2;
+
+	// init
+	static const bool HasInit = false;
 	inline static const tSpaceVector InitX = tSpaceVector::Zero();
 	inline static const double InitC = 1.0;
 	inline static const tSpaceMatrix InitS = tSpaceVector({1.0e-1, 1.0e-1}).asDiagonal();
@@ -62,7 +65,6 @@ struct _PassiveParticlesParameters {
 
 	// concentration threshold
 	inline static bool hasBlobBeenDeleted = false;
-	inline static unsigned int maxSplitNumber = 1;
 
 	// scalar field
 	using ScalarField = pl0f::ScalarField<DIM, tSpaceVector, tSpaceMatrix, tView>;
@@ -130,90 +132,110 @@ struct _PassiveParticlesParameters {
 					tView<tSpaceMatrix> memberS(pMemberState + DIM);
 					double& memberQ = pMemberState[DIM + DIM * DIM];
 
-					if(memberQ > Qth) {
+					Eigen::SelfAdjointEigenSolver<tSpaceMatrix> solver(memberS);
+					const tSpaceVector eigenValues = solver.eigenvalues();
+					const tSpaceMatrix eigenVectors = solver.eigenvectors();
 
-						Eigen::SelfAdjointEigenSolver<tSpaceMatrix> solver(memberS);
-						const tSpaceVector eigenValues = solver.eigenvalues();
-						const tSpaceMatrix eigenVectors = solver.eigenvectors();
+					std::vector<double> splitState;
 
-						std::vector<double> splitState;
+					// add member state to split state
+					tBase::pushBackMember(splitState);
+					double* pNewState = tBase::state(splitState.data(), tBase::groupSize(splitState.size()) - 1);
+					tView<tSpaceVector> newX(pNewState);
+					tView<tSpaceMatrix> newS(pNewState + DIM);
+					double& newQ = pNewState[DIM + DIM * DIM];
+					// set state
+					newX = memberX;
+					newS = memberS;
+					newQ = memberQ;
 
-						// add member state to split state
-						tBase::pushBackMember(splitState);
-						double* pNewState = tBase::state(splitState.data(), tBase::groupSize(splitState.size()) - 1);
-						tView<tSpaceVector> newX(pNewState);
-						tView<tSpaceMatrix> newS(pNewState + DIM);
-						double& newQ = pNewState[DIM + DIM * DIM];
-						// set state
-						newX = memberX;
-						newS = memberS;
-						newQ = memberQ;
-	
-						for(unsigned int i = 0; i < DIM; ++i) {
-							double variance = eigenValues[i];
-							double standardDeviation = std::sqrt(variance);
-							const tSpaceVector varianceDirection = eigenVectors.col(i);
+					for(unsigned int i = 0; i < DIM; ++i) { // TODO: implement new splitting method into default param
+						double variance = eigenValues[i];
+						double standardDeviation = std::sqrt(variance);
+						const tSpaceVector varianceDirection = eigenVectors.col(i);
 
-							unsigned int splitNumber = 0;
-							while(standardDeviation > SplitSize) {
+						int nDivisions = std::ceil(4.0 / std::pow(SplitDistance, 2) * (variance - std::pow(SplitSize, 2)));
 
-								std::vector<double> newSplitState;
-								newSplitState.reserve(2 * splitState.size());
+						if (nDivisions > 0) {
 
-								for(unsigned int splitMemberIndex = 0; splitMemberIndex < tBase::groupSize(splitState.size()); ++splitMemberIndex) {
+							// binomial distribution by repeated convolution with [0.5, 0.5] (coin toss)
+							// $P(k) = \binom{n}{k} (0.5)^n$ computed as follows :
+							// \begin{align}
+							// q_0 &= 2^{-n}, \\
+							// q_{k+1} &= q_k \cdot \frac{n - k}{k + 1}
+							// \end{align}
+							std::vector<double> qDistribution(nDivisions + 1);
+							// index of largest probability
+						    const unsigned int k_max = nDivisions / 2;
+						    // set max probability temporarily to 1.0
+						    qDistribution[k_max] = 1.0;
+						    // fill upwards: q[k+1] = q[k] * (n-k)/(k+1)
+						    for (unsigned int k = k_max; k < nDivisions; ++k) {
+						        qDistribution[k + 1] = qDistribution[k] * static_cast<double>(nDivisions - k) / static_cast<double>(k + 1);
+						    }
+						    // fill downwards: q[k-1] = q[k] * k / (n-k+1)
+						    for (int k = k_max; k > 0; --k) {
+						        qDistribution[k - 1] = qDistribution[k] * static_cast<double>(k) / static_cast<double>(nDivisions - k + 1);
+						    }
+						
+						    // normalize
+						    const double sum = std::accumulate(qDistribution.begin(), qDistribution.end(), 0.0);
+						    for (auto &q : qDistribution) q /= sum;
+						    
+						    // set split state
+							std::vector<double> newSplitState(tBase::groupSize(splitState.size()) * qDistribution.size() * StateSize);
+							for(unsigned int splitMemberIndex = 0; splitMemberIndex < tBase::groupSize(splitState.size()); ++splitMemberIndex) {
 
-									double* pSplitMemberState = tBase::state(splitState.data(), splitMemberIndex);
-									
-									tView<tSpaceVector> splitMemberX(pSplitMemberState);
-									tView<tSpaceMatrix> splitMemberS(pSplitMemberState + DIM);
-									double& splitMemberQ = pSplitMemberState[DIM + DIM * DIM];
+								double* pSplitMemberState = tBase::state(splitState.data(), splitMemberIndex);
 
-									const tSpaceVector splitX = splitMemberX;
-									const tSpaceMatrix splitS = splitMemberS - 0.25 * std::pow(SplitDistance, 2) * varianceDirection * varianceDirection.transpose();
-									const double splitQ = 0.5 * splitMemberQ;
-	
-									// add a member
-	
-									tBase::pushBackMember(newSplitState);
+								tView<tSpaceVector> splitMemberX(pSplitMemberState);
+								tView<tSpaceMatrix> splitMemberS(pSplitMemberState + DIM);
+								double& splitMemberQ = pSplitMemberState[DIM + DIM * DIM];
+
+								const tSpaceVector splitX = splitMemberX;
+								const tSpaceMatrix splitS = splitMemberS - nDivisions * 0.25 * std::pow(SplitDistance, 2) * varianceDirection * varianceDirection.transpose();
+
+								// add a member
+							
+								for(unsigned int k = 0; k < qDistribution.size(); ++k) {
 									// set state
-									double* pAState = tBase::state(newSplitState.data(), tBase::groupSize(newSplitState.size()) - 1);
+									double* pPartState = tBase::state(newSplitState.data(), splitMemberIndex * qDistribution.size() + k);
 									// x
-									tView<tSpaceVector> aX(pAState);
-									tView<tSpaceMatrix> aS(pAState + DIM);
-									double& aQ = pAState[DIM + DIM * DIM];
+									tView<tSpaceVector> partX(pPartState);
+									tView<tSpaceMatrix> partS(pPartState + DIM);
+									double& partQ = pPartState[DIM + DIM * DIM];
 				
-									aX = splitX - 0.5 * SplitDistance * varianceDirection;
-									aS = splitS;
-									aQ = splitQ;
-				
-									// add new member
-				
-									tBase::pushBackMember(newSplitState);
-									// set state
-									double* pBState = tBase::state(newSplitState.data(), tBase::groupSize(newSplitState.size()) - 1);
-									// x
-									tView<tSpaceVector> bX(pBState);
-									tView<tSpaceMatrix> bS(pBState + DIM);
-									double& bQ = pBState[DIM + DIM * DIM];
-				
-									bX = splitX + 0.5 * SplitDistance * varianceDirection;
-									bS = splitS;
-									bQ = splitQ;
-	
-									// update
-									variance -= 0.25 * std::pow(SplitDistance, 2);
-									standardDeviation = std::sqrt(variance);
+									partX = splitX + SplitDistance * (k - (qDistribution.size() - 1)/2.0) * varianceDirection;
+									partS = splitS;
+									partQ = splitMemberQ * qDistribution[k];
 								}
-
-								splitNumber++;
-								splitState = newSplitState;
 							}
-							if(splitNumber > maxSplitNumber) {
-								maxSplitNumber = splitNumber;
-								std::cout << "WARNING : A scalar blob splitted " << splitNumber << " times in one time step. Consider reducing the time step Dt of the simulation if this increases too much. This message will only be displayed again if the maximum number of splits increases. " << std::endl;
-							}
+							splitState = newSplitState;
 						}
-						newState.insert(newState.end(), splitState.begin(), splitState.end());
+					}
+					
+					newState.insert(newState.end(), splitState.begin(), splitState.end());
+				}
+				
+				// merge
+
+				scalarField.prepare0(tBase::cState(newState.data(), 0), tBase::groupSize(newState.size()));
+				_state = scalarField.superStateArray[0];
+
+				// filter
+				
+				newState.clear();
+				newState.reserve(_state.size());
+
+				for(int index = 0; index < tBase::groupSize(_state.size()); ++index) {
+					double* pMemberState = tBase::state(_state.data(), index);
+					
+					tView<tSpaceVector> memberX(pMemberState);
+					tView<tSpaceMatrix> memberS(pMemberState + DIM);
+					double& memberQ = pMemberState[DIM + DIM * DIM];
+
+					if(memberQ > Qth) {
+						newState.insert(newState.end(), pMemberState, pMemberState + StateSize);
 					} else {
 						if(not hasBlobBeenDeleted) {
 							std::cout << "INFO : A scalar blob has fallen below the concentration threshold and has been deleted. This message will not be displayed again." << std::endl;
@@ -222,11 +244,7 @@ struct _PassiveParticlesParameters {
 					}
 				}
 				
-				_state = newState;
-
-				// merge
-
-				scalarField.prepare(tBase::cState(_state.data(), 0), tBase::groupSize(_state.size()));
+				scalarField.prepare0(tBase::cState(newState.data(), 0), tBase::groupSize(newState.size()));
 				_state = scalarField.superStateArray[0];
 			}
 			
@@ -345,7 +363,7 @@ struct _PassiveParticlesParameters {
 			std::cout << "WARNING : " + name + " Dx (" << Dx << ") is smaller than the recommended minimum Dx." << std::endl;
 		}
 
-		{ // 0
+		if (HasInit) { // 0
 			tGroupVariable::pushBackMember(state);
 			// set initial state
 			double* pState = tGroupVariable::state(state.data(), tGroupVariable::groupSize(state.size()) - 1);
@@ -354,7 +372,7 @@ struct _PassiveParticlesParameters {
 			tView<tSpaceMatrix> s(pState + DIM);
 			double& q = pState[DIM + DIM * DIM];
 			// set
-			x = tSpaceVector::Zero();
+			x = InitX;
 			s = InitS;
 			q = InitC * (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(s.determinant()));
 		}

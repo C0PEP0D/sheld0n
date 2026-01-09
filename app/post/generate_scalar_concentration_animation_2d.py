@@ -100,8 +100,9 @@ def main():
         passive_scalar_pos_1_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_1", time_dir_array)
         passive_scalar_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, passive_scalar_name + ".*__c", time_dir_array)
         # c_max, c_min
-        c_max = max(c_max, np.array([x for c in passive_scalar_c_over_time[passive_scalar_name] for x in c if x >= 0.0]).max())
-        c_min = min(c_min, np.array([x for c in passive_scalar_c_over_time[passive_scalar_name] for x in c if x >= 0.0]).min())
+        c = [_c for cc in passive_scalar_c_over_time[passive_scalar_name] for _c in cc if _c > 0.0]
+        c_max = max(c_max, np.array(c).max())
+        c_min = min(c_min, np.array(c).min())
     # normalize
     for passive_scalar_name in passive_scalar_list:
         passive_scalar_c_over_time[passive_scalar_name] = [np.array(c)/c_max for c in passive_scalar_c_over_time[passive_scalar_name]]
@@ -124,6 +125,9 @@ def main():
         art_ax.set_xlim(args.xlim[0], args.xlim[1])
     if args.ylim:
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
+    # pane color
+    if args.flat:
+        art_ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     # plot the data
     print("INFO: Plotting...", flush=True)
     trajectories = {}
@@ -147,6 +151,8 @@ def main():
     # top-down view if necessary
     if args.flat:
         art_ax.view_init(90, -90)
+        art_ax.set_zticks([])
+        art_ax.set_zlabel("")
     # adjust the legend
     art_ax.legend(handles=legend_handles, loc='upper right', frameon=True)
     # adjust the color bar
@@ -184,6 +190,9 @@ def main():
         art_ax.set_xlim(args.xlim[0], args.xlim[1])
     if args.ylim:
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
+    # pane color
+    if args.flat:
+        art_ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     # plot data
     print("INFO: Plotting...", flush=True)
     trajectories = {}
@@ -207,6 +216,8 @@ def main():
     # top-down view if necessary
     if args.flat:
         art_ax.view_init(90, -90)
+        art_ax.set_zticks([])
+        art_ax.set_zlabel("")
     # adjust ax
     art_ax.zaxis.set_major_formatter(ticker.FuncFormatter(log_tick_formatter))
     art_ax.zaxis.set_major_locator(ticker.MaxNLocator(integer=True))

@@ -72,7 +72,8 @@ def main(passive_scalar_list, input_color_list, step):
         profile_c_x_over_time[passive_scalar_name] = np.array(libpost.get_equation_property_over_time(passive_scalar_name, "profile_c__.*__x", time_dir_array))
         profile_c_c_over_time[passive_scalar_name] = np.array(libpost.get_equation_property_over_time(passive_scalar_name, "profile_c__.*__c", time_dir_array))
         # c_max
-        c_max = max(c_max, np.array([x for c in np.nan_to_num(profile_c_c_over_time[passive_scalar_name]) for x in c]).max())
+        c = [_c for cc in passive_scalar_c_over_time[passive_scalar_name] for _c in cc if _c > 0.0]
+        c_max = max(c_max, np.array(c).max())
     # normalizing by c_max
     for passive_scalar_name in passive_scalar_list:
         profile_c_c_over_time[passive_scalar_name] = [np.array(c)/c_max for c in profile_c_c_over_time[passive_scalar_name]]

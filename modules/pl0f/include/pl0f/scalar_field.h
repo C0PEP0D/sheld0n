@@ -48,65 +48,9 @@ struct ScalarField {
 
 	public:
 		void prepare(const double* pState, const unsigned int number) {
-			// fill tree
-			binTree.clear();
-			for(unsigned int index = 0; index < number; ++index) {
-				const tVector x = sp0ce::xPeriodic<tVector>(pState + index * BlobStateSize, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
-				binTree.addIndex(index, x.data());
-			}
-
-			// compute super blobs
-			ijkToSuperIndex.clear();
-			superStateArray.clear();
-			// 0
-			ijkToSuperIndex.emplace_back();
-			superStateArray.emplace_back();
-			for (auto const& [ijk, indexes] : binTree.data[0].ijkToIndexes) {
-				// init
-				ijkToSuperIndex[0][ijk] = ijkToSuperIndex[0].size();
-				superStateArray[0].resize(ijkToSuperIndex[0].size() * BlobStateSize, 0.0);
-				// output
-				double* pSuperState = superStateArray[0].data() + superStateArray[0].size() - BlobStateSize;
-				tView<tVector> superX(pSuperState);
-				tView<tMatrix> superS(pSuperState + Dim);
-				double& superQ = pSuperState[Dim + Dim * Dim];
-				double superQAbs = 0.0;
-				
-				// x
-				for (auto const& index : indexes) {
-
-					const double* pMemberState = pState + BlobStateSize * index;
-
-					const tView<const tVector> memberX(pMemberState);
-					const tVector memberXPeriodic = sp0ce::xPeriodic<tVector>(memberX.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
-					const tView<const tMatrix> memberS(pMemberState + Dim);
-					const double memberQ = pMemberState[Dim + Dim * Dim];
-					const double memberQAbs = std::abs(memberQ);
-
-					superX += memberQAbs * memberXPeriodic;
-					superQ += memberQ;
-					superQAbs += memberQAbs;
-				}
-				if(superQAbs > 0.0) {
-					superX /= superQAbs;
-				}
-				// s
-				for (auto const& index : indexes) {
-					const double* pMemberState = pState + BlobStateSize * index;
-									
-					const tView<const tVector> memberX(pMemberState);
-					const tVector memberXPeriodic = sp0ce::xPeriodic<tVector>(memberX.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
-					const tView<const tMatrix> memberS(pMemberState + Dim);
-					const double memberQ = pMemberState[Dim + Dim * Dim];
-					const double memberQAbs = std::abs(memberQ);
-
-					const tVector r = memberXPeriodic - superX;
-					superS += memberQAbs * (memberS + r * r.transpose());
-				}
-				if(superQAbs > 0.0) {
-					superS /= superQAbs;
-				};
-			}
+			// prepare
+			prepare0(pState, number);
+			// continue
 			if(IsApproximatingWithBin) {
 				// others
 				for(unsigned int i = 1; i < binTree.data.size(); ++i) {
@@ -171,7 +115,74 @@ struct ScalarField {
 					}
 				}
 			}
+			// clear
+			for(unsigned int i = 1; i < binTree.data.size(); ++i) {
+				binTree.data[i].clear();
+			}
 		};
+
+		void prepare0(const double* pState, const unsigned int number) {
+			// fill tree
+			binTree.clear();
+			for(unsigned int index = 0; index < number; ++index) {
+				const tVector x = sp0ce::xPeriodic<tVector>(pState + index * BlobStateSize, periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
+				binTree.addIndex(index, x.data());
+			}
+			// compute super blobs
+			ijkToSuperIndex.clear();
+			superStateArray.clear();
+			// 0
+			ijkToSuperIndex.emplace_back();
+			superStateArray.emplace_back();
+			for (auto const& [ijk, indexes] : binTree.data[0].ijkToIndexes) {
+				// init
+				ijkToSuperIndex[0][ijk] = ijkToSuperIndex[0].size();
+				superStateArray[0].resize(ijkToSuperIndex[0].size() * BlobStateSize, 0.0);
+				// output
+				double* pSuperState = superStateArray[0].data() + superStateArray[0].size() - BlobStateSize;
+				tView<tVector> superX(pSuperState);
+				tView<tMatrix> superS(pSuperState + Dim);
+				double& superQ = pSuperState[Dim + Dim * Dim];
+				double superQAbs = 0.0;
+				
+				// x
+				for (auto const& index : indexes) {
+
+					const double* pMemberState = pState + BlobStateSize * index;
+
+					const tView<const tVector> memberX(pMemberState);
+					const tVector memberXPeriodic = sp0ce::xPeriodic<tVector>(memberX.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
+					const tView<const tMatrix> memberS(pMemberState + Dim);
+					const double memberQ = pMemberState[Dim + Dim * Dim];
+					const double memberQAbs = std::abs(memberQ);
+
+					superX += memberQAbs * memberXPeriodic;
+					superQ += memberQ;
+					superQAbs += memberQAbs;
+				}
+				if(superQAbs > 0.0) {
+					superX /= superQAbs;
+				}
+				// s
+				for (auto const& index : indexes) {
+					const double* pMemberState = pState + BlobStateSize * index;
+									
+					const tView<const tVector> memberX(pMemberState);
+					const tVector memberXPeriodic = sp0ce::xPeriodic<tVector>(memberX.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
+					const tView<const tMatrix> memberS(pMemberState + Dim);
+					const double memberQ = pMemberState[Dim + Dim * Dim];
+					const double memberQAbs = std::abs(memberQ);
+
+					const tVector r = memberXPeriodic - superX;
+					superS += memberQAbs * (memberS + r * r.transpose());
+				}
+				if(superQAbs > 0.0) {
+					superS /= superQAbs;
+				};
+			}
+			// clear
+			binTree.data[0].clear();
+		}
 
 	public:
 		double getScalar(const double* pState, const unsigned int number, const double* pX) {
@@ -182,8 +193,8 @@ struct ScalarField {
 			// compute
 			if (IsApproximatingWithBin) {
 				std::vector<std::array<int, Dim>> childrenIjkArray;
-				for (auto [key, value] : binTree.data[binTree.data.size() - 1].ijkToIndexes) {
-				    childrenIjkArray.push_back(key);
+				for (auto [ijk, indexes] : ijkToSuperIndex[ijkToSuperIndex.size() - 1]) {
+				    childrenIjkArray.push_back(ijk);
 				}
 
 				for(unsigned int i = binTree.data.size() - 1; i > 0; --i) {
@@ -268,8 +279,8 @@ struct ScalarField {
 			//compute
 			if (IsApproximatingWithBin) {
 				std::vector<std::array<int, Dim>> childrenIjkArray;
-				for (auto [key, value] : binTree.data[binTree.data.size() - 1].ijkToIndexes) {
-				    childrenIjkArray.push_back(key);
+				for (auto [ijk, indexes] : ijkToSuperIndex[ijkToSuperIndex.size() - 1]) {
+				    childrenIjkArray.push_back(ijk);
 				}
 
 				for(unsigned int i = binTree.data.size() - 1; i > 0; --i) {

@@ -6,8 +6,8 @@
 #include <map>
 #include <iomanip>
 
-// eigen includes
-#include <unsupported/Eigen/MatrixFunctions>
+// lib includes
+#include "sp0ce/operators.h"
 
 // app includes
 #include "core/solutions/core.h"
@@ -16,25 +16,26 @@
 #include "core/solutions/equation/custom/core.h"
 #include "param/parameters.h"
 
-// FLAG: INCLUDE OTHER SOLUTION START
+// ---------------- INCLUDE OTHER PARAM START
 #include "param/solutions/passive_scalar_blobs/parameters.h"
-// FLAG: INCLUDE OTHER SOLUTION END
 #include "param/run/parameters.h"
+// ---------------- INCLUDE OTHER PARAM END
 
 namespace c0p {
 
 struct _PassiveParticlesParameters {
-	inline static unsigned int StateIndex = 0; // USED INTERNALLY, DO NOT EDIT MANUALLY UNLESS YOU KNOW WHAT YOU ARE DOING
+	inline static unsigned int StateIndex = 0; // USED INTERNALLY, DO NOT EDIT
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
 
-	static const unsigned StateSize = DIM + DIM; // x + p
+	static const unsigned StateSize = DIM; // dimension of the state variable 
 	// feel free to add parameters if you need
-	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	static constexpr double SwimmingVelocity = 0.5;
-	static constexpr double ReorientationTime = 1.0; // must be larger than RunParameters::Dtto ensure stability
-	static constexpr double SurfingTimeHorizon = 0.0;
+	static const unsigned Number = 1; // number of members in the group
+	// source
+	inline static const double SourceC = 1.0;
+	inline static const tSpaceMatrix SourceS = tSpaceVector({1.0e-2, 1.0e-2}).asDiagonal();
+	inline static const double SourceReactionTime = 1.0/128.0;
 	// periodicity
 	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
 	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;
@@ -43,20 +44,26 @@ struct _PassiveParticlesParameters {
 	// ---------------- CUSTOM EQUATION PARAMETERS END
 
 	// variable
-
 	struct tMemberVariable : public d0t::VariableVector<tVector, tView, StateSize> {
 	
 		static void constrain(std::vector<std::vector<double>>& stateArray, const double t, const unsigned int memberStateIndex) {
 			// input
 			double* pState = stateArray[0].data() + memberStateIndex;
-
 			// ---------------- CUSTOM CONSTRAIN START
-
+			
 			tView<tSpaceVector> x(pState);
-			tView<tSpaceVector> p(pState + DIM);
 			x = sp0ce::xPeriodic<tSpaceVector>(x.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
-			p = p.normalized();
 
+			// scalar coupling
+
+			using PassiveScalarBlobsParameters = _PassiveScalarBlobsParameters;
+			const std::vector<double>& passiveScalarBlobsState = stateArray[PassiveScalarBlobsParameters::StateIndex];
+
+			const double c = PassiveScalarBlobsParameters::tGroupVariable::c(passiveScalarBlobsState.data(), passiveScalarBlobsState.size(), x.data());
+			
+			const double dQ = (SourceC - c) * std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(SourceS.determinant()) * RunParameters::Dt / SourceReactionTime;
+			PassiveScalarBlobsParameters::tGroupVariable::addQ(x.data(), SourceS.data(), dQ);
+			
 			// ---------------- CUSTOM CONSTRAIN END
 		}
 
@@ -65,16 +72,13 @@ struct _PassiveParticlesParameters {
 	using tVariable = tGroupVariable;
 
 	// equation
-
 	struct tMemberEquation : public d0t::Equation<tMemberVariable> {
 
 		static void prepare(const double* pState, const unsigned int stateSize, const double t) {
-
 			// ---------------- CUSTOM PREPARATION START
 
 			const tView<const tSpaceVector> cX(pState);
 			Flow::prepareVelocity(cX.data(), t);
-			Flow::prepareVelocityGradients(cX.data(), t);
 
 			// ---------------- CUSTOM PREPARATION END
 		}
@@ -90,63 +94,40 @@ struct _PassiveParticlesParameters {
 
 			// input
 			const tView<const tSpaceVector> x(pState);
-			const tView<const tSpaceVector> p(pState + DIM);
 			// flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
-			const tSpaceMatrix j = Flow::getVelocityGradients(x.data(), t);
-			// odor
-			using PassiveScalarBlobsParameters = _PassiveScalarBlobsParameters;
-			const double* pPassiveScalarBlobsState  = pStateArray[PassiveScalarBlobsParameters::StateIndex];
-			const unsigned int PassiveScalarBlobsSize  = pStateSize[PassiveScalarBlobsParameters::StateIndex];
-			// // input gradient
-			const tSpaceVector cGradient = PassiveScalarBlobsParameters::tVariable::cGradient(pPassiveScalarBlobsState, PassiveScalarBlobsSize, x.data());
-			const double cGradientNorm = cGradient.norm();
 			// output
 			tView<tSpaceVector> dX(dState.data());
-			tView<tSpaceVector> dP(dState.data() + DIM);
-			// equation
-			if(cGradientNorm > 0.0) {
-				// target
-				const tSpaceVector cTarget = (j * SurfingTimeHorizon).exp().transpose() * cGradient;
-				const double cTargetNorm = cTarget.norm();
-				const tSpaceVector cTargetNormalized = cTarget/cTargetNorm;
-				// control
-				dP = (cTargetNormalized - p) * cTargetNorm / ReorientationTime;
-			} else {
-				dP = tSpaceVector::Zero();
-			}
-			dX = u + SwimmingVelocity * p.normalized();
+			dX = u;
 
 			// ---------------- CUSTOM EQUATION END
 
 			// return result
 			return dState;
 		}
-
 	};
 	using tGroupEquation = d0t::EquationGroupStatic<tGroupVariable, tMemberEquation>;
 	using tEquation = tGroupEquation;
 
 	// ---------------- CUSTOM INIT PARAMETERS START
-
 	inline static const tSpaceVector BoxCenter = EnvParameters::cDomainCenter;
 	inline static const tSpaceVector BoxSize = EnvParameters::cDomainSize;
-
 	// ---------------- CUSTOM INIT PARAMETERS START
 
 	static void init(double* pState) {
 		// ---------------- CUSTOM INIT START
 
+		// interpret BoxCenter and BoxSize as vectors
+		const tSpaceVector boxCenter = tView<const tSpaceVector>(BoxCenter.data());
+		const tSpaceVector boxSize = tView<const tSpaceVector>(BoxSize.data());
 		// loop over each member of the variable group
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
 			// get the state variable of the subIndex member of the group
-			double* pMemberState = tVariable::state(pState, subIndex);
+			double* pSubState = tVariable::state(pState, subIndex);
 			// interpret subState as a tSpaceVector
-			tView<tSpaceVector> x(pMemberState);
-			tView<tSpaceVector> p(pMemberState + DIM);
+			tView<tSpaceVector> x(pSubState);
 			// set the initial position of this member
-			x = BoxCenter + 0.5 * BoxSize.asDiagonal() * tSpaceVector::Random();
-			p = tSpaceVector::Random().normalized();
+			x = boxCenter + 0.5 * boxSize.asDiagonal() * tSpaceVector::Random();
 		}
 
 		// ---------------- CUSTOM INIT END
@@ -158,20 +139,18 @@ struct _PassiveParticlesParameters {
 		std::map<std::string, double> output;
 
 		// ---------------- CUSTOM POST START
-		
+
 		tSpaceVector xAverage = tSpaceVector::Zero();
 		for(unsigned int subIndex = 0; subIndex < Number; ++subIndex) {
 			const double* pSubState = tVariable::cState(pState, subIndex);
 			// input
 			const tView<const tSpaceVector> x(pSubState);
-			const tView<const tSpaceVector> p(pSubState + DIM);
 			// generate formated index
 			std::ostringstream ossIndex;
 			ossIndex << "passive_particles__index_" << std::setw(FormatNumber) << std::setfill('0') << subIndex;
 			// output
 			for(unsigned int i = 0; i < DIM; ++i) {
 				output[ossIndex.str() + "__pos_" + std::to_string(i)] = x[i];
-				output[ossIndex.str() + "__dir_" + std::to_string(i)] = p[i];
 			}
 			// compute average
 			xAverage += x;
@@ -182,7 +161,6 @@ struct _PassiveParticlesParameters {
 		}
 
 		// ---------------- CUSTOM POST END
-		
 		return output;
 	}
 };

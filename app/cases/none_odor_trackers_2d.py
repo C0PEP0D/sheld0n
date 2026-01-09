@@ -19,14 +19,19 @@ def set_solutions():
     os.chdir('passive_scalar_blobs')
     os.system('./.cli_choose cpp_passive_scalar_blobs')
     os.chdir('..')
+    # odor emitters
+    os.system('./.cli_create_new_equation odor_emitters')
+    os.chdir('odor_emitters')
+    os.system('./.cli_choose cpp_odor_emitters')
+    os.chdir('..')
     # odor trackers
     os.system('./.cli_create_new_equation odor_trackers_gradient')
     os.chdir('odor_trackers_gradient')
     os.system('./.cli_choose cpp_odor_trackers_gradient')
     os.chdir('..')
+    # back
     os.chdir('../..')
     # set parameters
-    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs HasSource true') # add source of scalar
     os.system('./.cli_set_parameter param/solutions/odor_trackers_gradient Number "EnvParameters::cGroupSize/16"') # reduce number of trackers
 
 def main():
