@@ -173,7 +173,7 @@ struct ScalarField {
 					const double memberQ = pMemberState[Dim + Dim * Dim];
 					const double memberQAbs = std::abs(memberQ);
 
-					const tVector r = memberXPeriodic - superX;
+					const tVector r = sp0ce::abPeriodic<tVector, tView>(superX.data(), memberXPeriodic.data(), periodCenter.data(), periodSize.data(), isAxisPeriodic.data());
 					superS += memberQAbs * (memberS + r * r.transpose());
 				}
 				if(superQAbs > 0.0) {

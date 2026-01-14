@@ -6,6 +6,8 @@ namespace c0p {
 
 struct Flow {
 
+	inline static const double Velocity = 1.0;
+
 	static void init() {
 		// nothing to do
 	}
@@ -13,7 +15,7 @@ struct Flow {
 	// get
 
 	static tSpaceVector getVelocity(const double* pX, const double t) {
-		return tSpaceVector({
+		return Velocity * tSpaceVector({
 				std::cos(pX[0]) * std::sin(pX[1]),
 				-std::sin(pX[0]) * std::cos(pX[1])
 		});
@@ -23,7 +25,7 @@ struct Flow {
 		tSpaceMatrix velocityGradients = tSpaceMatrix::Zero();
 		velocityGradients(0,0) = -std::sin(pX[0]) * std::sin(pX[1]); velocityGradients(0,1) = std::cos(pX[0]) * std::cos(pX[1]);
 		velocityGradients(1,0) = -std::cos(pX[0]) * std::cos(pX[1]); velocityGradients(1,1) = std::sin(pX[0]) * std::sin(pX[1]);
-		return velocityGradients;
+		return Velocity * velocityGradients;
 	};
 	
 	// prepare

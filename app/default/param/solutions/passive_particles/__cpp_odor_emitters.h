@@ -33,10 +33,10 @@ struct _PassiveParticlesParameters {
 	// feel free to add parameters if you need
 	static const unsigned Number = 1; // number of members in the group
 	static constexpr double SwimmingVelocity = 0.5;
-	static constexpr double RotationalDiffusivity = 1e-1;
+	static constexpr double RotationalDiffusivity = 1e0;
 	// source
 	inline static const double SourceC = 1.0;
-	inline static const tSpaceMatrix SourceS = tSpaceVector({1.0e-2, 1.0e-2}).asDiagonal();
+	inline static const tSpaceMatrix SourceS = tSpaceVector({5.0e-3, 5.0e-3}).asDiagonal();
 	inline static const double SourceReactionTime = 1.0/128.0;
 	// periodicity
 	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;

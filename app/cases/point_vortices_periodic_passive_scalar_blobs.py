@@ -43,7 +43,7 @@ def set_solutions():
     os.chdir('../..')
     # set parameters
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs Diffusivity 1.0e-16')
-    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs Dx 2.5e-2')
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs SplitSizeFactor 1e-1')
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs InitS "tSpaceVector({1.0e-2, 1.0e-6}).asDiagonal()"')
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs Cth 1.0e-3')
 

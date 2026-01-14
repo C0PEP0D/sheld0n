@@ -40,14 +40,16 @@ struct _PassiveParticlesParameters {
 	// splitting
 	static const bool IsSplitting = true;
 	inline static const double OverlapFactor = 2.5; // must be bigger than 2 to avoid concentration increase when splitting, increase to increase accuracy at the cost of computation time
-	inline static const double MinDx = 2.0 * std::sqrt(Diffusivity * RunParameters::Dt) * OverlapFactor;
-	inline static const double Dx = std::max(4.0e-1, MinDx);
-	inline static const double SplitSize = Dx;
+	inline static const double SplitSizeFactor = 1e-1; // decrease to increase accuracy at the cost of computation time
+	inline static const double SplitSize = SplitSizeFactor * std::max(
+		EnvParameters::cLength, // ensure advection accuracy (EnvParameters::cLength should be set to the characteristic flow length scale)
+		2.0 * std::sqrt(Diffusivity * RunParameters::Dt) // ensure diffusive accuracy
+	);
 	inline static const double SplitDistance = SplitSize / OverlapFactor;
 	inline static const double MergeDx = SplitDistance / std::sqrt(DIM);
 	// concentration threshold (for blob deletion)
 	inline static const double Cth = 1.0e-6;
-	inline static const double Qth = Cth * std::pow(Dx, DIM);
+	inline static const double Qth = Cth * std::pow(MergeDx, DIM);
 
 	// source
 	static const bool HasSource = false;
@@ -358,11 +360,6 @@ struct _PassiveParticlesParameters {
 	static void init(std::vector<double>& state) {
 		// ---------------- CUSTOM INIT START
 
-		std::cout << "INFO : Init " + name + ": Minimum Dx: " << MinDx << std::endl;
-		if(Dx < MinDx) {
-			std::cout << "WARNING : " + name + " Dx (" << Dx << ") is smaller than the recommended minimum Dx." << std::endl;
-		}
-
 		if (HasInit) { // 0
 			tGroupVariable::pushBackMember(state);
 			// set initial state
@@ -383,7 +380,8 @@ struct _PassiveParticlesParameters {
 	// ---------------- CUSTOM POST PARAMETERS START
 
 	inline static const bool IsPostProcessingConcentration = true;
-	inline static const bool IsPostProcessingConcentrationProfile = false && IsPostProcessingConcentration;
+	inline static const bool IsPostProcessingConcentrationOnGrid = false;
+	inline static const unsigned int GridN = 256;
 
 	// ---------------- CUSTOM POST PARAMETERS START
 
@@ -400,33 +398,44 @@ struct _PassiveParticlesParameters {
 				const double* pMemberState = tVariable::cState(pState, index);
 				// input
 				const tView<const tSpaceVector> x(pMemberState);
+				const tView<const tSpaceMatrix> s(pMemberState + DIM);
+				const double& q = pMemberState[DIM + DIM * DIM];
 				// generate formated index
 				std::ostringstream ossIndex;
-				ossIndex << "passive_particles__index_" << std::setw(formatNumber) << std::setfill('0') << index;
+				ossIndex << "passive_scalar_blobs__index_" << std::setw(formatNumber) << std::setfill('0') << index;
 				// output
 				for(unsigned int i = 0; i < DIM; ++i) {
 					output[ossIndex.str() + "__pos_" + std::to_string(i)] = x[i];
+					for(unsigned int j = 0; j < DIM; ++j) {
+						output[ossIndex.str() + "__s_" + std::to_string(i) + "_" + std::to_string(j)] = s(i, j);
+					}
 				}
+				output[ossIndex.str() + "__c0"] = q / (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(s.determinant()));
 				if(IsPostProcessingConcentration) {
 					output[ossIndex.str() + "__c"] = tGroupVariable::c(pState, stateSize, x.data());
 				}
 			}
 		}
 
-		if(IsPostProcessingConcentrationProfile) { // profile
-			unsigned int number = std::round(EnvParameters::cDomainSize[0]/MergeDx);
-			unsigned int formatNumber = int(std::log10(number)) + 1;
+		if(IsPostProcessingConcentrationOnGrid) { // profile
+			const unsigned int formatNumber = int(std::log10(GridN)) + 1;
+
+			const double dx = EnvParameters::cDomainSize[0]/GridN;
+			const double dy = EnvParameters::cDomainSize[1]/GridN;
 			
-			for(unsigned int index = 0; index < number; ++index) {
-				tSpaceVector x = tSpaceVector::Zero();
-				x[0] = (-0.5 * number + index) * MergeDx;
-				// generate formated index
-				std::ostringstream ossIndex;
-				ossIndex << "profile_c__index_" << std::setw(formatNumber) << std::setfill('0') << index;
-				// output
-				output[ossIndex.str() + "__x"] = x[0];
-				output[ossIndex.str() + "__c"] = tGroupVariable::c(pState, stateSize, x.data());
-				output[ossIndex.str() + "__cGradient"] = tGroupVariable::cGradient(pState, stateSize, x.data())[0];
+			for(unsigned int i = 0; i < GridN; ++i) {
+				for(unsigned int j = 0; j < GridN; ++j) {
+					tSpaceVector x = tSpaceVector::Zero();
+					x[0] = -0.5 * EnvParameters::cDomainSize[0] + EnvParameters::cDomainCenter[0] + i * dx;
+					x[1] = -0.5 * EnvParameters::cDomainSize[1] + EnvParameters::cDomainCenter[1] + j * dy;
+					// generate formated i and j
+					std::ostringstream ossIndex;
+					ossIndex << "grid_c__i_" << std::setw(formatNumber) << std::setfill('0') << i << "_j_" << std::setw(formatNumber) << std::setfill('0') << j;
+					// output
+					output[ossIndex.str() + "__x"] = x[0];
+					output[ossIndex.str() + "__y"] = x[1];
+					output[ossIndex.str() + "__c"] = tGroupVariable::c(pState, stateSize, x.data());
+				}
 			}
 		}
 		

@@ -32,8 +32,8 @@ struct _PassiveParticlesParameters {
 	static const unsigned StateSize = DIM + DIM; // x + p
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
-	static constexpr double SwimmingVelocity = 0.5;
-	static constexpr double ReorientationTime = 1.0; // must be larger than RunParameters::Dtto ensure stability
+	static constexpr double SwimmingVelocity = 1.0;
+	static constexpr double ReorientationTime = 0.25; // must be larger than RunParameters::Dtto ensure stability
 	static constexpr double SurfingTimeHorizon = 0.0;
 	// periodicity
 	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
@@ -112,6 +112,7 @@ struct _PassiveParticlesParameters {
 				const tSpaceVector cTargetNormalized = cTarget/cTargetNorm;
 				// control
 				dP = (cTargetNormalized - p) * cTargetNorm / ReorientationTime;
+				dP = dP - dP.dot(p) * p;
 			} else {
 				dP = tSpaceVector::Zero();
 			}

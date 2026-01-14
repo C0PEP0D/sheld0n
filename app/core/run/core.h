@@ -86,7 +86,7 @@ class Run {
 		void saveAndPostProcess(const tScalar& t) {
 			// directory
 			std::ostringstream oss;
-			oss << "time/" << std::fixed << std::setprecision(7) << std::setw(10) << std::setfill('0') << t;
+			oss << "time/" << std::fixed << std::setprecision(7) << std::setw(11) << std::setfill('0') << t;
 			std::string folder = oss.str();
 			std::filesystem::create_directory(folder);
 			// save
@@ -101,7 +101,7 @@ class Run {
 		void load(const tScalar& t) {
 			// directory
 			std::ostringstream oss;
-			oss << "time/" << std::fixed << std::setprecision(7) << std::setw(10) << std::setfill('0') << t;
+			oss << "time/" << std::fixed << std::setprecision(7) << std::setw(11) << std::setfill('0') << t;
 			std::string folder = oss.str();
 			// load
 			Env::solutions.load(folder);
