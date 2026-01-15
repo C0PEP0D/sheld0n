@@ -83,6 +83,13 @@ However, if you feel like you do not need it or if the installation with gui doe
 ```
 This may take a while, especially during the operation **Building wheel for wxpython (pyproject.toml) ...**
 
+> [!NOTE]
+> Building wxpython takes a lot of disk space temporary.
+> If you do not have enough disk space, you may want to
+> move temporarily your tmp dir (where wxpython is built)
+> to an external disk. To do so, you can change TMPDIR
+> `export TMPDIR=/mnt/other-tmp` before the installation.
+
 ### Updating
 
 In the future, if you'd like to update the code, a simple pull should be enough.
