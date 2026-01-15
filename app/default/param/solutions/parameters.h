@@ -137,9 +137,13 @@ struct SolutionsParameters {
 
 	static void loadDynamicSolution(const std::string& filename, std::vector<double>& data) {
 		if(isSaveASCII) {
-			l0ad::ascii::loadVectorDouble(filename + ".txt", data);
+			if(std::filesystem::exists(filename + ".txt")) {
+				l0ad::ascii::loadVectorDouble(filename + ".txt", data);
+			}
 		} else {
-			l0ad::bin::loadVector(filename + ".bin", data);
+			if(std::filesystem::exists(filename + ".bin")) {
+				l0ad::bin::loadVector(filename + ".bin", data);
+			}
 		}
 	}
 

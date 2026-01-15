@@ -10,13 +10,13 @@ rcParams.update({
     # "text.usetex": True,
     "font.family": "serif",
     # "font.serif": ["Computer Modern Roman"],
-    "axes.labelsize": 10,
-    "font.size": 10,
-    "legend.fontsize": 9,
-    "xtick.labelsize": 9,
-    "ytick.labelsize": 9,
-    "axes.linewidth": 1.0,
-    "lines.linewidth": 1.1,
+    "axes.labelsize": 14,
+    "font.size": 14,
+    "legend.fontsize": 12,
+    "xtick.labelsize": 12,
+    "ytick.labelsize": 12,
+    "axes.linewidth": 1.5,
+    "lines.linewidth": 1.6,
 })
 import copy
 # internal modules
@@ -159,17 +159,22 @@ print("INFO: Starting DNS...")
 # Plot setup
 # ----------------------------
 
-fig, axes = plt.subplots(2, 3, figsize=(15, 8))
+fig = plt.figure(constrained_layout=True, figsize=(10, 4))
+subfigs = fig.subfigures(1, 2)
 
-dns_ax = axes.flatten()[0]
-green_axes = axes.flatten()[1:]
+dns_fig = subfigs.flatten()[0]
+green_fig = subfigs.flatten()[1]
+
+dns_ax = dns_fig.subplots()
+green_axes = [green_fig.subplots()]
+# green_axes = green_fig.subplots(4, 4).flatten()
 
 dns_contourf = None
 dns_title = dns_ax.set_title("t = 0.0")
 dns_ax.set_xlabel("x")
 dns_ax.set_ylabel("y")
 
-dns_cbar = fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=dns_ax)
+dns_cbar = dns_fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=dns_ax)
 dns_cbar.ax.tick_params(axis='y')
 dns_cbar.set_label(r"$c / c_{\mathrm{max}}$")
 
@@ -177,6 +182,10 @@ green_contourf = []
 green_title = []
 green_cbar = []
 for index, passive_scalar_name in enumerate(passive_scalar_names):
+
+    if index >= len(green_axes):
+        break
+
     green_contourf.append(None)
     green_title.append(
         green_axes[index].set_title("t = 0.0")
@@ -184,7 +193,7 @@ for index, passive_scalar_name in enumerate(passive_scalar_names):
     green_axes[index].set_xlabel("x")
     green_axes[index].set_ylabel("y")
     green_cbar.append(
-        fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=green_axes[index])
+        green_fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=green_axes[index])
     )
     green_cbar[index].ax.tick_params(axis='y')
     green_cbar[index].set_label(r"$c / c_{\mathrm{max}}$")
@@ -197,10 +206,8 @@ t = 0.0
 theta_hat = fft2(theta)
 
 error = []
-error_filtered = []; filter_threshold = 1e-1
 for index, passive_scalar_name in enumerate(passive_scalar_names):
     error.append([])
-    error_filtered.append([])
 
 with writer.saving(fig, "comparison_animation.mp4", dpi=150):
     for n in range(n_steps):
@@ -267,28 +274,29 @@ with writer.saving(fig, "comparison_animation.mp4", dpi=150):
 
             for index, passive_scalar_name in enumerate(passive_scalar_names):
 
-                if green_contourf[index] is not None:
-                    green_contourf[index].remove()
-
                 passive_scalar_grid_c = np.array(passive_scalar_grid_c_over_time[passive_scalar_name][time_index]).reshape((N, N))
 
-                green_contourf[index] = green_axes[index].contourf(
-                    X, Y, passive_scalar_grid_c,
-                    levels=contourf_levels,
-                    cmap=cmap,
-                    norm=norm,
-                    zorder=0
-                )
+                if index < len(green_axes):
 
-                split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi
-                
-                green_title[index].set_text(r"$\sigma_{\mathrm{max}} = " + str(round(split_size, 4)) + r"$" + f", t = {t:.2f}")
+                    if green_contourf[index] is not None:
+                        green_contourf[index].remove()
+
+                    green_contourf[index] = green_axes[index].contourf(
+                        X, Y, passive_scalar_grid_c,
+                        levels=contourf_levels,
+                        cmap=cmap,
+                        norm=norm,
+                        zorder=0
+                    )
+
+                    split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi
+                    split_d_factor = libpost.get_properties_from_string(passive_scalar_name)["SplitDistanceFactor"]
+                    
+                    green_title[index].set_text(r"$\sigma_{\mathrm{max}} = " + str(round(split_size, 4)) + r", d_{\mathrm{split}}/\sigma_{\mathrm{max}} = " + str(round(split_d_factor, 4)) + r"$" + f", t = {t:.2f}")
 
                 # error
                             
                 error[index].append(np.linalg.norm(passive_scalar_grid_c - theta) / np.linalg.norm(theta))
-                mask = theta > filter_threshold
-                error_filtered[index].append(np.linalg.norm(passive_scalar_grid_c[mask] - theta[mask]) / np.linalg.norm(theta[mask]))
 
                 print("INFO: " + passive_scalar_name + ", error ", error[index][-1])
 
@@ -315,7 +323,7 @@ dns_cbar.ax.tick_params(axis='y')
 dns_cbar.set_label(r"$c / c_{\mathrm{max}}$")
 
 plt.savefig("random_sine_flow_dns__t_" + str(t).replace(".", "o") + ".pdf")
-plt.close(fig)
+plt.close(dns_fig)
 
 # plot green
 
@@ -340,85 +348,150 @@ for index, passive_scalar_name in enumerate(passive_scalar_names):
     green_cbar.set_label(r"$c / c_{\mathrm{max}}$")
 
     split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi
+    split_d_factor = libpost.get_properties_from_string(passive_scalar_name)["SplitDistanceFactor"]
 
-    plt.savefig("random_sine_flow_green_split_size_" + str(round(split_size, 4)).replace(".", "o") + "__t_" + str(t).replace(".", "o") + ".pdf")
+    plt.savefig("random_sine_flow_green_split_size_" + str(round(split_size, 4)).replace(".", "o") + "__split_d_factor_" + str(round(split_d_factor, 4)).replace(".", "o") + "__t_" + str(t).replace(".", "o") + ".pdf")
     plt.close(fig)
 
 # plot error
 
 colors = [(1.0, 0.5, 0.5), (0.5, 1.0, 0.5), (0.5, 0.5, 1.0), (1.0, 1.0, 0.5), (0.5, 1.0, 1.0), (1.0, 0.5, 1.0)]
 markers = ["o", "s", "D", "*", "P", "X"]
-fig, ax = plt.subplots(figsize=(5, 4))
-for index, passive_scalar_name in enumerate(passive_scalar_names):
 
-    split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi
-
-    ax.plot(
-        time_array[:-1], error[index], marker=markers[index], color=colors[index], label=r"$\sigma_{\mathrm{max}} = " + str(round(split_size, 4)) + r"$", linestyle='none'
-    )
-ax.legend(loc='upper right', frameon=True)
-ax.set_xlabel("t")
-ax.set_ylabel(r"$|| c_{\mathrm{Green}} - c_{\mathrm{dns}} || / || c_{\mathrm{dns}} ||$")
-ax.set_yscale('log')
-plt.savefig("plot_error_f_time.pdf")
-plt.close(fig)
-
-# plot error filtered
-
-fig, ax = plt.subplots(figsize=(5, 4))
-for index, passive_scalar_name in enumerate(passive_scalar_names):
-
-    split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi
-
-    ax.plot(
-        time_array[:-1], error_filtered[index], marker=markers[index], color=colors[index], label=r"$\sigma_{\mathrm{max}} = " + str(round(split_size, 4)) + r"$", linestyle='none'
-    )
-ax.legend(loc='upper right', frameon=True)
-ax.set_xlabel("t")
-ax.set_ylabel(r"$|| c_{\mathrm{Green}}|_{> c_{\mathrm{filter}}} - c_{\mathrm{dns}}|_{> c_{\mathrm{filter}}} || / || c_{\mathrm{dns}}|_{> c_{\mathrm{filter}}} ||$")
-ax.set_yscale('log')
-plt.savefig("plot_error_filtered_f_time.pdf")
-plt.close(fig)
+# fig, ax = plt.subplots(figsize=(5, 4))
+# for index, passive_scalar_name in enumerate(passive_scalar_names):
+# 
+#     split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi
+#     split_d_factor = libpost.get_properties_from_string(passive_scalar_name)["SplitDistanceFactor"]
+# 
+#     ax.plot(
+#         time_array[:-1], error[index], marker=markers[index], color=colors[index], label=r"$\sigma_{\mathrm{max}} = " + str(round(split_size, 4)) + r", d_{\mathrm{split}}/\sigma_{\mathrm{max}} = " + str(round(split_d_factor, 4)) + r"$", linestyle='none'
+#     )
+# ax.legend(loc='upper right', frameon=True)
+# ax.set_xlabel("t")
+# ax.set_ylabel(r"$|| c_{\mathrm{Green}} - c_{\mathrm{dns}} || / || c_{\mathrm{dns}} ||$")
+# ax.set_yscale('log')
+# plt.savefig("plot_error_f_time.pdf")
+# plt.close(fig)
 
 # plot convergence
 
 split_size_array = []
+split_d_factor_array = []
+split_size_dict = {}
+split_d_factor_dict = {}
 error_array = []
-error_filtered_array = []
 for index, passive_scalar_name in enumerate(passive_scalar_names):
-    split_size_array.append(libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi)
+    split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi
+    split_d_factor = libpost.get_properties_from_string(passive_scalar_name)["SplitDistanceFactor"]
+
+    if split_size in split_size_dict:
+        split_size_dict[split_size].append(index)
+    else:
+        split_size_dict[split_size] = [index]
+
+    if split_d_factor in split_d_factor_dict:
+        split_d_factor_dict[split_d_factor].append(index)
+    else:
+        split_d_factor_dict[split_d_factor] = [index]
+
+    split_size_array.append(split_size)
+    split_d_factor_array.append(split_d_factor)
+    
     error_array.append(np.average(error[index]))
-    error_filtered_array.append(np.average(error_filtered[index]))
 
-fit_p, fit_log_e = np.polyfit(np.log(split_size_array), np.log(error_array), 1)
-fit_e = np.exp(fit_log_e)
-
-fit_p_f, fit_log_e_f = np.polyfit(np.log(split_size_array), np.log(error_filtered_array), 1)
-fit_e_f = np.exp(fit_log_e_f)
-
-fit_split_size_array = np.linspace(np.min(split_size_array), np.max(split_size_array), 2)
-
-fit_split_err = fit_e * fit_split_size_array**fit_p
-fit_split_err_f = fit_e_f * fit_split_size_array**fit_p_f
+# plot convergence : split_size
 
 fig, ax = plt.subplots(figsize=(5, 4))
-ax.plot(
-    split_size_array, error_array, marker="o", color=(1.0, 0.5, 0.5), linestyle='none', label=r"$|| c_{\mathrm{Green}} - c_{\mathrm{dns}} || / || c_{\mathrm{dns}} ||$"
-)
-ax.plot(
-    split_size_array, error_filtered_array, marker="s", color=(0.5, 0.5, 1.0), linestyle='none', label=r"$|| c_{\mathrm{Green}}|_{> c_{\mathrm{filter}}} - c_{\mathrm{dns}}|_{> c_{\mathrm{filter}}} || / || c_{\mathrm{dns}}|_{> c_{\mathrm{filter}}} ||$"
-)
-ax.plot(
-    fit_split_size_array, fit_split_err, color=(1.0, 0.5, 0.5), label=r'$p = ' + str(round(fit_p, 4)) + r'$'
-)
-ax.plot(
-    fit_split_size_array, fit_split_err_f, color=(0.5, 0.5, 1.0), label=r'$p = ' + str(round(fit_p_f, 4)) + r'$'
-)
-ax.legend(loc='upper left', frameon=True)
+
+plot_index = 0
+
+for split_d_factor in split_d_factor_dict:
+
+    sub_split_size_array = [split_size_array[index] for index in split_d_factor_dict[split_d_factor]]
+    sub_error_array = [error_array[index] for index in split_d_factor_dict[split_d_factor]]
+
+    # direct
+
+    ax.plot(
+        sub_split_size_array, sub_error_array, marker=markers[plot_index], color=colors[plot_index], linestyle='none', label=r"$d_{\mathrm{split}}/\sigma_{\mathrm{max}} = " + str(round(split_d_factor, 4)) + r"$"
+    )
+
+    # fit
+
+    fit_p, fit_log_e = np.polyfit(np.log(sub_split_size_array), np.log(sub_error_array), 1)
+    fit_e = np.exp(fit_log_e)
+    fit_split_size_array = np.logspace(np.log10(np.min(split_size_array)), np.log10(np.max(split_size_array)), 4)
+    fit_split_err = fit_e * fit_split_size_array**fit_p
+
+    ax.plot(fit_split_size_array, fit_split_err, color=colors[plot_index])
+    ax.text(
+        fit_split_size_array[1],
+        fit_split_err[1],
+        r'$p = ' + str(round(fit_p, 4)) + r'$',
+        ha='center',
+        va='center',
+        bbox=dict(facecolor=colors[plot_index], edgecolor='none', pad=1),
+        fontsize='small'
+    )
+
+    # more
+
+    plot_index += 1
+
+ax.legend(loc='upper right', frameon=True)
 ax.set_xlabel(r"$\sigma_{\mathrm{max}}$ (axis inverted)")
-ax.set_ylabel(r"$|| c_{\mathrm{Green}} - c_{\mathrm{dns}} || / || c_{\mathrm{dns}} ||$")
+ax.set_ylabel(r"$E$")
 ax.set_xscale('log')
 ax.invert_xaxis()
 ax.set_yscale('log')
 plt.savefig("plot_error_f_split_size.pdf")
+plt.close(fig)
+
+# plot convergence : split_d_factor
+
+fig, ax = plt.subplots(figsize=(5, 4))
+
+plot_index = 0
+
+for split_size in split_size_dict:
+
+    sub_split_d_factor_array = [split_d_factor_array[index] for index in split_size_dict[split_size]]
+    sub_error_array = [error_array[index] for index in split_size_dict[split_size]]
+
+    # direct
+
+    ax.plot(
+        sub_split_d_factor_array, sub_error_array, marker=markers[plot_index], color=colors[plot_index], linestyle='none', label=r"$\sigma_{\mathrm{max}} = " + str(round(split_size, 4)) + r"$"
+    )
+
+    # fit
+
+    fit_p, fit_log_e = np.polyfit(np.log(sub_split_d_factor_array), np.log(sub_error_array), 1)
+    fit_e = np.exp(fit_log_e)
+    fit_split_d_factor_array = np.logspace(np.log10(np.min(split_d_factor_array)), np.log10(np.max(split_d_factor_array)), 4)
+    fit_split_err = fit_e * fit_split_d_factor_array**fit_p
+
+    ax.plot(fit_split_d_factor_array, fit_split_err, color=colors[plot_index])
+    ax.text(
+        fit_split_d_factor_array[1],
+        fit_split_err[1],
+        r'$p = ' + str(round(fit_p, 4)) + r'$',
+        ha='center',
+        va='center',
+        bbox=dict(facecolor=colors[plot_index], edgecolor='none', pad=1),
+        fontsize='small'
+    )
+
+    # more
+
+    plot_index += 1
+
+ax.legend(loc='upper left', frameon=True)
+ax.set_xlabel(r"$d_{\mathrm{split}}/\sigma_{\mathrm{max}}$ (axis inverted)")
+ax.set_ylabel(r"$E$")
+ax.set_xscale('log')
+ax.invert_xaxis()
+ax.set_yscale('log')
+plt.savefig("plot_error_f_split_d_factor.pdf")
 plt.close(fig)

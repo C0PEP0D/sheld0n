@@ -27,7 +27,7 @@ struct _PassiveParticlesParameters {
 	inline static std::string name = "passive_particles";
 
 	// ---------------- CUSTOM EQUATION PARAMETERS START
-	static const unsigned StateSize = DIM + DIM * DIM + 1; // x, s, q
+	static const unsigned int StateSize = DIM + DIM * DIM + 1; // x, s, q
 	// feel free to add parameters if you need
 	inline static const double Diffusivity = 1.0e-2;
 
@@ -39,13 +39,12 @@ struct _PassiveParticlesParameters {
 
 	// splitting
 	static const bool IsSplitting = true;
-	inline static const double OverlapFactor = 2.5; // must be bigger than 2 to avoid concentration increase when splitting, increase to increase accuracy at the cost of computation time
+	
 	inline static const double SplitSizeFactor = 1e-1; // decrease to increase accuracy at the cost of computation time
-	inline static const double SplitSize = SplitSizeFactor * std::max(
-		EnvParameters::cLength, // ensure advection accuracy (EnvParameters::cLength should be set to the characteristic flow length scale)
-		2.0 * std::sqrt(Diffusivity * RunParameters::Dt) // ensure diffusive accuracy
-	);
-	inline static const double SplitDistance = SplitSize / OverlapFactor;
+	inline static const double SplitDistanceFactor = 2.0/5.0; // must be bigger smaller than 1/2 to avoid concentration increase when splitting, decrease for accuracy at the cost of computation time
+
+	inline static const double SplitSize = SplitSizeFactor * EnvParameters::cLength;
+	inline static const double SplitDistance = SplitDistanceFactor * SplitSize;
 	inline static const double MergeDx = SplitDistance / std::sqrt(DIM);
 	// concentration threshold (for blob deletion)
 	inline static const double Cth = 1.0e-6;
@@ -151,33 +150,32 @@ struct _PassiveParticlesParameters {
 					newS = memberS;
 					newQ = memberQ;
 
-					for(unsigned int i = 0; i < DIM; ++i) { // TODO: implement new splitting method into default param
+					for(unsigned int i = 0; i < DIM; ++i) {
 						double variance = eigenValues[i];
 						double standardDeviation = std::sqrt(variance);
 						const tSpaceVector varianceDirection = eigenVectors.col(i);
 
-						int nDivisions = std::ceil(4.0 / std::pow(SplitDistance, 2) * (variance - std::pow(SplitSize, 2)));
+						int nSplits = std::ceil(4.0 / std::pow(SplitDistance, 2) * (variance - std::pow(SplitSize, 2)));
 
-						if (nDivisions > 0) {
-
+						if (nSplits > 0) {
 							// binomial distribution by repeated convolution with [0.5, 0.5] (coin toss)
 							// $P(k) = \binom{n}{k} (0.5)^n$ computed as follows :
 							// \begin{align}
 							// q_0 &= 2^{-n}, \\
 							// q_{k+1} &= q_k \cdot \frac{n - k}{k + 1}
 							// \end{align}
-							std::vector<double> qDistribution(nDivisions + 1);
+							std::vector<double> qDistribution(nSplits + 1);
 							// index of largest probability
-						    const unsigned int k_max = nDivisions / 2;
+						    const unsigned int kMax = nSplits / 2;
 						    // set max probability temporarily to 1.0
-						    qDistribution[k_max] = 1.0;
+						    qDistribution[kMax] = 1.0;
 						    // fill upwards: q[k+1] = q[k] * (n-k)/(k+1)
-						    for (unsigned int k = k_max; k < nDivisions; ++k) {
-						        qDistribution[k + 1] = qDistribution[k] * static_cast<double>(nDivisions - k) / static_cast<double>(k + 1);
+						    for (unsigned int k = kMax; k < nSplits; ++k) {
+						        qDistribution[k + 1] = qDistribution[k] * static_cast<double>(nSplits - k) / static_cast<double>(k + 1);
 						    }
 						    // fill downwards: q[k-1] = q[k] * k / (n-k+1)
-						    for (int k = k_max; k > 0; --k) {
-						        qDistribution[k - 1] = qDistribution[k] * static_cast<double>(k) / static_cast<double>(nDivisions - k + 1);
+						    for (int k = kMax; k > 0; --k) {
+						        qDistribution[k - 1] = qDistribution[k] * static_cast<double>(k) / static_cast<double>(nSplits - k + 1);
 						    }
 						
 						    // normalize
@@ -195,7 +193,7 @@ struct _PassiveParticlesParameters {
 								double& splitMemberQ = pSplitMemberState[DIM + DIM * DIM];
 
 								const tSpaceVector splitX = splitMemberX;
-								const tSpaceMatrix splitS = splitMemberS - nDivisions * 0.25 * std::pow(SplitDistance, 2) * varianceDirection * varianceDirection.transpose();
+								const tSpaceMatrix splitS = splitMemberS - nSplits * 0.25 * std::pow(SplitDistance, 2) * varianceDirection * varianceDirection.transpose();
 
 								// add a member
 							
@@ -240,7 +238,7 @@ struct _PassiveParticlesParameters {
 						newState.insert(newState.end(), pMemberState, pMemberState + StateSize);
 					} else {
 						if(not hasBlobBeenDeleted) {
-							std::cout << "INFO : A scalar blob has fallen below the concentration threshold and has been deleted. This message will not be displayed again." << std::endl;
+							std::cout << "INFO: A scalar blob has fallen below the concentration threshold and has been deleted. This message will not be displayed again." << std::endl;
 							hasBlobBeenDeleted = true;
 						}
 					}
@@ -359,6 +357,16 @@ struct _PassiveParticlesParameters {
 
 	static void init(std::vector<double>& state) {
 		// ---------------- CUSTOM INIT START
+
+		const double dtMax = std::pow(EnvParameters::cLength/2.0, 2) / Diffusivity;
+		std::cout << "INFO: " << name << ", Maximum Dt: " << dtMax << std::endl;
+		std::cout << "INFO: " << name << ", Maximum SplitSize: " << EnvParameters::cLength << std::endl;
+		if (RunParameters::Dt > dtMax) {
+			std::cout << "WARNING: " << name << ", RunParameters::Dt " << RunParameters::Dt << " > Maximum Dt " << dtMax << ". Consider decreasing RunParameters::Dt to be smaller than Maximum Dt" << std::endl;
+		}
+		if (SplitSize > EnvParameters::cLength) {
+			std::cout << "WARNING: " << name << ", SplitSize " << SplitSize << " > EnvParameters::cLength " << EnvParameters::cLength << ". Consider decreasing SplitSize to be smaller than EnvParameters::cLength." << std::endl;
+		}
 
 		if (HasInit) { // 0
 			tGroupVariable::pushBackMember(state);

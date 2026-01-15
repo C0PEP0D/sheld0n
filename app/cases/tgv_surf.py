@@ -26,7 +26,6 @@ def set_solutions_surfers(c_time, c_length):
     os.system('./.cli_remove_equation surfers')
     # swimming velocity
     surfers = " ".join(glob.glob("surfers__*"))
-    c_velocity = c_length / c_time
     os.system('./.cli_batch_copy_equation ' + surfers + ' -p SwimmingVelocity -f EnvParameters::cVelocity -v ' + ' '.join([str(v) for v in [0.25, 0.5, 1.0, 2.0, 4.0]]))
     os.system('./.cli_remove_equation ' + surfers)
     os.chdir('../..')

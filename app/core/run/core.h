@@ -53,14 +53,19 @@ class Run {
 			}
 			// saved data
 			if(std::filesystem::exists("time")) {
-				std::vector<double> time;
+				std::vector<std::string> time;
 				for (const auto & entry : std::filesystem::directory_iterator("time")) {
-					time.emplace_back(std::stod(entry.path().filename()));
+					time.emplace_back(entry.path().filename());
 				}
 				if(time.size() > 0) {
 					std::sort(time.begin(), time.end());
-					startIndex = std::round(time.back() / tParameters::Dt) + 1;
+					startIndex = std::round(std::stod(time.back()) / tParameters::Dt) + 1;
 					if (startIndex < tParameters::NTime) {
+						// init random
+						rand0m::seed(EnvParameters::randomSeed);
+						// init flow
+						Flow::init();
+						// load
 						load(time.back());
 					} else {
 						std::cout << "INFO : Computation already finished. Nothing to do." << std::endl;
@@ -84,9 +89,11 @@ class Run {
 		}
 		
 		void saveAndPostProcess(const tScalar& t) {
+			const tScalar tEnd = tParameters::NTime * tParameters::Dt;
+			const unsigned int formatNumber = int(std::log10(tEnd)) + 3;
 			// directory
 			std::ostringstream oss;
-			oss << "time/" << std::fixed << std::setprecision(7) << std::setw(11) << std::setfill('0') << t;
+			oss << "time/" << std::fixed << std::setprecision(7) << std::setw(7+formatNumber) << std::setfill('0') << t;
 			std::string folder = oss.str();
 			std::filesystem::create_directory(folder);
 			// save
@@ -98,15 +105,13 @@ class Run {
 			Env::solutions.post(postFolder, t);
 		}
 		
-		void load(const tScalar& t) {
+		void load(const std::string& t) {
 			// directory
-			std::ostringstream oss;
-			oss << "time/" << std::fixed << std::setprecision(7) << std::setw(11) << std::setfill('0') << t;
-			std::string folder = oss.str();
-			// load
+			std::string folder = "time/" + t;
+   			// load
 			Env::solutions.load(folder);
 			// set time
-			Env::solutions.t = t;
+			Env::solutions.t = std::stod(t);
 		}
 };
 

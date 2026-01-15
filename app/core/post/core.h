@@ -81,6 +81,10 @@ class Post {
 			} else {
 				std::cout << "INFO : No data. Nothing to do." << std::endl;
 			}
+			// init random
+			rand0m::seed(EnvParameters::randomSeed);
+			// init flow
+			Flow::init();
 		}
 
 		void load(const std::string& t) {

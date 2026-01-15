@@ -123,9 +123,7 @@ def edit_add_equation_dynamic(name):
             print('\t\t\tsaveSolution(folder + "/" + _{Name}::tParameters::name, pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
             print('\t\t}} // _{Name}::Flag\n'.format(Name=upper_camel_name), end='')
         elif line == '\t\t// FLAG: LOAD DYNAMIC EQUATION END\n':
-            print('\t\tif(std::filesystem::exists(folder + "/" + _{Name}::tParameters::name + ".txt")) {{\n'.format(Name=upper_camel_name), end='')
-            print('\t\t\tloadDynamicSolution(folder + "/" + _{Name}::tParameters::name, stateArray[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
-            print('\t\t}} // _{Name}::Flag\n'.format(Name=upper_camel_name), end='')
+            print('\t\tloadDynamicSolution(folder + "/" + _{Name}::tParameters::name, stateArray[_{Name}::tParameters::StateIndex]);\n'.format(Name=upper_camel_name), end='')
         elif line == '\t\t// FLAG: POST DYNAMIC EQUATION END\n':
             print('\t\ts0ve::ascii::saveMapToCsvDouble(folder + "/" + _{Name}::tParameters::name + ".csv", _{Name}::tParameters::post(pStateArray[_{Name}::tParameters::StateIndex], pStateSize[_{Name}::tParameters::StateIndex], t), ",", "#");\n'.format(Name=upper_camel_name), end='')
         previous_line = line
