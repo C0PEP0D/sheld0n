@@ -29,14 +29,15 @@ def set_solutions():
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs InitS "tSpaceVector({5e-1, 5e-3}).asDiagonal()"')
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs SplitSizeFactor "1e-1"')
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs Cth "1e-5"')
-    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingConcentrationOnGrid true') # activate profile post processing
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingParticles false')
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingConcentrationOnGrid true')
     # batch SplitSizeFactor
     os.chdir('param/solutions')
     os.system('./.cli_batch_copy_equation passive_scalar_blobs -p SplitSizeFactor -v ' + " ".join([str(v) for v in np.logspace(-2, -1, 4)]))
     os.system('./.cli_remove_equation passive_scalar_blobs')
     # batch OverlapFactor
     passive_scalar_blobs = " ".join(glob.glob("passive_scalar_blobs__*"))
-    os.system('./.cli_batch_copy_equation ' + passive_scalar_blobs + ' -p SplitDistanceFactor -v ' + ' '.join([str(v) for v in np.logspace(np.log10(1.0/3.0), np.log10(1.0), 4)]))
+    os.system('./.cli_batch_copy_equation ' + passive_scalar_blobs + ' -p SplitDistanceFactor -v ' + ' '.join([str(v) for v in np.linspace(0.2, 1.0, 9)]))
     os.system('./.cli_remove_equation ' + passive_scalar_blobs)
     os.chdir('../..')
 

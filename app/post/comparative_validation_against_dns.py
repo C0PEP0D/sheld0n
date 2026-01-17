@@ -7,6 +7,7 @@ import matplotlib.ticker as ticker
 from matplotlib import animation
 from matplotlib import rcParams
 rcParams.update({
+    "mathtext.fontset": "cm",
     # "text.usetex": True,
     "font.family": "serif",
     # "font.serif": ["Computer Modern Roman"],
@@ -15,8 +16,8 @@ rcParams.update({
     "legend.fontsize": 12,
     "xtick.labelsize": 12,
     "ytick.labelsize": 12,
-    "axes.linewidth": 1.5,
-    "lines.linewidth": 1.6,
+    "axes.linewidth": 1.0,
+    "lines.linewidth": 1.1,
 })
 import copy
 # internal modules
@@ -46,21 +47,23 @@ cmap = colors.LinearSegmentedColormap.from_list("", [(1.0, 1.0, 1.0), (1.0, 0.5,
 # norm = colors.Normalize(vmin=0.0, vmax=1.0)
 # contourf_levels = np.linspace(0.0, 1.0, 16) 
 norm = colors.LogNorm(vmin=1e-4, vmax=1.0)
-contourf_levels = np.logspace(-4, 0, 16) 
-save_every = 100
+contourf_levels = np.logspace(-4, 0, 16)
 fps = 30
 writer = animation.FFMpegWriter(fps=fps)
 
 print("INFO: Reading time...", flush=True)
 
 time_dir_array, time_array = libpost.get_time()
+time_dir_array, time_array = time_dir_array[::5], time_array[::5]
 
-t_max = 10.0
 n_steps = int(time_array[-1]/dt)
+
+save_every = n_steps//(len(time_array) - 1)
 
 # ----------------------------
 # Random phases (updated each T)
 # ----------------------------
+t_max = 10.0
 n_periods = int(np.ceil(t_max / T))
 # set randomness
 np.random.seed(0)
@@ -142,15 +145,10 @@ for equation_name in libpost.get_equation_names():
     if equation_name.startswith("passive_scalar"):
         passive_scalar_names.append(equation_name)
 
-passive_scalar_pos_0_over_time = {}
-passive_scalar_pos_1_over_time = {}
-passive_scalar_c_over_time = {}
 passive_scalar_grid_c_over_time = {}
 
 for passive_scalar_name in passive_scalar_names:
-    passive_scalar_pos_0_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_0", time_dir_array)
-    passive_scalar_pos_1_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_1", time_dir_array)
-    passive_scalar_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, passive_scalar_name + ".*__c", time_dir_array)
+    print("\tINFO: Reading " + passive_scalar_name + "...")
     passive_scalar_grid_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "grid.*__c", time_dir_array)
 
 print("INFO: Starting DNS...")
@@ -210,9 +208,7 @@ for index, passive_scalar_name in enumerate(passive_scalar_names):
     error.append([])
 
 with writer.saving(fig, "comparison_animation.mp4", dpi=150):
-    for n in range(n_steps):
-
-        t = n * dt
+    for n in range(1, n_steps + 1):
     
         # Half diffusion
         theta_hat = diffusion_step(theta_hat, dt/2)
@@ -247,6 +243,8 @@ with writer.saving(fig, "comparison_animation.mp4", dpi=150):
         # ------------------------
         # Plot update
         # ------------------------
+
+        t = n * dt
         
         if n % save_every == 0:
 
@@ -289,10 +287,10 @@ with writer.saving(fig, "comparison_animation.mp4", dpi=150):
                         zorder=0
                     )
 
-                    split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi
+                    split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"]
                     split_d_factor = libpost.get_properties_from_string(passive_scalar_name)["SplitDistanceFactor"]
                     
-                    green_title[index].set_text(r"$\sigma_{\mathrm{max}} = " + str(round(split_size, 4)) + r", d_{\mathrm{split}}/\sigma_{\mathrm{max}} = " + str(round(split_d_factor, 4)) + r"$" + f", t = {t:.2f}")
+                    green_title[index].set_text(r"$\sigma_{\mathrm{max}}/\pi = " + str(round(split_size, 4)) + r", d_{\mathrm{split}}/\sigma_{\mathrm{max}} = " + str(round(split_d_factor, 4)) + r"$" + f", t = {t:.2f}")
 
                 # error
                             
@@ -322,7 +320,7 @@ dns_cbar = fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=dns_ax)
 dns_cbar.ax.tick_params(axis='y')
 dns_cbar.set_label(r"$c / c_{\mathrm{max}}$")
 
-plt.savefig("random_sine_flow_dns__t_" + str(t).replace(".", "o") + ".pdf")
+plt.savefig("random_sine_flow_dns__t_" + str(t).replace(".", "o") + ".pdf", bbox_inches='tight')
 plt.close(dns_fig)
 
 # plot green
@@ -347,21 +345,18 @@ for index, passive_scalar_name in enumerate(passive_scalar_names):
     green_cbar.ax.tick_params(axis='y')
     green_cbar.set_label(r"$c / c_{\mathrm{max}}$")
 
-    split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi
+    split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"]
     split_d_factor = libpost.get_properties_from_string(passive_scalar_name)["SplitDistanceFactor"]
 
-    plt.savefig("random_sine_flow_green_split_size_" + str(round(split_size, 4)).replace(".", "o") + "__split_d_factor_" + str(round(split_d_factor, 4)).replace(".", "o") + "__t_" + str(t).replace(".", "o") + ".pdf")
+    plt.savefig("random_sine_flow_green_split_size_" + str(round(split_size, 4)).replace(".", "o") + "__split_d_factor_" + str(round(split_d_factor, 4)).replace(".", "o") + "__t_" + str(t).replace(".", "o") + ".pdf", bbox_inches='tight')
     plt.close(fig)
 
-# plot error
-
-colors = [(1.0, 0.5, 0.5), (0.5, 1.0, 0.5), (0.5, 0.5, 1.0), (1.0, 1.0, 0.5), (0.5, 1.0, 1.0), (1.0, 0.5, 1.0)]
-markers = ["o", "s", "D", "*", "P", "X"]
+# plot error f time
 
 # fig, ax = plt.subplots(figsize=(5, 4))
 # for index, passive_scalar_name in enumerate(passive_scalar_names):
 # 
-#     split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi
+#     split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"]
 #     split_d_factor = libpost.get_properties_from_string(passive_scalar_name)["SplitDistanceFactor"]
 # 
 #     ax.plot(
@@ -371,7 +366,7 @@ markers = ["o", "s", "D", "*", "P", "X"]
 # ax.set_xlabel("t")
 # ax.set_ylabel(r"$|| c_{\mathrm{Green}} - c_{\mathrm{dns}} || / || c_{\mathrm{dns}} ||$")
 # ax.set_yscale('log')
-# plt.savefig("plot_error_f_time.pdf")
+# plt.savefig("plot_error_f_time.pdf", bbox_inches='tight')
 # plt.close(fig)
 
 # plot convergence
@@ -382,7 +377,7 @@ split_size_dict = {}
 split_d_factor_dict = {}
 error_array = []
 for index, passive_scalar_name in enumerate(passive_scalar_names):
-    split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"] * np.pi
+    split_size = libpost.get_properties_from_string(passive_scalar_name)["SplitSizeFactor"]
     split_d_factor = libpost.get_properties_from_string(passive_scalar_name)["SplitDistanceFactor"]
 
     if split_size in split_size_dict:
@@ -398,13 +393,27 @@ for index, passive_scalar_name in enumerate(passive_scalar_names):
     split_size_array.append(split_size)
     split_d_factor_array.append(split_d_factor)
     
-    error_array.append(np.average(error[index]))
+    error_array.append(np.average(error[index][len(error[index])//2:]))
+
+split_d_factor_dict = dict(sorted(split_d_factor_dict.items(), reverse=True))
+split_size_dict = dict(sorted(split_size_dict.items(), reverse=True))
+
+# define colors and markers
+
+cmap = colors.LinearSegmentedColormap.from_list("", [(1.0, 0.5, 0.5), (0.25, 0.25, 1.0)])
+colors = cmap(np.linspace(0.0, 1.0, len(split_d_factor_dict.keys())))
+markers = ["o", "s", "D", "*", "P", "X", "8", "p", "h", "H"]
 
 # plot convergence : split_size
 
 fig, ax = plt.subplots(figsize=(5, 4))
+ax.set_xlim(1e-2, 1e-1)
+ax.set_ylim(1e-3, 1e0)
 
 plot_index = 0
+
+_split_d_factor_array = []
+_fit_p_array = []
 
 for split_d_factor in split_d_factor_dict:
 
@@ -414,7 +423,7 @@ for split_d_factor in split_d_factor_dict:
     # direct
 
     ax.plot(
-        sub_split_size_array, sub_error_array, marker=markers[plot_index], color=colors[plot_index], linestyle='none', label=r"$d_{\mathrm{split}}/\sigma_{\mathrm{max}} = " + str(round(split_d_factor, 4)) + r"$"
+        sub_split_size_array, sub_error_array, marker=markers[plot_index], color=colors[plot_index], linestyle='none', label=r"$" + str(round(split_d_factor, 4)) + r"$"
     )
 
     # fit
@@ -425,73 +434,99 @@ for split_d_factor in split_d_factor_dict:
     fit_split_err = fit_e * fit_split_size_array**fit_p
 
     ax.plot(fit_split_size_array, fit_split_err, color=colors[plot_index])
-    ax.text(
-        fit_split_size_array[1],
-        fit_split_err[1],
-        r'$p = ' + str(round(fit_p, 4)) + r'$',
-        ha='center',
-        va='center',
-        bbox=dict(facecolor=colors[plot_index], edgecolor='none', pad=1),
-        fontsize='small'
-    )
+    # ax.text(
+    #     fit_split_size_array[1],
+    #     fit_split_err[1],
+    #     r'$p = ' + str(round(fit_p, 4)) + r'$',
+    #     ha='center',
+    #     va='center',
+    #     bbox=dict(facecolor=colors[plot_index], edgecolor='none', pad=1),
+    #     fontsize='small'
+    # )
+
+    _split_d_factor_array.append(split_d_factor)
+    _fit_p_array.append(fit_p)
 
     # more
 
     plot_index += 1
 
-ax.legend(loc='upper right', frameon=True)
-ax.set_xlabel(r"$\sigma_{\mathrm{max}}$ (axis inverted)")
+ax.legend(ncol=3, columnspacing=0.25, loc='lower left', frameon=False, title=r"$d_{\mathrm{split}}/\sigma_{\mathrm{max}} = $", handletextpad=-0.5)
+
+ax.set_xlabel(r"$\sigma_{\mathrm{max}}/\pi$ (axis inverted)")
 ax.set_ylabel(r"$E$")
 ax.set_xscale('log')
 ax.invert_xaxis()
 ax.set_yscale('log')
-plt.savefig("plot_error_f_split_size.pdf")
+
+ax.xaxis.set_major_locator(ticker.LogLocator(numticks=2))
+ax.xaxis.set_minor_locator(ticker.LogLocator(base=10, subs='auto'))
+ax.xaxis.set_minor_formatter(ticker.NullFormatter())
+
+plt.savefig("plot_error_f_split_size.pdf", bbox_inches='tight')
 plt.close(fig)
 
-# plot convergence : split_d_factor
+# plot p f split_d_factor
 
 fig, ax = plt.subplots(figsize=(5, 4))
+ax.set_xlim(0.0, 1.0)
+ax.set_ylim(1.0, 2.0)
 
-plot_index = 0
+ax.plot(
+    _split_d_factor_array, _fit_p_array, marker=markers[0], color=colors[0], linestyle='none'
+)
 
-for split_size in split_size_dict:
-
-    sub_split_d_factor_array = [split_d_factor_array[index] for index in split_size_dict[split_size]]
-    sub_error_array = [error_array[index] for index in split_size_dict[split_size]]
-
-    # direct
-
-    ax.plot(
-        sub_split_d_factor_array, sub_error_array, marker=markers[plot_index], color=colors[plot_index], linestyle='none', label=r"$\sigma_{\mathrm{max}} = " + str(round(split_size, 4)) + r"$"
-    )
-
-    # fit
-
-    fit_p, fit_log_e = np.polyfit(np.log(sub_split_d_factor_array), np.log(sub_error_array), 1)
-    fit_e = np.exp(fit_log_e)
-    fit_split_d_factor_array = np.logspace(np.log10(np.min(split_d_factor_array)), np.log10(np.max(split_d_factor_array)), 4)
-    fit_split_err = fit_e * fit_split_d_factor_array**fit_p
-
-    ax.plot(fit_split_d_factor_array, fit_split_err, color=colors[plot_index])
-    ax.text(
-        fit_split_d_factor_array[1],
-        fit_split_err[1],
-        r'$p = ' + str(round(fit_p, 4)) + r'$',
-        ha='center',
-        va='center',
-        bbox=dict(facecolor=colors[plot_index], edgecolor='none', pad=1),
-        fontsize='small'
-    )
-
-    # more
-
-    plot_index += 1
-
-ax.legend(loc='upper left', frameon=True)
-ax.set_xlabel(r"$d_{\mathrm{split}}/\sigma_{\mathrm{max}}$ (axis inverted)")
-ax.set_ylabel(r"$E$")
-ax.set_xscale('log')
-ax.invert_xaxis()
-ax.set_yscale('log')
-plt.savefig("plot_error_f_split_d_factor.pdf")
+ax.set_xlabel(r"$d_{\mathrm{split}}/\sigma_{\mathrm{max}}$")
+ax.set_ylabel(r"$p$")
+plt.savefig("plot_p_f_d_factor.pdf", bbox_inches='tight')
 plt.close(fig)
+
+print("p_max: ", np.array(_fit_p_array).max())
+
+# # plot convergence : split_d_factor
+# 
+# fig, ax = plt.subplots(figsize=(5, 4))
+# 
+# plot_index = 0
+# 
+# for split_size in split_size_dict:
+# 
+#     sub_split_d_factor_array = [split_d_factor_array[index] for index in split_size_dict[split_size]]
+#     sub_error_array = [error_array[index] for index in split_size_dict[split_size]]
+# 
+#     # direct
+# 
+#     ax.plot(
+#         sub_split_d_factor_array, sub_error_array, marker=markers[plot_index], color=colors[plot_index], linestyle='none', label=r"$\sigma_{\mathrm{max}} = " + str(round(split_size, 4)) + r"$"
+#     )
+# 
+#     # fit
+# 
+#     fit_p, fit_log_e = np.polyfit(np.log(sub_split_d_factor_array), np.log(sub_error_array), 1)
+#     fit_e = np.exp(fit_log_e)
+#     fit_split_d_factor_array = np.logspace(np.log10(np.min(split_d_factor_array)), np.log10(np.max(split_d_factor_array)), 4)
+#     fit_split_err = fit_e * fit_split_d_factor_array**fit_p
+# 
+#     ax.plot(fit_split_d_factor_array, fit_split_err, color=colors[plot_index])
+#     # ax.text(
+#     #     fit_split_d_factor_array[1],
+#     #     fit_split_err[1],
+#     #     r'$p = ' + str(round(fit_p, 4)) + r'$',
+#     #     ha='center',
+#     #     va='center',
+#     #     bbox=dict(facecolor=colors[plot_index], edgecolor='none', pad=1),
+#     #     fontsize='small'
+#     # )
+# 
+#     # more
+# 
+#     plot_index += 1
+# 
+# ax.legend(loc='upper left', frameon=False)
+# ax.set_xlabel(r"$d_{\mathrm{split}}/\sigma_{\mathrm{max}}$ (axis inverted)")
+# ax.set_ylabel(r"$E$")
+# ax.set_xscale('log')
+# ax.invert_xaxis()
+# ax.set_yscale('log')
+# plt.savefig("plot_error_f_split_d_factor.pdf", bbox_inches='tight')
+# plt.close(fig)

@@ -387,8 +387,9 @@ struct _PassiveParticlesParameters {
 
 	// ---------------- CUSTOM POST PARAMETERS START
 
-	inline static const bool IsPostProcessingConcentration = true;
-	inline static const bool IsPostProcessingConcentrationOnGrid = false;
+	inline static const bool IsPostProcessingParticles = false;
+	inline static const bool IsPostProcessingConcentration = true && IsPostProcessingParticles;
+	inline static const bool IsPostProcessingConcentrationOnGrid = true;
 	inline static const unsigned int GridN = 256;
 
 	// ---------------- CUSTOM POST PARAMETERS START
@@ -398,7 +399,7 @@ struct _PassiveParticlesParameters {
 		// ---------------- CUSTOM INIT START
 		scalarField.prepare(tGroupVariable::cState(pState, 0), tGroupVariable::groupSize(stateSize));
 
-		{ // particles
+		if(IsPostProcessingParticles) { // particles
 			unsigned int number = tVariable::groupSize(stateSize);
 			unsigned int formatNumber = int(std::log10(number)) + 1;
 			
@@ -443,6 +444,7 @@ struct _PassiveParticlesParameters {
 					output[ossIndex.str() + "__x"] = x[0];
 					output[ossIndex.str() + "__y"] = x[1];
 					output[ossIndex.str() + "__c"] = tGroupVariable::c(pState, stateSize, x.data());
+					output[ossIndex.str() + "__n"] = tVariable::groupSize(stateSize);
 				}
 			}
 		}
