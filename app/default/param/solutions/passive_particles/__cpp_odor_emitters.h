@@ -37,7 +37,7 @@ struct _PassiveParticlesParameters {
 	// source
 	inline static const double SourceC = 1.0;
 	inline static const tSpaceMatrix SourceS = tSpaceVector({5.0e-3, 5.0e-3}).asDiagonal();
-	inline static const double SourceReactionTime = 1.0/128.0;
+	inline static const double SourceReactionTime = 1.0/32.0;
 	// periodicity
 	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;
 	inline static const tSpaceVector periodSize = EnvParameters::cDomainSize;

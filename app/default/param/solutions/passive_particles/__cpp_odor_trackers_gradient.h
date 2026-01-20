@@ -33,7 +33,7 @@ struct _PassiveParticlesParameters {
 	// feel free to add parameters if you need
 	static const unsigned Number = EnvParameters::cGroupSize; // number of members in the group
 	static constexpr double SwimmingVelocity = 1.0;
-	static constexpr double ReorientationTime = 0.25; // must be larger than RunParameters::Dtto ensure stability
+	static constexpr double ReorientationTime = 0.25; // must be larger than RunParameters::Dt to ensure stability
 	static constexpr double SurfingTimeHorizon = 0.0;
 	// periodicity
 	inline static const tSpaceVector periodCenter = EnvParameters::cDomainCenter;

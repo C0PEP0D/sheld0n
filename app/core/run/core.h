@@ -32,14 +32,16 @@ class Run {
 				if(index % (tParameters::NTime / tParameters::NSave) == 0) {
 					// save
 					const tScalar t = index * tParameters::Dt;
-					std::cout << "INFO : Saving and Post Processing step " << t << "/" << tEnd << "." << std::endl;
+					std::cout << "INFO : Saving and Post Processing step " << t << "/" << tEnd << "..." << std::endl;
 					saveAndPostProcess(t);
+					std::cout << "INFO : Saving and Post Processing done." << std::endl;
 				}
 			}
 			if (startIndex < tParameters::NTime) {
 				// save
-				std::cout << "INFO : Saving and Post Processing last step " << tEnd << "/" << tEnd << "." << std::endl;
+				std::cout << "INFO : Saving and Post Processing last step " << tEnd << "/" << tEnd << "..." << std::endl;
 				saveAndPostProcess(tEnd);
+				std::cout << "INFO : Saving and Post Processing done." << std::endl;
 			}
 		}
 

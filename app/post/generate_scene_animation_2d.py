@@ -5,6 +5,7 @@ import argparse
 import os
 import sys
 # numpy
+import math
 import numpy as np
 # internal modules
 import libpost
@@ -94,24 +95,14 @@ def main():
         pos_0_over_time[equation_name] = libpost.get_equation_property_over_time(equation_name, ".*__pos_0", time_dir_array)
         pos_1_over_time[equation_name] = libpost.get_equation_property_over_time(equation_name, ".*__pos_1", time_dir_array)
     print("INFO: Reading passive scalar property over time...", flush=True)
-    passive_scalar_pos_0_over_time = {}
-    passive_scalar_pos_1_over_time = {}
-    passive_scalar_c_over_time = {}
     passive_scalar_grid_c_over_time = {}
     c_max = 0.0
     for passive_scalar_name in passive_scalar_list:
-        passive_scalar_pos_0_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_0", time_dir_array)
-        passive_scalar_pos_1_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_1", time_dir_array)
-        passive_scalar_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, passive_scalar_name + ".*__c", time_dir_array)
-        # c_max
-        c = [_c for cc in passive_scalar_c_over_time[passive_scalar_name] for _c in cc if _c > 0.0]
-        c_max = max(c_max, np.array(c).max())
-        # grid
         passive_scalar_grid_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "grid.*__c", time_dir_array)
-
-
-
-    
+        c = np.concatenate(passive_scalar_grid_c_over_time[passive_scalar_name])
+        c_max = max(c_max, c.max())
+    for passive_scalar_name in passive_scalar_list:
+        passive_scalar_grid_c_over_time[passive_scalar_name] = [c/c_max for c in passive_scalar_grid_c_over_time[passive_scalar_name]]
     print("INFO: Start...", flush=True)
     # create figure
     art_fig, art_ax = plt.subplots()
@@ -123,11 +114,6 @@ def main():
         art_ax.set_xlim(args.xlim[0], args.xlim[1])
     else:
         xs = []
-        # passive scalars
-        for name in passive_scalar_list:
-            for t in range(len(time_array)):
-                xs += passive_scalar_pos_0_over_time[name][t].tolist()
-        
         # trajectories
         for name in equation_name_list:
             for t in range(len(time_array)):
@@ -138,11 +124,6 @@ def main():
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
     else:
         ys = []
-        # passive scalars
-        for name in passive_scalar_list:
-            for t in range(len(time_array)):
-                ys += passive_scalar_pos_1_over_time[name][t].tolist()
-        
         # trajectories
         for name in equation_name_list:
             for t in range(len(time_array)):
@@ -154,18 +135,17 @@ def main():
     # initialize plots
     print("INFO: Plotting...", flush=True)
     # passive scalar
-    nx, ny = 256, 256
-    x = np.linspace(0.0, 2.0 * np.pi, nx, endpoint=False)
-    y = np.linspace(0.0, 2.0 * np.pi, ny, endpoint=False)
-
+    n = math.isqrt(len(passive_scalar_grid_c_over_time[next(iter(passive_scalar_grid_c_over_time))][0]))
+    x = np.linspace(art_ax.get_xlim()[0], art_ax.get_xlim()[1], n, endpoint=False)
+    y = np.linspace(art_ax.get_ylim()[0], art_ax.get_ylim()[1], n, endpoint=False)
     X, Y = np.meshgrid(x, y)
     levels = np.linspace(0.0, 1.0, 16) 
     passive_scalar_contourf = {}
     passive_scalar_cbar = {}
-    for passive_scalar_name in passive_scalar_list:
+    for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
         passive_scalar_contourf[passive_scalar_name] = None
         # cbar
-        passive_scalar_cbar[passive_scalar_name] = art_fig.colorbar(cm.ScalarMappable(norm=colors.LogNorm(vmin=1e-4, vmax=1.0), cmap=cmap[passive_scalar_index % len(args.cmap_color_list)]), ax=art_ax)
+        passive_scalar_cbar[passive_scalar_name] = art_fig.colorbar(cm.ScalarMappable(norm=colors.Normalize(vmin=0.0, vmax=1.0), cmap=cmap[passive_scalar_index % len(args.cmap_color_list)]), ax=art_ax)
         passive_scalar_cbar[passive_scalar_name].ax.tick_params(axis='y')
         passive_scalar_cbar[passive_scalar_name].set_label(passive_scalar_name + ": " + r"$c / c_{\mathrm{max}}$")
     # trajectories
@@ -192,10 +172,10 @@ def main():
                     passive_scalar_contourf[passive_scalar_name].remove()
 
                 passive_scalar_contourf[passive_scalar_name] = art_ax.contourf(
-                    X, Y, np.array(passive_scalar_grid_c_over_time[passive_scalar_name][time_index]).reshape((nx, ny)).T,
+                    X, Y, np.array(passive_scalar_grid_c_over_time[passive_scalar_name][time_index]).reshape((n, n)).T,
                     levels=levels,
                     cmap=cmap[passive_scalar_index % len(args.cmap_color_list)],
-                    norm=colors.LogNorm(vmin=1e-4, vmax=1.0),
+                    norm=colors.Normalize(vmin=0.0, vmax=1.0),
                     zorder=0
                 )
 

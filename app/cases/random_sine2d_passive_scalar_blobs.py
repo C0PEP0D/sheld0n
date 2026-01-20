@@ -31,6 +31,7 @@ def set_solutions():
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs Cth "1e-5"')
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingParticles false')
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingConcentrationOnGrid true')
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs GridN 256')
     # batch SplitSizeFactor
     os.chdir('param/solutions')
     os.system('./.cli_batch_copy_equation passive_scalar_blobs -p SplitSizeFactor -v ' + " ".join([str(v) for v in np.logspace(-2, -1, 4)]))

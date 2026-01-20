@@ -319,14 +319,12 @@ struct _PassiveParticlesParameters {
 			// // flow
 			const tSpaceVector u = Flow::getVelocity(x.data(), t);
 			const tSpaceMatrix j = Flow::getVelocityGradients(x.data(), t);
-			// // utils
-			// const tSpaceVector uD = ( Diffusivity / tGroupVariable::c(pGroupState, groupStateSize, x.data()) ) * tGroupVariable::cGradient(pGroupState, groupStateSize, x.data());
 			// // output
 			tView<tSpaceVector> dX(dState.data());
 			tView<tSpaceMatrix> dS(dState.data() + DIM);
 			double& dQ = dState[DIM + DIM * DIM];
 
-			dX = u; // u + uD ? ;
+			dX = u;
 			dS = 2.0 * Diffusivity * tSpaceMatrix::Identity() + j * s + s * j.transpose();
 			dQ = 0.0;
 
@@ -390,7 +388,7 @@ struct _PassiveParticlesParameters {
 	inline static const bool IsPostProcessingParticles = false;
 	inline static const bool IsPostProcessingConcentration = true && IsPostProcessingParticles;
 	inline static const bool IsPostProcessingConcentrationOnGrid = true;
-	inline static const unsigned int GridN = 256;
+	inline static const unsigned int GridN = 128;
 
 	// ---------------- CUSTOM POST PARAMETERS START
 

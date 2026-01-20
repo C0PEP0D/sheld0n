@@ -18,17 +18,22 @@ class Bin {
 		static const unsigned int Dim = _Dim;
 	public:
 		const double step;
-		std::map<
-			std::array<int, Dim>, 
-			std::vector<unsigned int>
-		> ijkToIndexes;
-		std::unordered_map<
-			unsigned int,
-			std::array<int, Dim>
-		> indexToIjk;
+		std::array<bool, Dim> isAxisPeriodic;
+		std::array<int, Dim> periodOffset;
+		std::array<unsigned int, Dim> periodSize;
+		
+		std::map<std::array<int, Dim>, std::vector<unsigned int>> ijkToIndexes;
+		std::unordered_map<unsigned int, std::array<int, Dim>> indexToIjk;
 	public:
-		Bin(const double p_step) : step(p_step) {
+		Bin(const double p_step, const std::array<bool, Dim>& p_isAxisPeriodix, const std::array<int, Dim>& p_periodOffset, const std::array<unsigned int, Dim>& p_periodSize) : 
+			step(p_step), isAxisPeriodic(p_isAxisPeriodix), periodOffset(p_periodOffset), periodSize(p_periodSize) {
 			
+		}
+	
+		Bin(const double p_step) : step(p_step) {
+			isAxisPeriodic.fill(false);
+			periodOffset.fill(0);
+			periodSize.fill(0);
 		}
 	public:
 		void addIndex(const unsigned int index, const double* pPosition) {
@@ -36,14 +41,15 @@ class Bin {
 		}
 
 		void addIndex(const unsigned int index, const std::array<int, Dim>& ijk) {
+			const std::array<int, Dim> ijkPeriodic = ijkToIjkPeriodic(ijk.data());
 			// update data
-			auto itIjkToIndexes = ijkToIndexes.find(ijk);
+			auto itIjkToIndexes = ijkToIndexes.find(ijkPeriodic);
 			if(itIjkToIndexes != ijkToIndexes.end()) {
 				itIjkToIndexes->second.push_back(index);
 			} else {
-				ijkToIndexes.emplace(ijk, std::vector<unsigned int>({ index }));
+				ijkToIndexes.emplace(ijkPeriodic, std::vector<unsigned int>({ index }));
 			}
-			indexToIjk.emplace(index, ijk);
+			indexToIjk.emplace(index, ijkPeriodic);
 		}
 
 		void addNone(const double* pPosition) {
@@ -51,10 +57,11 @@ class Bin {
 		}
 
 		void addNone(const std::array<int, Dim>& ijk) {
+			const std::array<int, Dim> ijkPeriodic = ijkToIjkPeriodic(ijk.data());
 			// update data
-			auto itIjkToIndexes = ijkToIndexes.find(ijk);
+			auto itIjkToIndexes = ijkToIndexes.find(ijkPeriodic);
 			if(itIjkToIndexes == ijkToIndexes.end()) {
-				ijkToIndexes.emplace(ijk, std::vector<unsigned int>());
+				ijkToIndexes.emplace(ijkPeriodic, std::vector<unsigned int>());
 			}
 		}
 
@@ -100,7 +107,7 @@ class Bin {
 				if(i < Dim - 1) {
 					ijkToNeighborIjkAuxiliary(newIjk.data(), i + 1, output);
 				} else {
-					output.push_back(newIjk);
+					output.push_back(ijkToIjkPeriodic(newIjk.data()));
 				}
 			}
 		}
@@ -153,7 +160,7 @@ class Bin {
 			for(unsigned int j = 0; j < Dim; ++j) {
 				newIjk[j] = pIjkStart[j];
 			}
-			output.push_back(newIjk);
+			output.push_back(ijkToIjkPeriodic(newIjk.data()));
 			// progress into graph
 			for(unsigned int j = i; j < Dim; ++j) {
 				std::array<int, Dim> newIjkStart = newIjk;
@@ -162,6 +169,23 @@ class Bin {
 					getIjkInBetweenAuxiliary(newIjkStart.data(), pIjkEnd, j, output);
 				}
 			}
+		}
+
+	public:
+		std::array<int, Dim> ijkToIjkPeriodic(const int* pIjk) const {
+			std::array<int, Dim> ijk;
+			for (unsigned int i = 0; i < Dim; ++i) {
+				if (isAxisPeriodic[i]) {
+					// offset
+					ijk[i] = pIjk[i] - periodOffset[i];
+				
+					const unsigned int n = periodSize[i];
+					ijk[i] = ((ijk[i] % n) + n) % n;  // safe modulo
+
+					ijk[i] += periodOffset[i];
+				}
+			}
+			return ijk;
 		}
 };
 
