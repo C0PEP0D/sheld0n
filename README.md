@@ -197,6 +197,8 @@ The script can search for any occurrences of a parameter and edit it.
 > If not used correctly, in case of name collision, it can completely corrupt the simulation case.
 > If you are not sure of its usage, make sure to copy and save your simulation case before executing the script.
 
+### Restarting a simulation
+
 ### Advance usage
 
 The simulations can be further customized using the scripts located in `param/solutions`.
