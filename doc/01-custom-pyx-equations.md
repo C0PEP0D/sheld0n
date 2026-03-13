@@ -145,27 +145,27 @@ We'll ignore the function `parse` for now to focus on the function `main`.
 Let's analyse this function from top to bottom.
 
 ```python
-20 def main(input_equation_list, input_color_list):
-21	# equations
-22	if input_equation_list:
-23		equation_name_list = input_equation_list
-24	else:
-25		print("INFO: Reading equation names...", flush=True)
-26		equation_name_list = libpost.get_equation_names()
-27	# colors
-28	if input_color_list:
-29		color_list = input_color_list
-30	else:
-31		cmap = plt.cm.get_cmap("plasma", len(equation_name_list))
-32		color_list = [cmap(index) for index in range(len(equation_name_list))]
+def main(input_equation_list, input_color_list):
+	# equations
+	if input_equation_list:
+		equation_name_list = input_equation_list
+	else:
+		print("INFO: Reading equation names...", flush=True)
+		equation_name_list = libpost.get_equation_names()
+	# colors
+	if input_color_list:
+		color_list = input_color_list
+	else:
+		cmap = plt.cm.get_cmap("plasma", len(equation_name_list))
+		color_list = [cmap(index) for index in range(len(equation_name_list))]
 ```
 This first part is responsible of adapting the code if the option of the script are not provides.
 It defines searches for the names of the equation to be post processed and defines default colors for the plot.
 We will not this part of the code here so let's move on.
 
 ```python
-33	print("INFO: Reading time...", flush=True)
-34	time_dir_array, time_array = libpost.get_time()
+	print("INFO: Reading time...", flush=True)
+	time_dir_array, time_array = libpost.get_time()
 ```
 This part reads the time of all time steps that have been post processed and stares it in two arrays:
 * `time_dit_array` an array of strings containing all paths in the directory `post_process/time`.
@@ -174,10 +174,10 @@ This will be useful in most cases when post processing the data so we will leave
 
 This next part is important.
 ```python
-35	print("INFO: Reading equation property over time...", flush=True)
-36	pos_1_over_time = {}
-37	for equation_name in equation_name_list:
-38		pos_1_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__pos_1", time_dir_array))
+	print("INFO: Reading equation property over time...", flush=True)
+	pos_1_over_time = {}
+	for equation_name in equation_name_list:
+		pos_1_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__pos_1", time_dir_array))
 ```
 It uses the function `libpost.get_equation_property_over_time` to read the property `"pos_1"` of the equation `equation_time` in the directory paths provided by `time_dir_array`.
 In other words, it returns the vertical component of the position of all particles of type `equation_name` over time.
@@ -190,43 +190,43 @@ Everything should be self explanatory in particular if you know Python.
 Let's just keep the last plot to have an example for now and delete the two others that won't be necessary.
 Your main function should then look like the following.
 ```python
-18 def main(input_equation_list, input_color_list):
+def main(input_equation_list, input_color_list):
 	# [...]
-33	print("INFO: Reading equation property over time...", flush=True)
-34	pos_1_over_time = {}
-35	for equation_name in equation_name_list:
-36		pos_1_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__pos_1", time_dir_array))
-37	print("INFO: Plotting property difference to initial time average ...", flush=True)
-38	for equation_index, equation_name in enumerate(equation_name_list):
-39		plt.plot(time_array, (pos_1_over_time[equation_name] - pos_1_over_time[equation_name][0]).mean(1), color=color_list[equation_index], label=equation_name)
-40	plt.xlabel('$t$')
-41	plt.ylabel(r'$\langle y \rangle$')
-42	plt.legend()
-43	plt.show()
+	print("INFO: Reading equation property over time...", flush=True)
+	pos_1_over_time = {}
+	for equation_name in equation_name_list:
+		pos_1_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__pos_1", time_dir_array))
+	print("INFO: Plotting property difference to initial time average ...", flush=True)
+	for equation_index, equation_name in enumerate(equation_name_list):
+		plt.plot(time_array, (pos_1_over_time[equation_name] - pos_1_over_time[equation_name][0]).mean(1), color=color_list[equation_index], label=equation_name)
+	plt.xlabel('$t$')
+	plt.ylabel(r'$\langle y \rangle$')
+	plt.legend()
+	plt.show()
 ```
 
 We are now interested by the particle velocity of our particles.
 Therefore let's change the first part to read the particle velocity rather than the vertical position.
 ```python
-33	print("INFO: Reading equation property over time...", flush=True)
-34	v_0_over_time = {}
-35	v_1_over_time = {}
-36	for equation_name in equation_name_list:
-37		v_0_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__v_0", time_dir_array))
-38		v_1_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__v_1", time_dir_array))
+	print("INFO: Reading equation property over time...", flush=True)
+	v_0_over_time = {}
+	v_1_over_time = {}
+	for equation_name in equation_name_list:
+		v_0_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__v_0", time_dir_array))
+		v_1_over_time[equation_name] = np.array(libpost.get_equation_property_over_time(equation_name, ".*__v_1", time_dir_array))
 ```
 
 Now for the plot, plotting this velocity over time would have little interest.
 We can rather use the `plt.hist` function to plot the probability function of the particle velocity.
 To do that change the next part to the following.
 ```python
-39	print("INFO: Plotting property difference to initial time average ...", flush=True)
-40	for equation_index, equation_name in enumerate(equation_name_list):
-41		plt.hist(v_1_over_time[equation_name].flatten(), bins=32, density=True, histtype="stepfilled", color=color_list[equation_index], label=equation_name)
-42	plt.xlabel(r'$u_y$')
-43	plt.ylabel('pdf')
-44	plt.legend()
-45	plt.show()
+	print("INFO: Plotting property difference to initial time average ...", flush=True)
+	for equation_index, equation_name in enumerate(equation_name_list):
+		plt.hist(v_1_over_time[equation_name].flatten(), bins=32, density=True, histtype="stepfilled", color=color_list[equation_index], label=equation_name)
+	plt.xlabel(r'$u_y$')
+	plt.ylabel('pdf')
+	plt.legend()
+	plt.show()
 ```
 
 Finally, you should be able to execute it using the following command:
