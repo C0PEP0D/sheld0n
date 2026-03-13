@@ -155,8 +155,6 @@ Then navigate in the case and run the case by executing the `run` script.
 > If it does not work, it might mean that your default compiler might not support all necessary C++ features.
 > Try specifying another C++ compiler, for instance `cpp-14`, `g++-14` or `clang++-18` using the **compiler** option.
 
-* TODO: screenshot
-
 Final data should be in the `post_process` directory. 
 Further post processing is provided using python scripts in that directory.
 
