@@ -21,6 +21,6 @@ cdef public void flow_get_velocity(c0p.tViewConstSpaceVector x, const double t, 
 #   t: current time
 # output:
 #   j: the flow velocity gradients at position x and time t
-cdef public void flow_get_velocity(c0p.tViewConstSpaceVector x, const double t, c0p.tSpaceMatrix& j) noexcept nogil:
+cdef public void flow_get_velocity_gradients(c0p.tViewConstSpaceVector x, const double t, c0p.tSpaceMatrix& j) noexcept nogil:
 	(&( j(0, 0) ))[0] = -std.sin(x[0]) * std.sin(x[1]); (&( j(0, 1) ))[0] = std.cos(x[0]) * std.cos(x[1]);
 	(&( j(1, 0) ))[0] = -std.cos(x[0]) * std.cos(x[1]); (&( j(1, 1) ))[0] = std.sin(x[0]) * std.sin(x[1]);

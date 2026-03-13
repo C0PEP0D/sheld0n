@@ -1,5 +1,6 @@
 cimport c0p
 cimport std
+cimport fl0w
 
 # parameters
 cdef double reaction_time
@@ -25,8 +26,8 @@ cdef public void passive_particles_constrain(const double t, c0p.tViewSpaceVecto
 #   v: particle velocity
 #   t: current time
 cdef public void passive_particles_prepare(c0p.tViewConstSpaceVector x, c0p.tViewConstSpaceVector v, const double t) noexcept nogil:
-	c0p.Flow.prepareVelocity(x.data(), t)
-	# c0p.Flow.prepareVelocityGradients(x.data(), t)
+	fl0w.Flow.prepareVelocity(x.data(), t)
+	# fl0w.Flow.prepareVelocityGradients(x.data(), t)
 
 # State Temporal Derivative: describe the temporal derivative of your state variable.
 # input:
@@ -38,7 +39,7 @@ cdef public void passive_particles_prepare(c0p.tViewConstSpaceVector x, c0p.tVie
 #   dv: dv/dt, temporal derivative of the particle velocity
 cdef public void passive_particles_state_temporal_derivative(c0p.tViewConstSpaceVector x, c0p.tViewConstSpaceVector v, const double t, c0p.tViewSpaceVector dx, c0p.tViewSpaceVector dv) noexcept nogil:
 	# get flow velocity at position x and time t
-	cdef c0p.tSpaceVector u = c0p.Flow.getVelocity(x.data(), t)
+	cdef c0p.tSpaceVector u = fl0w.Flow.getVelocity(x.data(), t)
 	# set the temporal derivative of x as the flow velocity
 	dx = v
 	dv = (u - v) / reaction_time
@@ -53,7 +54,7 @@ cdef public void passive_particles_init(const unsigned int particle_number, c0p.
 	cdef int particle_index, state_index
 	for particle_index in range(int(particle_number)):
 		x_array[particle_index] = c0p.tSpaceVector.Random() * std.M_PI
-		v_array[particle_index] = c0p.Flow.getVelocity(x_array[particle_index].data(), 0.0)
+		v_array[particle_index] = fl0w.Flow.getVelocity(x_array[particle_index].data(), 0.0)
 
 # Post: post process data.
 # input:

@@ -14,9 +14,9 @@ cdef public void flow_parameters() noexcept nogil:
 	u_0[1] = 0.0
 	u_0[2] = 0.0
 	# grad
-	(&( j(0, 0) ))[0] = 0.0;  (&( j(0, 1) ))[0] = 1.0;  (&( j(0, 2) ))[0] = -1.0;
-	(&( j(1, 0) ))[0] = 1.0;  (&( j(1, 1) ))[0] = -1.0; (&( j(1, 2) ))[0] = 1.0;
-	(&( j(2, 0) ))[0] = -1.0; (&( j(2, 1) ))[0] = -1.0; (&( j(2, 2) ))[0] = 1.0;
+	(&( grad(0, 0) ))[0] =  0.0; (&( grad(0, 1) ))[0] =  1.0; (&( grad(0, 2) ))[0] = -1.0;
+	(&( grad(1, 0) ))[0] =  1.0; (&( grad(1, 1) ))[0] = -1.0; (&( grad(1, 2) ))[0] =  1.0;
+	(&( grad(2, 0) ))[0] = -1.0; (&( grad(2, 1) ))[0] = -1.0; (&( grad(2, 2) ))[0] =  1.0;
 	# a
 	a[0] = 0.0;
 	a[1] = 0.0;
@@ -37,5 +37,5 @@ cdef public void flow_get_velocity(c0p.tViewConstSpaceVector x, const double t, 
 #   t: current time
 # output:
 #   j: the flow velocity gradients at position x and time t
-cdef public void flow_get_velocity(c0p.tViewConstSpaceVector x, const double t, c0p.tSpaceMatrix& j) noexcept nogil:
+cdef public void flow_get_velocity_gradients(c0p.tViewConstSpaceVector x, const double t, c0p.tSpaceMatrix& j) noexcept nogil:
 	j = grad;

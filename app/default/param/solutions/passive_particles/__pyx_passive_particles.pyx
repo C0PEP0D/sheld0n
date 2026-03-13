@@ -1,5 +1,6 @@
 cimport c0p
 cimport std
+cimport fl0w
 
 # Parameters: initialize global parameters
 cdef public void passive_particles_parameters() noexcept nogil:
@@ -19,8 +20,8 @@ cdef public void passive_particles_constrain(const double t, c0p.tViewSpaceVecto
 #   x: particle position
 #   t: current time
 cdef public void passive_particles_prepare(c0p.tViewConstSpaceVector x, const double t) noexcept nogil:
-	c0p.Flow.prepareVelocity(x.data(), t)
-	# c0p.Flow.prepareVelocityGradients(x.data(), t)
+	fl0w.Flow.prepareVelocity(x.data(), t)
+	# fl0w.Flow.prepareVelocityGradients(x.data(), t)
 
 # State Temporal Derivative: describe the temporal derivative of your state variable.
 # input:
@@ -30,7 +31,7 @@ cdef public void passive_particles_prepare(c0p.tViewConstSpaceVector x, const do
 #   dx: dx/dt, temporal derivative of the particle position
 cdef public void passive_particles_state_temporal_derivative(c0p.tViewConstSpaceVector x, const double t, c0p.tViewSpaceVector dx) noexcept nogil:
 	# get flow velocity at position x and time t
-	cdef c0p.tSpaceVector u = c0p.Flow.getVelocity(x.data(), t)
+	cdef c0p.tSpaceVector u = fl0w.Flow.getVelocity(x.data(), t)
 	# set the temporal derivative of x as the flow velocity
 	dx = u
 

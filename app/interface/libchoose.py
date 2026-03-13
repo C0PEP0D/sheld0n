@@ -174,6 +174,8 @@ def apply_choice(args):
         os.remove("parameters_" + name + ".pyx")
     if os.path.lexists("c0p.pxd"):
         os.unlink("c0p.pxd")
+    if os.path.lexists("fl0w.pxd"):
+        os.unlink("fl0w.pxd")
     if os.path.lexists("std.pxd"):
         os.unlink("std.pxd")
     if os.path.exists("parameters_" + name + ".h"):
@@ -188,6 +190,7 @@ def apply_choice(args):
         # links
         cython_dir = os.path.dirname(os.path.realpath(__file__)).split("interface")[0] + "interface/cython/"
         os.symlink(os.path.relpath(cython_dir + "c0p.pxd", "."), "c0p.pxd")
+        os.symlink(os.path.relpath(cython_dir + "fl0w.pxd", "."), "fl0w.pxd")
         os.symlink(os.path.relpath(cython_dir + "std.pxd", "."), "std.pxd")
     elif args.choice.startswith("py"):
         shutil.copyfile(get_abs_choices_dir(choices_dir) + "/" + choices[args.choice].replace(".h", ".py"), "parameters.py")

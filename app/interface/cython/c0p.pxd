@@ -208,20 +208,7 @@ cdef extern from "core/prop.h" namespace "c0p":
 	void print(const tSpaceVector&) nogil
 	void print(const char*) nogil
 
-# Flow
-
-cdef extern from "param/flow/parameters.h" namespace "c0p":
-	cdef cppclass Flow:
-
-		@staticmethod
-		void prepareVelocity(const double* pX, const double t) nogil
-		@staticmethod
-		void prepareVelocityGradients(const double* pX, const double t) nogil
-	
-		@staticmethod
-		tSpaceVector getVelocity(const double* pX, const double t) nogil
-		@staticmethod
-		tSpaceMatrix getVelocityGradients(const double* pX, const double t) nogil
+# Parameters
 
 cdef extern from "param/parameters.h" namespace "c0p":
 	unsigned int DIM

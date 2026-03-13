@@ -1,5 +1,6 @@
 cimport c0p
 cimport std
+cimport fl0w
 
 # parameters
 cdef c0p.tSpaceVector target_direction
@@ -28,8 +29,8 @@ cdef public void passive_particles_constrain(const double t, c0p.tViewSpaceVecto
 #   x: particle position
 #   t: current time
 cdef public void passive_particles_prepare(c0p.tViewConstSpaceVector x, const double t) noexcept nogil:
-	c0p.Flow.prepareVelocity(x.data(), t)
-	c0p.Flow.prepareVelocityGradients(x.data(), t)
+	fl0w.Flow.prepareVelocity(x.data(), t)
+	fl0w.Flow.prepareVelocityGradients(x.data(), t)
 
 # State Temporal Derivative: describe the temporal derivative of your state variable.
 # input:
@@ -39,8 +40,8 @@ cdef public void passive_particles_prepare(c0p.tViewConstSpaceVector x, const do
 #   dx: dx/dt, temporal derivative of the particle position
 cdef public void passive_particles_state_temporal_derivative(c0p.tViewConstSpaceVector x, const double t, c0p.tViewSpaceVector dx) noexcept nogil:
 	# get flow velocity at position x and time t
-	cdef c0p.tSpaceVector u = c0p.Flow.getVelocity(x.data(), t)
-	cdef c0p.tSpaceMatrix grad_u = c0p.Flow.getVelocityGradients(x.data(), t)
+	cdef c0p.tSpaceVector u = fl0w.Flow.getVelocity(x.data(), t)
+	cdef c0p.tSpaceMatrix grad_u = fl0w.Flow.getVelocityGradients(x.data(), t)
 	# compute surfing direction
 	cdef c0p.tSpaceVector n_surf = ((grad_u * time_horizon).exp().transpose() * target_direction).normalized()
 	# set the temporal derivative of x as the flow velocity
@@ -97,8 +98,8 @@ cdef public void passive_particles_post(c0p.tViewConstSpaceVector* x_array, cons
 		# compute the surfing direction
 
 		# surfing direction
-		u = c0p.Flow.getVelocity(x_array[particle_index].data(), t)
-		grad_u = c0p.Flow.getVelocityGradients(x_array[particle_index].data(), t)
+		u = fl0w.Flow.getVelocity(x_array[particle_index].data(), t)
+		grad_u = fl0w.Flow.getVelocityGradients(x_array[particle_index].data(), t)
 		# compute surfing direction
 		n_surf = ((grad_u * time_horizon).exp().transpose() * target_direction).normalized()
 		

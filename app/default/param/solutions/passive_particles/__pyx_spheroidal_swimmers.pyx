@@ -1,5 +1,6 @@
 cimport c0p
 cimport std
+cimport fl0w
 
 # parameters
 cdef double swimming_velocity # swimming velocity
@@ -29,8 +30,8 @@ cdef public void passive_particles_constrain(const double t, c0p.tViewSpaceVecto
 #   p: particle swimming direction
 #   t: current time
 cdef public void passive_particles_prepare(c0p.tViewConstSpaceVector x, c0p.tViewConstSpaceVector p, const double t) noexcept nogil:
-	c0p.Flow.prepareVelocity(x.data(), t)
-	c0p.Flow.prepareVelocityGradients(x.data(), t)
+	fl0w.Flow.prepareVelocity(x.data(), t)
+	fl0w.Flow.prepareVelocityGradients(x.data(), t)
 
 # State Temporal Derivative: describe the temporal derivative of your state variable.
 # input:
@@ -42,8 +43,8 @@ cdef public void passive_particles_prepare(c0p.tViewConstSpaceVector x, c0p.tVie
 #   dp: dp/dt, temporal derivative of the particle swimming direction
 cdef public void passive_particles_state_temporal_derivative(c0p.tViewConstSpaceVector x, c0p.tViewConstSpaceVector p, const double t, c0p.tViewSpaceVector dx, c0p.tViewSpaceVector dp) noexcept nogil:
 	# get flow velocity at position x and time t
-	cdef c0p.tSpaceVector u = c0p.Flow.getVelocity(x.data(), t)
-	cdef c0p.tSpaceMatrix grad_u = c0p.Flow.getVelocityGradients(x.data(), t)
+	cdef c0p.tSpaceVector u = fl0w.Flow.getVelocity(x.data(), t)
+	cdef c0p.tSpaceMatrix grad_u = fl0w.Flow.getVelocityGradients(x.data(), t)
 
 	cdef c0p.tSpaceMatrix sym_grad_u = 0.5 * (grad_u + grad_u.transpose())
 	cdef c0p.tSpaceMatrix skew_grad_u = 0.5 * (grad_u - grad_u.transpose())

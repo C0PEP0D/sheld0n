@@ -1,5 +1,6 @@
 cimport c0p
 cimport std
+cimport fl0w
 
 # parameters
 cdef double stiffness
@@ -107,8 +108,8 @@ cdef public void passive_particles_constrain(const double t, c0p.tViewSpaceVecto
 #   x: particle position
 #   t: current time
 cdef public void passive_particles_prepare(c0p.tViewConstSpaceVector x, const double theta, const double dof, const double t) noexcept nogil:
-	c0p.Flow.prepareVelocity(x.data(), t)
-	c0p.Flow.prepareVelocityGradients(x.data(), t)
+	fl0w.Flow.prepareVelocity(x.data(), t)
+	fl0w.Flow.prepareVelocityGradients(x.data(), t)
 
 # State Temporal Derivative: describe the temporal derivative of your state variable.
 # input:
@@ -118,8 +119,8 @@ cdef public void passive_particles_prepare(c0p.tViewConstSpaceVector x, const do
 #   dx: dx/dt, temporal derivative of the particle position
 cdef public void passive_particles_state_temporal_derivative(c0p.tViewConstSpaceVector x, const double theta, const double dof, const double t, c0p.tViewSpaceVector dx, double& dtheta, double& ddof) noexcept nogil:
 	# get flow velocity at position x and time t
-	cdef c0p.tSpaceVector u = c0p.Flow.getVelocity(x.data(), t)
-	cdef c0p.tSpaceMatrix grad_u = c0p.Flow.getVelocityGradients(x.data(), t)
+	cdef c0p.tSpaceVector u = fl0w.Flow.getVelocity(x.data(), t)
+	cdef c0p.tSpaceMatrix grad_u = fl0w.Flow.getVelocityGradients(x.data(), t)
 	# flow velocity gradients
 	cdef c0p.tSpaceMatrix sym_grad_u = 0.5 * (grad_u + grad_u.transpose())
 	cdef c0p.tSpaceMatrix skew_grad_u = 0.5 * (grad_u - grad_u.transpose())
@@ -223,8 +224,8 @@ cdef public void passive_particles_post(c0p.tViewConstSpaceVector* x_array, doub
 		# compute the surfing direction
 
 		# surfing direction
-		u = c0p.Flow.getVelocity(x_array[particle_index].data(), t)
-		grad_u = c0p.Flow.getVelocityGradients(x_array[particle_index].data(), t)
+		u = fl0w.Flow.getVelocity(x_array[particle_index].data(), t)
+		grad_u = fl0w.Flow.getVelocityGradients(x_array[particle_index].data(), t)
 		# compute surfing direction
 		n_surf = c0p.tSpaceVector.Zero()
 		

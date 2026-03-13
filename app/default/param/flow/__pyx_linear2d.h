@@ -19,7 +19,7 @@ struct Flow {
 		// input
 		const tView<const tSpaceVector> x(pX);
 		// output
-		const tSpaceVector u;
+		tSpaceVector u;
 
 		// cython
 		flow_get_velocity(x, t, u);
@@ -31,7 +31,7 @@ struct Flow {
 		// input
 		const tView<const tSpaceVector> x(pX);
 		// output
-		const tSpaceVector j;
+		tSpaceMatrix j;
 
 		// cython
 		flow_get_velocity_gradients(x, t, j);

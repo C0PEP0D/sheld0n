@@ -32,7 +32,7 @@ find_package(TBB REQUIRED)
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
 
 # Additional cpp files (cython)
-file(GLOB_RECURSE ADD_CPP_FILES "./param/solutions/*.cpp")
+file(GLOB_RECURSE ADD_CPP_FILES "./param/*.cpp")
 
 # Build run
 add_executable(run ${C0P_PROJECT_DIR}/app/core/run/main.cpp ${ADD_CPP_FILES})
