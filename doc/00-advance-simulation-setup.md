@@ -64,9 +64,9 @@ struct EnvParameters {
 Note that the `cGroupSize` parameters will control the number of particles in the simulation.
 Let's move on for now, we'll come back to these parameters later.
 
-## Adding a new particles
+## Adding new particles
 
-The default simulation case created using the `*_generate_new_case` script is a 2D simulation of passive particles in a Taylor-Green flow.
+The default simulation case created using the `generate_new_case` script is a 2D simulation of passive particles in a Taylor-Green flow.
 Let's first try to add some buoyant particles in the flow.
 
 ```
@@ -82,12 +82,12 @@ Check the content of the directory.
 The `parameters.h` file lists the equations to be solved in your simulation.
 Contrary to most of the other `parameters.h` files in the `param/` directory, 
 this particular file is solely meant to be modified using the scripts 
-`*_batch_copy_equation`, `*_copy_equation`, `*_create_new_equation`, `*_remove_equation`, `*_rename_equation`.
+`batch_copy_equation`, `copy_equation`, `create_new_equation`, `remove_equation`, `rename_equation`.
 
 Each execution of a script will change the directories content while editing the `parameters.h` file.
 
 For now, our simulation only solves the trajectory of passive particles, represented by the `passive_particles` directory.
-Let's try to add **buoyant particles** in the flow using the `*_create_new_equation` script.
+Let's try to add **buoyant particles** in the flow using the `create_new_equation` script.
 
 ```
 Execute the *_create_new_equation script and set the name of the new equation to buoyant_particles using the **name** argument. 
@@ -168,7 +168,7 @@ Close the parameters_buoyant_particles.pyx file and run the *_choose script with
 ```
 
 > [!CAUTION]
-> Using a `*_choose` script will override the `parameters.h` and the `parameters_buoyant_particles.pyx` files and all changes will be lost.
+> Using a `choose` script will override the `parameters.h` and the `parameters_buoyant_particles.pyx` files and all changes will be lost.
 
 If you open again the `parameters_buoyant_particles.pyx` file, you can see it has changed.
 You may note two new parameters defined at the top of the file (`buoyant_velocity` and `buoyancy_direction`) and a different definition of the temporal derivative corresponding to the following equation
@@ -255,7 +255,7 @@ To control further the simulation, three other directories exists with parameter
 Once that is done, we can run the simulation. 
 
 ```
-Execute the `*_run` script at the root directory of the current case.
+Execute the `run` script at the root directory of the current case.
 ```
 
 > [!NOTE]
@@ -286,7 +286,7 @@ Similarly, the directory `post_process/time` is created when running the post pr
 In certain cases, if the simulation or the post_processing was stopped while writing a file, the last time step may be corrupted.
 In that case, just delete the last step (the last directory in `time` directory) to continue from the previous step.
 
-Because the `*_run` and the `*_post` are separated,
+Because the `run` and the `post` are separated,
 you may change any post-processing function after the simulation has been executed without having to run again the whole simulation.
 However, in that case, make sure you delete the directory `post_process/time` before running again the `post` script.
 To do so, one can use the `post_process/clean` script.
