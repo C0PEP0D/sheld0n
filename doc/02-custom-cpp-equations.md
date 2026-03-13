@@ -85,8 +85,7 @@ Let us first copy paste the buoyancy parameters into our parameters.
 ```
 
 Then we need to modify the definition of the temporal derivative of our state variables to match the previous equation.
-To do so, let's first copy the line **38** of `save_buoyant_parameters.h` into our `parameters.h` file.
-This line gives us access to the vertical in vector form.
+To do so, let's first copy the line that gives us the vertical in vector form of `save_buoyant_parameters.h` into our `parameters.h` file.
 ```cpp
 			// ---------------- CUSTOM EQUATION START
 			// parameters <--- ADDED
@@ -104,7 +103,7 @@ This line gives us access to the vertical in vector form.
 			// ---------------- CUSTOM EQUATION END
 ```
 
-Finally, we just have to change the line **49** to match our new equation.
+Finally, we just have to change the derivative of velocity to match our new equation.
 ```cpp
 			dV = (u + BuoyantVelocity * z - v) / ReactionTime;
 ```
