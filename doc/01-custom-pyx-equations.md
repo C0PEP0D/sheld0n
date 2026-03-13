@@ -126,8 +126,8 @@ However, we also extract the velocity of these particles.
 
 Let's try to build another post processing script that exploits this data.
 First, we can copy the `plot_over_time.py` script to avoid starting from scratch. 
-```sh
-$ cp plot_over_time.py plot_custom.py
+```
+copy plot_over_time.py to plot_custom.py
 ```
 
 Then let's open that script to start analyzing it.
@@ -229,10 +229,7 @@ To do that change the next part to the following.
 	plt.show()
 ```
 
-Finally, you should be able to execute it using the following command:
-```sh
-$ ./plot_custom.py -e custom_particles
-```
+Finally, you should be able to execute it using `run_post_process`.
 
 > [!NOTE]
 > The `-e` option helps to specify which particles you want the post plot to be applied to.
@@ -248,20 +245,11 @@ run longer simulation with a higher number of particles.
 
 ## Custom flow equation
 
-Similarly a python flow can be chosen in the `param/flow` directory and the `parameters.py` file edited to modify its behavior.
-If you do so, the flow can be directly accessed in **Python** parameter files as follows:
-
- ```python
-sys.path.append('param')
-import flow.parameters as flow
-
-u = flow.get_velocity(x, t) # get flow velocity
- ```
+Similarly a Cython flow can be chosen in the `param/flow` directory and the `parameters_flow.pyx` file can be edited to modify its behavior.
 
 ## Next tutorial
 
 That's the end of this tutorial. 
 
 In the next tutorial [02-custom-cpp-equations.md](02-custom-cpp-equations.md), 
-you'll learn how to basically do the same using **C++** to avoid the performance drop caused
-by the **Python** interface.
+you'll learn how to basically do the same using **C++** for more flexibility.
