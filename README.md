@@ -155,8 +155,6 @@ Then navigate in the case and run the case by executing the `run` script.
 > If it does not work, it might mean that your default compiler might not support all necessary C++ features.
 > Try specifying another C++ compiler, for instance `cpp-14`, `g++-14` or `clang++-18` using the **compiler** option.
 
-* TODO: screenshot
-
 Final data should be in the `post_process` directory. 
 Further post processing is provided using python scripts in that directory.
 
@@ -175,9 +173,16 @@ All parameters are included in the `param` directory.
 * all files `parameters.h` contain parameters that can be edited.
 * `choose` scripts can be used to set `parameters.h` to a chosen default.
 
-For instance, one may use the `param/flow/choose` script to change the flow from a Taylor-Green Vortex to another type of flow. 
+For instance, one may use the `param/flow/choose` script to change the flow from a Taylor-Green Vortex to another type of flow.
+
+> [!NOTE]
+> Available choices start either with `cpp_` or `pyx_`.
+> `cpp_` stand for C++ parameter files. `pyx_` stand for
+> Cython parameter files. Some choices are only supported
+> in either C++ or Cython.
 
 If you do so, open the `parameters.h` file in the same directory to see how it has changed.
+If you chose a Cython case (`pyx_`), the `parameters.h` should not be directly edited (unless you know what you are doing) but rather edit the `parameters_*.pyx` file that appeared.
 
 > [!CAUTION]
 > Using a `choice` script will override the `parameters.h` file in the same directory and all changes will be lost.
