@@ -199,6 +199,13 @@ The script can search for any occurrences of a parameter and edit it.
 
 ### Restarting a simulation
 
+If a simulation stoped before it has ended and you run it again using the `run` script, the simulation will restart from the point it stopped using the data stored in the `time` and `post_process/time` directories.
+Therefore if you changed simulation parameters and would like to run again a simulation from the start, you will have to delete the `time` directories.
+To do so just run the `clean_time` script before running the `run` script.
+
+In some specific cases, you would also like the compilation to restart from the start too. 
+In that case, run the `clean_build` script.
+
 ### Advance usage
 
 The simulations can be further customized using the scripts located in `param/solutions`.
