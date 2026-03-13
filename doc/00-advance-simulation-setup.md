@@ -90,7 +90,7 @@ For now, our simulation only solves the trajectory of passive particles, represe
 Let's try to add **buoyant particles** in the flow using the `create_new_equation` script.
 
 ```
-Execute the *_create_new_equation script and set the name of the new equation to buoyant_particles using the **name** argument. 
+Execute the create_new_equation script and set the name of the new equation to buoyant_particles using the **name** argument. 
 Select the pyx_passive_particles as the parameters option.
 ```
 
@@ -161,10 +161,10 @@ This is exactly what the last line of this function states.
 ## Choosing the particles behavior
 
 Now that we analysed the `parameters_buoyant_particles.pyx` file of a passive particle, we want to change that file to match the behavior of a **buoyant** particle.
-We could manually edit the `parameters_buoyant_particles.pyx`, but we can also use the `*_choose` script in the same directory to choose another default behavior.
+We could manually edit the `parameters_buoyant_particles.pyx`, but we can also use the `choose` script in the same directory to choose another default behavior.
 
 ```
-Close the parameters_buoyant_particles.pyx file and run the *_choose script with pyx_buoyant_particles as the **choice** option.
+Close the parameters_buoyant_particles.pyx file and run the choose script with pyx_buoyant_particles as the **choice** option.
 ```
 
 > [!CAUTION]
@@ -184,7 +184,7 @@ Now that we know how to do, let's just add inertial particles to the simulation 
 Move back to the param/solutions directory
 ```
 ```
-Execute the *_create_new_equation script with the name inertial_particles and with the options pyx_inertial_particles. 
+Execute the create_new_equation script with the name inertial_particles and with the options pyx_inertial_particles. 
 This avoids having to use the choose script to change the particle behavior.
 ```
 
