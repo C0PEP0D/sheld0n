@@ -62,7 +62,7 @@ Copy parameters_custom_particles.pyx into parameters_buoyant_saved.pyx.
 
 Let's now start our new custom behavior based on that of inertial particles.
 ```
-Execute the choose script and choose the **pyx_inertial_particles**.
+Execute the choose script and choose the pyx_inertial_particles.
 ```
 
 We can now open both file at the same time and try to merge the `parameters_buoyant_saved.pyx` file into the `parameters_custom_particles.pyx` file.
