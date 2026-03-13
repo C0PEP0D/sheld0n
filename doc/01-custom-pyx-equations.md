@@ -50,7 +50,7 @@ By merging together both behavior, we should be fine.
 
 Let's first start by adding a new custom particle equation based on **pyx_buoyant_particles**.
 ```
-Move to the param/solutions directory and execute the *_create_new_equation script.
+Move to the param/solutions directory and execute the create_new_equation script.
 Give the name custom_particles to your new equation and choose **pyx_buoyant_particles**.
 ```
 
@@ -110,7 +110,7 @@ One could similarly change the `post` function too to match your needs.
 Once everything is setup, we can run the simulation and the post processing.
 ```
 Move back to the case-01 directory.
-And execute the *_run script.
+And execute the run script.
 ```
 
 Finally you can see your own custom particles in action.
