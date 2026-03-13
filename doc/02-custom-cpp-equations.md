@@ -31,20 +31,17 @@ If not, feel free to **open an issue** or contact me if you need any help.
 
 First let's generate a new case to avoid breaking the first tutorial case.
 Rather than generating a new case from scratch, let's just copy our first case.
-```sh
-cd cases
-ls
-cp -r case_00 case_02
-ls
+```
+Move to the cases directory.
+Copy the case_00 to the case_02.
 ```
 
 Let's move into it, clean entirely the simulation and create a new equation.
 ```sh
-cd case_02
-./clean
-cd param/solutions
-./create_new_equation custom_particles
-cd custom_particles
+Move to the case_02 directory.
+Execute clean_build and clean_time.
+Move to param/solutions and execute create_new_equation to create new particles named custom_particles.
+Finally, move to the custom_particles directory.
 ```
 
 As an exercise, let's try to create a particle that is both buoyant and inertial (the same as the previous tutorial).
@@ -56,8 +53,7 @@ The motion of such a particle would be described by the following equations
 \frac{d \vec{v}}{dt} = \frac{ u \left ( \vec{x}, t \right ) + V_{\mathrm{buoyancy}} \vec{z} - \vec{v} }{\tau} \, \mathrm{.}
 ```
 
-While this equation is not included in the choices available in the solver, `buoyant_particles` and `inertial_particles`
-are both already available.
+While this equation is not included in the choices available in the solver, `buoyant_particles` and `inertial_particles` are both already available.
 By merging together both behavior, we should be fine.
 
 Let's first get the `parameters.h` for buoyant particles and save it to have access to it later.
@@ -161,9 +157,8 @@ by the particles along their trajectories.
 
 Once everything is setup, we can run the simulation and the post processing.
 ```sh
-cd ../../..
-./run
-cd post_process
+Move back to the root of the case and execute the run script.
+You can then post process results in the post process directory.
 ```
 
 You can then add some further custom post processing if necessary (the same as the previous tutorial for instance).
