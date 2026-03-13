@@ -66,6 +66,8 @@ brew reinstall python3 && brew install tbb git cmake ffmpeg`
 
 ### Installing
 
+
+
 The following command will create a python virtual environment to encapsulate all python dependencies,
 then clone the sheld0n project and move into its directory.
 
@@ -144,6 +146,8 @@ or
 ```
 
 ### Quick start
+
+
 
 * Go to the `cases` directory.
 * Execute the `generate_new_case` script and provide a name for your new case using the **name** argument. 
