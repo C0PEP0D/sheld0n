@@ -12,8 +12,10 @@
 
 namespace c0p {
 
-template<typename tParameters>
+template<typename _tParameters>
 class Solutions {
+	public:
+		using tParameters = _tParameters;
 	public:
 		Solutions() : t(0.0) {
 		}

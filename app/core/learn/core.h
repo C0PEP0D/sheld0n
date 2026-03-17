@@ -38,14 +38,14 @@ namespace c0p {
 				std::filesystem::create_directory("param/learn/neural_network/data");
 			}
 			// input layer
-			s0ve::saveDouble("param/learn/neural_network/data/input_weights.txt", ls.ppo.actor.next_module.content.input_layer.weights.parameters._data, ls.ppo.actor.next_module.content.input_layer.INPUT_DIM * ls.ppo.actor.next_module.content.input_layer.OUTPUT_DIM);
-			s0ve::saveDouble("param/learn/neural_network/data/input_biases.txt", ls.ppo.actor.next_module.content.input_layer.biases.parameters._data, ls.ppo.actor.next_module.content.input_layer.OUTPUT_DIM);
+			s0ve::ascii::saveDouble("param/learn/neural_network/data/input_weights.txt", ls.ppo.actor.next_module.content.input_layer.weights.parameters._data, ls.ppo.actor.next_module.content.input_layer.INPUT_DIM * ls.ppo.actor.next_module.content.input_layer.OUTPUT_DIM);
+			s0ve::ascii::saveDouble("param/learn/neural_network/data/input_biases.txt", ls.ppo.actor.next_module.content.input_layer.biases.parameters._data, ls.ppo.actor.next_module.content.input_layer.OUTPUT_DIM);
 			// hidden layers
-			s0ve::saveDouble("param/learn/neural_network/data/hidden_weights.txt", ls.ppo.actor.next_module.content.hidden_layers->weights.parameters._data, ls.ppo.actor.next_module.content.hidden_layers->INPUT_DIM * ls.ppo.actor.next_module.content.hidden_layers->OUTPUT_DIM);
-			s0ve::saveDouble("param/learn/neural_network/data/hidden_biases.txt", ls.ppo.actor.next_module.content.hidden_layers->biases.parameters._data, ls.ppo.actor.next_module.content.hidden_layers->OUTPUT_DIM);
+			s0ve::ascii::saveDouble("param/learn/neural_network/data/hidden_weights.txt", ls.ppo.actor.next_module.content.hidden_layers->weights.parameters._data, ls.ppo.actor.next_module.content.hidden_layers->INPUT_DIM * ls.ppo.actor.next_module.content.hidden_layers->OUTPUT_DIM);
+			s0ve::ascii::saveDouble("param/learn/neural_network/data/hidden_biases.txt", ls.ppo.actor.next_module.content.hidden_layers->biases.parameters._data, ls.ppo.actor.next_module.content.hidden_layers->OUTPUT_DIM);
 			// output layer
-			s0ve::saveDouble("param/learn/neural_network/data/output_weights.txt", ls.ppo.actor.next_module.content.output_layer.weights.parameters._data, ls.ppo.actor.next_module.content.output_layer.INPUT_DIM * ls.ppo.actor.next_module.content.output_layer.OUTPUT_DIM);
-			s0ve::saveDouble("param/learn/neural_network/data/output_biases.txt", ls.ppo.actor.next_module.content.output_layer.biases.parameters._data, ls.ppo.actor.next_module.content.output_layer.OUTPUT_DIM);
+			s0ve::ascii::saveDouble("param/learn/neural_network/data/output_weights.txt", ls.ppo.actor.next_module.content.output_layer.weights.parameters._data, ls.ppo.actor.next_module.content.output_layer.INPUT_DIM * ls.ppo.actor.next_module.content.output_layer.OUTPUT_DIM);
+			s0ve::ascii::saveDouble("param/learn/neural_network/data/output_biases.txt", ls.ppo.actor.next_module.content.output_layer.biases.parameters._data, ls.ppo.actor.next_module.content.output_layer.OUTPUT_DIM);
 			// info
 			std::cout << "INFO: Done..." << std::endl;
 		}

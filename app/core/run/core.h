@@ -11,7 +11,9 @@
 #include <filesystem>
 #include <iomanip> // setprecision
 // app includes
-#include "core/learn/neural_network/core.h"
+#if __has_include("param/learn/neural_network/parameters.h")
+	#include "core/learn/neural_network/core.h"
+#endif
 
 namespace c0p {
 
@@ -87,7 +89,9 @@ class Run {
 				saveAndPostProcess(0.0);
 			}
 			// neural network
+#if __has_include("param/learn/neural_network/parameters.h")
 			NeuralNetwork::init();
+#endif
 		}
 		
 		void saveAndPostProcess(const tScalar& t) {

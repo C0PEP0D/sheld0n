@@ -47,13 +47,16 @@ namespace rl_tools {
 		nextState.solutions = state.solutions;
 		// next agent
 		using tAgentEquation = typename SPEC::PARAMETERS::tAgentEquation;
-		c0p::tView<c0p::tStateVectorDynamic> nextAgentState(nextState.solutions.template stateStatic<typename tAgentEquation::tVariable>(), tAgentEquation::tVariable::Size);
+		c0p::tView<c0p::tStateVectorDynamic> nextAgentState(nextState.solutions.stateArray[0].data() + tAgentEquation::tParameters::StateIndex, tAgentEquation::tVariable::Size);
 
 		// act
 		tAgentEquation::tParameters::act(action, nextAgentState.data());
 
 		// simulation step
-		nextState.solutions.step(SPEC::PARAMETERS::Dt / 128.0);
+		const double dt = SPEC::PARAMETERS::Dt/SPEC::PARAMETERS::SimulationStepNumberPerLearningStep;
+		for(unsigned int i = 0; i < SPEC::PARAMETERS::SimulationStepNumberPerLearningStep; i++) {
+			nextState.solutions.step(dt);
+		}
 		nextState.t += SPEC::PARAMETERS::Dt;
 
 		// return
@@ -64,9 +67,9 @@ namespace rl_tools {
 	typename SPEC::T reward(DEVICE& device, const c0p::RLEnv<SPEC>& env, const typename c0p::RLEnv<SPEC>::Parameters& parameters, const typename c0p::RLEnv<SPEC>::State& state, const Matrix<ACTION_SPEC>& action, const typename c0p::RLEnv<SPEC>::State& nextState, RNG& rng) {
 		using tAgentEquation = typename SPEC::PARAMETERS::tAgentEquation;
 		// get agent state
-		const c0p::tView<const c0p::tStateVectorDynamic> agentState(state.solutions.template cStateStatic<typename tAgentEquation::tVariable>(), tAgentEquation::tVariable::Size);
+		const c0p::tView<const c0p::tStateVectorDynamic> agentState(state.solutions.stateArray[0].data() + tAgentEquation::tParameters::StateIndex, tAgentEquation::tVariable::Size);
 		// get next agent state
-		const c0p::tView<const c0p::tStateVectorDynamic> nextAgentState(nextState.solutions.template cStateStatic<typename tAgentEquation::tVariable>(), tAgentEquation::tVariable::Size);
+		const c0p::tView<const c0p::tStateVectorDynamic> nextAgentState(nextState.solutions.stateArray[0].data() + tAgentEquation::tParameters::StateIndex, tAgentEquation::tVariable::Size);
 		// observe
 		return tAgentEquation::tParameters::reward(agentState.data(), nextAgentState.data());
 	}
@@ -75,7 +78,7 @@ namespace rl_tools {
 	void observe(DEVICE& device, const c0p::RLEnv<SPEC>& env, const typename c0p::RLEnv<SPEC>::Parameters& parameters, const typename c0p::RLEnv<SPEC>::State& state, const c0p::RLEnvObservation<OBS_TYPE_SPEC>& rlEnvObservation, Matrix<OBS_SPEC>& observation, RNG& rng) {
 		// get agent state
 		using tAgentEquation = typename SPEC::PARAMETERS::tAgentEquation;
-		const c0p::tView<const c0p::tStateVectorDynamic> agentState(state.solutions.template cStateStatic<typename tAgentEquation::tVariable>(), tAgentEquation::tVariable::Size);
+		const c0p::tView<const c0p::tStateVectorDynamic> agentState(state.solutions.stateArray[0].data() + tAgentEquation::tParameters::StateIndex, tAgentEquation::tVariable::Size);
 		// observe
 		tAgentEquation::tParameters::observe(agentState.data(), state.t, observation);
 	}

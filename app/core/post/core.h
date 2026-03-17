@@ -11,6 +11,9 @@
 #include <filesystem>
 // app include
 #include "core/prop.h"
+#if __has_include("param/learn/neural_network/parameters.h")
+	#include "core/learn/neural_network/core.h"
+#endif
 
 namespace c0p {
 
@@ -85,6 +88,10 @@ class Post {
 			rand0m::seed(EnvParameters::randomSeed);
 			// init flow
 			Flow::init();
+			// neural network
+#if __has_include("param/learn/neural_network/parameters.h")
+			NeuralNetwork::init();
+#endif
 		}
 
 		void load(const std::string& t) {

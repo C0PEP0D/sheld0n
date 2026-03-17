@@ -76,6 +76,7 @@ def run(args):
     #### solutions
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_copy_equation")
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_remove_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_remove_equation")
+    os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_batch_copy_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_batch_copy_equation")
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_create_new_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_create_new_equation")
     os.symlink(os.path.relpath(code_dir + "/app/interface/solutions/gui_rename_equation.py", args.name + "/param/solutions"), args.name + "/param/solutions/.gui_rename_equation")
     #### equation

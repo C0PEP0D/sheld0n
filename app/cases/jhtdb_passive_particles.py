@@ -29,7 +29,7 @@ def main():
     shutil.copy(code_dir + "/app/post/generate_trajectory_animation_3d.py", "post_process/generate_trajectory_animation_3d.py")
     # remove symbolic link
     os.unlink("learn")
-    # shutil.rmtree("param/learn")
+    shutil.rmtree("param/learn")
 
 if __name__ == '__main__':
     main()

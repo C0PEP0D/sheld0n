@@ -63,7 +63,7 @@ def main():
     shutil.copy(code_dir + "/app/post/comparative_validation_against_dns.py", "post_process/comparative_validation_against_dns.py")
     # remove symbolic link
     os.unlink("learn")
-    # shutil.rmtree("param/learn")
+    shutil.rmtree("param/learn")
 
 if __name__ == '__main__':
     main()

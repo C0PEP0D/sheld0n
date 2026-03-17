@@ -65,7 +65,7 @@ def main():
     shutil.copy(code_dir + "/app/post/generate_scene_animation_2d.py", "post_process/generate_scene_animation_2d.py")
     # remove symbolic link
     os.unlink("learn")
-    # shutil.rmtree("param/learn")
+    shutil.rmtree("param/learn")
 
 if __name__ == '__main__':
     main()

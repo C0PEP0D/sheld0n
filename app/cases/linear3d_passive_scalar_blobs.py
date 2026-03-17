@@ -53,7 +53,7 @@ def main():
     shutil.copy(code_dir + "/app/post/plot_profile_c_moments_over_time.py", "post_process/plot_profile_c_moments_over_time.py")
     # remove symbolic link
     os.unlink("learn")
-    # shutil.rmtree("param/learn")
+    shutil.rmtree("param/learn")
 
 if __name__ == '__main__':
     main()

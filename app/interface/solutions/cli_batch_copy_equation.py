@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# # gui
-# from cli2gui import Cli2Gui # TODO: add support to nargs='+' into cli2gui
 # command line program
 import argparse
 import numpy as np
@@ -90,7 +88,8 @@ def run(args):
 # @Cli2Gui(run_function=run)
 def main():
     parser = argparse.ArgumentParser(description='Copies an equation into several others by varying their parameters.')
-    parser.add_argument('sources', nargs='+', choices=[equation for equation in os.listdir(".") if os.path.isdir(equation)], help='specify the name of the source equations')
+    parser.add_argument('sources', nargs='+', help='specify the name of the source equations')
+    # parser.add_argument('sources', nargs='+', choices=[equation for equation in os.listdir(".") if os.path.isdir(equation)], help='specify the name of the source equations')
     parser.add_argument('-p', '--prop', help='specify the property', required=True)
     parser.add_argument('-v', '--values', type=float, nargs='+', help='specify the values', required=True)
     parser.add_argument('-f', '--factor', help='specify a factor', default=None)

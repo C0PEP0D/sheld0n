@@ -50,7 +50,7 @@ def main():
     # remove symbolic link
     os.unlink("learn")
     # print
-    print('WARNING: This case is designed for the evaluation of a neural network learn using the rl_tgv case.\n         To do so, copy the files in "param/learn/neural_network/data" from the rl_tgv case to this one after the reinforcement learning process ended.\n         Make sure the environment parameters from the rl_tgv case are the same (in particular the agent\'s swimming velocity) as this one before running the evaluation.')
+    print('WARNING: This case is designed for the evaluation of a neural network learnt using the rl_tgv case.\n         To do so, copy the files in "param/learn/neural_network/data" from the rl_tgv case to this one after the reinforcement learning process ended.\n         Make sure the environment parameters from the rl_tgv case are the same (in particular the agent\'s swimming velocity) as this one before running the evaluation.')
 
 if __name__ == '__main__':
     main()

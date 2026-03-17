@@ -39,7 +39,8 @@ def run(args):
 
 def main():
     parser = argparse.ArgumentParser(description='remove equations')
-    parser.add_argument('equations', nargs='+', choices=[equation for equation in os.listdir(".") if os.path.isdir(equation)], help='select the equations to remove')
+    # parser.add_argument('equations', nargs='+', choices=[equation for equation in os.listdir(".") if os.path.isdir(equation)], help='select the equations to remove')
+    parser.add_argument('equations', nargs='+', help='select the equations to remove')
     args = parser.parse_args()
     # run
     run(args)

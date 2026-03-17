@@ -17,6 +17,7 @@ def set_solutions_rl_swimmer():
     os.system('./.cli_create_new_equation rl_swimmer')
     os.chdir('rl_swimmer')
     os.system('./.cli_choose cpp_rl_swimmer')
+    os.chdir('..')
     os.system('./.cli_remove_equation passive_particles')
     os.chdir('..')
     os.chdir('../..')
