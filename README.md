@@ -147,7 +147,7 @@ or
 
 ### Quick start
 
-
+https://github.com/user-attachments/assets/dbbcb0be-aca8-4aa2-aaf7-2245ea387927
 
 * Go to the `cases` directory.
 * Execute the `generate_new_case` script and provide a name for your new case using the **name** argument. 
@@ -172,6 +172,8 @@ Further post processing can be done using the others scripts in that directory.
 Feel free to **edit these scripts** at your convenience and **create your own post processing** scripts.
 
 ### Editing simulation parameters
+
+https://github.com/user-attachments/assets/b51b8889-067d-4924-b1ff-880fe26c65c0
 
 All parameters are included in the `param` directory.
 * all files `parameters.h` contain parameters that can be edited.
