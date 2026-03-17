@@ -35,73 +35,74 @@ To perform this parametric study, the script `param/solutions/batch_copy_equatio
 ## Creating a batch of surfers
 
 Let's first create a new case.
-```sh
-$ cd cases/
-$ ./generate_new_case case_03
-$ cd case_03/
+```
+Move to the cases directory.
+Execute the generate_new_case script and create a new case named case_03.
+Move to the newly created case_03 directory.
 ```
 We can then add some surfers into it.
-```sh
-$ cd param/solutions
-$ ./create_new_equation surfers
 ```
-Remember that despite their name, all particles newly added to the simulation have a default behavior of passive particles.
-To change this behavior, we need to *choose* that behavior.
-```sh
-$ cd surfers
-$ ./choose surfers
+Move to the params/solutions directory.
+Execute the create_new_equation script with the name surfers and choose cpp_surfers.
 ```
 Feel free to open and look at the `parameters.h` file to see how the surfing strategy is implemented.
 By default the swimming velocity is set to `0.5` and the time horizon to `0.5` too.
 
 These values are good enough however we would like to explore various values of these parameters.
 And here comes the `batch_copy_equation` script to help us.
-Try executing the following command.
 ```sh
-$ cd ..
-$ ./batch_copy_equation surfers -p TimeHorizon -v 0.0 0.25 0.5 0.75 1.0 1.25 1.5 1.75 2.0
+Execute the batch_copy_equation script.
+Specify surfers as the sources.
+Specify TimeHorizon as the property.
+Specify 0.0 0.25 0.5 0.75 1.0 1.25 1.5 1.75 2.0 as values.
+Leave the factor field empty.
 ```
-The commands states to copy the **surfers** and in each copy, to change the parameter (`-p`) **TimeHorizon** with a value among (`-v`)
-**0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0**.
-Checkout the content of the solutions directory now.
-```sh
-$ ls
-batch_copy_equation  parameters.h       rename_equation            surfers__TimeHorizon_0o25  surfers__TimeHorizon_1o00  surfers__TimeHorizon_1o75
-copy_equation        passive_particles  surfers                    surfers__TimeHorizon_0o50  surfers__TimeHorizon_1o25  surfers__TimeHorizon_2o00
-create_new_equation  remove_equation    surfers__TimeHorizon_0o00  surfers__TimeHorizon_0o75  surfers__TimeHorizon_1o50
-```
-A whole lot new *surfers* have appeared. 
+The commands states to copy the **surfers** and in each copy, to change the parameter (`-p`) **TimeHorizon** with a value among (`-v`) **0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0**.
+Checkout the content of the solutions directory now and you'll see a bunch of new directories corresponding to just that.
+
 You can make sure that the parameter `TimeHorizon` has correctly been change in their `parameters.h` files.
 
 We won't be needing the original `surfers` so let's just remove them from the simulation.
 ```sh
-$ ./remove_equation surfers
+Execute the remove_equation script and specify the surfers.
 ```
 > [!CAUTION]
-> Make sure to use the `remove_equation` script to remove particles otherwise you might corrupt the `param/solutions/parameters.h` file.
+> Make sure to use the `remove_equation` script to remove particles rather than manually deleting the directory, otherwise you might corrupt the `param/solutions/parameters.h` file.
 
 Once this is done, one can then use again the `batch_copy_equation` to vary the **SwimmingVelocity** parameter.
-```sh
-$ ./batch_copy_equation surfers__* -p SwimmingVelocity -v 0.25 0.5 1.0
+
+```
+Execute the batch_copy_equation script.
+Use surfers__* as source.
+Use SwimmingVelocity as property.
+Use 0.25 0.5 1.0 as values.
 ```
 
 Again, you'll see a whole lot more surfers appear as the swimming speed has been changed for each value of the time horizon.
 Similarly, we can now delete the original surfers as they won't be needed anymore.
 
-```sh
-$ ./remove_equation surfers__TimeHorizon_0o00 surfers__TimeHorizon_0o25 surfers__TimeHorizon_0o50 surfers__TimeHorizon_0o75 surfers__TimeHorizon_1o00 surfers__TimeHorizon_1o25 surfers__TimeHorizon_1o50 surfers__TimeHorizon_1o75 surfers__TimeHorizon_2o00
 ```
+Execute the remove_equation script.
+Use surfers__TimeHorizon_0o00 surfers__TimeHorizon_0o25 surfers__TimeHorizon_0o50 surfers__TimeHorizon_0o75 surfers__TimeHorizon_1o00 surfers__TimeHorizon_1o25 surfers__TimeHorizon_1o50 surfers__TimeHorizon_1o75 surfers__TimeHorizon_2o00 as equations.
+```
+
 It is now time to run the simulation.
-```sh
-$ cd ../..
-$ ./run; ./post
+```
+Move back to the root case and execute the run script.
 ```
 We can then get to the post processing to see the results.
-```sh
-$ cd post_process
-$ ./generate_trajectory_animation.py -e passive_particles surfers__TimeHorizon_0o00__SwimmingVelocity_0o50 surfers__TimeHorizon_0o50__SwimmingVelocity_0o50
 ```
-Rather than including all particles in the plot, we focus on passive_particles and two specific time horizons at $V_{\mathrm{swim}} = 0.5$.
+Move to the post_process directory.
+```
+
+Rather than including all particles in our trajectory animation, we would like to focus on passive_particles and two specific time horizons at $V_{\mathrm{swim}} = 0.5$.
+
+To do so open the `generate_trajectory_animation_2d.py` and define the equations to be post processed as follows:
+
+```python
+default_equation_list = [passive_particles, surfers__TimeHorizon_0o00__SwimmingVelocity_0o50, surfers__TimeHorizon_0o50__SwimmingVelocity_0o50]
+```
+You can then generate the animation by executing the `run_post_process` script.
 
 ## Post processing
 
@@ -179,11 +180,13 @@ In particular for the smallest swimming velocity, you may notice that the result
 If you'd like to obtain converge results, you'll have to increase the number of particles in your simulation.
 To do so, you may just increase the value of the `cGroupSize` parameter in he `param/parameters.h` file.
 
-You can then run again the simulation and seen how the results changed.
+You can then run again the simulation and seen how the results change.
 
 > [!NOTE]
 > Make sure to clean the simulation before running it again using the `clean_time` script.
 
 ## Next tutorial
 
-That's the end of this tutorial and all tutorials for now.
+That's the end of this tutorial. 
+In the next tutorial [04-reinforcement-learning.md](04-reinforcement-learning.md), 
+you'll learn how to use basic reinforcement learning to solve a navigation problem.

@@ -66,6 +66,8 @@ brew reinstall python3 && brew install tbb git cmake ffmpeg`
 
 ### Installing
 
+https://github.com/user-attachments/assets/96869fd2-be48-4ff0-84a1-04b15897d1ac
+
 The following command will create a python virtual environment to encapsulate all python dependencies,
 then clone the sheld0n project and move into its directory.
 
@@ -145,6 +147,8 @@ or
 
 ### Quick start
 
+https://github.com/user-attachments/assets/dbbcb0be-aca8-4aa2-aaf7-2245ea387927
+
 * Go to the `cases` directory.
 * Execute the `generate_new_case` script and provide a name for your new case using the **name** argument. 
 
@@ -168,6 +172,8 @@ Further post processing can be done using the others scripts in that directory.
 Feel free to **edit these scripts** at your convenience and **create your own post processing** scripts.
 
 ### Editing simulation parameters
+
+https://github.com/user-attachments/assets/b51b8889-067d-4924-b1ff-880fe26c65c0
 
 All parameters are included in the `param` directory.
 * all files `parameters.h` contain parameters that can be edited.
@@ -196,6 +202,15 @@ The script can search for any occurrences of a parameter and edit it.
 > Using `set_parameters.py` edits directly the `parameters.h` files in the parameter tree. 
 > If not used correctly, in case of name collision, it can completely corrupt the simulation case.
 > If you are not sure of its usage, make sure to copy and save your simulation case before executing the script.
+
+### Restarting a simulation
+
+If a simulation stoped before it has ended and you run it again using the `run` script, the simulation will restart from the point it stopped using the data stored in the `time` and `post_process/time` directories.
+Therefore if you changed simulation parameters and would like to run again a simulation from the start, you will have to delete the `time` directories.
+To do so just run the `clean_time` script before running the `run` script.
+
+In some specific cases, you would also like the compilation to restart from the start too. 
+In that case, run the `clean_build` script.
 
 ### Advance usage
 
