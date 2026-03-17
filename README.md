@@ -66,7 +66,7 @@ brew reinstall python3 && brew install tbb git cmake ffmpeg`
 
 ### Installing
 
-
+https://github.com/user-attachments/assets/96869fd2-be48-4ff0-84a1-04b15897d1ac
 
 The following command will create a python virtual environment to encapsulate all python dependencies,
 then clone the sheld0n project and move into its directory.
