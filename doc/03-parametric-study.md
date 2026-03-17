@@ -187,4 +187,6 @@ You can then run again the simulation and seen how the results change.
 
 ## Next tutorial
 
-That's the end of this tutorial and all tutorials for now.
+That's the end of this tutorial. 
+In the next tutorial [04-reinforcement-learning.md](04-reinforcement-learning.md), 
+you'll learn how to use basic reinforcement learning to solve a navigation problem.
