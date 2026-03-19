@@ -1,6 +1,7 @@
 # Reinforcment Learning
 
-The code includes a very basic interface for reinforcement learning applications based on [rl-tools](https://github.com/rl-tools/rl-tools).
+The code includes a very basic interface for reinforcement learning applications based on [rl-tools](https://github.com/rl-tools/rl-tools). 
+This interface is at a proof of concept state but can already by used to solve simple navigation problems.
 This tutorial covers running and evaluating the performance of an agent that tries to solve the upward swimming problem introduced in the [Surfing on Turbulence](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.129.064502) paper.
 
 ## Table of Contents
