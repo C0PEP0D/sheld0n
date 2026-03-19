@@ -24,7 +24,18 @@ class Solutions {
 		// ---------------- INIT
 
 		void init() {
+			// init
 			tParameters::init(stateArray);
+			// prepare
+			std::vector<double*> pStateArray(stateArray.size());
+			std::vector<unsigned int> stateSizeArray(stateArray.size());
+			for(unsigned int index = 0; index < stateArray.size(); ++index) {
+				pStateArray[index] = stateArray[index].data();
+				stateSizeArray[index] = stateArray[index].size();
+			}
+			tParameters::prepare(pStateArray.data(), stateSizeArray.data(), pStateArray.size(), 0.0);
+			// constrain
+			tParameters::constrain(stateArray, 0.0);
 		}
 
 		// ---------------- STEP

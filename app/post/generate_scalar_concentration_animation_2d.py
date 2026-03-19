@@ -53,7 +53,7 @@ def parse():
     parser.add_argument('--step', '-s', type=int, default=default_step, help='animation frame step')
     parser.add_argument('--xlim', '-x', type=float, nargs=2, default=default_xlim, help='axis x lim')
     parser.add_argument('--ylim', '-y', type=float, nargs=2, default=default_ylim, help='axis y lim')
-    parser.add_argument('--flat', '-f', action='store_true', help='animation in 2D (top-view)')
+    parser.add_argument('--three-d', '-t', action='store_true', help='animation in 3D')
     return parser.parse_args()
 
 def log_tick_formatter(val, pos=None):
@@ -99,15 +99,14 @@ def main():
         passive_scalar_pos_0_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_0", time_dir_array)
         passive_scalar_pos_1_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_1", time_dir_array)
         passive_scalar_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, passive_scalar_name + ".*__c", time_dir_array)
-        # c_max, c_min
-        c = [_c for cc in passive_scalar_c_over_time[passive_scalar_name] for _c in cc if _c > 0.0]
-        c_max = max(c_max, np.array(c).max())
-        c_min = min(c_min, np.array(c).min())
+        # c_min, c_max
+        c = np.concatenate(passive_scalar_c_over_time[passive_scalar_name])
+        c_min = min(c_min, c.min())
+        c_max = max(c_max, c.max())
     # normalize
     for passive_scalar_name in passive_scalar_list:
         passive_scalar_c_over_time[passive_scalar_name] = [np.array(c)/c_max for c in passive_scalar_c_over_time[passive_scalar_name]]
     c_min /= c_max
-
 
 
 
@@ -126,7 +125,7 @@ def main():
     if args.ylim:
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
     # pane color
-    if args.flat:
+    if not args.three_d:
         art_ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     # plot the data
     print("INFO: Plotting...", flush=True)
@@ -145,18 +144,18 @@ def main():
             legend_handles.append(art)
         # passive scalar
         for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
-            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], passive_scalar_c_over_time[passive_scalar_name][time_index], c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap, norm=colors.Normalize(vmin=c_min, vmax=1.0), label=passive_scalar_name)
+            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], passive_scalar_c_over_time[passive_scalar_name][time_index], c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap, norm=colors.Normalize(vmin=0.0, vmax=1.0), label=passive_scalar_name)
             artists[-1].append(art)
             legend_handles.append(art)
     # top-down view if necessary
-    if args.flat:
+    if not args.three_d:
         art_ax.view_init(90, -90)
         art_ax.set_zticks([])
         art_ax.set_zlabel("")
     # adjust the legend
     art_ax.legend(handles=legend_handles, loc='upper right', frameon=True)
     # adjust the color bar
-    cbar = art_fig.colorbar(cm.ScalarMappable(norm=colors.Normalize(vmin=c_min, vmax=1.0), cmap=cmap), ax=art_ax)
+    cbar = art_fig.colorbar(cm.ScalarMappable(norm=colors.Normalize(vmin=0.0, vmax=1.0), cmap=cmap), ax=art_ax)
     cbar.ax.tick_params(axis='y')
     cbar.ax.set_yticklabels(cbar.ax.get_yticklabels())
     cbar.set_label(r"$c / c_{\mathrm{max}}$")
@@ -164,14 +163,14 @@ def main():
     art_fig.tight_layout()
     print("INFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
-    if args.flat:
-        anim.save("scalar_concentration_animation_flat.mp4")
-        # figure
-        art_fig.savefig("scalar_concentration_flat__t_{}.pdf".format(str(time_array[-1]).replace(".", "o"))) 
-    else:
+    if not args.three_d:
         anim.save("scalar_concentration_animation.mp4")
         # figure
-        art_fig.savefig("scalar_concentration__t_{}.pdf".format(str(time_array[-1]).replace(".", "o")))  
+        art_fig.savefig("scalar_concentration__t_{}.pdf".format(str(time_array[-1]).replace(".", "o"))) 
+    else:
+        anim.save("scalar_concentration_animation_3d.mp4")
+        # figure
+        art_fig.savefig("scalar_concentration_3d__t_{}.pdf".format(str(time_array[-1]).replace(".", "o")))  
 
 
 
@@ -191,7 +190,7 @@ def main():
     if args.ylim:
         art_ax.set_ylim(args.ylim[0], args.ylim[1])
     # pane color
-    if args.flat:
+    if not args.three_d:
         art_ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
     # plot data
     print("INFO: Plotting...", flush=True)
@@ -214,7 +213,7 @@ def main():
             artists[-1].append(art)
             legend_handles.append(art)
     # top-down view if necessary
-    if args.flat:
+    if not args.three_d:
         art_ax.view_init(90, -90)
         art_ax.set_zticks([])
         art_ax.set_zlabel("")
@@ -231,14 +230,14 @@ def main():
     art_fig.tight_layout()
     print("INFO: Animating and Saving...", flush=True)
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
-    if args.flat:
-        anim.save("scalar_concentration_animation_log_scale_flat.mp4")
-        # figure
-        art_fig.savefig("scalar_concentration_log_flat__t_{}.pdf".format(str(time_array[-1]).replace(".", "o")))
-    else:
+    if not args.three_d:
         anim.save("scalar_concentration_animation_log_scale.mp4")
         # figure
         art_fig.savefig("scalar_concentration_log__t_{}.pdf".format(str(time_array[-1]).replace(".", "o")))
+    else:
+        anim.save("scalar_concentration_animation_log_scale_3d.mp4")
+        # figure
+        art_fig.savefig("scalar_concentration_log_3d__t_{}.pdf".format(str(time_array[-1]).replace(".", "o")))
 
 if __name__ == '__main__':
     main()

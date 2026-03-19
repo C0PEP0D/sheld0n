@@ -101,15 +101,14 @@ def main():
         passive_scalar_pos_1_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_1", time_dir_array)
         passive_scalar_pos_2_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, ".*__pos_2", time_dir_array)
         passive_scalar_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, passive_scalar_name + ".*__c", time_dir_array)
-        # c_max, c_min
-        c = [_c for cc in passive_scalar_c_over_time[passive_scalar_name] for _c in cc if _c > 0.0]
-        c_max = max(c_max, np.array(c).max())
-        c_min = min(c_min, np.array(c).min())
+        # c_max
+        c = np.concatenate(passive_scalar_c_over_time[passive_scalar_name])
+        c_min = min(c_min, c.min())
+        c_max = max(c_max, c.max())
     # normalize
     for passive_scalar_name in passive_scalar_list:
         passive_scalar_c_over_time[passive_scalar_name] = [np.array(c)/c_max for c in passive_scalar_c_over_time[passive_scalar_name]]
     c_min /= c_max
-
 
 
 
@@ -146,13 +145,13 @@ def main():
             legend_handles.append(art)
         # passive scalar
         for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
-            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], passive_scalar_pos_2_over_time[passive_scalar_name][time_index], c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap, norm=colors.Normalize(vmin=c_min, vmax=1.0), label=passive_scalar_name)
+            art = art_ax.scatter(passive_scalar_pos_0_over_time[passive_scalar_name][time_index], passive_scalar_pos_1_over_time[passive_scalar_name][time_index], passive_scalar_pos_2_over_time[passive_scalar_name][time_index], c=passive_scalar_c_over_time[passive_scalar_name][time_index], cmap=cmap, norm=colors.Normalize(vmin=0.0, vmax=1.0), label=passive_scalar_name)
             artists[-1].append(art)
             legend_handles.append(art)
     # adjust the legend
     art_ax.legend(handles=legend_handles, loc='upper right', frameon=True)
     # adjust the color bar
-    cbar = art_fig.colorbar(cm.ScalarMappable(norm=colors.Normalize(vmin=c_min, vmax=1.0), cmap=cmap), ax=art_ax)
+    cbar = art_fig.colorbar(cm.ScalarMappable(norm=colors.Normalize(vmin=0.0, vmax=1.0), cmap=cmap), ax=art_ax)
     cbar.ax.tick_params(axis='y')
     cbar.ax.set_yticklabels(cbar.ax.get_yticklabels())
     cbar.set_label(r"$c / c_{\mathrm{max}}$")

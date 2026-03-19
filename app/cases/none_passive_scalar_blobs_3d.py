@@ -28,9 +28,13 @@ def set_solutions():
     os.chdir('..')
     os.chdir('../..')
     # set parameters
-    os.system('./.cli_set_parameter param/solutions/reference IsSplitting false') # removing splitting for the reference
-    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingConcentrationOnGrid true') # activate profile post processing
-    os.system('./.cli_set_parameter param/solutions/reference IsPostProcessingConcentrationOnGrid true') # activate profile post processing
+    os.system('./.cli_set_parameter param/solutions/reference HasInit true')
+    os.system('./.cli_set_parameter param/solutions/reference IsSplitting false')
+    os.system('./.cli_set_parameter param/solutions/reference IsPostProcessingConcentrationOnGrid true')
+    os.system('./.cli_set_parameter param/solutions/reference InitS "tSpaceVector({1.0e-1, 1.0e-1, 1.0e-1}).asDiagonal()"')
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs HasInit true')
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingConcentrationOnGrid true')
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs InitS "tSpaceVector({1.0e-1, 1.0e-1, 1.0e-1}).asDiagonal()"')
 
 def main():
     set_flow()
@@ -51,7 +55,6 @@ def main():
     shutil.copy(code_dir + "/app/post/plot_cmax_over_time.py", "post_process/plot_cmax_over_time.py")
     shutil.copy(code_dir + "/app/post/generate_scalar_concentration_animation_3d.py", "post_process/generate_scalar_concentration_animation_3d.py")
     shutil.copy(code_dir + "/app/post/generate_profile_c_animation.py", "post_process/generate_profile_c_animation.py")
-    shutil.copy(code_dir + "/app/post/plot_profile_c_moments_over_time.py", "post_process/plot_profile_c_moments_over_time.py")
     # remove symbolic link
     os.unlink("learn")
     shutil.rmtree("param/learn")

@@ -183,6 +183,8 @@ class Bin {
 					ijk[i] = ((ijk[i] % n) + n) % n;  // safe modulo
 
 					ijk[i] += periodOffset[i];
+				} else {
+					ijk[i] = pIjk[i];
 				}
 			}
 			return ijk;

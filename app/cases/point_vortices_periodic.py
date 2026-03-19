@@ -22,8 +22,8 @@ def set_flow_point_vortices():
     os.chdir('../..')
     # parameters
     ## param
-    os.system('./.cli_set_parameter param cLength 1.0')
-    os.system('./.cli_set_parameter param cTime 1.0')
+    os.system('./.cli_set_parameter param cLength "std::sqrt(1.0 / (cGroupSize * cGroupSize))"')
+    os.system('./.cli_set_parameter param cTime 1.0/16.0')
     os.system('./.cli_set_parameter param cDomainSize "{1.0, 1.0}"')
     os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{true, true}"')
     ## run

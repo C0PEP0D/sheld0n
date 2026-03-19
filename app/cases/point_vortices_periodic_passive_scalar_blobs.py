@@ -23,8 +23,8 @@ def set_flow_point_vortices_periodic():
     # parameters
     os.system('./.cli_set_parameter param/solutions/point_vortices InitCirculation "16.0/InitNumber"')
     ## param
-    os.system('./.cli_set_parameter param cLength 1.0')
-    os.system('./.cli_set_parameter param cTime 1.0')
+    os.system('./.cli_set_parameter param cLength "std::sqrt(1.0 / (cGroupSize * cGroupSize))"')
+    os.system('./.cli_set_parameter param cTime 1.0/16.0')
     os.system('./.cli_set_parameter param cDomainSize "{1.0, 1.0}"')
     os.system('./.cli_set_parameter param cDomainIsAxisPeriodic "{true, true}"')
     ## run
@@ -42,10 +42,17 @@ def set_solutions():
     # back
     os.chdir('../..')
     # set parameters
+    ## physics
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs Diffusivity 1.0e-16')
-    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs SplitSizeFactor 1e-1')
+    ## init
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs HasInit true')
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs InitS "tSpaceVector({1.0e-2, 1.0e-6}).asDiagonal()"')
-    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs Cth 1.0e-3')
+    ## splitting
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs SplitSizeFactor 4e-1')
+    ## threshold
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs Cth 1.0e-1')
+    ## post process
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingParticles true')
 
 def main():
     set_flow_point_vortices_periodic()
@@ -56,8 +63,8 @@ def main():
     code_dir = script_dir + "/../.."
     ## copy
     shutil.copy(code_dir + "/app/post/plot_cmax_over_time.py", "post_process/plot_cmax_over_time.py")
+    shutil.copy(code_dir + "/app/post/generate_scene_animation_2d.py", "post_process/generate_scene_animation_2d.py")
     shutil.copy(code_dir + "/app/post/generate_scalar_concentration_animation_2d.py", "post_process/generate_scalar_concentration_animation_2d.py")
-    shutil.copy(code_dir + "/app/post/generate_trajectory_animation_2d.py", "post_process/generate_trajectory_animation_2d.py")
     # remove symbolic link
     os.unlink("learn")
     shutil.rmtree("param/learn")

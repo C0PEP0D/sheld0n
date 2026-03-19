@@ -5,6 +5,7 @@
 // std includes
 #include <map>
 #include <iomanip>
+#include <numeric>
 
 // lib includes
 #include "pl0f/scalar_field.h"
@@ -40,12 +41,13 @@ struct _PassiveParticlesParameters {
 	// splitting
 	static const bool IsSplitting = true;
 	
-	inline static const double SplitSizeFactor = 1e-1; // decrease to increase accuracy at the cost of computation time
-	inline static const double SplitDistanceFactor = 2.0/5.0; // must be bigger smaller than 1/2 to avoid concentration increase when splitting, decrease for accuracy at the cost of computation time
+	inline static const double SplitSizeFactor = 4e-1; // decrease to increase accuracy at the cost of computation time
+	inline static const double SplitDistanceFactor = 2.0/5.0; // must be smaller than 1/2 to avoid concentration increase when splitting, decrease for accuracy at the cost of computation time
 
 	inline static const double SplitSize = SplitSizeFactor * EnvParameters::cLength;
 	inline static const double SplitDistance = SplitDistanceFactor * SplitSize;
 	inline static const double MergeDx = SplitDistance / std::sqrt(DIM);
+
 	// concentration threshold (for blob deletion)
 	inline static const double Cth = 1.0e-6;
 	inline static const double Qth = Cth * std::pow(MergeDx, DIM);
@@ -123,15 +125,18 @@ struct _PassiveParticlesParameters {
 			// numerics
 
 			if (IsSplitting) {
-				std::vector<double> newState;
-				newState.reserve(_state.size());
+				const unsigned int N = tBase::groupSize(_state.size());
+				std::vector<std::vector<double>> newStateArray(N);
 
-				for(int index = 0; index < tBase::groupSize(_state.size()); ++index) {
-					double* pMemberState = tBase::state(_state.data(), index);
+				std::vector<unsigned int> indices(N);
+				std::iota(indices.begin(), indices.end(), 0);
+
+				std::for_each(std::execution::par_unseq, indices.cbegin(), indices.cend(), [&_state, &newStateArray](const unsigned int index){
+					const double* pMemberState = tBase::state(_state.data(), index);
 					
-					tView<tSpaceVector> memberX(pMemberState);
-					tView<tSpaceMatrix> memberS(pMemberState + DIM);
-					double& memberQ = pMemberState[DIM + DIM * DIM];
+					const tView<const tSpaceVector> memberX(pMemberState);
+					const tView<const tSpaceMatrix> memberS(pMemberState + DIM);
+					const double memberQ = pMemberState[DIM + DIM * DIM];
 
 					Eigen::SelfAdjointEigenSolver<tSpaceMatrix> solver(memberS);
 					const tSpaceVector eigenValues = solver.eigenvalues();
@@ -164,25 +169,46 @@ struct _PassiveParticlesParameters {
 							// q_0 &= 2^{-n}, \\
 							// q_{k+1} &= q_k \cdot \frac{n - k}{k + 1}
 							// \end{align}
-							std::vector<double> qDistribution(nSplits + 1);
-							// index of largest probability
-						    const unsigned int kMax = nSplits / 2;
-						    // set max probability temporarily to 1.0
-						    qDistribution[kMax] = 1.0;
-						    // fill upwards: q[k+1] = q[k] * (n-k)/(k+1)
-						    for (unsigned int k = kMax; k < nSplits; ++k) {
-						        qDistribution[k + 1] = qDistribution[k] * static_cast<double>(nSplits - k) / static_cast<double>(k + 1);
-						    }
-						    // fill downwards: q[k-1] = q[k] * k / (n-k+1)
-						    for (int k = kMax; k > 0; --k) {
-						        qDistribution[k - 1] = qDistribution[k] * static_cast<double>(k) / static_cast<double>(nSplits - k + 1);
-						    }
-						
-						    // normalize
-						    const double sum = std::accumulate(qDistribution.begin(), qDistribution.end(), 0.0);
-						    for (auto &q : qDistribution) q /= sum;
-						    
-						    // set split state
+
+							const unsigned int kMax = nSplits / 2;
+							const double splitThreshold = Qth / memberQ;
+							
+							std::vector<double> qUpper;
+							const unsigned int estimatedUpperSize = std::min(
+								static_cast<unsigned int>(std::sqrt(nSplits / 4.0) * std::sqrt(-2.0 * std::log(splitThreshold))) + 4, 
+								nSplits - kMax + 1
+							);
+							qUpper.reserve(estimatedUpperSize);
+							qUpper.push_back(1.0);
+
+							// --- upper ---
+							for (unsigned int k = kMax; k < nSplits; ++k) {
+								double next = qUpper.back() * static_cast<double>(nSplits - k) / static_cast<double>(k + 1);
+								if (next < splitThreshold) break;
+								qUpper.push_back(next);
+							}
+
+							const unsigned int upperSize = qUpper.size();
+							unsigned int lowerCount = std::min(upperSize - 1, kMax); // clamp to boundary
+							const unsigned int finalSize = upperSize + lowerCount;
+
+							// --- final ---
+							std::vector<double> qDistribution(finalSize);
+							// --- copy upper ---
+							for (unsigned int i = 0; i < upperSize; ++i) {
+								qDistribution[lowerCount + i] = qUpper[i];
+							}
+							// --- Lower ---
+							for (unsigned int i = 0; i < lowerCount; ++i) {
+								unsigned int k = kMax - i;
+								qDistribution[lowerCount - i - 1] = qDistribution[lowerCount - i] * static_cast<double>(k) / static_cast<double>(nSplits - k + 1);
+							}
+							
+							// normalize
+							const double sum = std::accumulate(qDistribution.cbegin(), qDistribution.cend(), 0.0);
+							for (auto &q : qDistribution) q /= sum;
+							
+							// set split state
 							std::vector<double> newSplitState(tBase::groupSize(splitState.size()) * qDistribution.size() * StateSize);
 							for(unsigned int splitMemberIndex = 0; splitMemberIndex < tBase::groupSize(splitState.size()); ++splitMemberIndex) {
 
@@ -213,9 +239,21 @@ struct _PassiveParticlesParameters {
 							splitState = newSplitState;
 						}
 					}
-					
-					newState.insert(newState.end(), splitState.begin(), splitState.end());
-				}
+
+					newStateArray[index] = splitState;
+				});
+
+				// newState
+
+				std::vector<double> newState;
+				size_t newStateSize = 0;
+				for (const auto& s : newStateArray)
+					newStateSize += s.size();
+				newState.reserve(newStateSize);
+				
+				for (auto& s : newStateArray)
+					newState.insert(newState.end(), s.begin(), s.end());
+				newStateArray.clear();
 				
 				// merge
 
@@ -385,7 +423,7 @@ struct _PassiveParticlesParameters {
 
 	// ---------------- CUSTOM POST PARAMETERS START
 
-	inline static const bool IsPostProcessingParticles = false;
+	inline static const bool IsPostProcessingParticles = true;
 	inline static const bool IsPostProcessingConcentration = true && IsPostProcessingParticles;
 	inline static const bool IsPostProcessingConcentrationOnGrid = true;
 	inline static const unsigned int GridN = 128;
@@ -400,8 +438,13 @@ struct _PassiveParticlesParameters {
 		if(IsPostProcessingParticles) { // particles
 			unsigned int number = tVariable::groupSize(stateSize);
 			unsigned int formatNumber = int(std::log10(number)) + 1;
+
+			std::vector<unsigned int> indices(number);
+			std::iota(indices.begin(), indices.end(), 0);
 			
-			for(unsigned int index = 0; index < number; ++index) {
+			// output
+			std::vector<std::map<std::string, double>> memberOutput(number);
+			std::for_each(std::execution::par_unseq, indices.cbegin(), indices.cend(), [&](const unsigned int index) {
 				const double* pMemberState = tVariable::cState(pState, index);
 				// input
 				const tView<const tSpaceVector> x(pMemberState);
@@ -409,18 +452,23 @@ struct _PassiveParticlesParameters {
 				const double& q = pMemberState[DIM + DIM * DIM];
 				// generate formated index
 				std::ostringstream ossIndex;
-				ossIndex << "passive_scalar_blobs__index_" << std::setw(formatNumber) << std::setfill('0') << index;
+				ossIndex << "passive_particles__index_" << std::setw(formatNumber) << std::setfill('0') << index;
 				// output
 				for(unsigned int i = 0; i < DIM; ++i) {
-					output[ossIndex.str() + "__pos_" + std::to_string(i)] = x[i];
+					memberOutput[index][ossIndex.str() + "__pos_" + std::to_string(i)] = x[i];
 					for(unsigned int j = 0; j < DIM; ++j) {
-						output[ossIndex.str() + "__s_" + std::to_string(i) + "_" + std::to_string(j)] = s(i, j);
+						memberOutput[index][ossIndex.str() + "__s_" + std::to_string(i) + "_" + std::to_string(j)] = s(i, j);
 					}
 				}
-				output[ossIndex.str() + "__c0"] = q / (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(s.determinant()));
+				memberOutput[index][ossIndex.str() + "__c0"] = q / (std::pow(2.0 * M_PI, DIM/2.0) * std::sqrt(s.determinant()));
 				if(IsPostProcessingConcentration) {
-					output[ossIndex.str() + "__c"] = tGroupVariable::c(pState, stateSize, x.data());
+					memberOutput[index][ossIndex.str() + "__c"] = tGroupVariable::c(pState, stateSize, x.data());
 				}
+			});
+
+			// merge output
+			for (auto& o : memberOutput) {
+				output.insert(o.begin(), o.end());
 			}
 		}
 
@@ -429,21 +477,32 @@ struct _PassiveParticlesParameters {
 
 			const double dx = EnvParameters::cDomainSize[0]/GridN;
 			const double dy = EnvParameters::cDomainSize[1]/GridN;
-			
-			for(unsigned int i = 0; i < GridN; ++i) {
-				for(unsigned int j = 0; j < GridN; ++j) {
-					tSpaceVector x = tSpaceVector::Zero();
-					x[0] = -0.5 * EnvParameters::cDomainSize[0] + EnvParameters::cDomainCenter[0] + i * dx;
-					x[1] = -0.5 * EnvParameters::cDomainSize[1] + EnvParameters::cDomainCenter[1] + j * dy;
-					// generate formated i and j
-					std::ostringstream ossIndex;
-					ossIndex << "grid_c__i_" << std::setw(formatNumber) << std::setfill('0') << i << "_j_" << std::setw(formatNumber) << std::setfill('0') << j;
-					// output
-					output[ossIndex.str() + "__x"] = x[0];
-					output[ossIndex.str() + "__y"] = x[1];
-					output[ossIndex.str() + "__c"] = tGroupVariable::c(pState, stateSize, x.data());
-					output[ossIndex.str() + "__n"] = tVariable::groupSize(stateSize);
-				}
+
+			std::vector<unsigned int> gridIndices(GridN * GridN);
+			std::iota(gridIndices.begin(), gridIndices.end(), 0);
+
+			// output
+			std::vector<std::map<std::string, double>> gridOutput(GridN * GridN);
+			std::for_each(std::execution::par_unseq, gridIndices.cbegin(), gridIndices.cend(), [&](const unsigned int index) {
+				const unsigned int i = index / GridN;
+				const unsigned int j = index % GridN;
+				
+				tSpaceVector x = tSpaceVector::Zero();
+				x[0] = -0.5 * EnvParameters::cDomainSize[0] + EnvParameters::cDomainCenter[0] + i * dx;
+				x[1] = -0.5 * EnvParameters::cDomainSize[1] + EnvParameters::cDomainCenter[1] + j * dy;
+				// generate formated i and j
+				std::ostringstream ossIndex;
+				ossIndex << "grid_c__i_" << std::setw(formatNumber) << std::setfill('0') << i << "_j_" << std::setw(formatNumber) << std::setfill('0') << j;
+				// output
+				gridOutput[index][ossIndex.str() + "__x"] = x[0];
+				gridOutput[index][ossIndex.str() + "__y"] = x[1];
+				gridOutput[index][ossIndex.str() + "__c"] = tGroupVariable::c(pState, stateSize, x.data());
+				gridOutput[index][ossIndex.str() + "__n"] = tVariable::groupSize(stateSize);
+			});
+
+			// merge output
+			for (auto& o : gridOutput) {
+				output.insert(o.begin(), o.end());
 			}
 		}
 		

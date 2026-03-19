@@ -50,7 +50,6 @@ def main():
     ## copy
     shutil.copy(code_dir + "/app/post/generate_scalar_concentration_animation_3d.py", "post_process/generate_scalar_concentration_animation_3d.py")
     shutil.copy(code_dir + "/app/post/generate_profile_c_animation.py", "post_process/generate_profile_c_animation.py")
-    shutil.copy(code_dir + "/app/post/plot_profile_c_moments_over_time.py", "post_process/plot_profile_c_moments_over_time.py")
     # remove symbolic link
     os.unlink("learn")
     shutil.rmtree("param/learn")

@@ -99,6 +99,7 @@ def main():
     c_max = 0.0
     for passive_scalar_name in passive_scalar_list:
         passive_scalar_grid_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "grid.*__c", time_dir_array)
+        # c_max
         c = np.concatenate(passive_scalar_grid_c_over_time[passive_scalar_name])
         c_max = max(c_max, c.max())
     for passive_scalar_name in passive_scalar_list:

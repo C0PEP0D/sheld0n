@@ -134,6 +134,7 @@ struct ScalarField {
 			// 0
 			ijkToSuperIndex.emplace_back();
 			superStateArray.emplace_back();
+
 			for (auto const& [ijk, indexes] : binTree.data[0].ijkToIndexes) {
 				// init
 				ijkToSuperIndex[0][ijk] = ijkToSuperIndex[0].size();

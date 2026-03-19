@@ -23,13 +23,18 @@ def set_solutions():
     os.chdir('..')
     os.chdir('../..')
     # set parameters
+    ## physics
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs Diffusivity "1e-3"')
-    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs HasInit true') # activate of init
+    ## init
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs HasInit true')
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs InitX "{M_PI, M_PI}"')
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs InitS "tSpaceVector({5e-1, 5e-3}).asDiagonal()"')
+    ## splitting
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs SplitSizeFactor "1e-1"')
+    ## threshold
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs Cth "1e-5"')
-    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingParticles false')
+    ## post processing
+    os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingParticles true')
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs IsPostProcessingConcentrationOnGrid true')
     os.system('./.cli_set_parameter param/solutions/passive_scalar_blobs GridN 256')
     # batch SplitSizeFactor
@@ -60,6 +65,7 @@ def main():
     ## copy
     shutil.copy(code_dir + "/app/post/plot_cmax_over_time.py", "post_process/plot_cmax_over_time.py")
     shutil.copy(code_dir + "/app/post/generate_scene_animation_2d.py", "post_process/generate_scene_animation_2d.py")
+    shutil.copy(code_dir + "/app/post/generate_scalar_concentration_animation_2d.py", "post_process/generate_scalar_concentration_animation_2d.py")
     shutil.copy(code_dir + "/app/post/comparative_validation_against_dns.py", "post_process/comparative_validation_against_dns.py")
     # remove symbolic link
     os.unlink("learn")

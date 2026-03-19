@@ -56,12 +56,11 @@ struct LearnParameters {
 		static constexpr auto CRITIC_ACTIVATION_FUNCTION = rlt::nn::activation_functions::ActivationFunction::RELU;
 
 		// env parameters
-		static constexpr tIndex N_ENVIRONMENTS = 64;//std::pow(2, 7);
-		static constexpr tIndex ON_POLICY_RUNNER_STEPS_PER_ENV = 64;//std::pow(2, 13);
-		static constexpr tIndex BATCH_SIZE = N_ENVIRONMENTS * ON_POLICY_RUNNER_STEPS_PER_ENV / 16;//std::pow(2, 13);
-		// static constexpr tIndex TOTAL_STEP_LIMIT = 128;//std::pow(2, 24);
+		static constexpr tIndex N_ENVIRONMENTS = 128;
+		static constexpr tIndex ON_POLICY_RUNNER_STEPS_PER_ENV = 128;
+		static constexpr tIndex BATCH_SIZE = N_ENVIRONMENTS * ON_POLICY_RUNNER_STEPS_PER_ENV / 8;
 
-		static constexpr tIndex STEP_LIMIT = 8192 * 2;//TOTAL_STEP_LIMIT/(ON_POLICY_RUNNER_STEPS_PER_ENV * N_ENVIRONMENTS) + 1;
+		static constexpr tIndex STEP_LIMIT = 8192 * 2;
 		static constexpr tIndex EPISODE_STEP_LIMIT = tEnv::EPISODE_STEP_LIMIT;
 
 		// rl orgorithms
@@ -71,9 +70,9 @@ struct LearnParameters {
 		
 		static constexpr bool NORMALIZE_OBSERVATIONS = true;
 		struct PPO_PARAMETERS: rlt::rl::algorithms::ppo::DefaultParameters<tScalar, tIndex, BATCH_SIZE> {
-			static constexpr tScalar ACTION_ENTROPY_COEFFICIENT = 0.1;
+			static constexpr tScalar ACTION_ENTROPY_COEFFICIENT = 0.0;
 			static constexpr tIndex N_EPOCHS = 4;
-			static constexpr tScalar GAMMA = 1.0;
+			static constexpr tScalar GAMMA = 0.99;
 			static constexpr tScalar INITIAL_ACTION_STD = 1.0;
 		};
 	};

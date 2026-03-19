@@ -2,6 +2,8 @@
 
 # command line program
 import argparse
+# math
+import math
 # numpy
 import numpy as np
 # internal modules
@@ -59,22 +61,26 @@ def main(input_begin, input_end):
     time_dir_array, time_array = libpost.get_time()
     time_dir_array, time_array = time_dir_array[input_begin:input_end:1], time_array[input_begin:input_end:1]
     print("INFO: Reading equation property over time...", flush=True)
-    profile_c_x_over_time = {}
-    profile_c_c_over_time = {}
-    profile_c_c_grad_over_time = {}
+    passive_scalar_grid_x_over_time = {}
+    passive_scalar_grid_y_over_time = {}
+    passive_scalar_grid_c_over_time = {}
     c_max = 0.0
     for passive_scalar_name in passive_scalar_list:
-        profile_c_x_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "profile_c__.*__x", time_dir_array)
-        profile_c_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "profile_c__.*__c", time_dir_array)
-        profile_c_c_grad_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "profile_c__.*__cGradient", time_dir_array)
+        passive_scalar_grid_x_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "grid.*__x", time_dir_array)
+        passive_scalar_grid_y_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "grid.*__y", time_dir_array)
+        passive_scalar_grid_c_over_time[passive_scalar_name] = libpost.get_equation_property_over_time(passive_scalar_name, "grid.*__c", time_dir_array)
         # c_max
-        c = [_c for cc in profile_c_c_over_time[passive_scalar_name] for _c in cc if _c > 0.0]
-        c_max = max(c_max, np.array(c).max())
-    # normalizing by c_max
+        c = np.concatenate(passive_scalar_grid_c_over_time[passive_scalar_name])
+        c_max = max(c_max, c.max())
     for passive_scalar_name in passive_scalar_list:
-        profile_c_c_over_time[passive_scalar_name] = [np.array(c)/c_max for c in profile_c_c_over_time[passive_scalar_name]]
-        profile_c_c_grad_over_time[passive_scalar_name] = [np.array(c)/c_max for c in profile_c_c_grad_over_time[passive_scalar_name]]
-
+        passive_scalar_grid_c_over_time[passive_scalar_name] = [c/c_max for c in passive_scalar_grid_c_over_time[passive_scalar_name]]
+    print("INFO: Building Grid...", flush=True)
+    n = math.isqrt(len(passive_scalar_grid_c_over_time[next(iter(passive_scalar_grid_c_over_time))][0]))
+    for passive_scalar_name in passive_scalar_list:
+        for time_index, time in enumerate(time_array):
+            passive_scalar_grid_x_over_time[passive_scalar_name][time_index] = np.array(passive_scalar_grid_x_over_time[passive_scalar_name][time_index]).reshape((n, n))
+            passive_scalar_grid_y_over_time[passive_scalar_name][time_index] = np.array(passive_scalar_grid_y_over_time[passive_scalar_name][time_index]).reshape((n, n))
+            passive_scalar_grid_c_over_time[passive_scalar_name][time_index] = np.array(passive_scalar_grid_c_over_time[passive_scalar_name][time_index]).reshape((n, n))
     print("INFO: Animating c...", flush=True)
     art_fig, art_ax = plt.subplots(figsize=(3.4, 2.6))
     art_ax.set_xlabel(r'$x$')
@@ -85,9 +91,8 @@ def main(input_begin, input_end):
         artists.append([])
         # passive scalar
         for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
-            if profile_c_x_over_time[passive_scalar_name][time_index].size > 0:
-                arts = art_ax.scatter(profile_c_x_over_time[passive_scalar_name][time_index], profile_c_c_over_time[passive_scalar_name][time_index], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
-                artists[-1].append(arts)
+            arts = art_ax.scatter(passive_scalar_grid_x_over_time[passive_scalar_name][time_index][:, n//2], passive_scalar_grid_c_over_time[passive_scalar_name][time_index][:, n//2], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
+            artists[-1].append(arts)
     # legend
     art_ax.legend(handles=artists[-1], loc='upper right', frameon=True)
     art_fig.tight_layout()
@@ -95,31 +100,7 @@ def main(input_begin, input_end):
     anim = animation.ArtistAnimation(art_fig, artists, interval=33)
     anim.save("profile_c_animation.mp4")
     # figure
-    art_fig.savefig("profile_c__t_{}.pdf".format(str(time_array[-1]).replace(".", "o"))) 
-
-    print("INFO: Animating grad...", flush=True)
-    art_fig, art_ax = plt.subplots(figsize=(3.4, 2.6))
-    art_ax.set_xlabel(r'$x$')
-    art_ax.set_ylabel(r'$\left ( \nabla c \right)_x / c_{\mathrm{max}}$')
-    artists = []
-    for time_index, time in enumerate(time_array):
-        # init
-        artists.append([])
-        # passive scalar
-        for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
-            if profile_c_x_over_time[passive_scalar_name][time_index].size > 0:
-                arts = art_ax.scatter(profile_c_x_over_time[passive_scalar_name][time_index], profile_c_c_grad_over_time[passive_scalar_name][time_index], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
-                artists[-1].append(arts)
-                # arts = art_ax.plot(profile_c_x_over_time[passive_scalar_name][time_index], np.gradient(profile_c_c_over_time[passive_scalar_name][time_index], profile_c_x_over_time[passive_scalar_name][time_index]), marker=marker_list[passive_scalar_index % len(marker_list)], color="black", label=passive_scalar_name)
-                # artists[-1] += arts
-    # legend
-    art_ax.legend(handles=artists[-1], loc='upper right', frameon=True)
-    art_fig.tight_layout()
-    # anim
-    anim = animation.ArtistAnimation(art_fig, artists, interval=33)
-    anim.save("profile_grad_animation.mp4")
-    # figure
-    art_fig.savefig("profile_grad__t_{}.pdf".format(str(time_array[-1]).replace(".", "o"))) 
+    art_fig.savefig("profile_c__t_{}.pdf".format(str(time_array[-1]).replace(".", "o")))  
 
 
     print("INFO: Animating c log...", flush=True)
@@ -133,9 +114,8 @@ def main(input_begin, input_end):
         artists.append([])
         # passive scalar
         for passive_scalar_index, passive_scalar_name in enumerate(passive_scalar_list):
-            if profile_c_x_over_time[passive_scalar_name][time_index].size > 0:
-                arts = art_ax.scatter(profile_c_x_over_time[passive_scalar_name][time_index], profile_c_c_over_time[passive_scalar_name][time_index], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
-                artists[-1].append(arts)
+            arts = art_ax.scatter(passive_scalar_grid_x_over_time[passive_scalar_name][time_index][:, n//2], passive_scalar_grid_c_over_time[passive_scalar_name][time_index][:, n//2], marker=marker_list[passive_scalar_index % len(marker_list)], color=color_list[passive_scalar_index % len(color_list)], label=passive_scalar_name)
+            artists[-1].append(arts)
     # legend
     art_ax.legend(handles=artists[-1], loc='lower right', frameon=True)
     art_fig.tight_layout()
