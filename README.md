@@ -61,7 +61,7 @@ sudo apt update && sudo apt install git python-is-python3 python3-venv python3-d
 
 To install those dependencies on MacOS, just execute the following (with **Homebrew** previously installed):
 ```sh
-brew reinstall python3 && brew install tbb git cmake ffmpeg`
+brew reinstall python3 && brew install tbb git cmake ffmpeg virtualenv
 ```
 
 ### Installing
@@ -73,6 +73,12 @@ then clone the sheld0n project and move into its directory.
 
 ```sh
 python -m venv venv-sheld0n && cd venv-sheld0n && git clone https://github.com/C0PEP0D/sheld0n.git && cd sheld0n
+```
+
+or
+
+```sh
+virtualenv venv-sheld0n && cd venv-sheld0n && git clone https://github.com/C0PEP0D/sheld0n.git && cd sheld0n
 ```
 
 Finally pull submodules and install python dependencies by executing the `install-with-gui.py` script.
